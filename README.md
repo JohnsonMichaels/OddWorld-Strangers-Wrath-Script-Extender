@@ -8,6 +8,11 @@ The game never had mods because its `.smb` archive format could be unpacked but
 never repacked, and it had no script hooks. SWSE changes that - it can rewrite
 the game's files *and* inject code at runtime.
 
+### [Join the Discord](https://discord.gg/TWHzP924wE)
+
+Install help, bug reports, and a place to show off what you have built.
+If you release a mod, post it in `#your-mods`.
+
 ---
 
 ## What's in the box
@@ -97,6 +102,23 @@ and creates the `dinput8_real.dll` forward target. Edit the game path at the top
   console-callable. This is the map for building new features.
 - **`FORMAT.md`** - the `.smb` container spec.
 - **`tools/`** - exploration/validation scripts.
+
+---
+
+## Community and support
+
+**Discord: https://discord.gg/TWHzP924wE**
+
+| Channel | For |
+|---|---|
+| `#help-and-install` | Setup problems. Run `selftest` in the in-game console first and post the output - it names the system that broke. |
+| `#bug-reports` | Reproducible bugs. Confirmed ones get logged as GitHub Issues, which is the permanent record. |
+| `#your-mods` | Release and promote your mods. One post per mod. |
+| `#mod-dev` | Building things: engine questions, reverse-engineering, tooling. |
+
+Bugs can also go straight to
+[GitHub Issues](https://github.com/JohnsonMichaels/OddWorld-Strangers-Wrath-Script-Extender/issues)
+if you would rather not use Discord.
 
 ---
 

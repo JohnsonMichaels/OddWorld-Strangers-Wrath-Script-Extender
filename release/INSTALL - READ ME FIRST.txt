@@ -20,6 +20,16 @@ with the game and powers these mods:
     Steef, music, money, and access to 181 of the game's own functions.
 
 
+NEED HELP, OR WANT TO SHOW OFF A MOD?
+-------------------------------------
+  Discord:  https://discord.gg/TWHzP924wE
+
+  #help-and-install  - stuck? run `selftest` in the in-game console
+                       (the ~ key) and post what it says.
+  #your-mods         - release and promote your own mods.
+  #bug-reports       - found something broken? report it here.
+
+
 REQUIREMENTS
 ------------
   * Oddworld: Stranger's Wrath HD (the Steam version).
