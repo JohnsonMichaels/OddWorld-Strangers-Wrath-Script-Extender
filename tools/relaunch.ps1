@@ -1,4 +1,4 @@
-﻿# Restart Stranger's Wrath with the current SWSE build and load the last save.
+# Restart Stranger's Wrath with the current SWSE build and load the last save.
 #
 # The game MUST be started through Launcher.exe - running bin\stranger.exe
 # directly produces a frozen window. The launcher then waits on its PLAY

@@ -1,4 +1,4 @@
-﻿// SWSE â€” Granny 3D animation layer: additive hit reactions.
+// SWSE - Granny 3D animation layer: additive hit reactions.
 //
 // THE GOAL
 //   When a projectile hits an NPC, nudge the bone nearest the impact by a small
@@ -24,7 +24,7 @@
 // WHY THIS FILE SCANS INSTEAD OF HOOKING
 //   The obvious move is to inline-hook granny_world_pose (0x6AD060) and grab the
 //   local pose from its arguments. But a 5-byte JMP patch has to land on whole
-//   instruction boundaries, and we have no disassembler for that address â€”
+//   instruction boundaries, and we have no disassembler for that address -
 //   guessing is precisely what crashed the early graphics pass earlier today.
 //
 //   granny_transform has a very checkable shape instead, so we can FIND poses
@@ -37,7 +37,7 @@
 //                                  = 0x44 (68 bytes)
 //
 //   A run of these, with normalised quaternions and identity scale-shear, is an
-//   extremely distinctive pattern â€” the same value-signature approach that
+//   extremely distinctive pattern - the same value-signature approach that
 //   located the camera frustum.
 
 #include <windows.h>

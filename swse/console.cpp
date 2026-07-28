@@ -1,4 +1,4 @@
-﻿// SWSE Console - in-game dev console rendered by SWSE.
+// SWSE Console - in-game dev console rendered by SWSE.
 //
 // Toggle: the `/~ key (VK_OEM_3). Type a command, Enter runs it, output scrolls
 // in a translucent overlay across the top of the screen. The font is rasterized
@@ -1301,7 +1301,7 @@ static void Cmd_anim(int argc, char** argv) {
 
 // ---- synthetic input ----------------------------------------------------
 // These go through our dinput8 proxy (input.cpp), so they work at the main
-// menu and during cutscenes â€” places where there is no script VM and where
+// menu and during cutscenes - places where there is no script VM and where
 // OS-level injection (SendKeys/keybd_event) fails because the fullscreen
 // window does not reliably hold foreground focus.
 

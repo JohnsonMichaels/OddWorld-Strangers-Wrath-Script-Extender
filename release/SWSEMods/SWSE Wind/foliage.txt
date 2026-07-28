@@ -1,4 +1,4 @@
-﻿# SWSE foliage list - which textures the wind moves.
+# SWSE foliage list - which textures the wind moves.
 # Curated from every alpha-cutout (.tga) texture in the game.
 # Excludes trunks, cacti, particles, terrain grass and non-plant cutouts.
 # Add lines from all_alpha_textures.txt, then run: foliage reload

@@ -1,4 +1,4 @@
-﻿// SWSE â€” DirectInput8 proxy with synthetic key injection.
+// SWSE - DirectInput8 proxy with synthetic key injection.
 //
 // dllmain.cpp used to forward DirectInput8Create straight to the real DLL with
 // a linker pragma, so SWSE never saw a single input call. Here we implement the
@@ -87,7 +87,7 @@ static bool IsKeyboard(void* self) {
 // ---- scheduled key presses ----------------------------------------------
 // A press occupies a time window [downAt, upAt). Windows let a caller lay out
 // "Down now, Down in 400ms, Enter in 800ms" in one call, with no blocking and
-// no per-frame tick â€” the read hook just asks which windows are open right now.
+// no per-frame tick - the read hook just asks which windows are open right now.
 #define MAX_PRESSES 64
 struct Press { DWORD downAt, upAt; BYTE scan; BYTE live; };
 static Press g_press[MAX_PRESSES];
@@ -230,7 +230,7 @@ static HRESULT WINAPI My_CreateDevice(void* self, REFGUID rguid, void** out, LPU
     if (p) o_GetData = (PFN_GetData)p;
 
     char msg[160];
-    wsprintfA(msg, "input: device created (%s) â€” read hooks %s",
+    wsprintfA(msg, "input: device created (%s) - read hooks %s",
               isKbd ? "keyboard" : isMouse ? "mouse" : "other",
               (o_GetState || o_GetData) ? "installed" : "FAILED");
     SWSE_Log(msg);
@@ -594,7 +594,7 @@ void SWSE_InputInstallProbes() {
     // 'agentdebug on' once the focus polling has proven itself.
 
     char msg[220];
-    wsprintfA(msg, "input: probes installed â€” GetAsyncKeyState=%s GetKeyState=%s "
+    wsprintfA(msg, "input: probes installed - GetAsyncKeyState=%s GetKeyState=%s "
                    "GetKeyboardState=%s hwnd=%p",
               o_GetAsyncKeyState ? "yes" : "not-imported",
               o_GetKeyState      ? "yes" : "not-imported",
@@ -687,8 +687,8 @@ extern "C" HRESULT WINAPI DirectInput8Create(HINSTANCE hinst, DWORD ver, REFIID 
                                              LPVOID* out, LPUNKNOWN outer) {
     static PFN_Create real = 0;
     if (!real) {
-        // dinput8_real.dll is already loaded â€” the other exports in dllmain.cpp
-        // still forward to it â€” but resolve by path so we never bind to
+        // dinput8_real.dll is already loaded - the other exports in dllmain.cpp
+        // still forward to it - but resolve by path so we never bind to
         // ourselves if the loader search order ever changes.
         HMODULE m = GetModuleHandleA("dinput8_real.dll");
         if (!m) {
@@ -708,7 +708,7 @@ extern "C" HRESULT WINAPI DirectInput8Create(HINSTANCE hinst, DWORD ver, REFIID 
         void* p = PatchSlot(*out, VT_DI_CREATEDEVICE, (void*)My_CreateDevice);
         if (p) {
             o_CreateDevice = (PFN_CreateDevice)p;
-            SWSE_Log("input: DirectInput8 proxied â€” CreateDevice hooked");
+            SWSE_Log("input: DirectInput8 proxied - CreateDevice hooked");
         }
     }
     return hr;

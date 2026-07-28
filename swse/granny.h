@@ -1,14 +1,14 @@
-﻿// SWSE â€” Granny 3D animation layer (additive hit reactions).
+// SWSE - Granny 3D animation layer (additive hit reactions).
 //
 // See granny.cpp for the full rationale. In short: the game uses RAD's Granny,
 // whose local-pose stage is the natural place to add a small decaying offset to
-// the bone nearest an impact â€” additive feedback rather than a canned reaction
+// the bone nearest an impact - additive feedback rather than a canned reaction
 // animation, so it layers over walking/aiming/idling.
 #pragma once
 
 // Find candidate granny_local_pose arrays by value signature (unit quaternion +
 // near-identity scale-shear). Read-only: nothing is hooked or patched, which is
-// deliberate â€” we have no disassembler to place a safe inline hook on Granny.
+// deliberate - we have no disassembler to place a safe inline hook on Granny.
 // Returns the number written; counts[] receives each run's bone count.
 int  SWSE_GrannyScan(unsigned* addrs, int* counts, int maxOut, int minBones,
                      int wide, int strictScale, int mode);

@@ -76,6 +76,36 @@ STEP 4.  Launch the game (from Steam, normally).
    is running.
 
 
+STEP 5.  OPTIONAL - HD texture pack (needs the 4GB patch).
+   The HD pack (960 textures at 2x) is a separate download because of
+   its size. Get it from the project's GitHub Releases page or the
+   Discord, then:
+
+   1. Unzip it. You get files ending in .oft
+   2. Put them all in:   SWSEMods\SWSE HD\textures
+      (create the "textures" folder if it is not there)
+   3. Run  SWSE_4GB_Patcher.exe  (included in this download) once.
+      WHY: the game is a 32-bit program and Windows only gives it
+      2 GB of memory. Measured in a busy scene, the stock game
+      already uses 1.7 GB, and the HD textures do not fit in what
+      is left - the game would crash on level load. The patcher
+      raises the limit to 4 GB. It backs up your exe first, and
+      running it with  --restore  puts the original back.
+      If your game is under Program Files, right-click it and
+      pick "Run as administrator".
+   4. Launch the game. To check it worked, open the console
+      (~ key) and type:   hd
+      It reports how many textures are installed and how many are
+      already swapped in. The count rises as levels load.
+
+   Your game files are never modified by the textures themselves:
+   delete the .oft files and you are back to vanilla.
+
+   NOTE: Steam's "Verify integrity of game files" replaces the
+   patched exe. If HD textures stop working after a verify, run
+   SWSE_4GB_Patcher.exe again.
+
+
 ================================================================
   USING THE MODS
 ================================================================
@@ -91,8 +121,8 @@ SWSE GRAPHICS
 SWSE CONSOLE
    * Press the  ` / ~  key (top-left of the keyboard) to open/close it.
    * Type a command and press Enter.  Esc closes.  Tab autocompletes.
-   * IMPORTANT - prime it once:  most cheats need a "player context"
-     first. Just PICK UP ANY AMMO in-game once, then the commands work.
+   * The console finds the player on its own. If a command ever says
+     it has no player context, pick up any ammo once and retry.
    * Type  help   to see the built-in commands.
    * Type  list <word>   to search all 181 game functions
        e.g.  list music     list npc     list boat
@@ -115,7 +145,13 @@ SWSE CONSOLE
      - a line with just the mod name  = enabled
      - put "!" in front of the name   = disabled
      - lines starting with "#"        = comments
-   Both mods are enabled by default.
+   Everything is enabled by default.
+
+   The SWSE DLL's own systems (HD textures, foliage wind, hit
+   reactions, graphics, console, AI tuning) are switched on and off
+   in  SWSEModseatures.txt  instead - each one can be disabled
+   individually, and a disabled system leaves the game completely
+   untouched.
 
 
 ================================================================

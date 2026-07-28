@@ -23,7 +23,7 @@ If you release a mod, post it in `#your-mods`.
 | **SWSE** - Stranger's Wrath Script Extender | A DLL that loads with the game (`dinput8` proxy) and powers everything below. Each system can be switched off individually in `SWSEMods\features.txt`. |
 | **SWSE Graphics** | Post-process overhaul: sharpening, bloom, filmic tonemapping, colour grading, ambient occlusion, RTGI, vignette. Press **F10** in-game, **F11** to reload settings live. Only the 3D scene is touched - HUD/menus stay clean. |
 | **SWSE Console** | In-game dev console. Press **` / ~**: god, ammo, heal, transform into Steef, money, level warp, NPC control, plus `list`/`call` access to **181 of the game's own native script functions**. Scriptable from outside the game via `tools/swse.ps1`. |
-| **SWSE HD** | HD texture pack: 960 textures upscaled to 2x, swapped in at GPU upload. The game's archives are never modified. |
+| **SWSE HD** | HD texture pack: 960 textures upscaled to 2x, swapped in at GPU upload. The game's archives are never modified. The pack itself is a separate download (about 200 MB) from the Releases page; it needs the included 4GB patcher, and the INSTALL file walks through both. |
 | **SWSE Wind** | Foliage wind: grass and plants sway, and part around you as you walk through them. Per-plant tuning in `foliage.txt`. |
 | **SWSE Combat** | Additive hit reactions: NPCs flinch from the bone that was actually shot. Per-character tuning in `hitreact.txt` and `characters.txt`. |
 | **AI tuning** | Build your own difficulty: per-character sight, fire rate, accuracy and more via `aiprefs.txt` profiles. Off by default. |
@@ -41,6 +41,9 @@ Grab **`release/`** (or the packaged zip) and follow
 1. Copy the `bin` and `SWSEMods` folders into your Stranger's Wrath game folder.
 2. Double-click `SWSE-install.bat` once.
 3. Launch from Steam. **F10** = graphics, **`** = console.
+4. Optional: for the HD texture pack, download it from the Releases page,
+   unzip into `SWSEMods\SWSE HD\textures\`, and run `SWSE_4GB_Patcher.exe`
+   once. The INSTALL file explains why the patch is needed and how to undo it.
 
 Uninstall = delete `bin\dinput8.dll`, `bin\dinput8_real.dll`, and `SWSEMods`.
 Saves are never touched.

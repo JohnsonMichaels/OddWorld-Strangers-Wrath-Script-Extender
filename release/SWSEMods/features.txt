@@ -1,8 +1,8 @@
-﻿# SWSE â€” feature switches
+# SWSE - feature switches
 #
 # SWSE is several independent systems in one DLL. Turn off anything you do not
 # want. A disabled feature installs NO HOOKS AT ALL, so the game runs as if
-# SWSE never touched it â€” not a hook that runs and returns early.
+# SWSE never touched it - not a hook that runs and returns early.
 #
 # Delete this file (or leave every line `on`) for the full set.
 # Changes take effect on the next launch.
@@ -15,14 +15,14 @@ console    = on
 # Post-process graphics pipeline: RTGI and the other shader passes.
 graphics   = on
 
-# HD texture replacement â€” swaps .oft files in at upload time.
+# HD texture replacement - swaps .oft files in at upload time.
 # Archives are never modified, so this is always safe to turn off.
 hdtextures = on
 
 # Additive hit reactions: NPCs flinch from where they were actually shot.
 hitreact   = on
 
-# Foliage identification and wind â€” gentle sway, and plants pushed aside as
+# Foliage identification and wind - gentle sway, and plants pushed aside as
 # you walk through them.
 foliage    = on
 

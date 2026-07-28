@@ -1,4 +1,4 @@
-// SWSE Script-VM bridge â€” see scriptvm.h + swse/research/SCRIPT_VM.md.
+// SWSE Script-VM bridge - see scriptvm.h + swse/research/SCRIPT_VM.md.
 //
 // The game's script verbs are __cdecl native handlers taking a ScriptContext*
 // as arg0 (for player ops that's effectively the player script object). We
@@ -228,7 +228,7 @@ static void LogS(const char* s) {
 }
 
 // ==========================================================================
-//  POINTER CHAINS â€” the Cheat-Engine-independent path to any value.
+//  POINTER CHAINS - the Cheat-Engine-independent path to any value.
 //
 //  A CE pointer chain like:
 //      "stranger.exe"+0065178C  ->  +0 -> +54 -> +620 -> +1F8 -> +F4 -> +1C -> +70
@@ -239,7 +239,7 @@ static void LogS(const char* s) {
 //  Chains live in SWSEMods\SWSE Console\pointers.txt so new ones can
 //  be added from CE findings WITHOUT rebuilding the DLL:
 //      health = f, 65178C, 0, 54, 620, 1F8, F4, 1C, 70
-//      (name  = type(f|i), baseRVA, offsets...  â€” all hex except the type)
+//      (name  = type(f|i), baseRVA, offsets...  - all hex except the type)
 // ==========================================================================
 #define MAX_CHAIN_OFFSETS 12
 #define MAX_CHAINS        64
@@ -399,7 +399,7 @@ char SWSE_PtrType(int i) {
     return (i >= 0 && i < g_chainCount) ? g_chains[i].type : 'i';
 }
 
-// called every frame â€” reapply frozen chain values
+// called every frame - reapply frozen chain values
 static void ApplyFrozenChains() {
     for (int i = 0; i < g_chainCount; i++) {
         if (!g_chains[i].frozen) continue;
@@ -413,12 +413,12 @@ static void ApplyFrozenChains() {
 }
 
 // ==========================================================================
-//  HEAP DIFF SCANNER â€” find the artifact inventory.
+//  HEAP DIFF SCANNER - find the artifact inventory.
 //
 //  Store purchases never reach the script VM, so no script call can grant an
 //  artifact. The inventory has to be written directly. This snapshots every
 //  writable private heap region, then reports the dwords that changed after
-//  you buy one â€” which is the artifact flag.
+//  you buy one - which is the artifact flag.
 // ==========================================================================
 struct ScanRegion { unsigned char* base; size_t size; unsigned char* copy; };
 static ScanRegion g_scan[512];
@@ -471,9 +471,9 @@ static unsigned g_candVal[4096];
 static int      g_candN = 0;
 
 // Second and later passes: keep only candidates that changed AGAIN (buy
-// another artifact) â€” this is what eliminates timers and frame counters.
+// another artifact) - this is what eliminates timers and frame counters.
 int SWSE_ScanRefine(int mode) {
-    if (!g_candN) { LogS("scan: no candidates yet â€” run scandiff first"); return 0; }
+    if (!g_candN) { LogS("scan: no candidates yet - run scandiff first"); return 0; }
     int kept = 0;
     LogS(mode ? "==== refine: kept (changed again) ===="
               : "==== refine: kept (held steady) ====");
@@ -501,7 +501,7 @@ int SWSE_ScanRefine(int mode) {
 // then this. That function touches only the artifact inventory, so whatever
 // it zeroes IS the inventory.
 int SWSE_ScanCleared(int maxReport) {
-    if (!g_scanN) { LogS("scan: no snapshot â€” run 'scan' first"); return 0; }
+    if (!g_scanN) { LogS("scan: no snapshot - run 'scan' first"); return 0; }
     LogS("==== scan cleared: values wiped to 0 (the inventory) ====");
     g_candN = 0;
     int found = 0;
@@ -529,7 +529,7 @@ int SWSE_ScanCleared(int maxReport) {
     return found;
 }
 
-// Write `value` to every tracked candidate at once â€” if the candidate list is
+// Write `value` to every tracked candidate at once - if the candidate list is
 // the artifact inventory, this grants everything in one go.
 int SWSE_ScanPokeAll(int value) {
     int ok = 0;
@@ -545,7 +545,7 @@ int SWSE_ScanPokeAll(int value) {
 // Report dwords that changed to a small value (an ownership flag going 0->1,
 // or a count incrementing). Logs address + old/new so we can poke it.
 int SWSE_ScanDiff(int maxReport) {
-    if (!g_scanN) { LogS("scan: no snapshot â€” run 'scan' first"); return 0; }
+    if (!g_scanN) { LogS("scan: no snapshot - run 'scan' first"); return 0; }
     LogS("==== scan diff: candidate inventory flags (0->1 first) ====");
     g_candN = 0;
     int found = 0;
@@ -589,12 +589,12 @@ int SWSE_PokeAddr(unsigned addr, int value) {
 }
 
 // ==========================================================================
-//  INVENTORY LOCATOR â€” ask the game where its artifact data is.
+//  INVENTORY LOCATOR - ask the game where its artifact data is.
 //
 //  TakeAllArtifacts (0x5634D0) doesn't use a global; it calls 0x4588A0 twice
 //  to obtain an object, then does  cmp [eax+8],0 / mov eax,[eax] / mov ecx,[eax].
 //  Since SWSE lives in the process we can call that same getter and walk the
-//  structure it returns â€” no memory scanning, no guessing.
+//  structure it returns - no memory scanning, no guessing.
 // ==========================================================================
 #define RVA_InvGetter 0x0588A0
 
@@ -666,20 +666,20 @@ int SWSE_DumpInventory() {
         char b[128];
         wsprintfA(b, "==== inventory getter 0x4588A0 returned %08X ====", a);
         LogS(b);
-        if (!a) { LogS("  null â€” no inventory object right now"); return 0; }
+        if (!a) { LogS("  null - no inventory object right now"); return 0; }
         DumpBlock("object", a, 12);
         // TakeAllArtifacts does: mov eax,[eax]; mov ecx,[eax]
         __try {
             unsigned lvl1 = *(unsigned*)a;
             DumpBlock("[obj]", lvl1, 12);
             // [[obj]] is the PLAYER object: +0x24/+0x28/+0x2C read as a
-            // position vector. Dump it wide â€” artifact state is likely deeper
+            // position vector. Dump it wide - artifact state is likely deeper
             // in this struct than the first 24 dwords.
             unsigned lvl2 = *(unsigned*)lvl1;
             DumpBlock("[[obj]] PLAYER", lvl2, 160);
             // NOTE: +0x1C was briefly suspected to be the inventory (it went
             // null -> pointer when an artifact was acquired) but a later run
-            // with the same artifact read null again â€” it's transient state,
+            // with the same artifact read null again - it's transient state,
             // not the inventory. Left unfollowed deliberately.
             //
             // Instead: snapshot the player object so two runs (with and
@@ -694,7 +694,7 @@ int SWSE_DumpInventory() {
     }
 }
 
-// Dump arbitrary memory â€” for walking the inventory structure by hand.
+// Dump arbitrary memory - for walking the inventory structure by hand.
 int SWSE_DumpAddr(unsigned addr, int dwords) {
     if (addr < 0x10000 || addr >= 0x7F000000) return 0;
     if (dwords < 1) dwords = 16;
@@ -704,14 +704,14 @@ int SWSE_DumpAddr(unsigned addr, int dwords) {
 }
 
 // ==========================================================================
-//  SCRIPT SPY â€” trace the game calling its OWN script functions.
+//  SCRIPT SPY - trace the game calling its OWN script functions.
 //
 //  Rather than guessing how to invoke a handler, watch the interpreter do it.
 //  Each traced function gets a generated stub:
 //        pushad; pushfd; push esp; push index; call SpyLog; add esp,8;
 //        popfd; popad; jmp trampoline
 //  SpyLog receives a pointer to the saved registers, from which the ORIGINAL
-//  stack is at +36 â€” so we can read retBuf/ctx/args exactly as the caller
+//  stack is at +36 - so we can read retBuf/ctx/args exactly as the caller
 //  passed them, and pull the VM's own arguments via ctx->vtable[0x74](n).
 //  Nothing is modified; the original bytes run from the trampoline.
 // ==========================================================================
@@ -846,13 +846,13 @@ int SWSE_SpyStart(int budget) {
     }
     g_spyBudget = budget > 0 ? budget : 200;
     g_spyOn = true;
-    LogS("==== SPY ON â€” play normally; every script call is logged ====");
+    LogS("==== SPY ON - play normally; every script call is logged ====");
     return g_spyN;
 }
 
 void SWSE_SpyStop() {
     g_spyOn = false;
-    LogS("==== SPY OFF â€” hit counts ====");
+    LogS("==== SPY OFF - hit counts ====");
     for (int i = 0; i < g_spyN; i++) {
         char b[128];
         wsprintfA(b, "  %-28s %u call(s)", g_spy[i].name, g_spy[i].hits);
@@ -861,7 +861,7 @@ void SWSE_SpyStop() {
 }
 
 // ==========================================================================
-//  HARDWARE WATCHPOINT â€” "find out what writes to this address".
+//  HARDWARE WATCHPOINT - "find out what writes to this address".
 //
 //  Store purchases bypass the script VM entirely (spy proved it: 0 calls),
 //  so the code that adds an artifact is plain C++ we haven't located. A debug
@@ -1090,7 +1090,7 @@ void SWSE_WatchOff() {
     g_watchAddr = 0;
 }
 
-// Resolve player+0x1C (the inventory head) and watch it â€” the caller doesn't
+// Resolve player+0x1C (the inventory head) and watch it - the caller doesn't
 // need to know the address, which changes every session.
 int SWSE_WatchInventory() {
     __try {
@@ -1107,7 +1107,7 @@ int SWSE_WatchInventory() {
 }
 
 // ==========================================================================
-//  PLAYER FIELDS â€” reached via the getter chain, no priming, no Cheat Engine.
+//  PLAYER FIELDS - reached via the getter chain, no priming, no Cheat Engine.
 //
 //  invdump revealed the layout: at player+0x78 sit three floats reading 300
 //  (the normal-difficulty health the user reported: 600 easy / 300 normal /
@@ -1168,12 +1168,12 @@ int SWSE_PlayerStamina(float* cur, float* mx, float* base) {
 int SWSE_PlayerSetStamina(float v) { return SWSE_PlayerSet(PF_STAMINA, v); }
 
 // ==========================================================================
-//  EXACT VALUE SEARCH â€” far cleaner than diffing.
+//  EXACT VALUE SEARCH - far cleaner than diffing.
 //
 //  Diff scans drowned in noise (60-200 hits of unrelated churn). An exact
 //  match on a number the player can SEE (moolah) gives a handful of hits
-//  instead. Watch that address, buy something, and the purchase code â€” which
-//  also adds the item â€” is what trips the watchpoint.
+//  instead. Watch that address, buy something, and the purchase code - which
+//  also adds the item - is what trips the watchpoint.
 // ==========================================================================
 static unsigned g_hits[64];
 static int      g_hitN = 0;
@@ -1214,7 +1214,7 @@ int SWSE_FindValue(int value, int maxHits) {
 }
 
 // Narrow the previous hits to those now holding `value` (spend some moolah,
-// then re-check) â€” the survivor is the real one.
+// then re-check) - the survivor is the real one.
 int SWSE_FindNarrow(int value) {
     int kept = 0;
     char b[128];
@@ -1240,7 +1240,7 @@ unsigned SWSE_FindHit(int i) {
 }
 
 // ==========================================================================
-//  STORE GRANT PATH â€” how the game itself gives you an item.
+//  STORE GRANT PATH - how the game itself gives you an item.
 //
 //  Found by watchpointing moolah. Buying fires the store UI message
 //  "buy_item" -> dispatcher 0x87880 -> purchase 0x87A20, which deducts moolah
@@ -1270,7 +1270,7 @@ static void* RvaPtr(unsigned r) {
 }
 
 // Resolve the wallet the same way the purchase function does, so it survives
-// save reloads â€” no scanning, no cached addresses.
+// save reloads - no scanning, no cached addresses.
 // Returns the wallet, and optionally the object it was reached through. That
 // object is arg0 of the grant: the cache-hit branch at 0x87D67 calls its
 // virtual slot +0x230 (the wallet getter is +0x234 on the same class).
@@ -1332,10 +1332,10 @@ static char g_itemName[192];
 // The game's string object, recovered from 0x210890 (which allocates exactly
 // 0x10 bytes for one). Every field matters:
 //   +0x00 char* data
-//   +0x08 length INCLUDING the terminator â€” 0x210890 does `mov ecx,[P+8]; dec
+//   +0x08 length INCLUDING the terminator - 0x210890 does `mov ecx,[P+8]; dec
 //         ecx` and skips out when it is 0. Leaving this zero made every lookup
 //         see an empty name, which is what produced blank "blob" items.
-//   +0x0C refcount â€” 0x1CD100 increments it; ==1 means "safe to mutate in
+//   +0x0C refcount - 0x1CD100 increments it; ==1 means "safe to mutate in
 //         place", anything else forces a copy.
 struct NameObj {
     const char* data;      // +0x00
@@ -1351,11 +1351,11 @@ int SWSE_GrantItem(const char* name, int qty, char* msg, int msgLen) {
     char tmp[256];
     void* obj = nullptr;
     void* w = WalletFrom(&obj);
-    if (!w) { lstrcpynA(msg, "no wallet object â€” load a save first", msgLen); return 0; }
+    if (!w) { lstrcpynA(msg, "no wallet object - load a save first", msgLen); return 0; }
 
     // Accept a bare artifact name or an explicit prefs path. Backslashes are
     // what the store actually passes, and using them means 0x210890 finds no
-    // '/' to rewrite â€” so it never tries to reallocate our static buffer.
+    // '/' to rewrite - so it never tries to reallocate our static buffer.
     if (strchr(name, '/') || strchr(name, '\\'))
         lstrcpynA(g_itemName, name, sizeof(g_itemName));
     else
@@ -1380,7 +1380,7 @@ int SWSE_GrantItem(const char* name, int qty, char* msg, int msgLen) {
         // every previously-seen item (e.g. damagestingbee).
         ((TGrantItem)RvaPtr(RVA_GRANT_ITEM))(qty, 0, obj, w, &entry);
     } __except (GrantFilter(GetExceptionInformation(), "grant")) {
-        wsprintfA(tmp, "FAULTED granting %s â€” see log for the fault address", g_itemName);
+        wsprintfA(tmp, "FAULTED granting %s - see log for the fault address", g_itemName);
         lstrcpynA(msg, tmp, msgLen);
         return -2;
     }
@@ -1396,7 +1396,7 @@ int SWSE_GrantItem(const char* name, int qty, char* msg, int msgLen) {
 // genuine store purchase hands to 0x87C80.
 //
 // PLEN = 8: "55 8B EC 83 E4 F8 6A FF" is push ebp(1) + mov ebp,esp(2) +
-// and esp,-8(3) + push -1(2). Copying only 5 would slice the `and` in half â€”
+// and esp,-8(3) + push -1(2). Copying only 5 would slice the `and` in half -
 // the same bug that broke the auto-prime hooks.
 #define GRANT_PLEN 8
 static BYTE* g_grantFn    = nullptr;
@@ -1411,13 +1411,13 @@ static void* g_lastEntry  = nullptr;
 int SWSE_GrantLast(int qty, char* msg, int msgLen) {
     char tmp[200];
     if (!g_lastEntry) {
-        lstrcpynA(msg, "nothing captured yet â€” run grantspy, then buy once", msgLen);
+        lstrcpynA(msg, "nothing captured yet - run grantspy, then buy once", msgLen);
         return 0;
     }
     __try {
         ((TGrantItem)RvaPtr(RVA_GRANT_ITEM))(qty, 0, nullptr, g_lastWallet, g_lastEntry);
     } __except (GrantFilter(GetExceptionInformation(), "grantlast")) {
-        lstrcpynA(msg, "FAULTED replaying the captured call â€” see log", msgLen);
+        lstrcpynA(msg, "FAULTED replaying the captured call - see log", msgLen);
         return -2;
     }
     wsprintfA(tmp, "replayed captured grant x%d (entry %08X)",
@@ -1484,12 +1484,12 @@ int SWSE_GrantSpy(int on) {
     *(DWORD*)(g_grantFn + 1) = (DWORD)((BYTE*)&HookGrant - (g_grantFn + 5));
     for (int i = 5; i < GRANT_PLEN; i++) g_grantFn[i] = 0x90;
     VirtualProtect(g_grantFn, GRANT_PLEN, old, &old);
-    LogS("grant spy: hook installed on 0x87C80 â€” buy something now");
+    LogS("grant spy: hook installed on 0x87C80 - buy something now");
     return 1;
 }
 
 // ==========================================================================
-//  MOTION PREFS â€” jump height, run speed, gravity, air control.
+//  MOTION PREFS - jump height, run speed, gravity, air control.
 //
 //  The game reflects its own fields: each one is registered in .text as
 //      mov eax,"m_name" ; mov [edi],-1 ; call hash ; mov [esi+8],<offset>
@@ -1563,7 +1563,7 @@ static void ScanInstances(InstCache& c, const unsigned* vts, int nvt) {
 }
 
 // onlyMax: write ONLY the instance holding the highest current value, instead
-// of every match. Setting speed on all 94 MotionImpl matches crashed the game â€”
+// of every match. Setting speed on all 94 MotionImpl matches crashed the game -
 // a matching vtable dword does not prove an object, and even the real NPCs did
 // not survive it. One instance is a far smaller thing to be wrong about.
 static int VisitInstances(InstCache& c, const unsigned* vts, int nvt, int off,
@@ -1575,7 +1575,7 @@ static int VisitInstances(InstCache& c, const unsigned* vts, int nvt, int off,
 
     // A dword equal to the vtable is NOT proof of an object: the same pointer
     // appears in other structures and on stacks, and reading a field off one of
-    // those returns garbage. Reject implausible values â€” and crucially, never
+    // those returns garbage. Reject implausible values - and crucially, never
     // WRITE to an entry that fails, or we scribble on unrelated memory.
     // These are motion prefs: heights, speeds, gravity. Nothing is astronomical.
     int hits = 0;
@@ -1608,7 +1608,7 @@ static int VisitInstances(InstCache& c, const unsigned* vts, int nvt, int off,
 // Force a fresh scan (after a level load, when objects have been recreated).
 void SWSE_MotionRescan() { g_inst[0].valid = false; g_inst[1].valid = false; }
 
-// The player OWNS its motion objects â€” no scanning or guessing needed.
+// The player OWNS its motion objects - no scanning or guessing needed.
 // player+0xB0 and player+0x1A4 each hold a MotionImpl pointer (the Stranger
 // and Steef forms, most likely; +0x188 mirrors +0xB0). Scanning for the
 // "fastest instance" was a guess that could just as easily hit an NPC.
@@ -5306,11 +5306,11 @@ static volatile bool g_capLogged = false;
 // [esp+0xC]=arg2.
 //
 // IMPORTANT (from disassembling TakeAllArtifacts/GiveArtifact/HasArtifactCount):
-// the real convention is  handler(retBuf, ctx, args...)  â€” arg0 is a
+// the real convention is  handler(retBuf, ctx, args...)  - arg0 is a
 // caller-allocated RETURN BUFFER (TakeAllArtifacts writes a vtable into it and
 // returns it in eax), and arg1 is the ScriptContext (the one that gets
 // vtable-called at +0x74). We previously captured arg0, i.e. the return
-// buffer, not the context â€” capture BOTH here so the diagnostic can prove
+// buffer, not the context - capture BOTH here so the diagnostic can prove
 // which is which at runtime instead of us guessing from static reads.
 __declspec(naked) static void HookGiveAmmo() {
     __asm {
@@ -5319,9 +5319,9 @@ __declspec(naked) static void HookGiveAmmo() {
         mov eax, [esp+8]        // arg1 (ScriptContext, per disassembly)
         mov g_capA1, eax
         mov g_ctx, eax          // <-- use arg1 as the context now
-        mov eax, [esp+0Ch]      // arg2 (first real script arg â€” the String)
+        mov eax, [esp+0Ch]      // arg2 (first real script arg - the String)
         mov g_capA2, eax
-        mov eax, [esp+10h]      // arg3 (second script arg â€” the int count)
+        mov eax, [esp+10h]      // arg3 (second script arg - the int count)
         mov g_capA3, eax
         mov eax, [esp+14h]      // arg4 (spare, to see the pattern)
         mov g_capA4, eax
@@ -5333,7 +5333,7 @@ static void InstallCapture() {
     g_giveAmmo = (BYTE*)Addr(RVA_GiveAmmo);
     // sanity: expect 51 8b 44 24 0c
     if (!(g_giveAmmo[0] == 0x51 && g_giveAmmo[1] == 0x8B)) {
-        LogS("scriptvm: GiveAmmo prologue mismatch â€” capture NOT installed");
+        LogS("scriptvm: GiveAmmo prologue mismatch - capture NOT installed");
         return;
     }
     // trampoline: 5 original bytes + jmp to GiveAmmo+5
@@ -5352,16 +5352,16 @@ static void InstallCapture() {
 
 // ---- additional capture hooks: don't make the user hunt for ammo. --------
 // GetHealth/GetStamina/GetMoolah are polled by the HUD every frame, so
-// hooking them too means priming happens the instant a save loads â€” no
+// hooking them too means priming happens the instant a save loads - no
 // player action needed. Whichever fires first wins (first come, first
 // captured); g_ctx just needs to be A valid live ctx, not a specific one.
 // PLEN = full instruction-aligned copy length (NOT just 5). The JMP patch
 // itself only overwrites 5 bytes at the hook site, but the TRAMPOLINE must
-// replay whole, uncut instructions â€” copying exactly 5 bytes is only safe
+// replay whole, uncut instructions - copying exactly 5 bytes is only safe
 // when a 5-byte boundary happens to land on a real instruction edge (true
 // for GiveAmmo's "51 8B44240C" = 1+4 bytes). GetHealth/GetStamina's
 // "6AFF 6889C17000" = 2+5 bytes needs PLEN=7; GetMoolah's "51 C704240000000" =
-// 1+7 needs PLEN=8. Copying only 5 there would slice a push-imm32 in half â€”
+// 1+7 needs PLEN=8. Copying only 5 there would slice a push-imm32 in half -
 // exactly the bug that broke priming: those hooks fire every frame, so the
 // corrupted trampoline ran constantly.
 #define DEFINE_CAPTURE_HOOK(NAME, RVA, B0, B1, PLEN)                        \
@@ -5376,7 +5376,7 @@ static void InstallCapture() {
     static void InstallCapture##NAME() {                                    \
         g_##NAME = (BYTE*)Addr(RVA);                                        \
         if (!(g_##NAME[0] == B0 && g_##NAME[1] == B1)) {                    \
-            LogS("scriptvm: " #NAME " prologue mismatch â€” hook NOT installed"); \
+            LogS("scriptvm: " #NAME " prologue mismatch - hook NOT installed"); \
             return;                                                         \
         }                                                                   \
         g_##NAME##Tramp = (BYTE*)VirtualAlloc(NULL, 32, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE); \
@@ -5423,7 +5423,7 @@ __declspec(naked) static void HookGiveArtifact() {
 static void InstallGiveArtifactCapture() {
     g_giveArt = (BYTE*)Addr(RVA_GiveArtifact);
     if (!(g_giveArt[0] == 0x55 && g_giveArt[1] == 0x8B && g_giveArt[2] == 0xEC)) {
-        LogS("scriptvm: GiveArtifact prologue mismatch â€” capture NOT installed");
+        LogS("scriptvm: GiveArtifact prologue mismatch - capture NOT installed");
         return;
     }
     g_giveArtTramp = (BYTE*)VirtualAlloc(NULL, 32, MEM_COMMIT | MEM_RESERVE,
@@ -5501,7 +5501,7 @@ void SWSE_ScriptVMInit() {
             SWSE_NpcRoutineSpy(1);                    // tuning applies from the hook
         }
     }
-    // GetHealth/GetStamina/GetMoolah hooks install cleanly but NEVER fire â€”
+    // GetHealth/GetStamina/GetMoolah hooks install cleanly but NEVER fire -
     // the HUD reads these values directly in C++, not through the script-VM
     // entry points. Disabled; GiveAmmo (an actual ammo pickup) remains the
     // only proven-reliable capture trigger. See if a level-entry .foo hook
@@ -5514,7 +5514,7 @@ void SWSE_ScriptVMInit() {
 // ---- auto-prime: get a ScriptContext without the ammo dance ---------------
 // Priming used to require the player to trigger GiveAmmo so we could steal a
 // ScriptContext out of its arguments. But a ScriptContext is just an object
-// whose first dword is its vtable â€” so we can go find one, using the same
+// whose first dword is its vtable - so we can go find one, using the same
 // exact-value scan that located moolah. No player action, no hooks, no waiting.
 //
 // Hooking the HUD getters was tried first and failed: the HUD reads health and
@@ -5568,7 +5568,7 @@ int SWSE_AutoPrime() {
         }
         p = (BYTE*)mbi.BaseAddress + mbi.RegionSize;
     }
-    LogS("autoprime: no ScriptContext in memory yet â€” load a save first");
+    LogS("autoprime: no ScriptContext in memory yet - load a save first");
     return 0;
 }
 
@@ -5588,7 +5588,7 @@ bool SWSE_ScriptHaveCtx() { EnsureCtx(); return g_ctx != nullptr; }
 // ---- ctxinfo: is our captured context a known RTTI class instance? --------
 // If ctx is a real polymorphic object, *(unsigned*)ctx is its vtable pointer.
 // Compare against vtables recovered from RTTI (swse/research/RTTI_CLASSES.md)
-// to find out EXACTLY what class we're holding â€” this tells us whether we
+// to find out EXACTLY what class we're holding - this tells us whether we
 // can call PlayerImpl's other 194 methods through this same pointer.
 struct KnownVT { unsigned rva; const char* name; int methods; };
 static const KnownVT kKnownVT[] = {
@@ -5622,13 +5622,13 @@ void SWSE_ScriptCtxInfo() {
             }
         }
         if (!matched)
-            LogS("  no match in the known-class table â€” check RTTI_CLASSES.md for this RVA.");
+            LogS("  no match in the known-class table - check RTTI_CLASSES.md for this RVA.");
     } __except (EXCEPTION_EXECUTE_HANDLER) {
         LogS("ctxinfo: faulted reading vtable pointer.");
     }
 }
 
-// Call a virtual method through ctx's OWN vtable by slot index â€” only useful
+// Call a virtual method through ctx's OWN vtable by slot index - only useful
 // once ctxinfo confirms ctx's class, so we know what each slot means.
 // argc scalar args (0-2), same calling convention as the generic dispatcher.
 int SWSE_ScriptVCall(int slot, int argc, int a0, int a1) {
@@ -5642,7 +5642,7 @@ int SWSE_ScriptVCall(int slot, int argc, int a0, int a1) {
         LogS(b);
         return 1;
     } __except (EXCEPTION_EXECUTE_HANDLER) {
-        LogS("vcall: FAULTED â€” context invalidated, re-prime with ammo");
+        LogS("vcall: FAULTED - context invalidated, re-prime with ammo");
         g_ctx = nullptr;
         return -2;
     }
@@ -5650,7 +5650,7 @@ int SWSE_ScriptVCall(int slot, int argc, int a0, int a1) {
 
 // Diagnostic: probe the captured player object AND follow one level of
 // pointers, snapshotting floats. On the 2nd+ probe it logs only what CHANGED
-// since the previous probe â€” so "probe, walk, probe" isolates the position
+// since the previous probe - so "probe, walk, probe" isolates the position
 // (and any moving field) with zero guesswork. SEH-guarded.
 #define PROBE_N 2048
 static float g_prevSnap[PROBE_N];
@@ -5665,7 +5665,7 @@ static float ReadF(void* base, int dwordIdx) {
 // indices line up across repeated calls (used by both probe and watch).
 // When set, snapshots are taken around this address instead of the script
 // context. The ScriptContext holds no gameplay state, so scanning it finds
-// nothing useful â€” but a verified pointer chain (e.g. health) lands inside
+// nothing useful - but a verified pointer chain (e.g. health) lands inside
 // the real player object, where health/artifacts/ammo actually live.
 static void* g_watchAnchor = nullptr;
 void SWSE_SetWatchAnchor(void* p) { g_watchAnchor = p; }
@@ -5709,7 +5709,7 @@ static int BuildSnapshot(float* snap, char origin[][24]) {
 }
 
 // ---- find: search the SAME object graph probe/watch cover for a known
-// value â€” the built-in equivalent of a Cheat Engine "exact value" scan, but
+// value - the built-in equivalent of a Cheat Engine "exact value" scan, but
 // scoped to what we can already reach from ctx, so it's fast and low-noise.
 // If a hit shows up, that [+selfOff]+subOff pair is usable with poke/freeze
 // immediately, AND is a candidate for a permanent hardcoded SWSE offset
@@ -5740,7 +5740,7 @@ void SWSE_ScriptFind(int value) {
 
 // ---- watch: auto-capture a time WINDOW instead of two manual snapshots ---
 // Fixes the "I can't time my alt-tab right" problem: start it, then do the
-// action at your own pace â€” every frame is sampled for you, so nothing is
+// action at your own pace - every frame is sampled for you, so nothing is
 // missed regardless of timing.
 static bool g_watching = false;
 static DWORD g_watchEndTick = 0;
@@ -5763,7 +5763,7 @@ int SWSE_ScriptWatchStart(int durationMs, const char* label) {
         lstrcpynA(g_watchLabel, label ? label : "", 64);
         g_watchEndTick = GetTickCount() + (DWORD)durationMs;
         g_watching = true;
-        char b[96]; wsprintfA(b, "watch%s%s: capturing â€” do the action now.",
+        char b[96]; wsprintfA(b, "watch%s%s: capturing - do the action now.",
                               g_watchLabel[0] ? " " : "", g_watchLabel);
         LogS(b);
         return 1;
@@ -5939,12 +5939,12 @@ static int CallProtected(unsigned rva, int arg, bool hasArg) {
     } __except (EXCEPTION_EXECUTE_HANDLER) {
         // Self-heal instead of spamming: a fault means the captured context is
         // dead (freed/reallocated), so clear it. This also stops any per-frame
-        // caller (god mode) from retrying every frame forever â€” g_ctx==null
+        // caller (god mode) from retrying every frame forever - g_ctx==null
         // short-circuits those checks. Re-prime with ammo to recover.
         // Self-heal instead of spamming: a fault means this context is dead
         // (freed/reallocated), so drop it. EnsureCtx will scan for a fresh one
         // on the next call rather than making the player go find ammo.
-        LogS("scriptvm: replay FAULTED â€” context dropped, will re-scan");
+        LogS("scriptvm: replay FAULTED - context dropped, will re-scan");
         g_ctx = nullptr;
         return -2;
     }
@@ -6043,7 +6043,7 @@ static int GiveArtifactByPath(const char* path, int mode, char* msg, int msgLen)
 }
 
 // ==========================================================================
-//  VM ARGUMENT INJECTION  â€” the actual fix.
+//  VM ARGUMENT INJECTION  - the actual fix.
 //
 //  Handlers don't read args off our stack; they ask the context for them:
 //      mov ecx,[ctx]; mov edx,[ecx+0x74]; push <index>; call edx
@@ -6383,7 +6383,7 @@ int SWSE_GiveArtifact(const char* name, char* msg, int msgLen) {
 
     LogS(path);
     // Primary path: proper VM argument injection (args come from
-    // ctx->vtable[0x74], not our stack â€” see GiveArtifactVM).
+    // ctx->vtable[0x74], not our stack - see GiveArtifactVM).
     char mv[160] = {0};
     int rv = GiveArtifactVM(path, mv, 160);
     LogS(mv);
@@ -6408,7 +6408,7 @@ int SWSE_GiveArtifact(const char* name, char* msg, int msgLen) {
 // primed the old way; auto-prime makes it worth retrying.
 int SWSE_GiveWeapon(const char* name, char* msg, int msgLen) {
     EnsureCtx();
-    if (!g_ctx) { lstrcpynA(msg, "no script context â€” load a save first", msgLen); return 0; }
+    if (!g_ctx) { lstrcpynA(msg, "no script context - load a save first", msgLen); return 0; }
 
     // static: the string object below holds a pointer to this, and the game may
     // keep that reference alive past our call.
@@ -6421,7 +6421,7 @@ int SWSE_GiveWeapon(const char* name, char* msg, int msgLen) {
 
     // A String argument is a pointer to the game's string OBJECT, not a raw
     // char*. Passing the char* made WeaponPref hash the ASCII bytes as if they
-    // were a pointer â€” the fault at 0x24D926 (cmp byte ptr [esi],bl) with a
+    // were a pointer - the fault at 0x24D926 (cmp byte ptr [esi],bl) with a
     // garbage target. Same layout the store grant path needed.
     static NameObj s_wpnName;
     memset(&s_wpnName, 0, sizeof(s_wpnName));
@@ -6432,7 +6432,7 @@ int SWSE_GiveWeapon(const char* name, char* msg, int msgLen) {
     if (!InstallArgHook()) { lstrcpynA(msg, "could not hook ctx vtable", msgLen); return -2; }
     int result = -2;
 
-    // GiveCrossbow takes the STRING, not a WeaponPref â€” the signature table is
+    // GiveCrossbow takes the STRING, not a WeaponPref - the signature table is
     // misleading. Its own code does:
     //     getArg(0); cmp [val+0x14],5; mov eax,[val+0x10]; mov eax,[eax]
     // i.e. tag 5, payload -> a pointer whose first dword is the char*, then it
@@ -6443,10 +6443,10 @@ int SWSE_GiveWeapon(const char* name, char* msg, int msgLen) {
         SetArg(0, (unsigned)(uintptr_t)&s_wpnName, 5);
         memset(g_auxBuf, 0, sizeof(g_auxBuf));
         CallWithArgs(RVA_GiveCrossbow, g_auxBuf);
-        wsprintfA(msg, "GiveCrossbow(\"%s\") called â€” check your crossbow", path);
+        wsprintfA(msg, "GiveCrossbow(\"%s\") called - check your crossbow", path);
         result = 1;
     } __except (GrantFilter(GetExceptionInformation(), "givecrossbow")) {
-        lstrcpynA(msg, "FAULTED â€” see log for the fault address", msgLen);
+        lstrcpynA(msg, "FAULTED - see log for the fault address", msgLen);
         result = -2;
     }
     RemoveArgHook();
@@ -6465,7 +6465,7 @@ int SWSE_GiveWeapon(const char* name, char* msg, int msgLen) {
 
 int SWSE_LoadLevel(const char* name, bool transition, char* msg, int msgLen) {
     EnsureCtx();
-    if (!g_ctx) { lstrcpynA(msg, "no script context â€” load a save first", msgLen); return 0; }
+    if (!g_ctx) { lstrcpynA(msg, "no script context - load a save first", msgLen); return 0; }
 
     static char     s_lvl[128];
     static NameObj  s_lvlName;
@@ -6488,7 +6488,7 @@ int SWSE_LoadLevel(const char* name, bool transition, char* msg, int msgLen) {
         lstrcpynA(msg, tmp, msgLen);
         result = 1;
     } __except (GrantFilter(GetExceptionInformation(), "loadlevel")) {
-        lstrcpynA(msg, "FAULTED â€” see log for the fault address", msgLen);
+        lstrcpynA(msg, "FAULTED - see log for the fault address", msgLen);
         result = -2;
     }
     RemoveArgHook();
@@ -6504,7 +6504,7 @@ int SWSE_ScriptDo(const char* action, int arg) {
     if (!lstrcmpiA(action, "noammo"))      return CallProtected(RVA_TakeAllAmmo, 0, false);
     if (!lstrcmpiA(action, "crossbow"))    return CallProtected(RVA_GiveCrossbow, 0, false);
     if (!lstrcmpiA(action, "noweapons"))   return CallProtected(RVA_TakeAllWeapons, 0, false);
-    // health / stamina â€” direct player-object writes. The VM handlers below
+    // health / stamina - direct player-object writes. The VM handlers below
     // were called for months and never changed a value; hp/stam proved the
     // fields at +0x78 / +0x8C work.
     if (!lstrcmpiA(action, "heal"))       { GodTick(); return PlayerObj() ? 1 : 0; }
@@ -6569,7 +6569,7 @@ int SWSE_ScriptCallByName(const char* name, int argc, char** argv) {
             ((fnN_t)Addr(kVmFns[i].rva))(g_retBuf, g_ctx, w[0], w[1]);
             return 1;
         } __except (EXCEPTION_EXECUTE_HANDLER) {
-            LogS("scriptvm: generic call FAULTED â€” context invalidated, re-prime with ammo");
+            LogS("scriptvm: generic call FAULTED - context invalidated, re-prime with ammo");
             g_ctx = nullptr;
             return -2;
         }
@@ -6623,7 +6623,7 @@ const char* SWSE_ScriptArgs(const char* name) {
 // doing `mov [esi+4],edx` from [edi], so writing the copy changes what we read
 // and moves nothing. The authority is a motion object at edi-0x50.
 //
-// Nothing points to that object from the player â€” searching for its address
+// Nothing points to that object from the player - searching for its address
 // found only stack slots. It points back at us though: +0x4C holds player+8.
 // So we scan for that back-pointer. Several sibling objects match, so the
 // candidate is confirmed by checking its own position equals the copy.
@@ -6846,7 +6846,7 @@ static void LogCaptureDiag() {
             bool looksObj = (vt >= modLo && vt < modHi);
             wsprintfA(b, "  %s=%08X : first dword=%08X %s", nm, a, vt,
                       looksObj ? "<-- VTABLE, this is the ScriptContext"
-                               : "(not a module pointer â€” likely the return buffer)");
+                               : "(not a module pointer - likely the return buffer)");
             LogS(b);
         } __except (EXCEPTION_EXECUTE_HANDLER) {
             wsprintfA(b, "  %s=%08X : unreadable", nm, a);
@@ -6855,14 +6855,14 @@ static void LogCaptureDiag() {
     }
     // The game's own call is GiveAmmo("<ammo>.txt", -1), so arg2 should be the
     // STRING and arg3 the count. If arg3 is a small/negative literal then ints
-    // pass raw and only strings are pointers â€” which is all we need to know.
+    // pass raw and only strings are pointers - which is all we need to know.
     wsprintfA(b, "  module base = %08X", (unsigned)g_base);
     LogS(b);
     wsprintfA(b, "  arg3=%08X (int %d)   arg4=%08X (int %d)",
               g_capA3, (int)g_capA3, g_capA4, (int)g_capA4);
     LogS(b);
 
-    // Dump arg2 both as dwords and as text â€” if it (or what it points to) is a
+    // Dump arg2 both as dwords and as text - if it (or what it points to) is a
     // readable path, String args are just char*/a struct holding one.
     for (int pass = 0; pass < 2; pass++) {
         unsigned a = pass ? 0 : g_capA2;
