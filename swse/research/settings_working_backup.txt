@@ -1,0 +1,77 @@
+# ============================================================
+#  SWSE Graphics - "Reliably Beautiful" preset
+#  Edit a value, then press F11 in-game to reload live.
+#  Press F10 in-game to toggle the whole effect stack on/off.
+#  Set any *_enable to 1 (on) or 0 (off).
+# ============================================================
+
+# master strength: 0.0 = vanilla .. 1.0 = full effect
+intensity          0.65
+
+# ---- Depth buffer ----------------------------------------------------------
+# depth_near / depth_far / fov are IGNORED at runtime. SWSE reads the camera's
+# real frustum out of the game and uses that (type 'proj' in the console to see
+# it). They survive only as a fallback if that scan ever fails.
+# The old hand-tuned 1 / 120 / 65 were badly wrong - the real camera is
+# near 0.5, far 1000, fov 80 - and that is why depth-based GI looked flat.
+depth_near         0.5
+depth_far          1000
+fov                80
+# depth_invert 0 = standard GL depth. Set it to 1 and the shader assumes
+# reverse-Z, which collapses the whole scene to a single distance and kills
+# AO/GI completely. This one line was the original "RTGI looks terrible" bug.
+depth_invert       0
+# depth_flipv 1 = the game's depth texture is mirrored vertically relative to
+# the captured frame. With it off, geometry ghosts into the image upside down.
+depth_flipv        1
+
+# ---- Contact-shadow AO (depth-based ambient occlusion) ---------------------
+# Grounds objects and darkens creases.
+ao_enable          1
+ao_intensity 0.9
+ao_radius 1.2
+# ao_samples: the AO ring is rotated by a per-pixel random angle, and there is
+# no denoise pass, so too few samples show up as a fine diagonal dither grid.
+# 8 = clearly visible grid, 32 = clean. Range 4..32.
+ao_samples         32
+
+# ---- Bloom (soft glow on bright areas) ------------------------------------
+bloom_enable       0
+bloom_threshold    0.8
+bloom_intensity    0.7
+bloom_radius       3
+
+# ---- RTGI / SSGI (occlusion darkening + indirect light bounce) -------------
+# debug_gi 1 visualises the pass (red = occlusion, green = bounced light).
+# It is the fastest way to tell a real problem from a tuning problem: if it
+# shows scene structure, the geometry pipeline is sound.
+ssgi_enable        1
+ssgi_intensity 0.8
+ssgi_radius        20
+ssgi_samples       32
+# ssgi_thickness: how deep an occluder may be and still block a ray. A depth
+# buffer only stores the front surface, so without this bound a character in
+# the foreground occludes rays cast by ground pixels far behind it and its
+# silhouette smears outward as a dark halo (the "crown of thorns"). Raise it
+# for more contact darkening, lower it if halos reappear.
+ssgi_thickness     2
+debug_gi 0
+
+# ---- Sharpening (crisp detail; runs on the raw frame) ---------------------
+sharpen_enable 0
+sharpen_strength   0.05
+
+# ---- Tonemap + Colour Grade (filmic ACES + colour shaping) ----------------
+# Left off while GI is being evaluated, so the GI is judged on its own.
+grade_enable       0
+exposure           1.08
+tonemap            1
+saturation         1.02
+contrast           1.06
+brightness         1.0
+temperature        0.3
+
+# ---- Vignette (subtle corner darkening) -----------------------------------
+vignette           0
+early_pass 1
+near_cutoff 3

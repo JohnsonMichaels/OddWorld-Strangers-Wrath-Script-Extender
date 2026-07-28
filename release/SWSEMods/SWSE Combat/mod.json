@@ -1,0 +1,6 @@
+{
+  "name": "SWSE Combat",
+  "author": "Johnson Michaels",
+  "version": "1.0",
+  "description": "Additive hit reaction settings for the SWSE DLL (hitreact.txt). NOTE: this folder is runtime data read directly by the SWSE DLL. Turn it on or off in SWSEMods/features.txt, not in the load order."
+}

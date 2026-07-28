@@ -1,0 +1,6 @@
+{
+  "name": "SWSE Console",
+  "author": "Johnson Michaels",
+  "version": "1.1",
+  "description": "The SWSE in-game console. Press the tilde key, type commands, hit Enter. God mode, ammo, health, money, level warp, NPC control, AI tuning, and access to the game's own script functions. Also drives the remote mailbox that lets tools script the game from outside."
+}

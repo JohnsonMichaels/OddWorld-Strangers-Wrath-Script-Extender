@@ -1,0 +1,349 @@
+function	handler	sig_tokens
+Activate	0x55F390	
+ActivateAmbientEmitter	0x5580F0	{void}|ID
+ActivateDuration	0x55F890	{void}|Object
+ActivateEffect	0x55C790	{void}|Object
+ActivateFromActivator	0x55F980	{void}|Object
+ActivateGroup	0x55F5D0	{void}|ID
+ActivateSet	0x55F450	{void}|Object
+ActivateSetGroup	0x55F680	{void}|ID
+ActivateVolume	0x55F300	{void}|ID
+AddObjectToGroup	0x55D990	bool|Object
+AddStat	0x563C40	{void}|int
+ArtifactPref	0x568E50	ArtifactPref|String
+AttachGeometry	0x55C3B0	Geometry|Object|Resource
+BeginCinematic	0x558750	{void}
+BeginCinematicNoBars	0x5587F0	{void}
+BeginCinematicRollControl	0x558780	{void}|bool
+BeginJobLock	0x56A730	{void}
+BoatGiveTurret	0x55E760	{void}|MechanicalPref
+BoatHasTurret	0x55E020	bool
+BoatMove	0x55E3B0	{void}|ID
+BoatMoveAboard	0x55DF50	{void}|ID
+BoatMoveAboardWF	0x55DF80	{void}|ID
+BoatMoveWF	0x55E450	{void}|ID
+BoatPlayAnim	0x55E090	{void}|Resource
+BoatReleaseFromPath	0x55E3E0	{void}
+BoatStartPhysics	0x55E5A0	{void}
+BoatStopAutoRowing	0x55E610	{void}
+BoatStopPhysics	0x55E480	{void}
+BoatTakeTurret	0x55E810	{void}
+BoatTeleportAboard	0x55DD00	{void}|ID
+BoatTeleportAshore	0x55DD30	{void}|ID|EMotionTeleport
+BoatTurretFireStart	0x553BD0	{void}|ID
+BoatTurretFireStop	0x553CA0	{void}
+BoatWF	0x55E680	{void}
+BountyPost_AddAssignment	0x5623E0	{void}|BountyPref
+BountyPost_ClearAssignments	0x562360	{void}
+BountyPost_ClearPaidAssignments	0x5623A0	{void}
+BountyPost_MakeAssignmentAvailable	0x562490	{void}|BountyPref
+BountyPost_MakeAssignmentNotAvailable	0x562520	{void}|BountyPref
+BountyPref	0x568D60	BountyPref|String
+BreakLockToGround	0x54E070	{void}|Object
+BroadcastPlayerNoise	0x54CEC0	{void}|Object
+CameraWF	0x55E9E0	
+Checkpoint	0x54D860	
+CineFX_SetFadeIn	0x5609E0	{void}|float
+ClearActiveBolts	0x5612F0	{void}
+ClearAllBolts	0x561330	{void}
+CombatGoto	0x56C540	ShortGoal|Object
+CombatGotoWF	0x56E660	{void}|ID
+ConversationWaitFor	0x55F110	{void}
+CountNPCAlive	0x55D240	int|ID
+CountNPCAliveInGroup	0x55D490	int|ID
+CountNPCAliveOfType	0x55D430	int|ID
+CountNPCAliveOfTypeInGroup	0x55D680	int|ID
+CountNPCDead	0x55D1F0	int|ID
+CountNPCInAgit	0x55D2E0	int|ID
+CountNPCInAgitInGroup	0x55D530	int|ID
+CountNPCInCombat	0x55D330	int|ID
+CountNPCInCombatInGroup	0x55D580	int|ID
+CountNPCInNormal	0x55D290	int|ID
+CountNPCInNormalInGroup	0x55D4E0	int|ID
+CountNPCInPanic	0x55D380	int|ID
+CountNPCInPanicInGroup	0x55D5D0	int|ID
+CountNPCOfType	0x55D3D0	int|ID
+CountNPCOfTypeInGroup	0x55D620	int|ID
+CreateCineGroupFromVolume	0x55D740	ID|ID
+CrossbowWeaponOnLeft	0x561880	ID
+CrossbowWeaponOnRight	0x561930	ID
+CurrentSetEnabled	0x55E880	{void}|ID
+CutTo	0x559B90	{void}|ID
+Deactivate	0x55F510	
+DeactivateAmbientEmitter	0x5581B0	{void}|ID
+DeactivateEffect	0x55C850	{void}|Object
+DeactivateGroup	0x55F730	{void}|ID
+DeactivateVolume	0x55F330	{void}|ID
+DebugHudPrint	0x561D40	
+Dec	0x54F670	
+DefaultJob	0x54CAA0	Job
+Delete	0x54D900	{void}|Object
+DeleteZone	0x550570	{void}|ID
+DestroyAttachedBolts	0x54D640	{void}|Object
+DetachGeometry	0x55C630	{void}|Object
+DevicePressWF	0x55FCF0	{void}|ID
+DisableCombatMusic	0x556710	{void}
+DisableSaveLoad	0x55C950	{void}
+DisableShowingOnRadar	0x5616A0	{void}|Object
+DisableTensionMusic	0x556690	{void}
+DoPlayerVictoryWF	0x571DD0	{void}
+DontFixFeet	0x572270	{void}|ID
+EffectPref	0x568E00	EffectPref|String
+EnableCombatMusic	0x5566D0	{void}
+EnableSaveLoad	0x55C910	{void}
+EnableShowingOnRadar	0x561670	{void}|Object
+EnableTensionMusic	0x556650	{void}
+EndCineTorsoAnim	0x56AE20	{void}|Object
+EndCinematic	0x558820	{void}
+EndGame	0x5606B0	{void}
+EndJobLock	0x56A980	{void}
+Exhaust	0x555530	
+ExplosionPref	0x568EF0	ExplosionPref|String
+FadeIn	0x558AE0	{void}|float
+FadeInFromColor	0x558BA0	{void}|float|int
+FadeInFromColorWF	0x558BD0	{void}|float|int
+FadeInWF	0x558B10	{void}|float
+FadeOut	0x558B40	{void}|float
+FadeOutToColor	0x558C00	{void}|float|int
+FadeOutToColorWF	0x558C30	{void}|float|int
+FadeOutWF	0x558B70	{void}|float
+FireBolt	0x553850	{void}|NPCWeaponPrefs|String
+FireBoltMiss	0x5538B0	{void}|NPCWeaponPrefs|String
+FireWeapon	0x56C790	
+FireWeaponNoReload	0x56C9E0	ShortGoal|Object|int
+FlushResourceManager	0x561D40	{void}
+Follow	0x56BE50	
+FollowWF	0x56E180	{void}|ID
+ForceCombat	0x552E90	{void}|ID
+ForceFPS	0x558470	{void}
+ForceJob	0x54C870	
+ForceNotFPS	0x558490	{void}
+ForceSniper	0x5584B0	{void}
+GeneralStore_AddItemQuantity	0x562960	{void}|ID|int
+GeneralStore_SetItemQuantity	0x562A50	{void}|ID|int
+GetBool	0x54F370	bool|ID
+GetDOFDistance	0x55F0D0	
+GetFloat	0x54F270	float|ID
+GetHealth	0x569240	float
+GetID	0x54F8A0	ID|ID
+GetInt	0x54F170	int|ID
+GetMindState	0x5696E0	EMindState
+GetMoolah	0x5630E0	float
+GetNameOfBountyAssignment	0x5637D0	ID
+GetStamina	0x569490	float
+GetThis	0x54C6A0	
+GetWorker	0x56A290	Object
+Gib	0x5553E0	
+GiveAllAmmo	0x560E30	
+GiveAmmo	0x5610F0	{void}|String
+GiveAmmoForceDowngrade	0x561120	{void}|String
+GiveArtifact	0x563560	{void}|ArtifactPref
+GiveCrossbow	0x561770	{void}|WeaponPref
+GiveDefaultAmmo	0x560E90	{void}
+GoThroughDoorFast	0x56D7C0	ShortGoal|Object|Object
+GoThroughDoorFastWF	0x571240	ShortGoal|Object
+GoThroughDoorSlow	0x56D570	ShortGoal|Object|Object
+GoThroughDoorSlowWF	0x570D60	ShortGoal|Object
+Goto	0x56B510	
+GotoPlayerAggressive	0x56B760	ShortGoal|Object
+GotoRun	0x56BC00	ShortGoal|Object
+GotoRunWF	0x56F020	{void}|ID
+GotoSlow	0x56B9B0	ShortGoal|Object
+GotoSlowWF	0x56EB40	{void}|ID
+GotoTurnWork	0x56C2F0	
+GotoTurnWorkWF	0x570880	{void}|Object|ShortGoal
+GotoWF	0x56DCA0	{void}|ID
+HasArtifactCount	0x563210	int|ArtifactPref
+HireActor	0x559580	Object|Object
+ID	0x6823A0	
+Idle	0x56B070	
+IdleWF	0x56F500	{void}
+ImmobilizeSpiderBolaInstant	0x5538E0	{void}|Object
+Inc	0x54F510	{void}|ID
+IsActive	0x55F7E0	bool|Object
+IsCinematicRunning	0x559160	bool
+IsEnvironmentalCueActive	0x558290	bool|ID
+IsInFOV	0x55EA90	bool|Object
+IsInLOS	0x55EC00	bool|Object
+IsInView	0x55ECD0	bool|Object
+IsNull	0x54D020	bool|Object
+IsPlayerOnRope	0x54D710	bool
+IsPortalEnabled	0x5502F0	bool|String
+IsSteef	0x54D110	bool|Object
+IsStranger	0x54D200	bool|Object
+IsTownPanicking	0x55DC60	bool|ID
+IsVolumeActive	0x55F360	bool|ID
+IsZonePagedIn	0x550480	bool|String
+KeepInMindState	0x569B80	{void}
+Kill	0x555380	
+KillObject	0x555380	{void}|Object
+KnockPlayerOffRope	0x54D780	{void}
+LevelTransition	0x560510	{void}|String
+LoadLastSave	0x5622A0	{void}
+LoadLevel	0x560700	{void}|String
+LockCamera	0x54DEB0	
+LockPlayerDisguise	0x54D430	{void}
+LockToGround	0x54DF90	{void}|Object
+Log	0x54C060	{void}
+MakePlayerSteef	0x54D2F0	{void}
+MakePlayerStranger	0x54D390	{void}
+MechanicalPref	0x568EA0	MechanicalPref|String
+MoveIntoPurgatory	0x5601E0	{void}|Object
+MoveIntoPurgatoryGroup	0x5603C0	{void}|ID
+MoveIntoPurgatoryUpdateNav	0x572730	{void}|ID
+MoveOutOfPurgatory	0x5600C0	{void}|ID
+MoveOutOfPurgatoryGroup	0x560330	{void}|ID
+MoveOutOfPurgatoryUpdateNav	0x5724D0	{void}|ID
+MoveTo	0x55A160	{void}|ID|float
+MoveToWF	0x55A190	{void}|ID|float
+NPCWeaponPrefs	0x568F90	NPCWeaponPrefs|String
+NextCinematicPagingTracksCamera	0x5583B0	{void}
+Object	0x54C190	
+OpenWeaponHUD	0x5622F0	{void}
+PlayAnim	0x56CE80	ShortGoal|Object
+PlayAnimBlend	0x56D0D0	ShortGoal|Object|float
+PlayAnimBlendHold	0x56D320	ShortGoal|Object|float
+PlayAnimWF	0x56F9E0	{void}|Resource
+PlayBinkMovie	0x560900	{void}|String
+PlayBinkMovie_CineSkip	0x560970	{void}|String
+PlayEffect	0x55A7C0	{void}|Object
+PlayRumble	0x55CC70	{void}|ID
+PlaySound	0x556A60	SoundHandle|ID
+PlaySoundOnBone	0x556B50	SoundHandle|ID|ID
+PlaySoundUI	0x556840	{void}|ID
+PlaySpeech	0x556E90	SoundHandle|ID
+PlaySpeechAt	0x557280	SoundHandle|ID
+PlaySpeechAtWF	0x5576F0	{void}|ID|ID
+PlaySpeechVO	0x557CF0	{void}|ID
+PlayerHasAmmo	0x5619E0	bool|ID
+PlayerInBoat	0x55DFB0	bool
+Player_GetBountyAssignment	0x5625B0	String
+Player_GetBountyAssignmentFinished	0x562610	bool
+Player_GetBountyAssignmentFinishedKilled	0x5626D0	bool
+Player_SetBountyAssignment	0x562780	{void}|BountyPref
+Player_SetBountyAssignmentFinished	0x5628B0	{void}|bool
+PopBattleMusic	0x5564A0	
+PopEventMusic	0x5564A0	
+PopMusic	0x556590	{void}
+PopTrumpMusic	0x5564A0	
+PortalDisable	0x550270	{void}|String
+PortalEnable	0x5501F0	{void}|String
+PostAlarm	0x54CE10	{void}|ID
+PrimeCue	0x556CF0	{void}|ID
+PrimeSpeechCue	0x556D80	{void}|ID
+PushBattleMusic	0x5564A0	
+PushEventMusic	0x5564A0	
+PushMusic	0x5564E0	{void}|EMusicType
+PushTrumpMusic	0x5564A0	
+PutCurrentAnimationAtEnd	0x55A720	{void}|Object
+Queue	0x5556B0	{void}|ShortGoal
+QuickSave	0x54D8A0	{void}
+QuickSpeak	0x562DF0	{void}|Object
+RandomFloat	0x54C370	float
+RandomInt	0x54C2F0	int
+Reboot	0x54D860	{void}
+RemoveObjectFromGroup	0x55DAA0	bool|Object
+ReturnToGameCam	0x55A460	{void}|ID
+ReturnToGameCamSpecific	0x55A490	{void}|ID|float
+RingBell	0x55DBD0	
+RumblePref	0x568DB0	RumblePref|String
+Say	0x56B2C0	
+SayWF	0x5703A0	{void}|ID
+Set	0x54F470	{void}|ID|float
+SetCinematicSkippable	0x5586B0	{void}|bool
+SetCritterPathSpawnEnabled	0x5616D0	{void}|ID
+SetDOFDistance	0x55EF40	{void}|float
+SetDOFRange	0x55EE60	{void}|float
+SetDesiredMechState	0x55FBC0	{void}|ID
+SetDesiredMechStateWF	0x55FC10	{void}|ID
+SetFullRunAllowed	0x561380	{void}|bool
+SetHealth	0x555290	{void}|Object
+SetHomePosition	0x54E380	{void}|Object
+SetJournalText	0x563820	{void}|int
+SetMindState	0x569930	{void}|EMindState
+SetMoolah	0x563140	{void}|float
+SetNPCAffected	0x561430	{void}|Object|bool
+SetNPCForceFieldEnable	0x563A00	{void}|Object
+SetNPCHealthBarEnable	0x563AD0	{void}|Object
+SetNPCResponds	0x561500	{void}|Object|bool
+SetPlayerSeen	0x5563A0	{void}|Object
+SetRepeaterCue	0x556750	{void}|ID
+SetReverbEnvironment	0x5564A0	{void}|ID
+SetStamina	0x555440	{void}|Object
+SetSteefClothed	0x54D820	
+SetSteefNaked	0x54D820	{void}
+SetToInitialHealthAndStamina	0x555230	{void}|Object
+SetToMaxHealth	0x5552F0	{void}|Object
+SetToMaxHealthAndStamina	0x555260	{void}|Object
+SetToMaxStamina	0x5554A0	{void}|Object
+ShakeOffDamage	0x54D5A0	
+ShowHealthBars	0x558710	{void}
+Sleep	0x683470	
+SpawnEffectAttachedToBone	0x55ADF0	{void}|EffectPref|String
+SpawnEffectAttachedToBonePosition	0x55B030	{void}|EffectPref|String
+SpawnEffectAttachedToObject	0x55B270	{void}|EffectPref
+SpawnEffectAttachedToObjectPosition	0x55B440	{void}|EffectPref
+SpawnTendrilFromBoneToBone	0x55BDE0	Effect|EffectPref|Object
+SpawnTendrilFromBoneToObject	0x55BAE0	Effect|EffectPref|Object
+SpawnTendrilFromRandomBoneToObject	0x55C130	Effect|EffectPref|Object
+SpawnTendrilTweenObjects	0x55B7C0	
+StartCineTorsoAnim	0x56ABD0	{void}|Object|int
+StartCountdownTimer	0x5621B0	{void}|int
+StartEffect	0x55A9A0	Effect|Object
+StartEnvironmentalCue	0x558210	{void}|ID
+StartGS	0x572990	{void}|ID|ID
+StartJobOnSteef	0x559730	{void}|Resource
+StartOrContinueConversation	0x562F50	{void}|Object
+StartScript	0x5598E0	Script|Object
+StartSoundWF	0x557F20	SoundHandle|ID
+StopAnimation	0x55A680	{void}|Object
+StopCountdownTimer	0x562230	{void}
+StopEffect	0x55AC20	{void}|Effect
+StopEffectDelayed	0x55ACF0	{void}|Effect
+StopEnvironmentalCue	0x558330	{void}|ID
+StopLastCue	0x556C50	{void}|Object
+StopSound	0x558090	{void}|SoundHandle
+StopSpeech	0x557C00	{void}|Object
+String	0x6822E0	String|int
+TakeAllAmmo	0x560B90	{void}
+TakeAllArtifacts	0x5634D0	{void}
+TakeAllWeapons	0x560A80	{void}
+TakeArtifact	0x563350	{void}|ArtifactPref
+TakeDamage	0x555320	{void}|Object
+TakeStamina	0x5554D0	{void}|Object|float
+TakeWeapon	0x561150	{void}|String
+Teleport	0x54E140	
+TeleportHome	0x54E2C0	{void}|ID
+TeleportReset	0x54E200	{void}|Object|EMotionTeleport
+TextOverlay	0x561D80	{void}|ID
+TextOverlayClear	0x562080	{void}
+TextOverlayClose	0x562040	{void}
+TextOverlayOpen	0x561FA0	{void}|int
+TextOverlayPause	0x561DF0	{void}|ID
+TextOverlayUpDuringGUI	0x5620C0	{void}
+Time	0x54C550	
+TransitionMusic	0x5565D0	{void}|EMusicType
+TriggerAchievement	0x563B90	{void}|int
+TriggerAnimation	0x55A620	
+TriggerAnimationReverse	0x55A620	{void}|Object
+TriggerAnimationReverseWF	0x55A650	
+TriggerAnimationWF	0x55A650	{void}|Object
+TriggerExplosion	0x55CD30	{void}|Object
+TurnTo	0x56C0A0	
+TurnToWF	0x56FEC0	{void}|Object
+UnlockAllMovies	0x54D550	{void}
+UnlockPlayerDisguise	0x54D4C0	{void}
+UpdateJournal	0x5638F0	{void}
+UpdateNav	0x569DD0	{void}|ID
+UpdateNavObject	0x56A030	{void}|ID
+WaitFor	0x555590	{void}|ShortGoal
+WaitForButton	0x54C590	{void}|GameButton
+WaitForCameraTrans	0x55E9E0	
+WaitForZonePagedIn	0x550360	{void}|ID
+WeaponPref	0x568F40	WeaponPref|String
+and	0x682F30	
+float	0x682260	float|int
+int	0x6821F0	
+not	0x683040	bool|bool
+or	0x682FC0	
+sin	0x6830A0	

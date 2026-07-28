@@ -1,0 +1,11 @@
+; SWSE proxy exports - forward every dinput8 export the game may call to the
+; real system DLL (copied next to us as dinput8_real.dll by build.bat).
+; This lets the game use input normally while our DllMain runs SWSE.
+LIBRARY dinput8
+EXPORTS
+    DirectInput8Create = dinput8_real.DirectInput8Create
+    DllCanUnloadNow    = dinput8_real.DllCanUnloadNow
+    DllGetClassObject  = dinput8_real.DllGetClassObject
+    DllRegisterServer  = dinput8_real.DllRegisterServer
+    DllUnregisterServer= dinput8_real.DllUnregisterServer
+    GetdfDIJoystick    = dinput8_real.GetdfDIJoystick

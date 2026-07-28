@@ -1,0 +1,6 @@
+# SWSE load order - top loads first; later mods win conflicts.
+# 'ModName' = enabled, '!ModName' = disabled, '#...' = comment.
+# The SWSE DLL's own systems (HD, Wind, Combat...) are switched in
+# features.txt instead - the load order only governs archive patches.
+SWSE Graphics
+SWSE Console

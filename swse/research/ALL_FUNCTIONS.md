@@ -1,0 +1,612 @@
+# Stranger's Wrath - Full Function Catalog
+
+Enumerated from stranger.exe .text via CALL-target + prologue-signature scanning (no symbol table shipped with the game). **12259 function starts found**, 335 already named (script VM), 600 with a string hint pulled from nearby code. Full list (including the ~11324 unlabeled ones) is in `ALL_FUNCTIONS.tsv`.
+
+
+## Named (script VM functions)
+
+See `script_handlers.tsv` / `CONSOLE_CALLABLE.md` - 335 functions, already fully documented there.
+
+
+## Hinted (unnamed, but a nearby string suggests purpose)
+
+- `0x401260` (~80B) - .lvl
+- `0x404280` (~96B) - _DE | _FR | _IT
+- `0x4042E0` (~1152B) - \data\textures\loadAnim\bar%01d | _DE | _FR
+- `0x4058FB` (~289B) - .bmp
+- `0x405A1C` (~1012B) - \data\global\global_loadingscreen_%s.smb | \data\textures\gui\%s | .bmp
+- `0x4060D0` (~16B) - game.sav
+- `0x4060E0` (~272B) - %s\Save\%8x | %s\
+- `0x406AB0` (~416B) - %s\Save\%8x | %s\
+- `0x406CD0` (~96B) - U:\
+- `0x406D30` (~256B) - U:\
+- `0x406F40` (~1744B) - Save\savetemp | owsv
+- `0x407730` (~368B) - %s\Save\%8x | %s\
+- `0x4078A0` (~160B) - %s\Save\%8x | %s\
+- `0x407940` (~224B) - %s\Save\%8x | %s\
+- `0x4080B0` (~576B) - .smb | _thumb.bmp
+- `0x409130` (~736B) - metadata.dat
+- `0x409410` (~464B) - metadata.dat
+- `0x40AF90` (~880B) - Cannot create camera type that does not exist | .\Camera\Camera.cpp
+- `0x40B450` (~512B) - .\Camera\Camera.cpp
+- `0x40BED0` (~144B) - .\Camera\Camera.cpp
+- `0x40E840` (~416B) - Camera Right should never fail to project onto the XY plane! | .\Camera\CameraMgr.cpp | Camera Right and Forward BOTH failed to project onto the XY plane!
+- `0x40E9E0` (~448B) - Camera Right should never fail to project onto the XY plane! | .\Camera\CameraMgr.cpp
+- `0x415D80` (~336B) - No code for this fly camera scheme | .\Camera\FlyCamera.cpp
+- `0x418160` (~224B) - Degenerate vector in ComputePitch! | .\Camera\FollowEngine.cpp
+- `0x41CA60` (~304B) - No code for this orbit camera scheme | .\Camera\OrbitCamera.cpp
+- `0x41E0E0` (~512B) - .\Actor\Actor.cpp
+- `0x41F3A0` (~240B) - Phv
+- `0x420C00` (~1344B) - .\Actor\Actor.cpp
+- `0x429430` (~256B) - Bad bad!! | .\Actor\NPC.cpp
+- `0x42ADD0` (~1104B) - Phv
+- `0x42E250` (~1616B) - npc_ | zonebundle
+- `0x432E60` (~272B) - ../Engine\Core/CVarBodyArray.h
+- `0x435B40` (~672B) - should not get here in SetFacing | .\Actor\Critter\Critter.cpp
+- `0x43EAD0` (~304B) - Critter can't go away because of dangling refs! | .\Actor\Critter\CritterPools.cpp
+- `0x4434B0` (~2720B) - \data\textures\utility\reticle.tga | \data\textures\weapons\ammo_icons\empty_icon.tga
+- `0x444590` (~3440B) - Scripts\Steef.foo
+- `0x4468C0` (~640B) - Someone called Destroy on the Player!! | .\Player\PlayerImpl.cpp
+- `0x44ABC0` (~2240B) - +A-A+
+- `0x44C2B0` (~656B) - .\Player\PlayerImpl.cpp
+- `0x452710` (~464B) - bad case | .\Player\PlayerImpl.cpp
+- `0x455CC0` (~608B) - XYABXY | {{}}{{}} | 26XXYYBBAA
+- `0x458900` (~464B) - Player can't go away because of dangling refs! | .\Player\PlayerMgr.cpp
+- `0x459790` (~432B) - Unsupported numPanes | .\Player\PlayerMgr.cpp
+- `0x459A90` (~144B) - invalid view mode!! | .\Player\PlayerMgr.cpp
+- `0x45D340` (~912B) - /data/textures/utility/scope_overlay.tga
+- `0x45F8C0` (~144B) - Should only be calling this on objects with geometry. | .\GameObject\GameObject.cpp
+- `0x45FA60` (~96B) - GameObject::Tick should never be called! | .\GameObject\GameObject.cpp
+- `0x460450` (~304B) - This GameObject does not have a position. | .\GameObject\GameObject.cpp
+- `0x465CB0` (~272B) - %2.3f |  ACTIVE | Inactive
+- `0x4684C0` (~1056B) - you got an artifact!
+- `0x46B160` (~608B) - .\GOComponents\HealthMixin.cpp
+- `0x46BE90` (~80B) - center
+- `0x46C7C0` (~1168B) - Misunderstood animation type | .\GOComponents\SimpleAnimMixin.cpp
+- `0x471F10` (~384B) - set_assignment_count | %d, %s, %f, %f, %d, %d, %d, %d, %d | set_assignment_info
+- `0x472090` (~704B) - redeem_anim.start_redeem_info | %d, %ls, %d, %d, %f | redeem_anim.set_redeem_info
+- `0x47C940` (~1344B) - .\GOConcrete\Mechanical.cpp
+- `0x47E790` (~1232B) - weapnode_ranged_wpn1
+- `0x485240` (~704B) -  SHOULD NOT TICK !!  | .\GOConcrete\StaticCollectable.cpp
+- `0x486D90` (~832B) - your_moolah | set_buy_item_count | %d, %s, %d, %d, %d, %d
+- `0x4870D0` (~1472B) - get_current_category | get_current_item
+- `0x48DFB0` (~2752B) - .\GOConcrete\Weapons\Bolt.cpp
+- `0x493EE0` (~864B) - spn2
+- `0x49B2A0` (~7728B) - /data/prefs/artifacts/damagebeegun.txt | /data/prefs/Artifacts/damagebeegunextendersmall.txt | /data/prefs/Artifacts/damagebeegun.txt
+- `0x49F9C0` (~320B) - .\GOConcrete\Weapons\BoltPrefs.cpp
+- `0x4A5200` (~256B) - .\GOConcrete\Weapons\GOWeapon.cpp
+- `0x4A6470` (~528B) - Unknown spread | .\GOConcrete\Weapons\Projectile.cpp
+- `0x4AF7D0` (~1216B) - .\GOConcrete\Weapons\Target.cpp
+- `0x4B2480` (~96B) - \data\textures\weapons\reticleOutOfRangeL.tga
+- `0x4B24E0` (~1696B) - \data\textures\weapons\crossbow\ammoCounter_masked.tga
+- `0x4B3070` (~624B) - SnapIn Collide tests: %d, avg length: %2.3f, totalLength: %2.3f
+- `0x4BDE70` (~1568B) - \data\geometry\attachments\bountyCan_1stperson.geo
+- `0x4C0592` (~622B) - .\GOConcrete\Weapons\WeaponSubAction.cpp
+- `0x4C94E0` (~528B) - .\GOConcrete\Weapons\NPC\NPCBomberBomb.cpp
+- `0x4CC7D0` (~704B) - LTesla_Bot | LTesla_Top | RTesla_Bot
+- `0x4D03F0` (~976B) - Firearm | Shock | Sekto
+- `0x4D1B00` (~304B) - Weapon pool NPC can't go away because of dangling refs! | .\GOConcrete\Weapons\NPC\NPCWeaponPools.cpp
+- `0x4D3120` (~512B) - LeftRing | TopRing | RightRing
+- `0x4D4800` (~896B) - /data/geometry/characters/steefboat/steefboat.geo | /data/geometry/characters/steefboat/boatcover.geo
+- `0x4D74E0` (~160B) - grbL | bcpL | grbR
+- `0x4D82F0` (~1408B) - steefboat
+- `0x4D9DE0` (~848B) - .\GOConcrete\Mechanics\Boat\BoatImpl.cpp
+- `0x4DA7D0` (~1504B) - npc_ | zonebundle
+- `0x4DB850` (~1504B) - .\GOConcrete\Mechanics\Boat\BoatInput.cpp
+- `0x4DE6B0` (~704B) - Invalid SailorState! | .\GOConcrete\Mechanics\Boat\BoatPassengers.cpp
+- `0x4E6EE0` (~224B) - The player should not be asking if it can attack. | .\AI\AIUtil.cpp
+- `0x4E9CD0` (~576B) - Should only be one at the moment. | .\AI\Dispatcher.cpp
+- `0x4E9F10` (~544B) - Neither of these should be null | .\AI\Dispatcher.cpp
+- `0x4EA130` (~336B) - .\AI\Dispatcher.cpp
+- `0x4FA1A0` (~528B) - speak_laugh
+- `0x50CFA0` (~624B) - m_nav is NULL | .\Ai\SGGotoNav.cpp
+- `0x50D390` (~240B) - %s|%s
+- `0x50DEF0` (~976B) - This class is not IOZed | .\Ai\SGGotoNavWork.cpp
+- `0x50F2E0` (~960B) - This should be every case. | .\Ai\SGGotoNavWork.cpp
+- `0x50FC60` (~464B) - .\Ai\SGGotoNavWork.cpp
+- `0x5114E0` (~720B) - .\AI\ShortGoalCinematic.cpp
+- `0x5197F0` (~208B) - Unknown mind state | .\AI\Mind.cpp
+- `0x51B2E0` (~288B) - Phv
+- `0x51C0A0` (~896B) - Phv
+- `0x51C420` (~528B) - Phv
+- `0x51CDF0` (~576B) - Phv
+- `0x51D470` (~384B) - Event eNPCShout is being incorrectly sent. | .\AI\MindBasic.cpp
+- `0x51FFA0` (~416B) - ..\source\granny_track_mask.cpp
+- `0x520280` (~720B) - ..\source\granny_track_mask.cpp | %s(%d): BoneIndex %d is out-of-bounds (only %d bones in this track mask)
+- `0x522140` (~416B) - ..\source\granny_track_mask.cpp | %s(%d): BoneIndex %d is out-of-bounds (only %d bones in this track mask)
+- `0x52C2E0` (~1024B) - .\Motion\MotionImpl.cpp
+- `0x52E330` (~240B) - .\Motion\MotionImpl.cpp
+- `0x532BF0` (~1824B) - Phv
+- `0x541E90` (~96B) - grbR
+- `0x544A70` (~784B) - Should not get here! | .\Motion\MotionImpl.cpp
+- `0x546AA0` (~3616B) - Bad call on dummy! | d:\exodduspc\code\game\motion\MotionImplDummy.h | Bad call on Dummy!
+- `0x55F1E0` (~288B) - .\Script\ScriptGamelib.cpp
+- `0x560450` (~192B) - lm_
+- `0x563D60` (~17680B) - EAVEvent | eNPCGunshot | eNPCDamage
+- `0x5763F0` (~1920B) - true
+- `0x577D20` (~128B) -  No mapping found for game button! | .\GameInput\GameButtons.cpp
+- `0x577E20` (~336B) - Unknown type!! | .\GameInput\GameButtons.cpp
+- `0x5780B0` (~304B) - Unknown type!! | .\GameInput\GameButtons.cpp
+- `0x57A400` (~512B) - Unknown input %d | .\GameInput\RumblePrefs.cpp
+- `0x57A7D0` (~944B) - Unknown envelope %d | .\GameInput\RumblePrefs.cpp
+- `0x57AB80` (~176B) - Unknown envelope %d | .\GameInput\RumblePrefs.cpp
+- `0x5AC7D0` (~1056B) - \data\prefs\Effects\ | _surfaceAny | .txt
+- `0x5C0B50` (~1392B) - .\Effects\WaterDebrisParticle.cpp
+- `0x5C5F40` (~224B) - %s\SAVE\%08X.cin
+- `0x5C6100` (~160B) - %s\SAVE\%08X.cin
+- `0x5CCEC0` (~576B) - .\Inventory\ArtifactItem.cpp
+- `0x5CE7C0` (~366B) - set_steef | your_moolah | %ls
+- `0x5CE92E` (~432B) - set_artifact_count | %d, %s | set_artifact_info
+- `0x5CEADE` (~1186B) - %d, %s, %d, %d | set_ammo_info | %d, %s
+- `0x5D56D0` (~1888B) - \data\textures\sky\sun_blob.bmp | \data\textures\sky\sun_spikes.bmp
+- `0x5DAF20` (~2672B) - World::LevelInit() called on null string! | .\World\WorldZones.cpp | Scripts\
+- `0x5DBCB0` (~2592B) - .\World\WorldZones.cpp | _lm.smb | _other.smb
+- `0x5DC740` (~512B) - .tgl | .\World\WorldZones.cpp
+- `0x5DCC90` (~560B) - Invalid portal specification... | .\World\WorldZones.cpp
+- `0x5DDA50` (~384B) - setHDScreen | set_item_count | %d, %s
+- `0x5DDCB0` (~288B) - movieFinished | d:\data\movies\main_screen.bik
+- `0x5DDDD0` (~1136B) - region_name_%d
+- `0x5DE240` (~656B) - setController | set_Sens | flipFPSCamY
+- `0x5DE7A0` (~576B) - d:\data\movies\credit.bik | d:\data\movies\main_screen.bik
+- `0x5DED00` (~176B) - %ls | set_player_name
+- `0x5E0450` (~384B) - \data
+- `0x5E1100` (~752B) - d:\data\movies\main_screen.bik
+- `0x5E1470` (~1552B) - d:\data\movies\attract.bik
+- `0x5E1DB0` (~192B) - region_name_%d
+- `0x5E2480` (~2320B) - PlaySound
+- `0x5E3700` (~304B) - set_item_count | %d, %s | set_item_info
+- `0x5E4200` (~928B) - set_item_count | %d, %ls, %ls, %ls, %d, %d | set_item_info
+- `0x5E4680` (~976B) - get_screenshot_slot
+- `0x5E4E00` (~192B) - set_continue
+- `0x5E5580` (~624B) - set_item_count | %d, %ls | set_item_info
+- `0x5E58E0` (~224B) - d:\data\movies\main_screen.bik
+- `0x5E6040` (~272B) - %ls | set_player_name | set_confirm_needed
+- `0x5E6450` (~208B) - show_movie_options
+- `0x5E6970` (~224B) - vibrate_status.text | disable_save
+- `0x5E6B40` (~256B) - set_cursor | get_cursor
+- `0x5E74B0` (~640B) - \data\textures\utility\white_dot.tga | \data\textures\utility\proj_damage_icon.tga | \data\textures\utility\melee_damage_icon.tga
+- `0x5EA0F0` (~2064B) - lm_town_02_1.tag | town_02_1.tag
+- `0x5EC670` (~1728B) - \data\textures\utility\ | .tga | hidden_icon
+- `0x5ED7AE` (~930B) - %d, %d | set_item_count | %d, %ls, %ls, %ls, %d
+- `0x5EDC30` (~1984B) - get_screenshot_slot
+- `0x5EE3F0` (~432B) - set_sound_volume | set_music_volume | subtitlesStatus
+- `0x5F0F80` (~720B) - lm_ | _stream
+- `0x5F1250` (~2848B) - .smh | Zones: %d | normal:
+- `0x5F20E0` (~144B) - _blockmap.txt
+- `0x5F40A0` (~192B) - skip | play
+- `0x5F4F60` (~3920B) - \data
+- `0x5F5F70` (~128B) - 0x%2x
+- `0x5F6170` (~2784B) - width= | height= | bpp=
+- `0x5F6DD0` (~96B) - vector
+- `0x5F7000` (~80B) - basic_string
+- `0x5F71F0` (~1184B) - Custom %s
+- `0x5F79B0` (~2848B) - OSWGAME-088FA840-B10D-11D3-BC36-006067709674 | ODDWORLD Stranger's Wrath | ODDWORLD
+- `0x5F84D0` (~704B) - name | desc
+- `0x5FB940` (~304B) - .\Resource\BlockManager.cpp
+- `0x5FBE90` (~448B) - ERROR LOADING SHARED MEMORYBLOCK! | .\Resource\BlockManager.cpp
+- `0x5FD5C0` (~112B) - \data\
+- `0x5FD8A0` (~128B) - global | _stream.xwb | Region_02a
+- `0x6010D0` (~320B) - DoubleBufferWriteStream::SetStreamPosition not supported | .\Core\DoubleBufferFileStream.cpp
+- `0x6015B0` (~416B) - DoubleBufferReadStream::SetStreamPosition can't go backwards!! | .\Core\DoubleBufferFileStream.cpp
+- `0x601890` (~544B) - No Write | d:\exodduspc\code\engine\Core/DoubleBufferFileStream.h | No Read
+- `0x604D60` (~240B) - ..\source\granny_local_pose.cpp
+- `0x604EE0` (~192B) - ..\source\granny_local_pose.cpp
+- `0x605300` (~192B) - ..\source\granny_local_pose.cpp | %s(%d): BoneIndex %d is out of range [0, %d)
+- `0x6053C0` (~208B) - ..\source\granny_local_pose.cpp | %s(%d): BoneIndex %d is out of range [0, %d)
+- `0x606F50` (~240B) - ..\source\granny_local_pose.cpp
+- `0x609420` (~192B) - .\Audio\AudioMgr.cpp
+- `0x609C40` (~64B) - Couldn't load CueListResource
+- `0x610BA0` (~480B) - Resource: Default LoadDataVirtual implementation called! | .\Resource\Resource.cpp | Default Resource is not a FactoryProduct!!
+- `0x611130` (~400B) - Misunderstood texType | .\Renderer\Texture.cpp
+- `0x6112C0` (~592B) - .\Renderer\Texture.cpp
+- `0x612D00` (~1024B) - Misunderstood resource type | .\Resource\SharedMemoryBlock.cpp
+- `0x613190` (~528B) - Bad magic number 1 in SharedMemoryBlock | .\Resource\SharedMemoryBlock.cpp | Bad magic number 0 in SharedMemoryBlock
+- `0x613C20` (~400B) - .\Resource\SharedMemoryBlock.cpp
+- `0x614220` (~144B) - .\Resource\SharedMemoryBlock.cpp
+- `0x6142B0` (~192B) - .\Resource\SharedMemoryBlock.cpp
+- `0x616BC0` (~448B) - Animation: NO PreProcessTextKeyCallback registered before loading animations! | .\Animation\Animation.cpp
+- `0x616D80` (~368B) - Very very bad. | .\Animation\Animation.cpp
+- `0x61D470` (~144B) - That zone is not referenced on the portal! | .\Level\Zones.cpp
+- `0x61F1C0` (~544B) - .\Level\Zones.cpp
+- `0x61F3E0` (~464B) - .\Level\Zones.cpp
+- `0x61F5B0` (~272B) - .\Level\Zones.cpp
+- `0x628530` (~128B) - .txt
+- `0x628B00` (~448B) - Bad file version - code is old! | .\Audio\SoundCueMgr.cpp | Bad file version - data is old!
+- `0x62F5A0` (~192B) - .xsb
+- `0x630070` (~2064B) - This code is out of date! | .\Geometry\GeometryHierarchyDef.cpp
+- `0x632510` (~912B) - .\Core/CVarBodyVector.h
+- `0x635DF0` (~192B) - Degenerate vector in LookAt! | .\Math\Frame3Util.cpp
+- `0x636630` (~1146B) - ..\source\granny_local_pose.cpp | %s(%d): BoneIndex %d is out of range [0, %d)
+- `0x636AAA` (~518B) - ..\source\granny_local_pose.cpp | %s(%d): BoneIndex %d is out of range [0, %d)
+- `0x637360` (~224B) - Should never be here | .\Renderer\HudFade.cpp
+- `0x637440` (~224B) - Should never be here | .\Renderer\HudFade.cpp
+- `0x637520` (~288B) - Should never be here | .\Renderer\HudFade.cpp
+- `0x637B60` (~1360B) - .\Geometry\GeometryDef.cpp
+- `0x638A50` (~576B) - Bad Collidable type | .\Geometry\Collidable.cpp | Bad wrapper version for Collidable
+- `0x638C90` (~880B) - Bad file version | .\Geometry\Collidable.cpp | Very bad.  Sub-write failed
+- `0x639AD0` (~352B) - This code is out of date! | .\Animation\SentenceMgr.cpp
+- `0x639C30` (~128B) - globallip
+- `0x63A950` (~192B) - onFadeOut
+- `0x63CFE0` (~448B) - Bad file version - code is old! | .\Resource\FontResource.cpp | Bad file version - data is old!
+- `0x63D7F0` (~352B) - ..\source\granny_controlled_animation.cpp | %s(%d): TrackGroupIndex %d is out of range [0, %d)
+- `0x63DCE0` (~832B) - Control not mine! | .\Animation\QuadAnimationControl.cpp
+- `0x63EAE0` (~576B) - .\Geometry\BaseGeometryDef.cpp
+- `0x63EF40` (~128B) - Effect | SpawnTendrilTweenObjects
+- `0x63F1F0` (~432B) - Too many tokens.  | .\Core\StringBufferTokenizer.cpp
+- `0x642310` (~352B) - %s_%i
+- `0x645BF0` (~240B) - Too many vis queries pending !! | .\Renderer\Visibility.cpp
+- `0x646900` (~624B) - v54_%08x_vs.cg | .\Renderer\VertexShaderMgr.cpp
+- `0x6477A0` (~624B) - v54_%08x_fs.cg | .\Renderer\PixelShaderMgr.cpp
+- `0x647BD0` (~464B) - Bad file version - code is old! | .\Resource\CompiledShader.cpp | Bad file version - data is old!
+- `0x6498D0` (~592B) - Not implemented in FINAL! | .\Renderer\MaterialDef.cpp | Clone is not implemented for this type!
+- `0x649C10` (~144B) - _noshadow | _aa
+- `0x64CC10` (~80B) - Tried to set Position element on a non-supported vertex | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64CC60` (~112B) - Tried to get Position element from a non-supported vertex | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64CCD0` (~96B) - d:\exodduspc\code\engine\renderer\VertexFormat.h
+- `0x64CD30` (~112B) - d:\exodduspc\code\engine\renderer\VertexFormat.h
+- `0x64CDA0` (~96B) - d:\exodduspc\code\engine\renderer\VertexFormat.h
+- `0x64CE00` (~112B) - d:\exodduspc\code\engine\renderer\VertexFormat.h
+- `0x64CE70` (~80B) - Tried to set Position element on a non-supported vertex | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64CEC0` (~112B) - Tried to get Position element from a non-supported vertex | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64CF30` (~96B) - No PointSprite params | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64CF90` (~96B) - No PointSprite params | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64CFF0` (~96B) - No PointSprite params | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D050` (~96B) - No PointSprite params | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D0B0` (~96B) - No Binormals | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D110` (~96B) - No Binormals | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D170` (~96B) - No Bone weights | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D1D0` (~96B) - No Bone weights | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D230` (~96B) - No Bone weights | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D290` (~96B) - No Bone weights | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D2F0` (~96B) - No Bone weights | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D350` (~96B) - No Texcoords on this vertex type | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D3B0` (~96B) - No Texcoords on this vertex type | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D410` (~96B) - Tried to set Diffuse element from a non-supported vertex | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D470` (~112B) - Tried to get Diffuse element from a non-supported vertex | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D4E0` (~96B) - Tried to set Diffuse element from a non-supported vertex | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D540` (~112B) - Tried to get Diffuse element from a non-supported vertex | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D5B0` (~80B) - Not supported on this vert type | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64D600` (~112B) - Not supported on this vert type | d:\exodduspc\code\engine\Renderer/VertexFormatElements.h
+- `0x64DB80` (~416B) - ReadWholeStream::Write | .\Core\ReadWholeStream.cpp
+- `0x650790` (~480B) - Bad file version - code is old! | .\Resource\GameStringIndex.cpp | Bad file version - data is old!
+- `0x651F80` (~432B) - Failed to load resource! | .\Resource\ResourceManagerImpl.cpp
+- `0x6523E0` (~128B) - vector
+- `0x653C60` (~592B) - .\Audio\WaveBank.cpp
+- `0x65F9E0` (~384B) - %02X |     
+- `0x662C40` (~528B) - shape_loader: id = %d, rect 
+- `0x6641E0` (~624B) - onRollout
+- `0x669E90` (~80B) - vector
+- `0x66A280` (~80B) - vector
+- `0x66DB20` (~800B) - charCodeAt | indexOf | substring
+- `0x670520` (~304B) - <object 0x%X> | <c_function 0x%X> | <as_function 0x%X>
+- `0x6714C0` (~80B) - error: invalid path; neither string nor object
+- `0x671FB0` (~944B) - <unknown>[0x%02X] | %-15s |  0x%02X
+- `0x6734A0` (~96B) - vector
+- `0x673560` (~80B) - vector
+- `0x675B60` (~848B) - gameswf::fontlib::save_cached_font_data(): problem writing to output stream!
+- `0x6771A0` (~112B) - vector
+- `0x677280` (~80B) - vector
+- `0x6772D0` (~80B) - vector
+- `0x677320` (~96B) - vector
+- `0x678790` (~320B) - MakeFit failed! | .\Core\MemStreamWrite.cpp
+- `0x6795C0` (~96B) - You should never be registering functions here, foo. | .\Script\VMClass.cpp
+- `0x67A860` (~336B) - .\Renderer\VertexBufferResource.cpp
+- `0x67AB20` (~624B) - Bad file version - code is old! | .\Geometry\SkeletonResource.cpp
+- `0x67AF10` (~528B) - Bad file version - code is old! | .\Resource\NavResource.cpp | Bad file version - data is old!
+- `0x67B5E0` (~560B) - Bad file version - code is old! | .\Resource\BinaryResource.cpp
+- `0x67B8F0` (~373B) - Bad file version - code is old! | .\Audio\SoundBank.cpp
+- `0x67BF80` (~144B) - BVnR
+- `0x67C610` (~960B) - Not implemented in FINAL! | .\Renderer\Materials\MaterialDef_MatteTextured.cpp
+- `0x67CD7A` (~1558B) - Not implemented in FINAL! | .\Renderer\Materials\MaterialDef_StaticInstance.cpp
+- `0x67D390` (~1600B) - Not implemented in FINAL! | .\Renderer\Materials\MaterialDef_NormalMapped.cpp
+- `0x67E211` (~447B) - Not implemented in FINAL! | .\Renderer\Materials\MaterialDef_TriBlended2.cpp
+- `0x67EF00` (~1216B) - Not implemented in FINAL! | .\Renderer\Materials\MaterialDef_SimpleTextured.cpp
+- `0x67F3C0` (~1424B) - Not implemented in FINAL! | .\Renderer\Materials\MaterialDef_Transparent.cpp
+- `0x67FBF0` (~2048B) - Not implemented in FINAL! | .\Renderer\Materials\MaterialDef_StaticVertexLit.cpp
+- `0x6803F0` (~1024B) - Not implemented in FINAL! | .\Renderer\Materials\MaterialDef_DynamicVertexLit.cpp
+- `0x680A20` (~1248B) -  GeometryGroup::RenderSubset should not be called!!  | .\Geometry\GeometryGroup.cpp
+- `0x683570` (~1120B) - float | int | String
+- `0x6839D0` (~304B) - invalid CUBEMAP_FACE | .\Renderer/TextureUtil.h
+- `0x689830` (~512B) - Bad file version - code is old! | .\Geometry\KDTree.cpp | Bad file version - data is old!
+- `0x68B040` (~528B) - You fucked up somewhere, dave. | .\Geometry\KDTree2.cpp
+- `0x68B880` (~928B) - Bad file version - code is old! | .\Geometry\KDTree2.cpp | Bad file version - data is old!
+- `0x68BE50` (~336B) - Bad file version - code is old! | .\Animation\LipDataGroup.cpp | Bad file version - data is old!
+- `0x68CE40` (~208B) - Trying to use FloatImage! | .\Swf\BitmapInfoOWI.cpp
+- `0x68CF10` (~208B) - Trying to use FloatImage! | .\Swf\BitmapInfoOWI.cpp
+- `0x68CFE0` (~208B) - Trying to use FloatImage! | .\Swf\BitmapInfoOWI.cpp
+- `0x68D1E0` (~1328B) - File version is newer than code! | .\Geometry\GeometryDestructableDef.cpp | File version is too old!
+- `0x68E630` (~800B) - screen_z | Color0 | Color1
+- `0x68E950` (~2304B) - tex2D( u0 | tex2D( u1 | tex2D( u2
+- `0x68F500` (~9040B) - _MODULATE_REGISTER | ___ALPHA_REGISTER___
+- `0x693030` (~1184B) - 0gj
+- `0x695BE0` (~96B) - vector
+- `0x69A280` (~96B) - vector
+- `0x69A340` (~80B) - vector
+- `0x69B0A0` (~80B) - vector
+- `0x69B1B0` (~96B) - vector
+- `0x69EAB0` (~96B) - vector
+- `0x6A0910` (~96B) - vector
+- `0x6A0EE0` (~80B) - vector
+- `0x6A1A30` (~832B) - smd: orig bounds  | smd: target bounds 
+- `0x6A2800` (~1328B) - fsr: color1  | fsr: color2 
+- `0x6A2D30` (~432B) - mls 1: width %d color  | mls 2: width %d color 
+- `0x6A3680` (~96B) - vector
+- `0x6A3740` (~80B) - vector
+- `0x6A3790` (~96B) - vector
+- `0x6A3CB0` (~96B) - vector
+- `0x6A4460` (~80B) - vector
+- `0x6A5810` (~1264B) - Bad call on SpatialMultiLink | .\Geometry/SpatialProxy.h
+- `0x6A60C0` (~912B) - fsr color: 
+- `0x6A73C0` (~96B) - vector
+- `0x6A7760` (~64B) - ..\source\granny_controlled_animation.cpp | %s(%d): TrackGroupIndex %d is out of range [0, %d)
+- `0x6A77A0` (~64B) - ..\source\granny_controlled_animation.cpp | %s(%d): TrackGroupIndex %d is out of range [0, %d)
+- `0x6A7B10` (~144B) - ..\source\granny_fixed_allocator.cpp | %s(%d): Memory block 0x%x was not allocated by this allocator.
+- `0x6A8040` (~192B) - ..\source\granny_fixed_allocator.cpp | %s(%d): Memory block 0x%x was not allocated by this allocator.
+- `0x6A8970` (~1728B) - ..\source\granny_animation_binding.cpp
+- `0x6A9120` (~192B) - ..\source\granny_animation_binding.cpp | %s(%d): NewAnimationPointer is not allowed to be 0
+- `0x6A9640` (~496B) - map/set<T> too long
+- `0x6A9AE0` (~720B) - invalid map/set<T> iterator
+- `0x6AAEE0` (~176B) - ..\source\granny_bspline.cpp | %s(%d): Unrecognized degree/dimension combination (%d/%d) | %s(%d): Dimension %d is out of range [0, %d)
+- `0x6AC1D0` (~272B) - ..\source\granny_controlled_animation.cpp
+- `0x6AC2E0` (~592B) - ..\source\granny_controlled_animation.cpp | %s(%d): Control->LocalDuration %d is out of range [%d, %d] | %s(%d): Unable to bind track group
+- `0x6AC790` (~224B) - ..\source\granny_track_mask.cpp
+- `0x6AC970` (~128B) - ..\source\xbox_granny_file_writer.cpp | CreateFile | ..\source\xbox_granny_xtl.cpp
+- `0x6AC9F0` (~96B) - CloseHandle | ..\source\xbox_granny_file_writer.cpp | ..\source\xbox_granny_xtl.cpp
+- `0x6ACA50` (~96B) - SetFilePointer | ..\source\xbox_granny_xtl.cpp | %s(%d): %s(%d) : %s failed with error %d
+- `0x6ACAB0` (~144B) - WriteFile | ..\source\xbox_granny_file_writer.cpp | ..\source\xbox_granny_xtl.cpp
+- `0x6ACB40` (~208B) - ..\source\granny_fixed_allocator.cpp
+- `0x6ACC10` (~64B) - ..\source\granny_fixed_allocator.cpp
+- `0x6ACC50` (~160B) - ..\source\granny_fixed_allocator.cpp | %s(%d): The fixed allocator cannot be used with a unit size of 0.
+- `0x6AD060` (~352B) - ..\source\granny_world_pose.cpp | %s(%d): OnePastLastBone %d is out of range [%d, %d]
+- `0x6AD580` (~144B) - ..\source\granny_pointer_hash.cpp
+- `0x6AD8E0` (~640B) - ..\source\granny_local_pose.cpp | %s(%d): FirstBone + BoneCount %d is out of range [%d, %d] | %s(%d): FirstBone %d is out of range [0, %d)
+- `0x6AE0E0` (~192B) - ..\source\granny_fixed_allocator.cpp | %s(%d): Memory block 0x%x was not allocated by this allocator.
+- `0x6AE310` (~1248B) - ..\source\granny_local_pose.cpp | %s(%d): BoneIndex %d is out of range [0, %d)
+- `0x6AE890` (~704B) - (infinity) | (qnan) | (snan)
+- `0x6AEB50` (~896B) - 0123456789abcdefghijklmnopqrstuvwxyz | 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
+- `0x6AF2A0` (~128B) - ..\source\granny_member_iterator.cpp | %s(%d): Illegal iterator type (%d) in IterateOverSubMembers
+- `0x6AF320` (~176B) - ..\source\granny_member_iterator.cpp | %s(%d): Illegal iterator type (%d) in IterateOverSubMembers
+- `0x6AF430` (~112B) - d:\exodduspc\code\granny\xbox\source\contain.inl
+- `0x6AF780` (~64B) - d:\exodduspc\code\granny\xbox\source\contain.inl
+- `0x6AF7C0` (~176B) - ..\source\granny_pointer_hash.cpp | d:\exodduspc\code\granny\xbox\source\contain.inl
+- `0x6B38F0` (~400B) - %s\ScreenShots\%8x.bmp
+- `0x6B6370` (~416B) - %s\Save\%s\*.* | %s\Save\%s
+- `0x6B6510` (~160B) - %8x | %s\Save\%s\*.* | %s\Save\%s
+- `0x6B65B0` (~256B) - %s\Save\*.* | %s\Save\%s | %s\Save\%s\
+- `0x6B66B0` (~224B) - %s\Save\%s | %s\Save\%s\
+- `0x6B7B90` (~464B) - SigmaTel | french | german
+- `0x6B7D60` (~432B) - stranger.fev
+- `0x6BD1D0` (~208B) - \data\shaders\%s.bin
+- `0x6BD2A0` (~1376B) - #define FXAA_QUALITY__PRESET 12 | #define FXAA_QUALITY__PRESET %.02d | main
+- `0x6BDDC0` (~768B) - bin\splash.raw
+- `0x6D1370` (~1424B) - glBlendColor | glBlendEquation | glDrawRangeElements
+- `0x6D1900` (~1712B) - glActiveTexture | glClientActiveTexture | glMultiTexCoord1d
+- `0x6D1FB0` (~1664B) - glBlendFuncSeparate | glFogCoordf | glFogCoordfv
+- `0x6D2630` (~736B) - glGenQueries | glDeleteQueries | glIsQuery
+- `0x6D2910` (~3392B) - glBlendEquationSeparate | glDrawBuffers | glStencilOpSeparate
+- `0x6D3650` (~272B) - glUniformMatrix2x3fv | glUniformMatrix3x2fv | glUniformMatrix2x4fv
+- `0x6D3760` (~2160B) - glColorMaski | glGetBooleani_v | glGetIntegeri_v
+- `0x6D3FD0` (~1280B) - glActiveTextureARB | glClientActiveTextureARB | glMultiTexCoord1dARB
+- `0x6D44D0` (~192B) - glLoadTransposeMatrixfARB | glLoadTransposeMatrixdARB | glMultTransposeMatrixfARB
+- `0x6D4590` (~80B) - glSampleCoverageARB
+- `0x6D45E0` (~304B) - glCompressedTexImage3DARB | glCompressedTexImage2DARB | glCompressedTexImage1DARB
+- `0x6D4710` (~128B) - glPointParameterfARB | glPointParameterfvARB
+- `0x6D4790` (~416B) - glWeightbvARB | glWeightsvARB | glWeightivARB
+- `0x6D4930` (~224B) - glCurrentPaletteMatrixARB | glMatrixIndexubvARB | glMatrixIndexusvARB
+- `0x6D4A10` (~640B) - glWindowPos2dARB | glWindowPos2dvARB | glWindowPos2fARB
+- `0x6D4C90` (~2288B) - glVertexAttrib1dARB | glVertexAttrib1dvARB | glVertexAttrib1fARB
+- `0x6D5580` (~448B) - glBindBufferARB | glDeleteBuffersARB | glGenBuffersARB
+- `0x6D5740` (~336B) - glGenQueriesARB | glDeleteQueriesARB | glIsQueryARB
+- `0x6D5890` (~1456B) - glDeleteObjectARB | glGetHandleARB | glDetachObjectARB
+- `0x6D5E40` (~160B) - glBindAttribLocationARB | glGetActiveAttribARB | glGetAttribLocationARB
+- `0x6D5EE0` (~80B) - glDrawBuffersARB
+- `0x6D5F30` (~80B) - glClampColorARB
+- `0x6D5F80` (~128B) - glDrawArraysInstancedARB | glDrawElementsInstancedARB
+- `0x6D6000` (~768B) - glIsRenderbuffer | glBindRenderbuffer | glDeleteRenderbuffers
+- `0x6D6300` (~192B) - glProgramParameteriARB | glFramebufferTextureARB | glFramebufferTextureLayerARB
+- `0x6D63C0` (~80B) - glVertexAttribDivisor
+- `0x6D6410` (~128B) - glMapBufferRange | glFlushMappedBufferRange
+- `0x6D6490` (~80B) - glTexBufferARB
+- `0x6D64E0` (~192B) - glBindVertexArray | glDeleteVertexArrays | glGenVertexArrays
+- `0x6D65A0` (~80B) - glBlendColorEXT
+- `0x6D65F0` (~80B) - glPolygonOffsetEXT
+- `0x6D6640` (~128B) - glTexImage3DEXT | glTexSubImage3DEXT
+- `0x6D66C0` (~128B) - glGetTexFilterFuncSGIS | glTexFilterFuncSGIS
+- `0x6D6740` (~128B) - glTexSubImage1DEXT | glTexSubImage2DEXT
+- `0x6D67C0` (~224B) - glCopyTexImage1DEXT | glCopyTexImage2DEXT | glCopyTexSubImage1DEXT
+- `0x6D68A0` (~416B) - glGetHistogramEXT | glGetHistogramParameterfvEXT | glGetHistogramParameterivEXT
+- `0x6D6A40` (~512B) - glConvolutionFilter1DEXT | glConvolutionFilter2DEXT | glConvolutionParameterfEXT
+- `0x6D6C40` (~304B) - glColorTableSGI | glColorTableParameterfvSGI | glColorTableParameterivSGI
+- `0x6D6D70` (~272B) - glPixelTexGenParameteriSGIS | glPixelTexGenParameterivSGIS | glPixelTexGenParameterfSGIS
+- `0x6D6E80` (~80B) - glPixelTexGenSGIX
+- `0x6D6ED0` (~144B) - glTexImage4DSGIS | glTexSubImage4DSGIS
+- `0x6D6F60` (~272B) - glAreTexturesResidentEXT | glBindTextureEXT | glDeleteTexturesEXT
+- `0x6D7070` (~128B) - glDetailTexFuncSGIS | glGetDetailTexFuncSGIS
+- `0x6D70F0` (~128B) - glSharpenTexFuncSGIS | glGetSharpenTexFuncSGIS
+- `0x6D7170` (~128B) - glSampleMaskSGIS | glSamplePatternSGIS
+- `0x6D7220` (~80B) - glBlendEquationEXT
+- `0x6D7270` (~192B) - glSpriteParameterfSGIX | glSpriteParameterfvSGIX | glSpriteParameteriSGIX
+- `0x6D7330` (~128B) - glPointParameterfEXT | glPointParameterfvEXT
+- `0x6D73B0` (~128B) - glPointParameterfSGIS | glPointParameterfvSGIS
+- `0x6D7430` (~272B) - glGetInstrumentsSGIX | glInstrumentsBufferSGIX | glPollInstrumentsSGIX
+- `0x6D7540` (~80B) - glFrameZoomSGIX
+- `0x6D7590` (~80B) - glTagSampleBufferSGIX
+- `0x6D75E0` (~26B) - glDeformationMap3dSGIX
+- `0x6D75FA` (~166B) - glDeformationMap3fSGIX | glDeformSGIX | glLoadIdentityDeformationMapSGIX
+- `0x6D76A0` (~80B) - glReferencePlaneSGIX
+- `0x6D76F0` (~80B) - glFlushRasterSGIX
+- `0x6D7740` (~128B) - glFogFuncSGIS | glGetFogFuncSGIS
+- `0x6D77D0` (~272B) - glImageTransformParameteriHP | glImageTransformParameterfHP | glImageTransformParameterivHP
+- `0x6D78E0` (~128B) - glColorSubTableEXT | glCopyColorSubTableEXT
+- `0x6D7960` (~80B) - glHintPGI
+- `0x6D79E0` (~272B) - glGetListParameterfvSGIX | glGetListParameterivSGIX | glListParameterfSGIX
+- `0x6D7AF0` (~80B) - glIndexMaterialEXT
+- `0x6D7B40` (~80B) - glIndexFuncEXT
+- `0x6D7B90` (~128B) - glLockArraysEXT | glUnlockArraysEXT
+- `0x6D7C10` (~128B) - glCullParameterdvEXT | glCullParameterfvEXT
+- `0x6D7C90` (~704B) - glFragmentColorMaterialSGIX | glFragmentLightfSGIX | glFragmentLightfvSGIX
+- `0x6D7F50` (~80B) - glDrawRangeElementsEXT
+- `0x6D7FA0` (~160B) - glApplyTextureEXT | glTextureLightEXT | glTextureMaterialEXT
+- `0x6D8040` (~272B) - glAsyncMarkerSGIX | glFinishAsyncSGIX | glPollAsyncSGIX
+- `0x6D8150` (~192B) - glVertexPointervINTEL | glNormalPointervINTEL | glColorPointervINTEL
+- `0x6D8210` (~192B) - glPixelTransformParameteriEXT | glPixelTransformParameterfEXT | glPixelTransformParameterivEXT
+- `0x6D82D0` (~656B) - glSecondaryColor3bEXT | glSecondaryColor3bvEXT | glSecondaryColor3dEXT
+- `0x6D8560` (~80B) - glTextureNormalEXT
+- `0x6D85B0` (~128B) - glMultiDrawArraysEXT | glMultiDrawElementsEXT
+- `0x6D8630` (~224B) - glFogCoordfEXT | glFogCoordfvEXT | glFogCoorddEXT
+- `0x6D8710` (~848B) - glTangent3bEXT | glTangent3bvEXT | glTangent3dEXT
+- `0x6D8A60` (~80B) - glFinishTextureSUNX
+- `0x6D8AB0` (~336B) - glGlobalAlphaFactorbSUN | glGlobalAlphaFactorsSUN | glGlobalAlphaFactoriSUN
+- `0x6D8C00` (~304B) - glReplacementCodeuiSUN | glReplacementCodeusSUN | glReplacementCodeubSUN
+- `0x6D8D30` (~1488B) - glColor4ubVertex2fSUN | glColor4ubVertex2fvSUN | glColor4ubVertex3fSUN
+- `0x6D9300` (~80B) - glBlendFuncSeparateEXT
+- `0x6D9350` (~64B) - glVertexWeightfEXT | glVertexWeightfvEXT
+- `0x6D9390` (~96B) - glVertexWeightPointerEXT
+- `0x6D93F0` (~128B) - glFlushVertexArrayRangeNV | glVertexArrayRangeNV
+- `0x6D9470` (~512B) - glCombinerParameterfvNV | glCombinerParameterfNV | glCombinerParameterivNV
+- `0x6D9670` (~80B) - glResizeBuffersMESA
+- `0x6D96C0` (~912B) - glWindowPos2dMESA | glWindowPos2dvMESA | glWindowPos2fMESA
+- `0x6D9A50` (~128B) - glMultiModeDrawArraysIBM | glMultiModeDrawElementsIBM
+- `0x6D9AD0` (~336B) - glColorPointerListIBM | glSecondaryColorPointerListIBM | glEdgeFlagPointerListIBM
+- `0x6D9C20` (~80B) - glTbufferMask3DFX
+- `0x6D9C70` (~89B) - glSampleMaskEXT | glSamplePatternEXT
+- `0x6D9CF0` (~80B) - glTextureColorMaskSGIS
+- `0x6D9D40` (~304B) - glDeleteFencesNV | glGenFencesNV | glIsFenceNV
+- `0x6D9E70` (~384B) - glMapControlPointsNV | glMapParameterivNV | glMapParameterfvNV
+- `0x6D9FF0` (~128B) - glCombinerStageParameterfvNV | glGetCombinerStageParameterfvNV
+- `0x6DA070` (~1470B) - glAreProgramsResidentNV | glBindProgramNV | glDeleteProgramsNV
+- `0x6DA62E` (~882B) - glVertexAttrib3sNV | glVertexAttrib3svNV | glVertexAttrib4dNV
+- `0x6DA9A0` (~192B) - glTexBumpParameterivATI | glTexBumpParameterfvATI | glGetTexBumpParameterivATI
+- `0x6DAA60` (~560B) - glGenFragmentShadersATI | glBindFragmentShaderATI | glDeleteFragmentShaderATI
+- `0x6DAC90` (~128B) - glPNTrianglesiATI | glPNTrianglesfATI
+- `0x6DAD10` (~480B) - glNewObjectBufferATI | glIsObjectBufferATI | glUpdateObjectBufferATI
+- `0x6DAEF0` (~115B) - glBeginVertexShaderEXT | glEndVertexShaderEXT | glBindVertexShaderEXT
+- `0x6DAF63` (~1453B) - glGenVertexShadersEXT | glDeleteVertexShaderEXT | glShaderOp1EXT
+- `0x6DB510` (~952B) - glVertexStream1sATI | glVertexStream1svATI | glVertexStream1iATI
+- `0x6DB8C8` (~712B) - glVertexStream4ivATI | glVertexStream4fATI | glVertexStream4fvATI
+- `0x6DBB90` (~160B) - glElementPointerATI | glDrawElementArrayATI | glDrawRangeElementArrayATI
+- `0x6DBC30` (~80B) - glDrawMeshArraysSUN
+- `0x6DBC80` (~304B) - glGenOcclusionQueriesNV | glDeleteOcclusionQueriesNV | glIsOcclusionQueryNV
+- `0x6DBDB0` (~128B) - glPointParameteriNV | glPointParameterivNV
+- `0x6DBE30` (~80B) - glActiveStencilFaceEXT
+- `0x6DBE80` (~224B) - glElementPointerAPPLE | glDrawElementArrayAPPLE | glDrawRangeElementArrayAPPLE
+- `0x6DBF60` (~336B) - glGenFencesAPPLE | glDeleteFencesAPPLE | glSetFenceAPPLE
+- `0x6DC0B0` (~192B) - glBindVertexArrayAPPLE | glDeleteVertexArraysAPPLE | glGenVertexArraysAPPLE
+- `0x6DC170` (~160B) - glVertexArrayRangeAPPLE | glFlushVertexArrayRangeAPPLE | glVertexArrayParameteriAPPLE
+- `0x6DC211` (~79B) - glDrawBuffersATI
+- `0x6DC260` (~272B) - glProgramNamedParameter4fNV | glProgramNamedParameter4dNV | glProgramNamedParameter4fvNV
+- `0x6DC370` (~1712B) - glVertex2hNV | glVertex2hvNV | glVertex3hNV
+- `0x6DCA20` (~128B) - glPixelDataRangeNV | glFlushPixelDataRangeNV
+- `0x6DCAA0` (~128B) - glPrimitiveRestartNV | glPrimitiveRestartIndexNV
+- `0x6DCB20` (~128B) - glMapObjectBufferATI | glUnmapObjectBufferATI
+- `0x6DCBA0` (~128B) - glStencilOpSeparateATI | glStencilFuncSeparateATI
+- `0x6DCC20` (~150B) - glVertexAttribArrayObjectATI | glGetVertexAttribArrayObjectfvATI | glGetVertexAttribArrayObjectivATI
+- `0x6DCCC0` (~80B) - glDepthBoundsEXT
+- `0x6DCD10` (~80B) - glBlendEquationSeparateEXT
+- `0x6DCD60` (~656B) - glIsRenderbufferEXT | glBindRenderbufferEXT | glDeleteRenderbuffersEXT
+- `0x6DCFF0` (~80B) - glStringMarkerGREMEDY
+- `0x6DD040` (~80B) - glStencilClearTagEXT
+- `0x6DD090` (~80B) - glBlitFramebufferEXT
+- `0x6DD0E0` (~80B) - glRenderbufferStorageMultisampleEXT
+- `0x6DD130` (~128B) - glGetQueryObjecti64vEXT | glGetQueryObjectui64vEXT
+- `0x6DD1B0` (~128B) - glProgramEnvParameters4fvEXT | glProgramLocalParameters4fvEXT
+- `0x6DD230` (~128B) - glBufferParameteriAPPLE | glFlushMappedBufferRangeAPPLE
+- `0x6DD2B0` (~448B) - glGetUniformuivEXT | glBindFragDataLocationEXT | glGetFragDataLocationEXT
+- `0x6DD470` (~128B) - glDrawArraysInstancedEXT | glDrawElementsInstancedEXT
+- `0x6DD4F0` (~80B) - glTexBufferEXT
+- `0x6DD540` (~160B) - glDepthRangedNV | glClearDepthdNV | glDepthBoundsdNV
+- `0x6DD5E0` (~67B) - glRenderbufferStorageMultisampleCoverageNV
+- `0x6DD630` (~160B) - glProgramBufferParametersfvNV | glProgramBufferParametersIivNV | glProgramBufferParametersIuivNV
+- `0x6DD6D0` (~272B) - glColorMaskIndexedEXT | glGetBooleanIndexedvEXT | glGetIntegerIndexedvEXT
+- `0x6DD7E0` (~448B) - glBeginTransformFeedbackNV | glEndTransformFeedbackNV | glTransformFeedbackAttribsNV
+- `0x6DD9A0` (~160B) - glUniformBufferEXT | glGetUniformBufferSizeEXT | glGetUniformOffsetEXT
+- `0x6DDA40` (~272B) - glTexParameterIivEXT | glTexParameterIuivEXT | glGetTexParameterIivEXT
+- `0x6DDB50` (~80B) - glFrameTerminatorGREMEDY
+- `0x6DDBA0` (~128B) - glBeginConditionalRenderNV | glEndConditionalRenderNV
+- `0x6DDC20` (~320B) - glBeginTransformFeedbackEXT | glEndTransformFeedbackEXT | glBindBufferRangeEXT
+- `0x6DDD60` (~748B) - glClientAttribDefaultEXT | glPushClientAttribDefaultEXT | glMatrixLoadfEXT
+- `0x6DE04C` (~485B) - glTextureParameterfEXT | glTextureParameterfvEXT | glTextureParameteriEXT
+- `0x6DE231` (~2560B) - glGetTextureParameterfvEXT | glGetTextureParameterivEXT | glGetTextureLevelParameterfvEXT
+- `0x6DEC31` (~2959B) - glNamedProgramLocalParameters4fvEXT | glNamedProgramLocalParameterI4iEXT | glNamedProgramLocalParameterI4ivEXT
+- `0x6DF7C0` (~160B) - glGetMultisamplefvNV | glSampleMaskIndexedNV | glTexRenderbufferNV
+- `0x6DF860` (~304B) - glBindTransformFeedbackNV | glDeleteTransformFeedbacksNV | glGenTransformFeedbacksNV
+- `0x6DF990` (~80B) - glBlendFuncSeparateINGR
+- `0x6DF9E0` (~80B) - glIglooInterfaceSGIX
+- `0x6DFA30` (~126B) - glFragmentLightModeliEXT | glFragmentLightModelfEXT | glFragmentLightModelivEXT
+- `0x6DFAAE` (~578B) - glFragmentLightiEXT | glFragmentLightfEXT | glFragmentLightivEXT
+- `0x6DFCF0` (~192B) - glProgramParameteriEXT | glFramebufferTextureEXT | glFramebufferTextureLayerEXT
+- `0x6DFDB0` (~144B) - glBeginSceneEXT | glEndSceneEXT
+- `0x6DFE40` (~1520B) - glProgramLocalParameterI4iNV | glProgramLocalParameterI4ivNV | glProgramLocalParametersI4ivNV
+- `0x6E0430` (~272B) - glDepthRangefOES | glFrustumfOES | glOrthofOES
+- `0x6E0540` (~147B) - wglCreateBufferRegionARB | wglDeleteBufferRegionARB | wglSaveBufferRegionARB
+- `0x6E0600` (~80B) - wglGetExtensionsStringARB
+- `0x6E0650` (~160B) - wglGetPixelFormatAttribivARB | wglGetPixelFormatAttribfvARB | wglChoosePixelFormatARB
+- `0x6E06F0` (~128B) - wglMakeContextCurrentARB | wglGetCurrentReadDCARB
+- `0x6E0770` (~224B) - wglCreatePbufferARB | wglGetPbufferDCARB | wglReleasePbufferDCARB
+- `0x6E0850` (~160B) - wglBindTexImageARB | wglReleaseTexImageARB | wglSetPbufferAttribARB
+- `0x6E08F0` (~80B) - wglCreateContextAttribsARB
+- `0x6E0940` (~128B) - wglMakeContextCurrentEXT | wglGetCurrentReadDCEXT
+- `0x6E09C0` (~160B) - wglGetPixelFormatAttribivEXT | wglGetPixelFormatAttribfvEXT | wglChoosePixelFormatEXT
+- `0x6E0A60` (~224B) - wglCreatePbufferEXT | wglGetPbufferDCEXT | wglReleasePbufferDCEXT
+- `0x6E0B40` (~128B) - wglGetDigitalVideoParametersI3D | wglSetDigitalVideoParametersI3D
+- `0x6E0BC0` (~192B) - wglGetGammaTableParametersI3D | wglSetGammaTableParametersI3D | wglGetGammaTableI3D
+- `0x6E0C80` (~480B) - wglEnableGenlockI3D | wglDisableGenlockI3D | wglIsEnabledGenlockI3D
+- `0x6E0E60` (~192B) - wglCreateImageBufferI3D | wglDestroyImageBufferI3D | wglAssociateImageBufferEventsI3D
+- `0x6E0F20` (~124B) - wglEnableFrameLockI3D | wglDisableFrameLockI3D | wglIsEnabledFrameLockI3D
+- `0x6E0FF0` (~160B) - wglEnumerateVideoDevicesNV | wglBindVideoDeviceNV | wglQueryCurrentContextNV
+- `0x6E1090` (~272B) - wglJoinSwapGroupNV | wglBindSwapBarrierNV | wglQuerySwapGroupNV
+- `0x6E11A0` (~224B) - wglEnumGpusNV | wglEnumGpuDevicesNV | wglCreateAffinityDCNV
+- `0x6E1280` (~192B) - wglCreateDisplayColorTableEXT | wglLoadDisplayColorTableEXT | wglBindDisplayColorTableEXT
+- `0x6E1340` (~80B) - wglGetExtensionsStringEXT
+- `0x6E1390` (~128B) - wglSwapIntervalEXT | wglGetSwapIntervalEXT
+- `0x6E1410` (~128B) - wglAllocateMemoryNV | wglFreeMemoryNV
+- `0x6E1490` (~272B) - wglGetSyncValuesOML | wglGetMscRateOML | wglSwapBuffersMscOML
+- `0x6E15A0` (~192B) - wglGetFrameUsageI3D | wglBeginFrameTrackingI3D | wglEndFrameTrackingI3D
+- `0x6E1660` (~272B) - wglGetVideoDeviceNV | wglReleaseVideoDeviceNV | wglBindVideoImageNV
+- `0x6E1970` (~64B) - wglGetExtensionsStringARB
+- `0x6E1A30` (~557B) - glGetString(GL_EXTENSIONS) failed. | %s %s | %s%s
+- `0x6E1C5D` (~115B) - Extension name exceeds 1023 characters.
+- `0x6E1DA0` (~1774B) - GL extension querying failed. | GL_ARB_imaging | GL_ARB_multitexture
+- `0x6E248E` (~2561B) - GL_ARB_instanced_arrays | GL_ARB_map_buffer_range | GL_ARB_texture_buffer_object
+- `0x6E2E8F` (~2361B) - GL_SGIX_shadow_ambient | GL_EXT_index_texture | GL_EXT_index_material
+- `0x6E37C8` (~2889B) - GL_IBM_vertex_array_lists | GL_SGIX_subsample | GL_SGIX_ycrcb_subsample
+- `0x6E4311` (~2725B) - GL_NV_fragment_program2 | GL_NV_vertex_program2_option | GL_NV_vertex_program3
+- `0x6E4DB6` (~650B) - WGL_NV_render_depth_texture | WGL_NV_render_texture_rectangle | WGL_ATI_pixel_format_float
+- `0x6E6680` (~112B) - basic_string
+- `0x6E6809` (~56B) - string too long
+- `0x6E6841` (~56B) - invalid string position
+- `0x6E69B7` (~125B) - Attempted a typeid of NULL pointer! | Bad read pointer - no RTTI data! | Access violation - no RTTI data!
+- `0x6E6D43` (~213B) - Bad dynamic_cast! | Access violation - no RTTI data!
+- `0x6E87B0` (~41B) - CorExitProcess
+- `0x6EAE16` (~112B) - EncodePointer
+- `0x6EAE91` (~121B) - DecodePointer
+- `0x6EAF7B` (~213B) - EncodePointer | DecodePointer
+- `0x6EB224` (~397B) - FlsAlloc | FlsGetValue | FlsSetValue
+- `0x6EBAA7` (~425B) - <program name unknown> | ... | Microsoft Visual C++ Runtime Library
+- `0x6EFEA3` (~711B) - ccs | UTF-8 | UTF-16LE
+- `0x6F5630` (~839B) - bad exception
+- `0x6F5D86` (~365B) - e+000
+- `0x6F6716` (~41B) - KERNEL32 | IsProcessorFeaturePresent
+- `0x6F7596` (~39B) -  ?? 
+- `0x6F7A22` (~55B) - {flat}
+- `0x6F7C37` (~82B) - {for 
+- `0x6F7E91` (~210B) - char  | short  | int 
+- `0x6F7F65` (~218B) - void
+- `0x6F8041` (~125B) -  throw(
+- `0x6F8416` (~309B) - {for 
+- `0x6F8643` (~715B) - NULL | `template-parameter | `non-type-template-parameter
+- `0x6F8910` (~220B) - void | void  | cli::array<
+- `0x6F89EE` (~450B) - void | `template-parameter
+- `0x6F8BB2` (~1435B) - operator | `string' | `anonymous namespace'
+- `0x6F955D` (~261B) - cointerface  | coclass  | enum 
+- `0x6F96AE` (~152B) - void
+- `0x6F9748` (~2933B) - }'  | `vtordispex{
+- `0x6FA4FB` (~622B) - `anonymous namespace'
+- `0x6FAABF` (~1221B) - volatile  | const 
+- `0x6FAF86` (~303B) - CV: 
+- `0x6FB284` (~949B) - char | short | int
+- `0x6FB63B` (~310B) - volatile
+- `0x6FB773` (~190B) - void | void 
+- `0x6FB8A1` (~359B) - USER32.DLL | MessageBoxA | GetProcessWindowStation
+- `0x7014B1` (~76B) - CONOUT$
+- `0x7014FF` (~1560B) - 1#SNAN | 1#IND | 1#INF

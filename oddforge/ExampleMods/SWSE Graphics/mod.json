@@ -1,0 +1,6 @@
+{
+  "name": "SWSE Graphics",
+  "author": "SWSE",
+  "version": "0.1",
+  "description": "The SWSE graphics overhaul. Adds screen-space post-processing and lighting effects (sharpening, bloom, ambient occlusion, and screen-space global illumination) rendered by SWSE, the Stranger's Wrath Script Extender. Requires SWSE installed in the game's bin folder. Press HOME in-game to open the effects menu. Enable/disable this mod like any other; it only affects the 3D scene, not menus or HUD."
+}

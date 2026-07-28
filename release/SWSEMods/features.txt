@@ -1,0 +1,32 @@
+﻿# SWSE â€” feature switches
+#
+# SWSE is several independent systems in one DLL. Turn off anything you do not
+# want. A disabled feature installs NO HOOKS AT ALL, so the game runs as if
+# SWSE never touched it â€” not a hook that runs and returns early.
+#
+# Delete this file (or leave every line `on`) for the full set.
+# Changes take effect on the next launch.
+
+
+# In-game console overlay (~ key) and the remote command mailbox.
+# Turning this off also disables driving the game from outside.
+console    = on
+
+# Post-process graphics pipeline: RTGI and the other shader passes.
+graphics   = on
+
+# HD texture replacement â€” swaps .oft files in at upload time.
+# Archives are never modified, so this is always safe to turn off.
+hdtextures = on
+
+# Additive hit reactions: NPCs flinch from where they were actually shot.
+hitreact   = on
+
+# Foliage identification and wind â€” gentle sway, and plants pushed aside as
+# you walk through them.
+foliage    = on
+
+# NPC AI tuning from `SWSE Console\aiprefs.txt` (sight, fire rate, accuracy).
+# This only does anything if aiprefs.txt names an `active` profile; on its own
+# it changes nothing.
+aituning   = on

@@ -1,0 +1,21 @@
+# SWSE settings - named feature toggles.
+#
+# Read at startup and applied as each level spawns its characters.
+# Run `tuning` in the console to reload without restarting the game.
+#
+# These are RULES, not lists: noimmortals works by measuring a character's
+# health rather than naming it, so it catches every protected variant --
+# including the ones nobody has identified yet. A hash list cannot do that,
+# which is how the farmers stayed immortal after a sweep aimed at one hash.
+
+# Any character the game shipped as unkillable (100000 hp) gets this health
+# instead. "off" leaves them alone. 22 of the game's 66 characters are
+# protected this way: townsfolk, natives, farmers, storekeepers, the Vykker Doc.
+noimmortals  = 100
+
+# Should those newly-mortal characters gib on death?
+# Note: townsfolk are knocked UNCONSCIOUS rather than killed (the game's
+# non-lethal capture path), so this may never fire for them.
+immortalsgib = on
+
+# Per-character detail lives in characters.txt, which overrides these.

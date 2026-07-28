@@ -1,0 +1,12208 @@
+# Stranger's Wrath - RTTI class / vtable recovery
+
+432 classes with at least one recovered vtable (548 vtables, 10560 virtual method slots total). Each method is now known to belong to this class, even before we know its exact purpose - labelled `ClassName::vfunc<N>` in ALL_FUNCTIONS cross-reference.
+
+
+## AVEventPrefs  (vtable @ 0x7816A4, 22 methods)
+
+- `AVEventPrefs::vfunc0` = `0x4CF5C0`
+- `AVEventPrefs::vfunc1` = `0x604E40`
+- `AVEventPrefs::vfunc2` = `0x4041C0`
+- `AVEventPrefs::vfunc3` = `0x4041C0`
+- `AVEventPrefs::vfunc4` = `0x59E9A0`
+- `AVEventPrefs::vfunc5` = `0x460B60`
+- `AVEventPrefs::vfunc6` = `0x610BC0`
+- `AVEventPrefs::vfunc7` = `0x547170`
+- `AVEventPrefs::vfunc8` = `0x610BD0`
+- `AVEventPrefs::vfunc9` = `0x64A9B0`
+- `AVEventPrefs::vfunc10` = `0x60EAE0`
+- `AVEventPrefs::vfunc11` = `0x460B60`
+- `AVEventPrefs::vfunc12` = `0x437C60`
+- `AVEventPrefs::vfunc13` = `0x460B60`
+- `AVEventPrefs::vfunc14` = `0x64CAE0`
+- `AVEventPrefs::vfunc15` = `0x57B040`
+- `AVEventPrefs::vfunc16` = `0x437C60`
+- `AVEventPrefs::vfunc17` = `0x610C00`
+- `AVEventPrefs::vfunc18` = `0x59E9B0`
+- `AVEventPrefs::vfunc19` = `0x59E9D0`
+- `AVEventPrefs::vfunc20` = `0x460B60`
+- `AVEventPrefs::vfunc21` = `0x67AA00`
+
+## ActivatableMixin  (vtable @ 0x76C8C4, 7 methods)
+
+- `ActivatableMixin::vfunc0` = `0x4659C0`
+- `ActivatableMixin::vfunc1` = `0x465A60`
+- `ActivatableMixin::vfunc2` = `0x516940`
+- `ActivatableMixin::vfunc3` = `0x465AA0`
+- `ActivatableMixin::vfunc4` = `0x465AE0`
+- `ActivatableMixin::vfunc5` = `0x465C00`
+- `ActivatableMixin::vfunc6` = `0x465C30`
+
+## ActivateCollisionComponent  (vtable @ 0x79A98C, 5 methods)
+
+- `ActivateCollisionComponent::vfunc0` = `0x4CF5C0`
+- `ActivateCollisionComponent::vfunc1` = `0x604E40`
+- `ActivateCollisionComponent::vfunc2` = `0x680730`
+- `ActivateCollisionComponent::vfunc3` = `0x680760`
+- `ActivateCollisionComponent::vfunc4` = `0x6806C0`
+
+## Actor  (vtable @ 0x7667FC, 18 methods)
+
+- `Actor::vfunc0` = `0x4179D0`
+- `Actor::vfunc1` = `0x46B3B0`
+- `Actor::vfunc2` = `0x421860`
+- `Actor::vfunc3` = `0x41DFF0`
+- `Actor::vfunc4` = `0x546E20`
+- `Actor::vfunc5` = `0x435630`
+- `Actor::vfunc6` = `0x46B350`
+- `Actor::vfunc7` = `0x41E090`
+- `Actor::vfunc8` = `0x41E1C0`
+- `Actor::vfunc9` = `0x41E2C0`
+- `Actor::vfunc10` = `0x546E20`
+- `Actor::vfunc11` = `0x46B3A0`
+- `Actor::vfunc12` = `0x516940`
+- `Actor::vfunc13` = `0x437C60`
+- `Actor::vfunc14` = `0x437C60`
+- `Actor::vfunc15` = `0x437C60`
+- `Actor::vfunc16` = `0x41E0E0`
+- `Actor::vfunc17` = `0x41E170`
+
+## Actor  (vtable @ 0x76677C, 31 methods)
+
+- `Actor::vfunc0` = `0x421880`
+- `Actor::vfunc1` = `0x421890`
+- `Actor::vfunc2` = `0x46A610`
+- `Actor::vfunc3` = `0x46A630`
+- `Actor::vfunc4` = `0x46A650`
+- `Actor::vfunc5` = `0x46A660`
+- `Actor::vfunc6` = `0x46AB50`
+- `Actor::vfunc7` = `0x46AB70`
+- `Actor::vfunc8` = `0x46AB90`
+- `Actor::vfunc9` = `0x63DDA0`
+- `Actor::vfunc10` = `0x46ABC0`
+- `Actor::vfunc11` = `0x63DDB0`
+- `Actor::vfunc12` = `0x46ABD0`
+- `Actor::vfunc13` = `0x46AF60`
+- `Actor::vfunc14` = `0x46ABE0`
+- `Actor::vfunc15` = `0x46AC70`
+- `Actor::vfunc16` = `0x46B210`
+- `Actor::vfunc17` = `0x46ACC0`
+- `Actor::vfunc18` = `0x46ACF0`
+- `Actor::vfunc19` = `0x46A7D0`
+- `Actor::vfunc20` = `0x46AF00`
+- `Actor::vfunc21` = `0x516940`
+- `Actor::vfunc22` = `0x47C830`
+- `Actor::vfunc23` = `0x4205B0`
+- `Actor::vfunc24` = `0x420B70`
+- `Actor::vfunc25` = `0x460B60`
+- `Actor::vfunc26` = `0x420590`
+- `Actor::vfunc27` = `0x65F170`
+- `Actor::vfunc28` = `0x65F500`
+- `Actor::vfunc29` = `0x46AC90`
+- `Actor::vfunc30` = `0x46AD10`
+
+## Actor  (vtable @ 0x766750, 6 methods)
+
+- `Actor::vfunc0` = `0x4218B0`
+- `Actor::vfunc1` = `0x4607B0`
+- `Actor::vfunc2` = `0x4600D0`
+- `Actor::vfunc3` = `0x46D470`
+- `Actor::vfunc4` = `0x65F500`
+- `Actor::vfunc5` = `0x4218E0`
+
+## Actor  (vtable @ 0x7665D4, 94 methods)
+
+- `Actor::vfunc0` = `0x41D380`
+- `Actor::vfunc1` = `0x604E40`
+- `Actor::vfunc2` = `0x57E760`
+- `Actor::vfunc3` = `0x57E760`
+- `Actor::vfunc4` = `0x5FDAA0`
+- `Actor::vfunc5` = `0x41DBC0`
+- `Actor::vfunc6` = `0x680110`
+- `Actor::vfunc7` = `0x604E40`
+- `Actor::vfunc8` = `0x47E370`
+- `Actor::vfunc9` = `0x64CAE0`
+- `Actor::vfunc10` = `0x64CAE0`
+- `Actor::vfunc11` = `0x64CAE0`
+- `Actor::vfunc12` = `0x64CAE0`
+- `Actor::vfunc13` = `0x41D1A0`
+- `Actor::vfunc14` = `0x64CAE0`
+- `Actor::vfunc15` = `0x65F310`
+- `Actor::vfunc16` = `0x41DB90`
+- `Actor::vfunc17` = `0x41F490`
+- `Actor::vfunc18` = `0x460B60`
+- `Actor::vfunc19` = `0x460260`
+- `Actor::vfunc20` = `0x460280`
+- `Actor::vfunc21` = `0x64CAE0`
+- `Actor::vfunc22` = `0x460B60`
+- `Actor::vfunc23` = `0x45F970`
+- `Actor::vfunc24` = `0x41E1A0`
+- `Actor::vfunc25` = `0x45F8A0`
+- `Actor::vfunc26` = `0x45F920`
+- `Actor::vfunc27` = `0x516940`
+- `Actor::vfunc28` = `0x64A9B0`
+- `Actor::vfunc29` = `0x460160`
+- `Actor::vfunc30` = `0x41FB70`
+- `Actor::vfunc31` = `0x41FB50`
+- `Actor::vfunc32` = `0x460830`
+- `Actor::vfunc33` = `0x460A00`
+- `Actor::vfunc34` = `0x421110`
+- `Actor::vfunc35` = `0x460B70`
+- `Actor::vfunc36` = `0x460110`
+- `Actor::vfunc37` = `0x4203F0`
+- `Actor::vfunc38` = `0x460B60`
+- `Actor::vfunc39` = `0x64A9B0`
+- `Actor::vfunc40` = `0x460610`
+- `Actor::vfunc41` = `0x41D790`
+- `Actor::vfunc42` = `0x45FE40`
+- `Actor::vfunc43` = `0x4218C0`
+- `Actor::vfunc44` = `0x41DBA0`
+- `Actor::vfunc45` = `0x516940`
+- `Actor::vfunc46` = `0x460A20`
+- `Actor::vfunc47` = `0x460A70`
+- `Actor::vfunc48` = `0x460A40`
+- `Actor::vfunc49` = `0x460B60`
+- `Actor::vfunc50` = `0x421160`
+- `Actor::vfunc51` = `0x41DD10`
+- `Actor::vfunc52` = `0x41D9C0`
+- `Actor::vfunc53` = `0x41E1E0`
+- `Actor::vfunc54` = `0x4526B0`
+- `Actor::vfunc55` = `0x41E230`
+- `Actor::vfunc56` = `0x41E010`
+- `Actor::vfunc57` = `0x41E030`
+- `Actor::vfunc58` = `0x41E050`
+- `Actor::vfunc59` = `0x41E070`
+- `Actor::vfunc60` = `0x437C60`
+- `Actor::vfunc61` = `0x64A9B0`
+- `Actor::vfunc62` = `0x41F380`
+- `Actor::vfunc63` = `0x41E300`
+- `Actor::vfunc64` = `0x41E300`
+- `Actor::vfunc65` = `0x41FC80`
+- `Actor::vfunc66` = `0x41FBB0`
+- `Actor::vfunc67` = `0x460B60`
+- `Actor::vfunc68` = `0x41FD00`
+- `Actor::vfunc69` = `0x41FCF0`
+- `Actor::vfunc70` = `0x41FFA0`
+- `Actor::vfunc71` = `0x41DAD0`
+- `Actor::vfunc72` = `0x4203B0`
+- `Actor::vfunc73` = `0x4203D0`
+- `Actor::vfunc74` = `0x460B60`
+- `Actor::vfunc75` = `0x460B60`
+- `Actor::vfunc76` = `0x6E6E7D`
+- `Actor::vfunc77` = `0x6E6E7D`
+- `Actor::vfunc78` = `0x547170`
+- `Actor::vfunc79` = `0x64BC40`
+- `Actor::vfunc80` = `0x41E360`
+- `Actor::vfunc81` = `0x41E360`
+- `Actor::vfunc82` = `0x41E4B0`
+- `Actor::vfunc83` = `0x41E570`
+- `Actor::vfunc84` = `0x64A9B0`
+- `Actor::vfunc85` = `0x41EAA0`
+- `Actor::vfunc86` = `0x41EA90`
+- `Actor::vfunc87` = `0x41E310`
+- `Actor::vfunc88` = `0x64CAE0`
+- `Actor::vfunc89` = `0x64CAE0`
+- `Actor::vfunc90` = `0x64CAE0`
+- `Actor::vfunc91` = `0x421050`
+- `Actor::vfunc92` = `0x4210B0`
+- `Actor::vfunc93` = `0x41E730`
+
+## ActorSpawner  (vtable @ 0x766AD0, 6 methods)
+
+- `ActorSpawner::vfunc0` = `0x423FA0`
+- `ActorSpawner::vfunc1` = `0x64CAE0`
+- `ActorSpawner::vfunc2` = `0x4600D0`
+- `ActorSpawner::vfunc3` = `0x46D470`
+- `ActorSpawner::vfunc4` = `0x65F500`
+- `ActorSpawner::vfunc5` = `0x4218E0`
+
+## ActorSpawner  (vtable @ 0x7669FC, 52 methods)
+
+- `ActorSpawner::vfunc0` = `0x422940`
+- `ActorSpawner::vfunc1` = `0x604E40`
+- `ActorSpawner::vfunc2` = `0x57E760`
+- `ActorSpawner::vfunc3` = `0x57E760`
+- `ActorSpawner::vfunc4` = `0x422630`
+- `ActorSpawner::vfunc5` = `0x422D40`
+- `ActorSpawner::vfunc6` = `0x680110`
+- `ActorSpawner::vfunc7` = `0x64A9B0`
+- `ActorSpawner::vfunc8` = `0x64CAE0`
+- `ActorSpawner::vfunc9` = `0x64CAE0`
+- `ActorSpawner::vfunc10` = `0x64CAE0`
+- `ActorSpawner::vfunc11` = `0x64CAE0`
+- `ActorSpawner::vfunc12` = `0x64CAE0`
+- `ActorSpawner::vfunc13` = `0x64CAE0`
+- `ActorSpawner::vfunc14` = `0x64CAE0`
+- `ActorSpawner::vfunc15` = `0x65F310`
+- `ActorSpawner::vfunc16` = `0x64CAE0`
+- `ActorSpawner::vfunc17` = `0x4230A0`
+- `ActorSpawner::vfunc18` = `0x460B60`
+- `ActorSpawner::vfunc19` = `0x460260`
+- `ActorSpawner::vfunc20` = `0x460280`
+- `ActorSpawner::vfunc21` = `0x64CAE0`
+- `ActorSpawner::vfunc22` = `0x460B60`
+- `ActorSpawner::vfunc23` = `0x422B80`
+- `ActorSpawner::vfunc24` = `0x422B80`
+- `ActorSpawner::vfunc25` = `0x46F7D0`
+- `ActorSpawner::vfunc26` = `0x45F920`
+- `ActorSpawner::vfunc27` = `0x422B30`
+- `ActorSpawner::vfunc28` = `0x422B90`
+- `ActorSpawner::vfunc29` = `0x460160`
+- `ActorSpawner::vfunc30` = `0x4605E0`
+- `ActorSpawner::vfunc31` = `0x460450`
+- `ActorSpawner::vfunc32` = `0x460B60`
+- `ActorSpawner::vfunc33` = `0x460B60`
+- `ActorSpawner::vfunc34` = `0x45FC80`
+- `ActorSpawner::vfunc35` = `0x460B70`
+- `ActorSpawner::vfunc36` = `0x460110`
+- `ActorSpawner::vfunc37` = `0x460B60`
+- `ActorSpawner::vfunc38` = `0x460B60`
+- `ActorSpawner::vfunc39` = `0x64A9B0`
+- `ActorSpawner::vfunc40` = `0x460610`
+- `ActorSpawner::vfunc41` = `0x45FF80`
+- `ActorSpawner::vfunc42` = `0x45FE40`
+- `ActorSpawner::vfunc43` = `0x4218C0`
+- `ActorSpawner::vfunc44` = `0x4600B0`
+- `ActorSpawner::vfunc45` = `0x4602D0`
+- `ActorSpawner::vfunc46` = `0x460600`
+- `ActorSpawner::vfunc47` = `0x45FC10`
+- `ActorSpawner::vfunc48` = `0x45FAC0`
+- `ActorSpawner::vfunc49` = `0x422E30`
+- `ActorSpawner::vfunc50` = `0x460B60`
+- `ActorSpawner::vfunc51` = `0x547170`
+
+## Alarm  (vtable @ 0x777634, 7 methods)
+
+- `Alarm::vfunc0` = `0x4E61D0`
+- `Alarm::vfunc1` = `0x4E60C0`
+- `Alarm::vfunc2` = `0x516940`
+- `Alarm::vfunc3` = `0x4E61B0`
+- `Alarm::vfunc4` = `0x484970`
+- `Alarm::vfunc5` = `0x4E6100`
+- `Alarm::vfunc6` = `0x4E6130`
+
+## Alarm  (vtable @ 0x777618, 6 methods)
+
+- `Alarm::vfunc0` = `0x4E61C0`
+- `Alarm::vfunc1` = `0x64CAE0`
+- `Alarm::vfunc2` = `0x4600D0`
+- `Alarm::vfunc3` = `0x46D470`
+- `Alarm::vfunc4` = `0x65F500`
+- `Alarm::vfunc5` = `0x4218E0`
+
+## Alarm  (vtable @ 0x777544, 52 methods)
+
+- `Alarm::vfunc0` = `0x4E5F40`
+- `Alarm::vfunc1` = `0x604E40`
+- `Alarm::vfunc2` = `0x57E760`
+- `Alarm::vfunc3` = `0x57E760`
+- `Alarm::vfunc4` = `0x4E5D70`
+- `Alarm::vfunc5` = `0x4E5F70`
+- `Alarm::vfunc6` = `0x680110`
+- `Alarm::vfunc7` = `0x64A9B0`
+- `Alarm::vfunc8` = `0x64CAE0`
+- `Alarm::vfunc9` = `0x64CAE0`
+- `Alarm::vfunc10` = `0x64CAE0`
+- `Alarm::vfunc11` = `0x64CAE0`
+- `Alarm::vfunc12` = `0x64CAE0`
+- `Alarm::vfunc13` = `0x64CAE0`
+- `Alarm::vfunc14` = `0x64CAE0`
+- `Alarm::vfunc15` = `0x65F310`
+- `Alarm::vfunc16` = `0x64CAE0`
+- `Alarm::vfunc17` = `0x4E6150`
+- `Alarm::vfunc18` = `0x460B60`
+- `Alarm::vfunc19` = `0x460260`
+- `Alarm::vfunc20` = `0x460280`
+- `Alarm::vfunc21` = `0x64CAE0`
+- `Alarm::vfunc22` = `0x460B60`
+- `Alarm::vfunc23` = `0x4E6070`
+- `Alarm::vfunc24` = `0x45F980`
+- `Alarm::vfunc25` = `0x45F8A0`
+- `Alarm::vfunc26` = `0x45F920`
+- `Alarm::vfunc27` = `0x4E6080`
+- `Alarm::vfunc28` = `0x4E5D80`
+- `Alarm::vfunc29` = `0x460160`
+- `Alarm::vfunc30` = `0x4605E0`
+- `Alarm::vfunc31` = `0x460450`
+- `Alarm::vfunc32` = `0x460B60`
+- `Alarm::vfunc33` = `0x460B60`
+- `Alarm::vfunc34` = `0x45FC80`
+- `Alarm::vfunc35` = `0x460B70`
+- `Alarm::vfunc36` = `0x460110`
+- `Alarm::vfunc37` = `0x460B60`
+- `Alarm::vfunc38` = `0x460B60`
+- `Alarm::vfunc39` = `0x64A9B0`
+- `Alarm::vfunc40` = `0x460610`
+- `Alarm::vfunc41` = `0x45FF80`
+- `Alarm::vfunc42` = `0x45FE40`
+- `Alarm::vfunc43` = `0x4218C0`
+- `Alarm::vfunc44` = `0x4600B0`
+- `Alarm::vfunc45` = `0x4602D0`
+- `Alarm::vfunc46` = `0x460600`
+- `Alarm::vfunc47` = `0x45FC10`
+- `Alarm::vfunc48` = `0x45FAC0`
+- `Alarm::vfunc49` = `0x460B60`
+- `Alarm::vfunc50` = `0x460B60`
+- `Alarm::vfunc51` = `0x547170`
+
+## AlarmTag  (vtable @ 0x77E6FC, 10 methods)
+
+- `AlarmTag::vfunc0` = `0x584630`
+- `AlarmTag::vfunc1` = `0x604E40`
+- `AlarmTag::vfunc2` = `0x57E760`
+- `AlarmTag::vfunc3` = `0x57E760`
+- `AlarmTag::vfunc4` = `0x57D020`
+- `AlarmTag::vfunc5` = `0x57D0D0`
+- `AlarmTag::vfunc6` = `0x57D0F0`
+- `AlarmTag::vfunc7` = `0x582220`
+- `AlarmTag::vfunc8` = `0x460B60`
+- `AlarmTag::vfunc9` = `0x680110`
+
+## AnimSwitchInstance  (vtable @ 0x76DB34, 18 methods)
+
+- `AnimSwitchInstance::vfunc0` = `0x4179D0`
+- `AnimSwitchInstance::vfunc1` = `0x46B3B0`
+- `AnimSwitchInstance::vfunc2` = `0x470D80`
+- `AnimSwitchInstance::vfunc3` = `0x546E20`
+- `AnimSwitchInstance::vfunc4` = `0x546E20`
+- `AnimSwitchInstance::vfunc5` = `0x46BC60`
+- `AnimSwitchInstance::vfunc6` = `0x46BBC0`
+- `AnimSwitchInstance::vfunc7` = `0x546E30`
+- `AnimSwitchInstance::vfunc8` = `0x65F500`
+- `AnimSwitchInstance::vfunc9` = `0x46BD20`
+- `AnimSwitchInstance::vfunc10` = `0x546E20`
+- `AnimSwitchInstance::vfunc11` = `0x46B3A0`
+- `AnimSwitchInstance::vfunc12` = `0x516940`
+- `AnimSwitchInstance::vfunc13` = `0x437C60`
+- `AnimSwitchInstance::vfunc14` = `0x437C60`
+- `AnimSwitchInstance::vfunc15` = `0x437C60`
+- `AnimSwitchInstance::vfunc16` = `0x65F220`
+- `AnimSwitchInstance::vfunc17` = `0x547160`
+
+## AnimSwitchInstance  (vtable @ 0x76DB14, 6 methods)
+
+- `AnimSwitchInstance::vfunc0` = `0x470D70`
+- `AnimSwitchInstance::vfunc1` = `0x485B40`
+- `AnimSwitchInstance::vfunc2` = `0x470D00`
+- `AnimSwitchInstance::vfunc3` = `0x46D470`
+- `AnimSwitchInstance::vfunc4` = `0x65F500`
+- `AnimSwitchInstance::vfunc5` = `0x4218E0`
+
+## AnimSwitchInstance  (vtable @ 0x76DA34, 55 methods)
+
+- `AnimSwitchInstance::vfunc0` = `0x470960`
+- `AnimSwitchInstance::vfunc1` = `0x604E40`
+- `AnimSwitchInstance::vfunc2` = `0x57E760`
+- `AnimSwitchInstance::vfunc3` = `0x57E760`
+- `AnimSwitchInstance::vfunc4` = `0x4708C0`
+- `AnimSwitchInstance::vfunc5` = `0x470C90`
+- `AnimSwitchInstance::vfunc6` = `0x680110`
+- `AnimSwitchInstance::vfunc7` = `0x604E40`
+- `AnimSwitchInstance::vfunc8` = `0x64CAE0`
+- `AnimSwitchInstance::vfunc9` = `0x64CAE0`
+- `AnimSwitchInstance::vfunc10` = `0x64CAE0`
+- `AnimSwitchInstance::vfunc11` = `0x64CAE0`
+- `AnimSwitchInstance::vfunc12` = `0x64CAE0`
+- `AnimSwitchInstance::vfunc13` = `0x46B680`
+- `AnimSwitchInstance::vfunc14` = `0x64CAE0`
+- `AnimSwitchInstance::vfunc15` = `0x65F310`
+- `AnimSwitchInstance::vfunc16` = `0x64CAE0`
+- `AnimSwitchInstance::vfunc17` = `0x470C30`
+- `AnimSwitchInstance::vfunc18` = `0x460B60`
+- `AnimSwitchInstance::vfunc19` = `0x460260`
+- `AnimSwitchInstance::vfunc20` = `0x460280`
+- `AnimSwitchInstance::vfunc21` = `0x64CAE0`
+- `AnimSwitchInstance::vfunc22` = `0x460B60`
+- `AnimSwitchInstance::vfunc23` = `0x45F970`
+- `AnimSwitchInstance::vfunc24` = `0x45F980`
+- `AnimSwitchInstance::vfunc25` = `0x45F8A0`
+- `AnimSwitchInstance::vfunc26` = `0x45F920`
+- `AnimSwitchInstance::vfunc27` = `0x516940`
+- `AnimSwitchInstance::vfunc28` = `0x64A9B0`
+- `AnimSwitchInstance::vfunc29` = `0x460160`
+- `AnimSwitchInstance::vfunc30` = `0x4605E0`
+- `AnimSwitchInstance::vfunc31` = `0x460450`
+- `AnimSwitchInstance::vfunc32` = `0x460B60`
+- `AnimSwitchInstance::vfunc33` = `0x460B60`
+- `AnimSwitchInstance::vfunc34` = `0x45FC80`
+- `AnimSwitchInstance::vfunc35` = `0x460B70`
+- `AnimSwitchInstance::vfunc36` = `0x460110`
+- `AnimSwitchInstance::vfunc37` = `0x460B60`
+- `AnimSwitchInstance::vfunc38` = `0x460B60`
+- `AnimSwitchInstance::vfunc39` = `0x64A9B0`
+- `AnimSwitchInstance::vfunc40` = `0x460610`
+- `AnimSwitchInstance::vfunc41` = `0x45FF80`
+- `AnimSwitchInstance::vfunc42` = `0x45FE40`
+- `AnimSwitchInstance::vfunc43` = `0x4218C0`
+- `AnimSwitchInstance::vfunc44` = `0x4600B0`
+- `AnimSwitchInstance::vfunc45` = `0x470D60`
+- `AnimSwitchInstance::vfunc46` = `0x460600`
+- `AnimSwitchInstance::vfunc47` = `0x45FC10`
+- `AnimSwitchInstance::vfunc48` = `0x45FAC0`
+- `AnimSwitchInstance::vfunc49` = `0x460B60`
+- `AnimSwitchInstance::vfunc50` = `0x460B60`
+- `AnimSwitchInstance::vfunc51` = `0x547170`
+- `AnimSwitchInstance::vfunc52` = `0x4EE210`
+- `AnimSwitchInstance::vfunc53` = `0x470D40`
+- `AnimSwitchInstance::vfunc54` = `0x516940`
+
+## AnimSwitchObject  (vtable @ 0x77E824, 8 methods)
+
+- `AnimSwitchObject::vfunc0` = `0x57D7E0`
+- `AnimSwitchObject::vfunc1` = `0x604E40`
+- `AnimSwitchObject::vfunc2` = `0x57E760`
+- `AnimSwitchObject::vfunc3` = `0x57E760`
+- `AnimSwitchObject::vfunc4` = `0x57D720`
+- `AnimSwitchObject::vfunc5` = `0x57D980`
+- `AnimSwitchObject::vfunc6` = `0x57D850`
+- `AnimSwitchObject::vfunc7` = `0x516940`
+
+## AnimatedDamagerInstance  (vtable @ 0x76D664, 7 methods)
+
+- `AnimatedDamagerInstance::vfunc0` = `0x470070`
+- `AnimatedDamagerInstance::vfunc1` = `0x465A60`
+- `AnimatedDamagerInstance::vfunc2` = `0x516940`
+- `AnimatedDamagerInstance::vfunc3` = `0x4700A0`
+- `AnimatedDamagerInstance::vfunc4` = `0x470090`
+- `AnimatedDamagerInstance::vfunc5` = `0x465C00`
+- `AnimatedDamagerInstance::vfunc6` = `0x465C30`
+
+## AnimatedDamagerInstance  (vtable @ 0x76D658, 2 methods)
+
+- `AnimatedDamagerInstance::vfunc0` = `0x4700B0`
+- `AnimatedDamagerInstance::vfunc1` = `0x470060`
+
+## AnimatedDamagerInstance  (vtable @ 0x76D604, 18 methods)
+
+- `AnimatedDamagerInstance::vfunc0` = `0x4179D0`
+- `AnimatedDamagerInstance::vfunc1` = `0x46B3B0`
+- `AnimatedDamagerInstance::vfunc2` = `0x470050`
+- `AnimatedDamagerInstance::vfunc3` = `0x546E20`
+- `AnimatedDamagerInstance::vfunc4` = `0x546E20`
+- `AnimatedDamagerInstance::vfunc5` = `0x46BC60`
+- `AnimatedDamagerInstance::vfunc6` = `0x46BBC0`
+- `AnimatedDamagerInstance::vfunc7` = `0x546E30`
+- `AnimatedDamagerInstance::vfunc8` = `0x65F500`
+- `AnimatedDamagerInstance::vfunc9` = `0x46BD20`
+- `AnimatedDamagerInstance::vfunc10` = `0x546E20`
+- `AnimatedDamagerInstance::vfunc11` = `0x46B3A0`
+- `AnimatedDamagerInstance::vfunc12` = `0x516940`
+- `AnimatedDamagerInstance::vfunc13` = `0x437C60`
+- `AnimatedDamagerInstance::vfunc14` = `0x437C60`
+- `AnimatedDamagerInstance::vfunc15` = `0x437C60`
+- `AnimatedDamagerInstance::vfunc16` = `0x65F220`
+- `AnimatedDamagerInstance::vfunc17` = `0x547160`
+
+## AnimatedDamagerInstance  (vtable @ 0x76D5E4, 6 methods)
+
+- `AnimatedDamagerInstance::vfunc0` = `0x470040`
+- `AnimatedDamagerInstance::vfunc1` = `0x485B40`
+- `AnimatedDamagerInstance::vfunc2` = `0x4600D0`
+- `AnimatedDamagerInstance::vfunc3` = `0x46D470`
+- `AnimatedDamagerInstance::vfunc4` = `0x65F500`
+- `AnimatedDamagerInstance::vfunc5` = `0x4218E0`
+
+## AnimatedDamagerInstance  (vtable @ 0x76D504, 55 methods)
+
+- `AnimatedDamagerInstance::vfunc0` = `0x46FDA0`
+- `AnimatedDamagerInstance::vfunc1` = `0x604E40`
+- `AnimatedDamagerInstance::vfunc2` = `0x57E760`
+- `AnimatedDamagerInstance::vfunc3` = `0x57E760`
+- `AnimatedDamagerInstance::vfunc4` = `0x46FC50`
+- `AnimatedDamagerInstance::vfunc5` = `0x46FF20`
+- `AnimatedDamagerInstance::vfunc6` = `0x680110`
+- `AnimatedDamagerInstance::vfunc7` = `0x604E40`
+- `AnimatedDamagerInstance::vfunc8` = `0x64CAE0`
+- `AnimatedDamagerInstance::vfunc9` = `0x64CAE0`
+- `AnimatedDamagerInstance::vfunc10` = `0x64CAE0`
+- `AnimatedDamagerInstance::vfunc11` = `0x64CAE0`
+- `AnimatedDamagerInstance::vfunc12` = `0x64CAE0`
+- `AnimatedDamagerInstance::vfunc13` = `0x46B680`
+- `AnimatedDamagerInstance::vfunc14` = `0x64CAE0`
+- `AnimatedDamagerInstance::vfunc15` = `0x46FC60`
+- `AnimatedDamagerInstance::vfunc16` = `0x64CAE0`
+- `AnimatedDamagerInstance::vfunc17` = `0x46FEE0`
+- `AnimatedDamagerInstance::vfunc18` = `0x460B60`
+- `AnimatedDamagerInstance::vfunc19` = `0x460260`
+- `AnimatedDamagerInstance::vfunc20` = `0x460280`
+- `AnimatedDamagerInstance::vfunc21` = `0x64CAE0`
+- `AnimatedDamagerInstance::vfunc22` = `0x460B60`
+- `AnimatedDamagerInstance::vfunc23` = `0x45F970`
+- `AnimatedDamagerInstance::vfunc24` = `0x45F980`
+- `AnimatedDamagerInstance::vfunc25` = `0x45F8A0`
+- `AnimatedDamagerInstance::vfunc26` = `0x45F920`
+- `AnimatedDamagerInstance::vfunc27` = `0x46FF50`
+- `AnimatedDamagerInstance::vfunc28` = `0x46FF90`
+- `AnimatedDamagerInstance::vfunc29` = `0x460160`
+- `AnimatedDamagerInstance::vfunc30` = `0x4605E0`
+- `AnimatedDamagerInstance::vfunc31` = `0x460450`
+- `AnimatedDamagerInstance::vfunc32` = `0x460B60`
+- `AnimatedDamagerInstance::vfunc33` = `0x460B60`
+- `AnimatedDamagerInstance::vfunc34` = `0x45FC80`
+- `AnimatedDamagerInstance::vfunc35` = `0x460B70`
+- `AnimatedDamagerInstance::vfunc36` = `0x460110`
+- `AnimatedDamagerInstance::vfunc37` = `0x460B60`
+- `AnimatedDamagerInstance::vfunc38` = `0x460B60`
+- `AnimatedDamagerInstance::vfunc39` = `0x64A9B0`
+- `AnimatedDamagerInstance::vfunc40` = `0x460610`
+- `AnimatedDamagerInstance::vfunc41` = `0x45FF80`
+- `AnimatedDamagerInstance::vfunc42` = `0x45FE40`
+- `AnimatedDamagerInstance::vfunc43` = `0x4218C0`
+- `AnimatedDamagerInstance::vfunc44` = `0x4600B0`
+- `AnimatedDamagerInstance::vfunc45` = `0x470000`
+- `AnimatedDamagerInstance::vfunc46` = `0x460600`
+- `AnimatedDamagerInstance::vfunc47` = `0x45FC10`
+- `AnimatedDamagerInstance::vfunc48` = `0x45FAC0`
+- `AnimatedDamagerInstance::vfunc49` = `0x460B60`
+- `AnimatedDamagerInstance::vfunc50` = `0x460B60`
+- `AnimatedDamagerInstance::vfunc51` = `0x470830`
+- `AnimatedDamagerInstance::vfunc52` = `0x4EE210`
+- `AnimatedDamagerInstance::vfunc53` = `0x46C810`
+- `AnimatedDamagerInstance::vfunc54` = `0x46FFA0`
+
+## AnimatedDamagerInstancedObject  (vtable @ 0x77E788, 8 methods)
+
+- `AnimatedDamagerInstancedObject::vfunc0` = `0x57D7E0`
+- `AnimatedDamagerInstancedObject::vfunc1` = `0x604E40`
+- `AnimatedDamagerInstancedObject::vfunc2` = `0x57E760`
+- `AnimatedDamagerInstancedObject::vfunc3` = `0x57E760`
+- `AnimatedDamagerInstancedObject::vfunc4` = `0x57D1F0`
+- `AnimatedDamagerInstancedObject::vfunc5` = `0x57D3E0`
+- `AnimatedDamagerInstancedObject::vfunc6` = `0x57D2B0`
+- `AnimatedDamagerInstancedObject::vfunc7` = `0x516940`
+
+## AnimatedDestructable  (vtable @ 0x76D878, 7 methods)
+
+- `AnimatedDestructable::vfunc0` = `0x470430`
+- `AnimatedDestructable::vfunc1` = `0x465A60`
+- `AnimatedDestructable::vfunc2` = `0x516940`
+- `AnimatedDestructable::vfunc3` = `0x470450`
+- `AnimatedDestructable::vfunc4` = `0x47DD50`
+- `AnimatedDestructable::vfunc5` = `0x465C00`
+- `AnimatedDestructable::vfunc6` = `0x465C30`
+
+## AnimatedDestructable  (vtable @ 0x76D824, 18 methods)
+
+- `AnimatedDestructable::vfunc0` = `0x4179D0`
+- `AnimatedDestructable::vfunc1` = `0x46B3B0`
+- `AnimatedDestructable::vfunc2` = `0x470480`
+- `AnimatedDestructable::vfunc3` = `0x546E20`
+- `AnimatedDestructable::vfunc4` = `0x546E20`
+- `AnimatedDestructable::vfunc5` = `0x46BC60`
+- `AnimatedDestructable::vfunc6` = `0x46BBC0`
+- `AnimatedDestructable::vfunc7` = `0x546E30`
+- `AnimatedDestructable::vfunc8` = `0x65F500`
+- `AnimatedDestructable::vfunc9` = `0x46BD20`
+- `AnimatedDestructable::vfunc10` = `0x546E20`
+- `AnimatedDestructable::vfunc11` = `0x46B3A0`
+- `AnimatedDestructable::vfunc12` = `0x516940`
+- `AnimatedDestructable::vfunc13` = `0x437C60`
+- `AnimatedDestructable::vfunc14` = `0x437C60`
+- `AnimatedDestructable::vfunc15` = `0x437C60`
+- `AnimatedDestructable::vfunc16` = `0x65F220`
+- `AnimatedDestructable::vfunc17` = `0x547160`
+
+## AnimatedDestructable  (vtable @ 0x76D804, 6 methods)
+
+- `AnimatedDestructable::vfunc0` = `0x470470`
+- `AnimatedDestructable::vfunc1` = `0x485B40`
+- `AnimatedDestructable::vfunc2` = `0x470D00`
+- `AnimatedDestructable::vfunc3` = `0x46D470`
+- `AnimatedDestructable::vfunc4` = `0x65F500`
+- `AnimatedDestructable::vfunc5` = `0x4218E0`
+
+## AnimatedDestructable  (vtable @ 0x76D724, 55 methods)
+
+- `AnimatedDestructable::vfunc0` = `0x470440`
+- `AnimatedDestructable::vfunc1` = `0x604E40`
+- `AnimatedDestructable::vfunc2` = `0x57E760`
+- `AnimatedDestructable::vfunc3` = `0x57E760`
+- `AnimatedDestructable::vfunc4` = `0x4700C0`
+- `AnimatedDestructable::vfunc5` = `0x470460`
+- `AnimatedDestructable::vfunc6` = `0x680110`
+- `AnimatedDestructable::vfunc7` = `0x604E40`
+- `AnimatedDestructable::vfunc8` = `0x64CAE0`
+- `AnimatedDestructable::vfunc9` = `0x64CAE0`
+- `AnimatedDestructable::vfunc10` = `0x64CAE0`
+- `AnimatedDestructable::vfunc11` = `0x64CAE0`
+- `AnimatedDestructable::vfunc12` = `0x64CAE0`
+- `AnimatedDestructable::vfunc13` = `0x46B680`
+- `AnimatedDestructable::vfunc14` = `0x4700F0`
+- `AnimatedDestructable::vfunc15` = `0x4700D0`
+- `AnimatedDestructable::vfunc16` = `0x64CAE0`
+- `AnimatedDestructable::vfunc17` = `0x4707A0`
+- `AnimatedDestructable::vfunc18` = `0x460B60`
+- `AnimatedDestructable::vfunc19` = `0x460260`
+- `AnimatedDestructable::vfunc20` = `0x460280`
+- `AnimatedDestructable::vfunc21` = `0x64CAE0`
+- `AnimatedDestructable::vfunc22` = `0x460B60`
+- `AnimatedDestructable::vfunc23` = `0x45F970`
+- `AnimatedDestructable::vfunc24` = `0x4703A0`
+- `AnimatedDestructable::vfunc25` = `0x45F8A0`
+- `AnimatedDestructable::vfunc26` = `0x45F920`
+- `AnimatedDestructable::vfunc27` = `0x4707E0`
+- `AnimatedDestructable::vfunc28` = `0x470820`
+- `AnimatedDestructable::vfunc29` = `0x460160`
+- `AnimatedDestructable::vfunc30` = `0x4605E0`
+- `AnimatedDestructable::vfunc31` = `0x460450`
+- `AnimatedDestructable::vfunc32` = `0x460B60`
+- `AnimatedDestructable::vfunc33` = `0x460B60`
+- `AnimatedDestructable::vfunc34` = `0x45FC80`
+- `AnimatedDestructable::vfunc35` = `0x460B70`
+- `AnimatedDestructable::vfunc36` = `0x460110`
+- `AnimatedDestructable::vfunc37` = `0x460B60`
+- `AnimatedDestructable::vfunc38` = `0x460B60`
+- `AnimatedDestructable::vfunc39` = `0x64A9B0`
+- `AnimatedDestructable::vfunc40` = `0x460610`
+- `AnimatedDestructable::vfunc41` = `0x45FF80`
+- `AnimatedDestructable::vfunc42` = `0x45FE40`
+- `AnimatedDestructable::vfunc43` = `0x4218C0`
+- `AnimatedDestructable::vfunc44` = `0x4600B0`
+- `AnimatedDestructable::vfunc45` = `0x470420`
+- `AnimatedDestructable::vfunc46` = `0x460600`
+- `AnimatedDestructable::vfunc47` = `0x45FC10`
+- `AnimatedDestructable::vfunc48` = `0x45FAC0`
+- `AnimatedDestructable::vfunc49` = `0x460B60`
+- `AnimatedDestructable::vfunc50` = `0x460B60`
+- `AnimatedDestructable::vfunc51` = `0x470830`
+- `AnimatedDestructable::vfunc52` = `0x4EE210`
+- `AnimatedDestructable::vfunc53` = `0x46C810`
+- `AnimatedDestructable::vfunc54` = `0x516940`
+
+## AnimatedDestructable  (vtable @ 0x76D69C, 33 methods)
+
+- `AnimatedDestructable::vfunc0` = `0x470200`
+- `AnimatedDestructable::vfunc1` = `0x470340`
+- `AnimatedDestructable::vfunc2` = `0x46A610`
+- `AnimatedDestructable::vfunc3` = `0x46A630`
+- `AnimatedDestructable::vfunc4` = `0x46A650`
+- `AnimatedDestructable::vfunc5` = `0x46A660`
+- `AnimatedDestructable::vfunc6` = `0x64A9B0`
+- `AnimatedDestructable::vfunc7` = `0x64A9B0`
+- `AnimatedDestructable::vfunc8` = `0x64A9B0`
+- `AnimatedDestructable::vfunc9` = `0x46B190`
+- `AnimatedDestructable::vfunc10` = `0x46B190`
+- `AnimatedDestructable::vfunc11` = `0x46B190`
+- `AnimatedDestructable::vfunc12` = `0x46B1A0`
+- `AnimatedDestructable::vfunc13` = `0x46B2D0`
+- `AnimatedDestructable::vfunc14` = `0x46B1B0`
+- `AnimatedDestructable::vfunc15` = `0x46B1D0`
+- `AnimatedDestructable::vfunc16` = `0x46B210`
+- `AnimatedDestructable::vfunc17` = `0x46B250`
+- `AnimatedDestructable::vfunc18` = `0x46B270`
+- `AnimatedDestructable::vfunc19` = `0x46A7D0`
+- `AnimatedDestructable::vfunc20` = `0x65F500`
+- `AnimatedDestructable::vfunc21` = `0x516940`
+- `AnimatedDestructable::vfunc22` = `0x4786D0`
+- `AnimatedDestructable::vfunc23` = `0x4788B0`
+- `AnimatedDestructable::vfunc24` = `0x478AC0`
+- `AnimatedDestructable::vfunc25` = `0x460B60`
+- `AnimatedDestructable::vfunc26` = `0x516940`
+- `AnimatedDestructable::vfunc27` = `0x65F170`
+- `AnimatedDestructable::vfunc28` = `0x65F500`
+- `AnimatedDestructable::vfunc29` = `0x46B1E0`
+- `AnimatedDestructable::vfunc30` = `0x65F220`
+- `AnimatedDestructable::vfunc31` = `0x516940`
+- `AnimatedDestructable::vfunc32` = `0x470100`
+
+## AnimatedInstance  (vtable @ 0x76DA00, 7 methods)
+
+- `AnimatedInstance::vfunc0` = `0x470880`
+- `AnimatedInstance::vfunc1` = `0x465A60`
+- `AnimatedInstance::vfunc2` = `0x516940`
+- `AnimatedInstance::vfunc3` = `0x470450`
+- `AnimatedInstance::vfunc4` = `0x47DD50`
+- `AnimatedInstance::vfunc5` = `0x465C00`
+- `AnimatedInstance::vfunc6` = `0x465C30`
+
+## AnimatedInstance  (vtable @ 0x76D9AC, 18 methods)
+
+- `AnimatedInstance::vfunc0` = `0x4179D0`
+- `AnimatedInstance::vfunc1` = `0x46B3B0`
+- `AnimatedInstance::vfunc2` = `0x4708A0`
+- `AnimatedInstance::vfunc3` = `0x546E20`
+- `AnimatedInstance::vfunc4` = `0x546E20`
+- `AnimatedInstance::vfunc5` = `0x46BC60`
+- `AnimatedInstance::vfunc6` = `0x46BBC0`
+- `AnimatedInstance::vfunc7` = `0x546E30`
+- `AnimatedInstance::vfunc8` = `0x65F500`
+- `AnimatedInstance::vfunc9` = `0x46BD20`
+- `AnimatedInstance::vfunc10` = `0x546E20`
+- `AnimatedInstance::vfunc11` = `0x46B3A0`
+- `AnimatedInstance::vfunc12` = `0x516940`
+- `AnimatedInstance::vfunc13` = `0x437C60`
+- `AnimatedInstance::vfunc14` = `0x437C60`
+- `AnimatedInstance::vfunc15` = `0x437C60`
+- `AnimatedInstance::vfunc16` = `0x65F220`
+- `AnimatedInstance::vfunc17` = `0x547160`
+
+## AnimatedInstance  (vtable @ 0x76D98C, 6 methods)
+
+- `AnimatedInstance::vfunc0` = `0x470890`
+- `AnimatedInstance::vfunc1` = `0x485B40`
+- `AnimatedInstance::vfunc2` = `0x470D00`
+- `AnimatedInstance::vfunc3` = `0x46D470`
+- `AnimatedInstance::vfunc4` = `0x65F500`
+- `AnimatedInstance::vfunc5` = `0x4218E0`
+
+## AnimatedInstance  (vtable @ 0x76D8AC, 55 methods)
+
+- `AnimatedInstance::vfunc0` = `0x4705B0`
+- `AnimatedInstance::vfunc1` = `0x604E40`
+- `AnimatedInstance::vfunc2` = `0x57E760`
+- `AnimatedInstance::vfunc3` = `0x57E760`
+- `AnimatedInstance::vfunc4` = `0x4704A0`
+- `AnimatedInstance::vfunc5` = `0x4707C0`
+- `AnimatedInstance::vfunc6` = `0x680110`
+- `AnimatedInstance::vfunc7` = `0x604E40`
+- `AnimatedInstance::vfunc8` = `0x64CAE0`
+- `AnimatedInstance::vfunc9` = `0x64CAE0`
+- `AnimatedInstance::vfunc10` = `0x64CAE0`
+- `AnimatedInstance::vfunc11` = `0x64CAE0`
+- `AnimatedInstance::vfunc12` = `0x64CAE0`
+- `AnimatedInstance::vfunc13` = `0x46B680`
+- `AnimatedInstance::vfunc14` = `0x64CAE0`
+- `AnimatedInstance::vfunc15` = `0x65F310`
+- `AnimatedInstance::vfunc16` = `0x64CAE0`
+- `AnimatedInstance::vfunc17` = `0x4707A0`
+- `AnimatedInstance::vfunc18` = `0x460B60`
+- `AnimatedInstance::vfunc19` = `0x460260`
+- `AnimatedInstance::vfunc20` = `0x460280`
+- `AnimatedInstance::vfunc21` = `0x64CAE0`
+- `AnimatedInstance::vfunc22` = `0x460B60`
+- `AnimatedInstance::vfunc23` = `0x45F970`
+- `AnimatedInstance::vfunc24` = `0x45F980`
+- `AnimatedInstance::vfunc25` = `0x45F8A0`
+- `AnimatedInstance::vfunc26` = `0x45F920`
+- `AnimatedInstance::vfunc27` = `0x4707E0`
+- `AnimatedInstance::vfunc28` = `0x470820`
+- `AnimatedInstance::vfunc29` = `0x460160`
+- `AnimatedInstance::vfunc30` = `0x4605E0`
+- `AnimatedInstance::vfunc31` = `0x460450`
+- `AnimatedInstance::vfunc32` = `0x460B60`
+- `AnimatedInstance::vfunc33` = `0x460B60`
+- `AnimatedInstance::vfunc34` = `0x45FC80`
+- `AnimatedInstance::vfunc35` = `0x460B70`
+- `AnimatedInstance::vfunc36` = `0x460110`
+- `AnimatedInstance::vfunc37` = `0x460B60`
+- `AnimatedInstance::vfunc38` = `0x460B60`
+- `AnimatedInstance::vfunc39` = `0x64A9B0`
+- `AnimatedInstance::vfunc40` = `0x460610`
+- `AnimatedInstance::vfunc41` = `0x45FF80`
+- `AnimatedInstance::vfunc42` = `0x45FE40`
+- `AnimatedInstance::vfunc43` = `0x4218C0`
+- `AnimatedInstance::vfunc44` = `0x4600B0`
+- `AnimatedInstance::vfunc45` = `0x470850`
+- `AnimatedInstance::vfunc46` = `0x460600`
+- `AnimatedInstance::vfunc47` = `0x45FC10`
+- `AnimatedInstance::vfunc48` = `0x45FAC0`
+- `AnimatedInstance::vfunc49` = `0x460B60`
+- `AnimatedInstance::vfunc50` = `0x460B60`
+- `AnimatedInstance::vfunc51` = `0x470830`
+- `AnimatedInstance::vfunc52` = `0x4EE210`
+- `AnimatedInstance::vfunc53` = `0x46C810`
+- `AnimatedInstance::vfunc54` = `0x516940`
+
+## AnimatedInstancedObject  (vtable @ 0x77E7D8, 8 methods)
+
+- `AnimatedInstancedObject::vfunc0` = `0x57D7E0`
+- `AnimatedInstancedObject::vfunc1` = `0x604E40`
+- `AnimatedInstancedObject::vfunc2` = `0x57E760`
+- `AnimatedInstancedObject::vfunc3` = `0x57E760`
+- `AnimatedInstancedObject::vfunc4` = `0x57D400`
+- `AnimatedInstancedObject::vfunc5` = `0x57D700`
+- `AnimatedInstancedObject::vfunc6` = `0x57D4C0`
+- `AnimatedInstancedObject::vfunc7` = `0x516940`
+
+## Animation  (vtable @ 0x7890F4, 19 methods)
+
+- `Animation::vfunc0` = `0x6167E0`
+- `Animation::vfunc1` = `0x604E40`
+- `Animation::vfunc2` = `0x610CC0`
+- `Animation::vfunc3` = `0x610D20`
+- `Animation::vfunc4` = `0x5FDAA0`
+- `Animation::vfunc5` = `0x616FB0`
+- `Animation::vfunc6` = `0x617000`
+- `Animation::vfunc7` = `0x616FC0`
+- `Animation::vfunc8` = `0x547170`
+- `Animation::vfunc9` = `0x604E40`
+- `Animation::vfunc10` = `0x617040`
+- `Animation::vfunc11` = `0x460B60`
+- `Animation::vfunc12` = `0x437C60`
+- `Animation::vfunc13` = `0x460B60`
+- `Animation::vfunc14` = `0x64BC40`
+- `Animation::vfunc15` = `0x57B040`
+- `Animation::vfunc16` = `0x610C60`
+- `Animation::vfunc17` = `0x610C00`
+- `Animation::vfunc18` = `0x64CAE0`
+
+## AnimationControl  (vtable @ 0x789F0C, 16 methods)
+
+- `AnimationControl::vfunc0` = `0x632A70`
+- `AnimationControl::vfunc1` = `0x604E40`
+- `AnimationControl::vfunc2` = `0x57E760`
+- `AnimationControl::vfunc3` = `0x57E760`
+- `AnimationControl::vfunc4` = `0x6329E0`
+- `AnimationControl::vfunc5` = `0x632BB0`
+- `AnimationControl::vfunc6` = `0x680110`
+- `AnimationControl::vfunc7` = `0x62FA30`
+- `AnimationControl::vfunc8` = `0x62FA40`
+- `AnimationControl::vfunc9` = `0x62FA50`
+- `AnimationControl::vfunc10` = `0x62FA60`
+- `AnimationControl::vfunc11` = `0x62FA70`
+- `AnimationControl::vfunc12` = `0x63D340`
+- `AnimationControl::vfunc13` = `0x63D5A0`
+- `AnimationControl::vfunc14` = `0x63D5D0`
+- `AnimationControl::vfunc15` = `0x632C00`
+
+## AnimationLayer  (vtable @ 0x779E2C, 8 methods)
+
+- `AnimationLayer::vfunc0` = `0x520120`
+- `AnimationLayer::vfunc1` = `0x604E40`
+- `AnimationLayer::vfunc2` = `0x57E760`
+- `AnimationLayer::vfunc3` = `0x57E760`
+- `AnimationLayer::vfunc4` = `0x51FAE0`
+- `AnimationLayer::vfunc5` = `0x520300`
+- `AnimationLayer::vfunc6` = `0x680110`
+- `AnimationLayer::vfunc7` = `0x5202F0`
+
+## AnimationLayerConfig  (vtable @ 0x779E8C, 22 methods)
+
+- `AnimationLayerConfig::vfunc0` = `0x523D40`
+- `AnimationLayerConfig::vfunc1` = `0x604E40`
+- `AnimationLayerConfig::vfunc2` = `0x4041C0`
+- `AnimationLayerConfig::vfunc3` = `0x4041C0`
+- `AnimationLayerConfig::vfunc4` = `0x523C50`
+- `AnimationLayerConfig::vfunc5` = `0x460B60`
+- `AnimationLayerConfig::vfunc6` = `0x610BC0`
+- `AnimationLayerConfig::vfunc7` = `0x547170`
+- `AnimationLayerConfig::vfunc8` = `0x610BD0`
+- `AnimationLayerConfig::vfunc9` = `0x64A9B0`
+- `AnimationLayerConfig::vfunc10` = `0x524050`
+- `AnimationLayerConfig::vfunc11` = `0x460B60`
+- `AnimationLayerConfig::vfunc12` = `0x437C60`
+- `AnimationLayerConfig::vfunc13` = `0x460B60`
+- `AnimationLayerConfig::vfunc14` = `0x64CAE0`
+- `AnimationLayerConfig::vfunc15` = `0x57B040`
+- `AnimationLayerConfig::vfunc16` = `0x437C60`
+- `AnimationLayerConfig::vfunc17` = `0x610C00`
+- `AnimationLayerConfig::vfunc18` = `0x523C60`
+- `AnimationLayerConfig::vfunc19` = `0x523C80`
+- `AnimationLayerConfig::vfunc20` = `0x460B60`
+- `AnimationLayerConfig::vfunc21` = `0x67AA00`
+
+## ArtifactPrefs  (vtable @ 0x7847CC, 22 methods)
+
+- `ArtifactPrefs::vfunc0` = `0x4CF5C0`
+- `ArtifactPrefs::vfunc1` = `0x604E40`
+- `ArtifactPrefs::vfunc2` = `0x4041C0`
+- `ArtifactPrefs::vfunc3` = `0x4041C0`
+- `ArtifactPrefs::vfunc4` = `0x5CCE80`
+- `ArtifactPrefs::vfunc5` = `0x460B60`
+- `ArtifactPrefs::vfunc6` = `0x610BC0`
+- `ArtifactPrefs::vfunc7` = `0x547170`
+- `ArtifactPrefs::vfunc8` = `0x610BD0`
+- `ArtifactPrefs::vfunc9` = `0x64A9B0`
+- `ArtifactPrefs::vfunc10` = `0x60EAE0`
+- `ArtifactPrefs::vfunc11` = `0x460B60`
+- `ArtifactPrefs::vfunc12` = `0x437C60`
+- `ArtifactPrefs::vfunc13` = `0x460B60`
+- `ArtifactPrefs::vfunc14` = `0x64CAE0`
+- `ArtifactPrefs::vfunc15` = `0x5CD0B0`
+- `ArtifactPrefs::vfunc16` = `0x437C60`
+- `ArtifactPrefs::vfunc17` = `0x610C00`
+- `ArtifactPrefs::vfunc18` = `0x5CCE90`
+- `ArtifactPrefs::vfunc19` = `0x5CCEB0`
+- `ArtifactPrefs::vfunc20` = `0x5CCF90`
+- `ArtifactPrefs::vfunc21` = `0x67AA00`
+
+## AttachedDamager  (vtable @ 0x76C8FC, 7 methods)
+
+- `AttachedDamager::vfunc0` = `0x4CF5C0`
+- `AttachedDamager::vfunc1` = `0x604E40`
+- `AttachedDamager::vfunc2` = `0x57E760`
+- `AttachedDamager::vfunc3` = `0x57E760`
+- `AttachedDamager::vfunc4` = `0x465D50`
+- `AttachedDamager::vfunc5` = `0x466110`
+- `AttachedDamager::vfunc6` = `0x680110`
+
+## AudioCluster  (vtable @ 0x789F50, 2 methods)
+
+- `AudioCluster::vfunc0` = `0x632CA0`
+- `AudioCluster::vfunc1` = `0x604E40`
+
+## AudioEmitter  (vtable @ 0x7896B0, 5 methods)
+
+- `AudioEmitter::vfunc0` = `0x6277B0`
+- `AudioEmitter::vfunc1` = `0x604E40`
+- `AudioEmitter::vfunc2` = `0x6273D0`
+- `AudioEmitter::vfunc3` = `0x627970`
+- `AudioEmitter::vfunc4` = `0x627A40`
+
+## AudioLevelPrefs  (vtable @ 0x780C7C, 22 methods)
+
+- `AudioLevelPrefs::vfunc0` = `0x590A90`
+- `AudioLevelPrefs::vfunc1` = `0x604E40`
+- `AudioLevelPrefs::vfunc2` = `0x4041C0`
+- `AudioLevelPrefs::vfunc3` = `0x4041C0`
+- `AudioLevelPrefs::vfunc4` = `0x590970`
+- `AudioLevelPrefs::vfunc5` = `0x460B60`
+- `AudioLevelPrefs::vfunc6` = `0x610BC0`
+- `AudioLevelPrefs::vfunc7` = `0x547170`
+- `AudioLevelPrefs::vfunc8` = `0x610BD0`
+- `AudioLevelPrefs::vfunc9` = `0x64A9B0`
+- `AudioLevelPrefs::vfunc10` = `0x60EAE0`
+- `AudioLevelPrefs::vfunc11` = `0x460B60`
+- `AudioLevelPrefs::vfunc12` = `0x437C60`
+- `AudioLevelPrefs::vfunc13` = `0x460B60`
+- `AudioLevelPrefs::vfunc14` = `0x64CAE0`
+- `AudioLevelPrefs::vfunc15` = `0x57B040`
+- `AudioLevelPrefs::vfunc16` = `0x437C60`
+- `AudioLevelPrefs::vfunc17` = `0x610C00`
+- `AudioLevelPrefs::vfunc18` = `0x590980`
+- `AudioLevelPrefs::vfunc19` = `0x5909A0`
+- `AudioLevelPrefs::vfunc20` = `0x460B60`
+- `AudioLevelPrefs::vfunc21` = `0x67AA00`
+
+## AudioLocationTag  (vtable @ 0x77E870, 10 methods)
+
+- `AudioLocationTag::vfunc0` = `0x584630`
+- `AudioLocationTag::vfunc1` = `0x604E40`
+- `AudioLocationTag::vfunc2` = `0x57E760`
+- `AudioLocationTag::vfunc3` = `0x57E760`
+- `AudioLocationTag::vfunc4` = `0x57D9A0`
+- `AudioLocationTag::vfunc5` = `0x57DA20`
+- `AudioLocationTag::vfunc6` = `0x57DA40`
+- `AudioLocationTag::vfunc7` = `0x582220`
+- `AudioLocationTag::vfunc8` = `0x460B60`
+- `AudioLocationTag::vfunc9` = `0x680110`
+
+## AudioResource  (vtable @ 0x7896C8, 3 methods)
+
+- `AudioResource::vfunc0` = `0x626D50`
+- `AudioResource::vfunc1` = `0x604E40`
+- `AudioResource::vfunc2` = `0x6E6E7D`
+
+## AudioVolumeTag  (vtable @ 0x77E904, 10 methods)
+
+- `AudioVolumeTag::vfunc0` = `0x584630`
+- `AudioVolumeTag::vfunc1` = `0x604E40`
+- `AudioVolumeTag::vfunc2` = `0x57E760`
+- `AudioVolumeTag::vfunc3` = `0x57E760`
+- `AudioVolumeTag::vfunc4` = `0x57DAA0`
+- `AudioVolumeTag::vfunc5` = `0x57DBE0`
+- `AudioVolumeTag::vfunc6` = `0x57DC00`
+- `AudioVolumeTag::vfunc7` = `0x582220`
+- `AudioVolumeTag::vfunc8` = `0x460B60`
+- `AudioVolumeTag::vfunc9` = `0x680110`
+
+## BSP2  (vtable @ 0x78AFE4, 22 methods)
+
+- `BSP2::vfunc0` = `0x648C30`
+- `BSP2::vfunc1` = `0x604E40`
+- `BSP2::vfunc2` = `0x610CC0`
+- `BSP2::vfunc3` = `0x610D20`
+- `BSP2::vfunc4` = `0x5FDAA0`
+- `BSP2::vfunc5` = `0x616FB0`
+- `BSP2::vfunc6` = `0x610BC0`
+- `BSP2::vfunc7` = `0x547170`
+- `BSP2::vfunc8` = `0x610BD0`
+- `BSP2::vfunc9` = `0x64A9B0`
+- `BSP2::vfunc10` = `0x460B60`
+- `BSP2::vfunc11` = `0x460B60`
+- `BSP2::vfunc12` = `0x437C60`
+- `BSP2::vfunc13` = `0x460B60`
+- `BSP2::vfunc14` = `0x64BC40`
+- `BSP2::vfunc15` = `0x57B040`
+- `BSP2::vfunc16` = `0x610C60`
+- `BSP2::vfunc17` = `0x610C00`
+- `BSP2::vfunc18` = `0x648DA0`
+- `BSP2::vfunc19` = `0x648E10`
+- `BSP2::vfunc20` = `0x648EB0`
+- `BSP2::vfunc21` = `0x67AA00`
+
+## BaseControl  (vtable @ 0x789CF4, 16 methods)
+
+- `BaseControl::vfunc0` = `0x62FAB0`
+- `BaseControl::vfunc1` = `0x604E40`
+- `BaseControl::vfunc2` = `0x57E760`
+- `BaseControl::vfunc3` = `0x57E760`
+- `BaseControl::vfunc4` = `0x5FDAA0`
+- `BaseControl::vfunc5` = `0x62FC30`
+- `BaseControl::vfunc6` = `0x680110`
+- `BaseControl::vfunc7` = `0x62FA30`
+- `BaseControl::vfunc8` = `0x62FA40`
+- `BaseControl::vfunc9` = `0x62FA50`
+- `BaseControl::vfunc10` = `0x62FA60`
+- `BaseControl::vfunc11` = `0x62FA70`
+- `BaseControl::vfunc12` = `0x6E6E7D`
+- `BaseControl::vfunc13` = `0x6E6E7D`
+- `BaseControl::vfunc14` = `0x6E6E7D`
+- `BaseControl::vfunc15` = `0x6E6E7D`
+
+## BaseDecoratorContainer  (vtable @ 0x784554, 2 methods)
+
+- `BaseDecoratorContainer::vfunc0` = `0x5C9B60`
+- `BaseDecoratorContainer::vfunc1` = `0x604E40`
+
+## BaseGeometryDef  (vtable @ 0x78A84C, 24 methods)
+
+- `BaseGeometryDef::vfunc0` = `0x63E760`
+- `BaseGeometryDef::vfunc1` = `0x604E40`
+- `BaseGeometryDef::vfunc2` = `0x610CC0`
+- `BaseGeometryDef::vfunc3` = `0x610D20`
+- `BaseGeometryDef::vfunc4` = `0x5FDAA0`
+- `BaseGeometryDef::vfunc5` = `0x616FB0`
+- `BaseGeometryDef::vfunc6` = `0x610BC0`
+- `BaseGeometryDef::vfunc7` = `0x547170`
+- `BaseGeometryDef::vfunc8` = `0x610BD0`
+- `BaseGeometryDef::vfunc9` = `0x64A9B0`
+- `BaseGeometryDef::vfunc10` = `0x460B60`
+- `BaseGeometryDef::vfunc11` = `0x460B60`
+- `BaseGeometryDef::vfunc12` = `0x437C60`
+- `BaseGeometryDef::vfunc13` = `0x460B60`
+- `BaseGeometryDef::vfunc14` = `0x64BC40`
+- `BaseGeometryDef::vfunc15` = `0x57B040`
+- `BaseGeometryDef::vfunc16` = `0x610C60`
+- `BaseGeometryDef::vfunc17` = `0x610C00`
+- `BaseGeometryDef::vfunc18` = `0x6E6E7D`
+- `BaseGeometryDef::vfunc19` = `0x63E7E0`
+- `BaseGeometryDef::vfunc20` = `0x63EA00`
+- `BaseGeometryDef::vfunc21` = `0x67AA00`
+- `BaseGeometryDef::vfunc22` = `0x460B60`
+- `BaseGeometryDef::vfunc23` = `0x64CAE0`
+
+## BaseTexture  (vtable @ 0x788E34, 21 methods)
+
+- `BaseTexture::vfunc0` = `0x610E60`
+- `BaseTexture::vfunc1` = `0x611290`
+- `BaseTexture::vfunc2` = `0x610CC0`
+- `BaseTexture::vfunc3` = `0x610D20`
+- `BaseTexture::vfunc4` = `0x5FDAA0`
+- `BaseTexture::vfunc5` = `0x610F90`
+- `BaseTexture::vfunc6` = `0x610FE0`
+- `BaseTexture::vfunc7` = `0x547170`
+- `BaseTexture::vfunc8` = `0x610BD0`
+- `BaseTexture::vfunc9` = `0x604E40`
+- `BaseTexture::vfunc10` = `0x460B60`
+- `BaseTexture::vfunc11` = `0x460B60`
+- `BaseTexture::vfunc12` = `0x611050`
+- `BaseTexture::vfunc13` = `0x611070`
+- `BaseTexture::vfunc14` = `0x64BC40`
+- `BaseTexture::vfunc15` = `0x57B040`
+- `BaseTexture::vfunc16` = `0x610C60`
+- `BaseTexture::vfunc17` = `0x610C00`
+- `BaseTexture::vfunc18` = `0x611090`
+- `BaseTexture::vfunc19` = `0x611240`
+- `BaseTexture::vfunc20` = `0x604E40`
+
+## BinaryResource  (vtable @ 0x79A1EC, 19 methods)
+
+- `BinaryResource::vfunc0` = `0x67B570`
+- `BinaryResource::vfunc1` = `0x604E40`
+- `BinaryResource::vfunc2` = `0x610CC0`
+- `BinaryResource::vfunc3` = `0x610D20`
+- `BinaryResource::vfunc4` = `0x5FDAA0`
+- `BinaryResource::vfunc5` = `0x67B800`
+- `BinaryResource::vfunc6` = `0x67B7D0`
+- `BinaryResource::vfunc7` = `0x547170`
+- `BinaryResource::vfunc8` = `0x610BD0`
+- `BinaryResource::vfunc9` = `0x64A9B0`
+- `BinaryResource::vfunc10` = `0x460B60`
+- `BinaryResource::vfunc11` = `0x460B60`
+- `BinaryResource::vfunc12` = `0x437C60`
+- `BinaryResource::vfunc13` = `0x460B60`
+- `BinaryResource::vfunc14` = `0x64BC40`
+- `BinaryResource::vfunc15` = `0x57B040`
+- `BinaryResource::vfunc16` = `0x610C60`
+- `BinaryResource::vfunc17` = `0x610C00`
+- `BinaryResource::vfunc18` = `0x67AA00`
+
+## Boat  (vtable @ 0x7769A0, 6 methods)
+
+- `Boat::vfunc0` = `0x460E90`
+- `Boat::vfunc1` = `0x4607B0`
+- `Boat::vfunc2` = `0x4600D0`
+- `Boat::vfunc3` = `0x46D470`
+- `Boat::vfunc4` = `0x65F500`
+- `Boat::vfunc5` = `0x4218E0`
+
+## Boat  (vtable @ 0x776834, 90 methods)
+
+- `Boat::vfunc0` = `0x460780`
+- `Boat::vfunc1` = `0x604E40`
+- `Boat::vfunc2` = `0x57E760`
+- `Boat::vfunc3` = `0x57E760`
+- `Boat::vfunc4` = `0x5FDAA0`
+- `Boat::vfunc5` = `0x4609C0`
+- `Boat::vfunc6` = `0x680110`
+- `Boat::vfunc7` = `0x604E40`
+- `Boat::vfunc8` = `0x64CAE0`
+- `Boat::vfunc9` = `0x64CAE0`
+- `Boat::vfunc10` = `0x64CAE0`
+- `Boat::vfunc11` = `0x64CAE0`
+- `Boat::vfunc12` = `0x64CAE0`
+- `Boat::vfunc13` = `0x64CAE0`
+- `Boat::vfunc14` = `0x64CAE0`
+- `Boat::vfunc15` = `0x65F310`
+- `Boat::vfunc16` = `0x64CAE0`
+- `Boat::vfunc17` = `0x6E6E7D`
+- `Boat::vfunc18` = `0x460B60`
+- `Boat::vfunc19` = `0x460260`
+- `Boat::vfunc20` = `0x460280`
+- `Boat::vfunc21` = `0x64CAE0`
+- `Boat::vfunc22` = `0x460B60`
+- `Boat::vfunc23` = `0x45F970`
+- `Boat::vfunc24` = `0x45F980`
+- `Boat::vfunc25` = `0x45F8A0`
+- `Boat::vfunc26` = `0x45F920`
+- `Boat::vfunc27` = `0x516940`
+- `Boat::vfunc28` = `0x64A9B0`
+- `Boat::vfunc29` = `0x460160`
+- `Boat::vfunc30` = `0x4605E0`
+- `Boat::vfunc31` = `0x460450`
+- `Boat::vfunc32` = `0x460830`
+- `Boat::vfunc33` = `0x460A00`
+- `Boat::vfunc34` = `0x45FC80`
+- `Boat::vfunc35` = `0x460B70`
+- `Boat::vfunc36` = `0x460110`
+- `Boat::vfunc37` = `0x460B60`
+- `Boat::vfunc38` = `0x460B60`
+- `Boat::vfunc39` = `0x64A9B0`
+- `Boat::vfunc40` = `0x460610`
+- `Boat::vfunc41` = `0x45FF80`
+- `Boat::vfunc42` = `0x45FE40`
+- `Boat::vfunc43` = `0x4218C0`
+- `Boat::vfunc44` = `0x4600B0`
+- `Boat::vfunc45` = `0x4602D0`
+- `Boat::vfunc46` = `0x460A20`
+- `Boat::vfunc47` = `0x460A70`
+- `Boat::vfunc48` = `0x460A40`
+- `Boat::vfunc49` = `0x460B60`
+- `Boat::vfunc50` = `0x460B60`
+- `Boat::vfunc51` = `0x547170`
+- `Boat::vfunc52` = `0x460B60`
+- `Boat::vfunc53` = `0x6E6E7D`
+- `Boat::vfunc54` = `0x6E6E7D`
+- `Boat::vfunc55` = `0x6E6E7D`
+- `Boat::vfunc56` = `0x6E6E7D`
+- `Boat::vfunc57` = `0x6E6E7D`
+- `Boat::vfunc58` = `0x6E6E7D`
+- `Boat::vfunc59` = `0x6E6E7D`
+- `Boat::vfunc60` = `0x6E6E7D`
+- `Boat::vfunc61` = `0x6E6E7D`
+- `Boat::vfunc62` = `0x6E6E7D`
+- `Boat::vfunc63` = `0x6E6E7D`
+- `Boat::vfunc64` = `0x6E6E7D`
+- `Boat::vfunc65` = `0x6E6E7D`
+- `Boat::vfunc66` = `0x6E6E7D`
+- `Boat::vfunc67` = `0x6E6E7D`
+- `Boat::vfunc68` = `0x6E6E7D`
+- `Boat::vfunc69` = `0x6E6E7D`
+- `Boat::vfunc70` = `0x6E6E7D`
+- `Boat::vfunc71` = `0x6E6E7D`
+- `Boat::vfunc72` = `0x6E6E7D`
+- `Boat::vfunc73` = `0x6E6E7D`
+- `Boat::vfunc74` = `0x6E6E7D`
+- `Boat::vfunc75` = `0x6E6E7D`
+- `Boat::vfunc76` = `0x6E6E7D`
+- `Boat::vfunc77` = `0x6E6E7D`
+- `Boat::vfunc78` = `0x6E6E7D`
+- `Boat::vfunc79` = `0x6E6E7D`
+- `Boat::vfunc80` = `0x6E6E7D`
+- `Boat::vfunc81` = `0x6E6E7D`
+- `Boat::vfunc82` = `0x6E6E7D`
+- `Boat::vfunc83` = `0x6E6E7D`
+- `Boat::vfunc84` = `0x6E6E7D`
+- `Boat::vfunc85` = `0x6E6E7D`
+- `Boat::vfunc86` = `0x6E6E7D`
+- `Boat::vfunc87` = `0x6E6E7D`
+- `Boat::vfunc88` = `0x6E6E7D`
+- `Boat::vfunc89` = `0x6E6E7D`
+
+## BoatImpl  (vtable @ 0x776E6C, 18 methods)
+
+- `BoatImpl::vfunc0` = `0x4179D0`
+- `BoatImpl::vfunc1` = `0x4D9AB0`
+- `BoatImpl::vfunc2` = `0x4DB050`
+- `BoatImpl::vfunc3` = `0x4895E0`
+- `BoatImpl::vfunc4` = `0x46F7E0`
+- `BoatImpl::vfunc5` = `0x4D8C40`
+- `BoatImpl::vfunc6` = `0x4D8CE0`
+- `BoatImpl::vfunc7` = `0x4D8D40`
+- `BoatImpl::vfunc8` = `0x65F170`
+- `BoatImpl::vfunc9` = `0x4D8F40`
+- `BoatImpl::vfunc10` = `0x629920`
+- `BoatImpl::vfunc11` = `0x46F7D0`
+- `BoatImpl::vfunc12` = `0x46F7F0`
+- `BoatImpl::vfunc13` = `0x46F800`
+- `BoatImpl::vfunc14` = `0x46DB30`
+- `BoatImpl::vfunc15` = `0x46F820`
+- `BoatImpl::vfunc16` = `0x65F220`
+- `BoatImpl::vfunc17` = `0x4D8ED0`
+
+## BoatImpl  (vtable @ 0x776E50, 6 methods)
+
+- `BoatImpl::vfunc0` = `0x4DB060`
+- `BoatImpl::vfunc1` = `0x4607B0`
+- `BoatImpl::vfunc2` = `0x4600D0`
+- `BoatImpl::vfunc3` = `0x46D470`
+- `BoatImpl::vfunc4` = `0x65F500`
+- `BoatImpl::vfunc5` = `0x4218E0`
+
+## BoatImpl  (vtable @ 0x776CD4, 94 methods)
+
+- `BoatImpl::vfunc0` = `0x4D9260`
+- `BoatImpl::vfunc1` = `0x604E40`
+- `BoatImpl::vfunc2` = `0x57E760`
+- `BoatImpl::vfunc3` = `0x57E760`
+- `BoatImpl::vfunc4` = `0x4D7E80`
+- `BoatImpl::vfunc5` = `0x4D8650`
+- `BoatImpl::vfunc6` = `0x680110`
+- `BoatImpl::vfunc7` = `0x604E40`
+- `BoatImpl::vfunc8` = `0x64CAE0`
+- `BoatImpl::vfunc9` = `0x64CAE0`
+- `BoatImpl::vfunc10` = `0x64CAE0`
+- `BoatImpl::vfunc11` = `0x64CAE0`
+- `BoatImpl::vfunc12` = `0x64CAE0`
+- `BoatImpl::vfunc13` = `0x4D7E90`
+- `BoatImpl::vfunc14` = `0x64CAE0`
+- `BoatImpl::vfunc15` = `0x65F310`
+- `BoatImpl::vfunc16` = `0x64CAE0`
+- `BoatImpl::vfunc17` = `0x4D8870`
+- `BoatImpl::vfunc18` = `0x460B60`
+- `BoatImpl::vfunc19` = `0x460260`
+- `BoatImpl::vfunc20` = `0x460280`
+- `BoatImpl::vfunc21` = `0x64CAE0`
+- `BoatImpl::vfunc22` = `0x460B60`
+- `BoatImpl::vfunc23` = `0x45F970`
+- `BoatImpl::vfunc24` = `0x45F980`
+- `BoatImpl::vfunc25` = `0x45F8A0`
+- `BoatImpl::vfunc26` = `0x45F920`
+- `BoatImpl::vfunc27` = `0x516940`
+- `BoatImpl::vfunc28` = `0x64A9B0`
+- `BoatImpl::vfunc29` = `0x460160`
+- `BoatImpl::vfunc30` = `0x4D9860`
+- `BoatImpl::vfunc31` = `0x4D9840`
+- `BoatImpl::vfunc32` = `0x460830`
+- `BoatImpl::vfunc33` = `0x460A00`
+- `BoatImpl::vfunc34` = `0x45FC80`
+- `BoatImpl::vfunc35` = `0x460B70`
+- `BoatImpl::vfunc36` = `0x4DA220`
+- `BoatImpl::vfunc37` = `0x460B60`
+- `BoatImpl::vfunc38` = `0x460B60`
+- `BoatImpl::vfunc39` = `0x64A9B0`
+- `BoatImpl::vfunc40` = `0x460610`
+- `BoatImpl::vfunc41` = `0x4DA380`
+- `BoatImpl::vfunc42` = `0x45FE40`
+- `BoatImpl::vfunc43` = `0x4DA2C0`
+- `BoatImpl::vfunc44` = `0x4600B0`
+- `BoatImpl::vfunc45` = `0x4602D0`
+- `BoatImpl::vfunc46` = `0x460A20`
+- `BoatImpl::vfunc47` = `0x460A70`
+- `BoatImpl::vfunc48` = `0x460A40`
+- `BoatImpl::vfunc49` = `0x460B60`
+- `BoatImpl::vfunc50` = `0x460B60`
+- `BoatImpl::vfunc51` = `0x547170`
+- `BoatImpl::vfunc52` = `0x4D7F00`
+- `BoatImpl::vfunc53` = `0x4D8210`
+- `BoatImpl::vfunc54` = `0x4D8790`
+- `BoatImpl::vfunc55` = `0x4D87C0`
+- `BoatImpl::vfunc56` = `0x4D9940`
+- `BoatImpl::vfunc57` = `0x4D9880`
+- `BoatImpl::vfunc58` = `0x4DAEA0`
+- `BoatImpl::vfunc59` = `0x4D9DE0`
+- `BoatImpl::vfunc60` = `0x4D9FA0`
+- `BoatImpl::vfunc61` = `0x4DA120`
+- `BoatImpl::vfunc62` = `0x4D8F60`
+- `BoatImpl::vfunc63` = `0x4D8F90`
+- `BoatImpl::vfunc64` = `0x4D8FB0`
+- `BoatImpl::vfunc65` = `0x4D9550`
+- `BoatImpl::vfunc66` = `0x4D9430`
+- `BoatImpl::vfunc67` = `0x4D9440`
+- `BoatImpl::vfunc68` = `0x4D9450`
+- `BoatImpl::vfunc69` = `0x4D9470`
+- `BoatImpl::vfunc70` = `0x4D94C0`
+- `BoatImpl::vfunc71` = `0x4D94E0`
+- `BoatImpl::vfunc72` = `0x4D94F0`
+- `BoatImpl::vfunc73` = `0x4D9500`
+- `BoatImpl::vfunc74` = `0x4DA340`
+- `BoatImpl::vfunc75` = `0x4DA7B0`
+- `BoatImpl::vfunc76` = `0x4D9DC0`
+- `BoatImpl::vfunc77` = `0x4DA250`
+- `BoatImpl::vfunc78` = `0x4DA270`
+- `BoatImpl::vfunc79` = `0x4DA7D0`
+- `BoatImpl::vfunc80` = `0x4DAD80`
+- `BoatImpl::vfunc81` = `0x4D9580`
+- `BoatImpl::vfunc82` = `0x4D9560`
+- `BoatImpl::vfunc83` = `0x4D95B0`
+- `BoatImpl::vfunc84` = `0x4D9070`
+- `BoatImpl::vfunc85` = `0x4D9A90`
+- `BoatImpl::vfunc86` = `0x4D9DA0`
+- `BoatImpl::vfunc87` = `0x4D8FC0`
+- `BoatImpl::vfunc88` = `0x4DADB0`
+- `BoatImpl::vfunc89` = `0x4DAE40`
+- `BoatImpl::vfunc90` = `0x4D87F0`
+- `BoatImpl::vfunc91` = `0x4D8810`
+- `BoatImpl::vfunc92` = `0x4D8840`
+- `BoatImpl::vfunc93` = `0x4D7F70`
+
+## BoatPrefs  (vtable @ 0x7774AC, 22 methods)
+
+- `BoatPrefs::vfunc0` = `0x4CF5C0`
+- `BoatPrefs::vfunc1` = `0x604E40`
+- `BoatPrefs::vfunc2` = `0x4041C0`
+- `BoatPrefs::vfunc3` = `0x4041C0`
+- `BoatPrefs::vfunc4` = `0x4E4350`
+- `BoatPrefs::vfunc5` = `0x460B60`
+- `BoatPrefs::vfunc6` = `0x610BC0`
+- `BoatPrefs::vfunc7` = `0x547170`
+- `BoatPrefs::vfunc8` = `0x610BD0`
+- `BoatPrefs::vfunc9` = `0x64A9B0`
+- `BoatPrefs::vfunc10` = `0x60EAE0`
+- `BoatPrefs::vfunc11` = `0x460B60`
+- `BoatPrefs::vfunc12` = `0x437C60`
+- `BoatPrefs::vfunc13` = `0x460B60`
+- `BoatPrefs::vfunc14` = `0x64CAE0`
+- `BoatPrefs::vfunc15` = `0x4E4750`
+- `BoatPrefs::vfunc16` = `0x437C60`
+- `BoatPrefs::vfunc17` = `0x610C00`
+- `BoatPrefs::vfunc18` = `0x4E4360`
+- `BoatPrefs::vfunc19` = `0x4E4380`
+- `BoatPrefs::vfunc20` = `0x4E4620`
+- `BoatPrefs::vfunc21` = `0x67AA00`
+
+## Bolt  (vtable @ 0x770F6C, 18 methods)
+
+- `Bolt::vfunc0` = `0x4179D0`
+- `Bolt::vfunc1` = `0x46B3B0`
+- `Bolt::vfunc2` = `0x492270`
+- `Bolt::vfunc3` = `0x629920`
+- `Bolt::vfunc4` = `0x546E20`
+- `Bolt::vfunc5` = `0x46DAC0`
+- `Bolt::vfunc6` = `0x46B350`
+- `Bolt::vfunc7` = `0x546E30`
+- `Bolt::vfunc8` = `0x46DB60`
+- `Bolt::vfunc9` = `0x46DB20`
+- `Bolt::vfunc10` = `0x546E20`
+- `Bolt::vfunc11` = `0x46B3A0`
+- `Bolt::vfunc12` = `0x40B570`
+- `Bolt::vfunc13` = `0x46DB30`
+- `Bolt::vfunc14` = `0x437C60`
+- `Bolt::vfunc15` = `0x437C60`
+- `Bolt::vfunc16` = `0x46DAE0`
+- `Bolt::vfunc17` = `0x46DB00`
+
+## Bolt  (vtable @ 0x770F4C, 6 methods)
+
+- `Bolt::vfunc0` = `0x492280`
+- `Bolt::vfunc1` = `0x4607B0`
+- `Bolt::vfunc2` = `0x4600D0`
+- `Bolt::vfunc3` = `0x46D470`
+- `Bolt::vfunc4` = `0x65F500`
+- `Bolt::vfunc5` = `0x4218E0`
+
+## Bolt  (vtable @ 0x770E6C, 55 methods)
+
+- `Bolt::vfunc0` = `0x48D7C0`
+- `Bolt::vfunc1` = `0x604E40`
+- `Bolt::vfunc2` = `0x57E760`
+- `Bolt::vfunc3` = `0x57E760`
+- `Bolt::vfunc4` = `0x48D3B0`
+- `Bolt::vfunc5` = `0x48F600`
+- `Bolt::vfunc6` = `0x680110`
+- `Bolt::vfunc7` = `0x604E40`
+- `Bolt::vfunc8` = `0x64CAE0`
+- `Bolt::vfunc9` = `0x64CAE0`
+- `Bolt::vfunc10` = `0x64CAE0`
+- `Bolt::vfunc11` = `0x64CAE0`
+- `Bolt::vfunc12` = `0x64CAE0`
+- `Bolt::vfunc13` = `0x4D7E90`
+- `Bolt::vfunc14` = `0x64CAE0`
+- `Bolt::vfunc15` = `0x65F310`
+- `Bolt::vfunc16` = `0x64CAE0`
+- `Bolt::vfunc17` = `0x491180`
+- `Bolt::vfunc18` = `0x460B60`
+- `Bolt::vfunc19` = `0x460260`
+- `Bolt::vfunc20` = `0x460280`
+- `Bolt::vfunc21` = `0x64CAE0`
+- `Bolt::vfunc22` = `0x460B60`
+- `Bolt::vfunc23` = `0x45F970`
+- `Bolt::vfunc24` = `0x46DB50`
+- `Bolt::vfunc25` = `0x45F8A0`
+- `Bolt::vfunc26` = `0x45F920`
+- `Bolt::vfunc27` = `0x516940`
+- `Bolt::vfunc28` = `0x64A9B0`
+- `Bolt::vfunc29` = `0x460160`
+- `Bolt::vfunc30` = `0x4605E0`
+- `Bolt::vfunc31` = `0x460450`
+- `Bolt::vfunc32` = `0x460830`
+- `Bolt::vfunc33` = `0x460A00`
+- `Bolt::vfunc34` = `0x45FC80`
+- `Bolt::vfunc35` = `0x492040`
+- `Bolt::vfunc36` = `0x460110`
+- `Bolt::vfunc37` = `0x460B60`
+- `Bolt::vfunc38` = `0x48DA10`
+- `Bolt::vfunc39` = `0x48D9E0`
+- `Bolt::vfunc40` = `0x604E40`
+- `Bolt::vfunc41` = `0x45FF80`
+- `Bolt::vfunc42` = `0x45FE40`
+- `Bolt::vfunc43` = `0x4218C0`
+- `Bolt::vfunc44` = `0x64CAE0`
+- `Bolt::vfunc45` = `0x4602D0`
+- `Bolt::vfunc46` = `0x460A20`
+- `Bolt::vfunc47` = `0x460A70`
+- `Bolt::vfunc48` = `0x460A40`
+- `Bolt::vfunc49` = `0x460B60`
+- `Bolt::vfunc50` = `0x460B60`
+- `Bolt::vfunc51` = `0x490750`
+- `Bolt::vfunc52` = `0x48FCF0`
+- `Bolt::vfunc53` = `0x4996F0`
+- `Bolt::vfunc54` = `0x492030`
+
+## BoltActivatePrefs  (vtable @ 0x7737CC, 37 methods)
+
+- `BoltActivatePrefs::vfunc0` = `0x4A0F40`
+- `BoltActivatePrefs::vfunc1` = `0x604E40`
+- `BoltActivatePrefs::vfunc2` = `0x4041C0`
+- `BoltActivatePrefs::vfunc3` = `0x4041C0`
+- `BoltActivatePrefs::vfunc4` = `0x49A990`
+- `BoltActivatePrefs::vfunc5` = `0x460B60`
+- `BoltActivatePrefs::vfunc6` = `0x610BC0`
+- `BoltActivatePrefs::vfunc7` = `0x547170`
+- `BoltActivatePrefs::vfunc8` = `0x610BD0`
+- `BoltActivatePrefs::vfunc9` = `0x64A9B0`
+- `BoltActivatePrefs::vfunc10` = `0x60EAE0`
+- `BoltActivatePrefs::vfunc11` = `0x460B60`
+- `BoltActivatePrefs::vfunc12` = `0x437C60`
+- `BoltActivatePrefs::vfunc13` = `0x460B60`
+- `BoltActivatePrefs::vfunc14` = `0x64CAE0`
+- `BoltActivatePrefs::vfunc15` = `0x49AA60`
+- `BoltActivatePrefs::vfunc16` = `0x437C60`
+- `BoltActivatePrefs::vfunc17` = `0x610C00`
+- `BoltActivatePrefs::vfunc18` = `0x49A9A0`
+- `BoltActivatePrefs::vfunc19` = `0x49A9C0`
+- `BoltActivatePrefs::vfunc20` = `0x49A9D0`
+- `BoltActivatePrefs::vfunc21` = `0x67AA00`
+- `BoltActivatePrefs::vfunc22` = `0x64A9B0`
+- `BoltActivatePrefs::vfunc23` = `0x604E40`
+- `BoltActivatePrefs::vfunc24` = `0x64A9B0`
+- `BoltActivatePrefs::vfunc25` = `0x49A7E0`
+- `BoltActivatePrefs::vfunc26` = `0x64A9B0`
+- `BoltActivatePrefs::vfunc27` = `0x64A9B0`
+- `BoltActivatePrefs::vfunc28` = `0x604E40`
+- `BoltActivatePrefs::vfunc29` = `0x4A0170`
+- `BoltActivatePrefs::vfunc30` = `0x4A0300`
+- `BoltActivatePrefs::vfunc31` = `0x49A850`
+- `BoltActivatePrefs::vfunc32` = `0x49A8F0`
+- `BoltActivatePrefs::vfunc33` = `0x4A01D0`
+- `BoltActivatePrefs::vfunc34` = `0x4A0250`
+- `BoltActivatePrefs::vfunc35` = `0x4A0430`
+- `BoltActivatePrefs::vfunc36` = `0x4A0430`
+
+## BoltAndTrailGeometry  (vtable @ 0x7710A4, 6 methods)
+
+- `BoltAndTrailGeometry::vfunc0` = `0x497C10`
+- `BoltAndTrailGeometry::vfunc1` = `0x62ECE0`
+- `BoltAndTrailGeometry::vfunc2` = `0x637710`
+- `BoltAndTrailGeometry::vfunc3` = `0x475AA0`
+- `BoltAndTrailGeometry::vfunc4` = `0x47E370`
+- `BoltAndTrailGeometry::vfunc5` = `0x475A90`
+
+## BoltAndTrailGeometry  (vtable @ 0x771084, 7 methods)
+
+- `BoltAndTrailGeometry::vfunc0` = `0x516940`
+- `BoltAndTrailGeometry::vfunc1` = `0x547170`
+- `BoltAndTrailGeometry::vfunc2` = `0x64A9B0`
+- `BoltAndTrailGeometry::vfunc3` = `0x6269D0`
+- `BoltAndTrailGeometry::vfunc4` = `0x604E40`
+- `BoltAndTrailGeometry::vfunc5` = `0x64CAE0`
+- `BoltAndTrailGeometry::vfunc6` = `0x430D50`
+
+## BoltAndTrailGeometry  (vtable @ 0x77102C, 21 methods)
+
+- `BoltAndTrailGeometry::vfunc0` = `0x496720`
+- `BoltAndTrailGeometry::vfunc1` = `0x604E40`
+- `BoltAndTrailGeometry::vfunc2` = `0x57E760`
+- `BoltAndTrailGeometry::vfunc3` = `0x57E760`
+- `BoltAndTrailGeometry::vfunc4` = `0x4962D0`
+- `BoltAndTrailGeometry::vfunc5` = `0x4962E0`
+- `BoltAndTrailGeometry::vfunc6` = `0x626990`
+- `BoltAndTrailGeometry::vfunc7` = `0x64A9B0`
+- `BoltAndTrailGeometry::vfunc8` = `0x6269F0`
+- `BoltAndTrailGeometry::vfunc9` = `0x64A9B0`
+- `BoltAndTrailGeometry::vfunc10` = `0x460B60`
+- `BoltAndTrailGeometry::vfunc11` = `0x63A620`
+- `BoltAndTrailGeometry::vfunc12` = `0x460B60`
+- `BoltAndTrailGeometry::vfunc13` = `0x460B60`
+- `BoltAndTrailGeometry::vfunc14` = `0x516940`
+- `BoltAndTrailGeometry::vfunc15` = `0x547170`
+- `BoltAndTrailGeometry::vfunc16` = `0x437C60`
+- `BoltAndTrailGeometry::vfunc17` = `0x547170`
+- `BoltAndTrailGeometry::vfunc18` = `0x604E40`
+- `BoltAndTrailGeometry::vfunc19` = `0x516940`
+- `BoltAndTrailGeometry::vfunc20` = `0x605BC0`
+
+## BoltComplexData  (vtable @ 0x770FC4, 2 methods)
+
+- `BoltComplexData::vfunc0` = `0x48D5A0`
+- `BoltComplexData::vfunc1` = `0x604E40`
+
+## BoltDamagePrefs  (vtable @ 0x773864, 37 methods)
+
+- `BoltDamagePrefs::vfunc0` = `0x4A0F40`
+- `BoltDamagePrefs::vfunc1` = `0x604E40`
+- `BoltDamagePrefs::vfunc2` = `0x4041C0`
+- `BoltDamagePrefs::vfunc3` = `0x4041C0`
+- `BoltDamagePrefs::vfunc4` = `0x49A9E0`
+- `BoltDamagePrefs::vfunc5` = `0x460B60`
+- `BoltDamagePrefs::vfunc6` = `0x610BC0`
+- `BoltDamagePrefs::vfunc7` = `0x547170`
+- `BoltDamagePrefs::vfunc8` = `0x610BD0`
+- `BoltDamagePrefs::vfunc9` = `0x64A9B0`
+- `BoltDamagePrefs::vfunc10` = `0x60EAE0`
+- `BoltDamagePrefs::vfunc11` = `0x460B60`
+- `BoltDamagePrefs::vfunc12` = `0x437C60`
+- `BoltDamagePrefs::vfunc13` = `0x460B60`
+- `BoltDamagePrefs::vfunc14` = `0x64CAE0`
+- `BoltDamagePrefs::vfunc15` = `0x49AA60`
+- `BoltDamagePrefs::vfunc16` = `0x437C60`
+- `BoltDamagePrefs::vfunc17` = `0x610C00`
+- `BoltDamagePrefs::vfunc18` = `0x49A9F0`
+- `BoltDamagePrefs::vfunc19` = `0x49AA10`
+- `BoltDamagePrefs::vfunc20` = `0x49A9D0`
+- `BoltDamagePrefs::vfunc21` = `0x67AA00`
+- `BoltDamagePrefs::vfunc22` = `0x64A9B0`
+- `BoltDamagePrefs::vfunc23` = `0x64A9B0`
+- `BoltDamagePrefs::vfunc24` = `0x604E40`
+- `BoltDamagePrefs::vfunc25` = `0x49A7E0`
+- `BoltDamagePrefs::vfunc26` = `0x64A9B0`
+- `BoltDamagePrefs::vfunc27` = `0x64A9B0`
+- `BoltDamagePrefs::vfunc28` = `0x604E40`
+- `BoltDamagePrefs::vfunc29` = `0x4A0170`
+- `BoltDamagePrefs::vfunc30` = `0x4A0300`
+- `BoltDamagePrefs::vfunc31` = `0x49A850`
+- `BoltDamagePrefs::vfunc32` = `0x49A8F0`
+- `BoltDamagePrefs::vfunc33` = `0x4A01D0`
+- `BoltDamagePrefs::vfunc34` = `0x4A0250`
+- `BoltDamagePrefs::vfunc35` = `0x4A0430`
+- `BoltDamagePrefs::vfunc36` = `0x4A0430`
+
+## BoltEffectPrefs  (vtable @ 0x7736D4, 22 methods)
+
+- `BoltEffectPrefs::vfunc0` = `0x49E060`
+- `BoltEffectPrefs::vfunc1` = `0x604E40`
+- `BoltEffectPrefs::vfunc2` = `0x4041C0`
+- `BoltEffectPrefs::vfunc3` = `0x4041C0`
+- `BoltEffectPrefs::vfunc4` = `0x49A770`
+- `BoltEffectPrefs::vfunc5` = `0x460B60`
+- `BoltEffectPrefs::vfunc6` = `0x610BC0`
+- `BoltEffectPrefs::vfunc7` = `0x547170`
+- `BoltEffectPrefs::vfunc8` = `0x610BD0`
+- `BoltEffectPrefs::vfunc9` = `0x64A9B0`
+- `BoltEffectPrefs::vfunc10` = `0x60EAE0`
+- `BoltEffectPrefs::vfunc11` = `0x460B60`
+- `BoltEffectPrefs::vfunc12` = `0x437C60`
+- `BoltEffectPrefs::vfunc13` = `0x460B60`
+- `BoltEffectPrefs::vfunc14` = `0x64CAE0`
+- `BoltEffectPrefs::vfunc15` = `0x49D760`
+- `BoltEffectPrefs::vfunc16` = `0x437C60`
+- `BoltEffectPrefs::vfunc17` = `0x610C00`
+- `BoltEffectPrefs::vfunc18` = `0x49A780`
+- `BoltEffectPrefs::vfunc19` = `0x49A7A0`
+- `BoltEffectPrefs::vfunc20` = `0x49E400`
+- `BoltEffectPrefs::vfunc21` = `0x67AA00`
+
+## BoltPrefs  (vtable @ 0x77351C, 37 methods)
+
+- `BoltPrefs::vfunc0` = `0x4CF5C0`
+- `BoltPrefs::vfunc1` = `0x604E40`
+- `BoltPrefs::vfunc2` = `0x4041C0`
+- `BoltPrefs::vfunc3` = `0x4041C0`
+- `BoltPrefs::vfunc4` = `0x49A7B0`
+- `BoltPrefs::vfunc5` = `0x460B60`
+- `BoltPrefs::vfunc6` = `0x610BC0`
+- `BoltPrefs::vfunc7` = `0x547170`
+- `BoltPrefs::vfunc8` = `0x610BD0`
+- `BoltPrefs::vfunc9` = `0x64A9B0`
+- `BoltPrefs::vfunc10` = `0x60EAE0`
+- `BoltPrefs::vfunc11` = `0x460B60`
+- `BoltPrefs::vfunc12` = `0x437C60`
+- `BoltPrefs::vfunc13` = `0x460B60`
+- `BoltPrefs::vfunc14` = `0x64CAE0`
+- `BoltPrefs::vfunc15` = `0x49E2F0`
+- `BoltPrefs::vfunc16` = `0x437C60`
+- `BoltPrefs::vfunc17` = `0x610C00`
+- `BoltPrefs::vfunc18` = `0x49A7C0`
+- `BoltPrefs::vfunc19` = `0x4D25C0`
+- `BoltPrefs::vfunc20` = `0x49F670`
+- `BoltPrefs::vfunc21` = `0x67AA00`
+- `BoltPrefs::vfunc22` = `0x64A9B0`
+- `BoltPrefs::vfunc23` = `0x64A9B0`
+- `BoltPrefs::vfunc24` = `0x64A9B0`
+- `BoltPrefs::vfunc25` = `0x49A7E0`
+- `BoltPrefs::vfunc26` = `0x64A9B0`
+- `BoltPrefs::vfunc27` = `0x64A9B0`
+- `BoltPrefs::vfunc28` = `0x64A9B0`
+- `BoltPrefs::vfunc29` = `0x437C60`
+- `BoltPrefs::vfunc30` = `0x4A0020`
+- `BoltPrefs::vfunc31` = `0x49A800`
+- `BoltPrefs::vfunc32` = `0x49A810`
+- `BoltPrefs::vfunc33` = `0x4A0040`
+- `BoltPrefs::vfunc34` = `0x4A00C0`
+- `BoltPrefs::vfunc35` = `0x49E3D0`
+- `BoltPrefs::vfunc36` = `0x49E3D0`
+
+## BoltSendToPrefs  (vtable @ 0x7738FC, 37 methods)
+
+- `BoltSendToPrefs::vfunc0` = `0x4A0F40`
+- `BoltSendToPrefs::vfunc1` = `0x604E40`
+- `BoltSendToPrefs::vfunc2` = `0x4041C0`
+- `BoltSendToPrefs::vfunc3` = `0x4041C0`
+- `BoltSendToPrefs::vfunc4` = `0x49AA20`
+- `BoltSendToPrefs::vfunc5` = `0x460B60`
+- `BoltSendToPrefs::vfunc6` = `0x610BC0`
+- `BoltSendToPrefs::vfunc7` = `0x547170`
+- `BoltSendToPrefs::vfunc8` = `0x610BD0`
+- `BoltSendToPrefs::vfunc9` = `0x64A9B0`
+- `BoltSendToPrefs::vfunc10` = `0x60EAE0`
+- `BoltSendToPrefs::vfunc11` = `0x460B60`
+- `BoltSendToPrefs::vfunc12` = `0x437C60`
+- `BoltSendToPrefs::vfunc13` = `0x460B60`
+- `BoltSendToPrefs::vfunc14` = `0x64CAE0`
+- `BoltSendToPrefs::vfunc15` = `0x49AA60`
+- `BoltSendToPrefs::vfunc16` = `0x437C60`
+- `BoltSendToPrefs::vfunc17` = `0x610C00`
+- `BoltSendToPrefs::vfunc18` = `0x49AA30`
+- `BoltSendToPrefs::vfunc19` = `0x49AA50`
+- `BoltSendToPrefs::vfunc20` = `0x49A9D0`
+- `BoltSendToPrefs::vfunc21` = `0x67AA00`
+- `BoltSendToPrefs::vfunc22` = `0x604E40`
+- `BoltSendToPrefs::vfunc23` = `0x64A9B0`
+- `BoltSendToPrefs::vfunc24` = `0x64A9B0`
+- `BoltSendToPrefs::vfunc25` = `0x49A7E0`
+- `BoltSendToPrefs::vfunc26` = `0x64A9B0`
+- `BoltSendToPrefs::vfunc27` = `0x64A9B0`
+- `BoltSendToPrefs::vfunc28` = `0x604E40`
+- `BoltSendToPrefs::vfunc29` = `0x4A0170`
+- `BoltSendToPrefs::vfunc30` = `0x4A0300`
+- `BoltSendToPrefs::vfunc31` = `0x49A850`
+- `BoltSendToPrefs::vfunc32` = `0x49A8F0`
+- `BoltSendToPrefs::vfunc33` = `0x4A01D0`
+- `BoltSendToPrefs::vfunc34` = `0x4A0250`
+- `BoltSendToPrefs::vfunc35` = `0x4A0430`
+- `BoltSendToPrefs::vfunc36` = `0x4A0430`
+
+## BoltSpreadPrefs  (vtable @ 0x7735B4, 22 methods)
+
+- `BoltSpreadPrefs::vfunc0` = `0x4CF5C0`
+- `BoltSpreadPrefs::vfunc1` = `0x604E40`
+- `BoltSpreadPrefs::vfunc2` = `0x4041C0`
+- `BoltSpreadPrefs::vfunc3` = `0x4041C0`
+- `BoltSpreadPrefs::vfunc4` = `0x49A6B0`
+- `BoltSpreadPrefs::vfunc5` = `0x460B60`
+- `BoltSpreadPrefs::vfunc6` = `0x610BC0`
+- `BoltSpreadPrefs::vfunc7` = `0x547170`
+- `BoltSpreadPrefs::vfunc8` = `0x610BD0`
+- `BoltSpreadPrefs::vfunc9` = `0x64A9B0`
+- `BoltSpreadPrefs::vfunc10` = `0x60EAE0`
+- `BoltSpreadPrefs::vfunc11` = `0x460B60`
+- `BoltSpreadPrefs::vfunc12` = `0x437C60`
+- `BoltSpreadPrefs::vfunc13` = `0x460B60`
+- `BoltSpreadPrefs::vfunc14` = `0x64CAE0`
+- `BoltSpreadPrefs::vfunc15` = `0x57B040`
+- `BoltSpreadPrefs::vfunc16` = `0x437C60`
+- `BoltSpreadPrefs::vfunc17` = `0x610C00`
+- `BoltSpreadPrefs::vfunc18` = `0x49A6C0`
+- `BoltSpreadPrefs::vfunc19` = `0x49A6E0`
+- `BoltSpreadPrefs::vfunc20` = `0x49AEE0`
+- `BoltSpreadPrefs::vfunc21` = `0x67AA00`
+
+## BoltStuckData  (vtable @ 0x770FB8, 2 methods)
+
+- `BoltStuckData::vfunc0` = `0x4CF5C0`
+- `BoltStuckData::vfunc1` = `0x604E40`
+
+## BoltSurfaceFXPrefs  (vtable @ 0x773614, 22 methods)
+
+- `BoltSurfaceFXPrefs::vfunc0` = `0x49AF80`
+- `BoltSurfaceFXPrefs::vfunc1` = `0x604E40`
+- `BoltSurfaceFXPrefs::vfunc2` = `0x4041C0`
+- `BoltSurfaceFXPrefs::vfunc3` = `0x4041C0`
+- `BoltSurfaceFXPrefs::vfunc4` = `0x49A6F0`
+- `BoltSurfaceFXPrefs::vfunc5` = `0x460B60`
+- `BoltSurfaceFXPrefs::vfunc6` = `0x610BC0`
+- `BoltSurfaceFXPrefs::vfunc7` = `0x547170`
+- `BoltSurfaceFXPrefs::vfunc8` = `0x610BD0`
+- `BoltSurfaceFXPrefs::vfunc9` = `0x64A9B0`
+- `BoltSurfaceFXPrefs::vfunc10` = `0x60EAE0`
+- `BoltSurfaceFXPrefs::vfunc11` = `0x460B60`
+- `BoltSurfaceFXPrefs::vfunc12` = `0x437C60`
+- `BoltSurfaceFXPrefs::vfunc13` = `0x460B60`
+- `BoltSurfaceFXPrefs::vfunc14` = `0x64CAE0`
+- `BoltSurfaceFXPrefs::vfunc15` = `0x57B040`
+- `BoltSurfaceFXPrefs::vfunc16` = `0x437C60`
+- `BoltSurfaceFXPrefs::vfunc17` = `0x610C00`
+- `BoltSurfaceFXPrefs::vfunc18` = `0x49A700`
+- `BoltSurfaceFXPrefs::vfunc19` = `0x49A720`
+- `BoltSurfaceFXPrefs::vfunc20` = `0x49B030`
+- `BoltSurfaceFXPrefs::vfunc21` = `0x67AA00`
+
+## BoltSurfaceSndPrefs  (vtable @ 0x773674, 22 methods)
+
+- `BoltSurfaceSndPrefs::vfunc0` = `0x49B140`
+- `BoltSurfaceSndPrefs::vfunc1` = `0x604E40`
+- `BoltSurfaceSndPrefs::vfunc2` = `0x4041C0`
+- `BoltSurfaceSndPrefs::vfunc3` = `0x4041C0`
+- `BoltSurfaceSndPrefs::vfunc4` = `0x49A730`
+- `BoltSurfaceSndPrefs::vfunc5` = `0x460B60`
+- `BoltSurfaceSndPrefs::vfunc6` = `0x610BC0`
+- `BoltSurfaceSndPrefs::vfunc7` = `0x547170`
+- `BoltSurfaceSndPrefs::vfunc8` = `0x610BD0`
+- `BoltSurfaceSndPrefs::vfunc9` = `0x64A9B0`
+- `BoltSurfaceSndPrefs::vfunc10` = `0x60EAE0`
+- `BoltSurfaceSndPrefs::vfunc11` = `0x460B60`
+- `BoltSurfaceSndPrefs::vfunc12` = `0x437C60`
+- `BoltSurfaceSndPrefs::vfunc13` = `0x460B60`
+- `BoltSurfaceSndPrefs::vfunc14` = `0x64CAE0`
+- `BoltSurfaceSndPrefs::vfunc15` = `0x57B040`
+- `BoltSurfaceSndPrefs::vfunc16` = `0x437C60`
+- `BoltSurfaceSndPrefs::vfunc17` = `0x610C00`
+- `BoltSurfaceSndPrefs::vfunc18` = `0x49A740`
+- `BoltSurfaceSndPrefs::vfunc19` = `0x49A760`
+- `BoltSurfaceSndPrefs::vfunc20` = `0x49B1D0`
+- `BoltSurfaceSndPrefs::vfunc21` = `0x67AA00`
+
+## BoltTrapPrefs  (vtable @ 0x773994, 37 methods)
+
+- `BoltTrapPrefs::vfunc0` = `0x4A10C0`
+- `BoltTrapPrefs::vfunc1` = `0x604E40`
+- `BoltTrapPrefs::vfunc2` = `0x4041C0`
+- `BoltTrapPrefs::vfunc3` = `0x4041C0`
+- `BoltTrapPrefs::vfunc4` = `0x49AA70`
+- `BoltTrapPrefs::vfunc5` = `0x460B60`
+- `BoltTrapPrefs::vfunc6` = `0x610BC0`
+- `BoltTrapPrefs::vfunc7` = `0x547170`
+- `BoltTrapPrefs::vfunc8` = `0x610BD0`
+- `BoltTrapPrefs::vfunc9` = `0x64A9B0`
+- `BoltTrapPrefs::vfunc10` = `0x60EAE0`
+- `BoltTrapPrefs::vfunc11` = `0x460B60`
+- `BoltTrapPrefs::vfunc12` = `0x437C60`
+- `BoltTrapPrefs::vfunc13` = `0x460B60`
+- `BoltTrapPrefs::vfunc14` = `0x64CAE0`
+- `BoltTrapPrefs::vfunc15` = `0x49AA60`
+- `BoltTrapPrefs::vfunc16` = `0x437C60`
+- `BoltTrapPrefs::vfunc17` = `0x610C00`
+- `BoltTrapPrefs::vfunc18` = `0x49AA80`
+- `BoltTrapPrefs::vfunc19` = `0x49AAA0`
+- `BoltTrapPrefs::vfunc20` = `0x4A1100`
+- `BoltTrapPrefs::vfunc21` = `0x67AA00`
+- `BoltTrapPrefs::vfunc22` = `0x64A9B0`
+- `BoltTrapPrefs::vfunc23` = `0x64A9B0`
+- `BoltTrapPrefs::vfunc24` = `0x64A9B0`
+- `BoltTrapPrefs::vfunc25` = `0x49A7E0`
+- `BoltTrapPrefs::vfunc26` = `0x604E40`
+- `BoltTrapPrefs::vfunc27` = `0x64A9B0`
+- `BoltTrapPrefs::vfunc28` = `0x604E40`
+- `BoltTrapPrefs::vfunc29` = `0x4A0170`
+- `BoltTrapPrefs::vfunc30` = `0x4A0300`
+- `BoltTrapPrefs::vfunc31` = `0x49A850`
+- `BoltTrapPrefs::vfunc32` = `0x49A8F0`
+- `BoltTrapPrefs::vfunc33` = `0x4A01D0`
+- `BoltTrapPrefs::vfunc34` = `0x4A0250`
+- `BoltTrapPrefs::vfunc35` = `0x4A0430`
+- `BoltTrapPrefs::vfunc36` = `0x4A0430`
+
+## BonePositionProxy  (vtable @ 0x76C924, 7 methods)
+
+- `BonePositionProxy::vfunc0` = `0x467670`
+- `BonePositionProxy::vfunc1` = `0x64CAE0`
+- `BonePositionProxy::vfunc2` = `0x467690`
+- `BonePositionProxy::vfunc3` = `0x467520`
+- `BonePositionProxy::vfunc4` = `0x65F500`
+- `BonePositionProxy::vfunc5` = `0x64A9B0`
+- `BonePositionProxy::vfunc6` = `0x516940`
+
+## BountyAssignmentPrefs  (vtable @ 0x784914, 22 methods)
+
+- `BountyAssignmentPrefs::vfunc0` = `0x5CD370`
+- `BountyAssignmentPrefs::vfunc1` = `0x604E40`
+- `BountyAssignmentPrefs::vfunc2` = `0x4041C0`
+- `BountyAssignmentPrefs::vfunc3` = `0x4041C0`
+- `BountyAssignmentPrefs::vfunc4` = `0x5CD290`
+- `BountyAssignmentPrefs::vfunc5` = `0x460B60`
+- `BountyAssignmentPrefs::vfunc6` = `0x610BC0`
+- `BountyAssignmentPrefs::vfunc7` = `0x547170`
+- `BountyAssignmentPrefs::vfunc8` = `0x610BD0`
+- `BountyAssignmentPrefs::vfunc9` = `0x64A9B0`
+- `BountyAssignmentPrefs::vfunc10` = `0x60EAE0`
+- `BountyAssignmentPrefs::vfunc11` = `0x460B60`
+- `BountyAssignmentPrefs::vfunc12` = `0x437C60`
+- `BountyAssignmentPrefs::vfunc13` = `0x460B60`
+- `BountyAssignmentPrefs::vfunc14` = `0x64CAE0`
+- `BountyAssignmentPrefs::vfunc15` = `0x57B040`
+- `BountyAssignmentPrefs::vfunc16` = `0x437C60`
+- `BountyAssignmentPrefs::vfunc17` = `0x610C00`
+- `BountyAssignmentPrefs::vfunc18` = `0x5CD2A0`
+- `BountyAssignmentPrefs::vfunc19` = `0x5CD2C0`
+- `BountyAssignmentPrefs::vfunc20` = `0x460B60`
+- `BountyAssignmentPrefs::vfunc21` = `0x67AA00`
+
+## BountyPost  (vtable @ 0x76DE74, 6 methods)
+
+- `BountyPost::vfunc0` = `0x473050`
+- `BountyPost::vfunc1` = `0x64CAE0`
+- `BountyPost::vfunc2` = `0x4600D0`
+- `BountyPost::vfunc3` = `0x46D470`
+- `BountyPost::vfunc4` = `0x65F500`
+- `BountyPost::vfunc5` = `0x4218E0`
+
+## BountyPost  (vtable @ 0x76DD9C, 53 methods)
+
+- `BountyPost::vfunc0` = `0x471520`
+- `BountyPost::vfunc1` = `0x604E40`
+- `BountyPost::vfunc2` = `0x57E760`
+- `BountyPost::vfunc3` = `0x57E760`
+- `BountyPost::vfunc4` = `0x470DC0`
+- `BountyPost::vfunc5` = `0x4717B0`
+- `BountyPost::vfunc6` = `0x680110`
+- `BountyPost::vfunc7` = `0x64A9B0`
+- `BountyPost::vfunc8` = `0x64CAE0`
+- `BountyPost::vfunc9` = `0x64CAE0`
+- `BountyPost::vfunc10` = `0x64CAE0`
+- `BountyPost::vfunc11` = `0x64CAE0`
+- `BountyPost::vfunc12` = `0x64CAE0`
+- `BountyPost::vfunc13` = `0x64CAE0`
+- `BountyPost::vfunc14` = `0x64CAE0`
+- `BountyPost::vfunc15` = `0x65F310`
+- `BountyPost::vfunc16` = `0x64CAE0`
+- `BountyPost::vfunc17` = `0x45FA60`
+- `BountyPost::vfunc18` = `0x460B60`
+- `BountyPost::vfunc19` = `0x64BC40`
+- `BountyPost::vfunc20` = `0x471EB0`
+- `BountyPost::vfunc21` = `0x64CAE0`
+- `BountyPost::vfunc22` = `0x460B60`
+- `BountyPost::vfunc23` = `0x45F970`
+- `BountyPost::vfunc24` = `0x45F980`
+- `BountyPost::vfunc25` = `0x45F8A0`
+- `BountyPost::vfunc26` = `0x45F920`
+- `BountyPost::vfunc27` = `0x486D60`
+- `BountyPost::vfunc28` = `0x471EA0`
+- `BountyPost::vfunc29` = `0x460160`
+- `BountyPost::vfunc30` = `0x4605E0`
+- `BountyPost::vfunc31` = `0x460450`
+- `BountyPost::vfunc32` = `0x460B60`
+- `BountyPost::vfunc33` = `0x460B60`
+- `BountyPost::vfunc34` = `0x45FC80`
+- `BountyPost::vfunc35` = `0x460B70`
+- `BountyPost::vfunc36` = `0x460110`
+- `BountyPost::vfunc37` = `0x460B60`
+- `BountyPost::vfunc38` = `0x460B60`
+- `BountyPost::vfunc39` = `0x64A9B0`
+- `BountyPost::vfunc40` = `0x460610`
+- `BountyPost::vfunc41` = `0x45FF80`
+- `BountyPost::vfunc42` = `0x45FE40`
+- `BountyPost::vfunc43` = `0x4218C0`
+- `BountyPost::vfunc44` = `0x4600B0`
+- `BountyPost::vfunc45` = `0x4602D0`
+- `BountyPost::vfunc46` = `0x460600`
+- `BountyPost::vfunc47` = `0x45FC10`
+- `BountyPost::vfunc48` = `0x45FAC0`
+- `BountyPost::vfunc49` = `0x460B60`
+- `BountyPost::vfunc50` = `0x460B60`
+- `BountyPost::vfunc51` = `0x547170`
+- `BountyPost::vfunc52` = `0x516940`
+
+## BountyPostPrefs  (vtable @ 0x76DD3C, 22 methods)
+
+- `BountyPostPrefs::vfunc0` = `0x4CF5C0`
+- `BountyPostPrefs::vfunc1` = `0x604E40`
+- `BountyPostPrefs::vfunc2` = `0x4041C0`
+- `BountyPostPrefs::vfunc3` = `0x4041C0`
+- `BountyPostPrefs::vfunc4` = `0x470EA0`
+- `BountyPostPrefs::vfunc5` = `0x460B60`
+- `BountyPostPrefs::vfunc6` = `0x610BC0`
+- `BountyPostPrefs::vfunc7` = `0x547170`
+- `BountyPostPrefs::vfunc8` = `0x610BD0`
+- `BountyPostPrefs::vfunc9` = `0x64A9B0`
+- `BountyPostPrefs::vfunc10` = `0x60EAE0`
+- `BountyPostPrefs::vfunc11` = `0x460B60`
+- `BountyPostPrefs::vfunc12` = `0x437C60`
+- `BountyPostPrefs::vfunc13` = `0x460B60`
+- `BountyPostPrefs::vfunc14` = `0x64CAE0`
+- `BountyPostPrefs::vfunc15` = `0x470F40`
+- `BountyPostPrefs::vfunc16` = `0x437C60`
+- `BountyPostPrefs::vfunc17` = `0x610C00`
+- `BountyPostPrefs::vfunc18` = `0x470EB0`
+- `BountyPostPrefs::vfunc19` = `0x470ED0`
+- `BountyPostPrefs::vfunc20` = `0x460B60`
+- `BountyPostPrefs::vfunc21` = `0x67AA00`
+
+## CAAImpl  (vtable @ 0x768644, 32 methods)
+
+- `CAAImpl::vfunc0` = `0x438D30`
+- `CAAImpl::vfunc1` = `0x604E40`
+- `CAAImpl::vfunc2` = `0x57E760`
+- `CAAImpl::vfunc3` = `0x57E760`
+- `CAAImpl::vfunc4` = `0x437DE0`
+- `CAAImpl::vfunc5` = `0x437EF0`
+- `CAAImpl::vfunc6` = `0x680110`
+- `CAAImpl::vfunc7` = `0x64CAE0`
+- `CAAImpl::vfunc8` = `0x64CAE0`
+- `CAAImpl::vfunc9` = `0x47E370`
+- `CAAImpl::vfunc10` = `0x47E370`
+- `CAAImpl::vfunc11` = `0x64CAE0`
+- `CAAImpl::vfunc12` = `0x64CAE0`
+- `CAAImpl::vfunc13` = `0x64BC40`
+- `CAAImpl::vfunc14` = `0x4396C0`
+- `CAAImpl::vfunc15` = `0x439720`
+- `CAAImpl::vfunc16` = `0x606DC0`
+- `CAAImpl::vfunc17` = `0x4EDFF0`
+- `CAAImpl::vfunc18` = `0x43A000`
+- `CAAImpl::vfunc19` = `0x439B10`
+- `CAAImpl::vfunc20` = `0x460B60`
+- `CAAImpl::vfunc21` = `0x484980`
+- `CAAImpl::vfunc22` = `0x516940`
+- `CAAImpl::vfunc23` = `0x438E60`
+- `CAAImpl::vfunc24` = `0x439C10`
+- `CAAImpl::vfunc25` = `0x439C80`
+- `CAAImpl::vfunc26` = `0x439DB0`
+- `CAAImpl::vfunc27` = `0x439EF0`
+- `CAAImpl::vfunc28` = `0x43A080`
+- `CAAImpl::vfunc29` = `0x43A0A0`
+- `CAAImpl::vfunc30` = `0x43A0C0`
+- `CAAImpl::vfunc31` = `0x43A140`
+
+## CAImpl  (vtable @ 0x7683FC, 29 methods)
+
+- `CAImpl::vfunc0` = `0x436460`
+- `CAImpl::vfunc1` = `0x604E40`
+- `CAImpl::vfunc2` = `0x57E760`
+- `CAImpl::vfunc3` = `0x57E760`
+- `CAImpl::vfunc4` = `0x436270`
+- `CAImpl::vfunc5` = `0x436370`
+- `CAImpl::vfunc6` = `0x680110`
+- `CAImpl::vfunc7` = `0x47E370`
+- `CAImpl::vfunc8` = `0x47E370`
+- `CAImpl::vfunc9` = `0x64CAE0`
+- `CAImpl::vfunc10` = `0x64CAE0`
+- `CAImpl::vfunc11` = `0x64CAE0`
+- `CAImpl::vfunc12` = `0x64CAE0`
+- `CAImpl::vfunc13` = `0x64ADD0`
+- `CAImpl::vfunc14` = `0x436B10`
+- `CAImpl::vfunc15` = `0x436B80`
+- `CAImpl::vfunc16` = `0x436BD0`
+- `CAImpl::vfunc17` = `0x660020`
+- `CAImpl::vfunc18` = `0x460B60`
+- `CAImpl::vfunc19` = `0x437610`
+- `CAImpl::vfunc20` = `0x460B60`
+- `CAImpl::vfunc21` = `0x4376F0`
+- `CAImpl::vfunc22` = `0x516940`
+- `CAImpl::vfunc23` = `0x436880`
+- `CAImpl::vfunc24` = `0x437700`
+- `CAImpl::vfunc25` = `0x436340`
+- `CAImpl::vfunc26` = `0x436360`
+- `CAImpl::vfunc27` = `0x437780`
+- `CAImpl::vfunc28` = `0x437BA0`
+
+## CArrayBase  (vtable @ 0x767E78, 4 methods)
+
+- `CArrayBase::vfunc0` = `0x6E6E7D`
+- `CArrayBase::vfunc1` = `0x6E6E7D`
+- `CArrayBase::vfunc2` = `0x6E6E7D`
+- `CArrayBase::vfunc3` = `0x6E6E7D`
+
+## CEnumBase  (vtable @ 0x761CA0, 2 methods)
+
+- `CEnumBase::vfunc0` = `0x6E6E7D`
+- `CEnumBase::vfunc1` = `0x6E6E7D`
+
+## CPAImpl  (vtable @ 0x768774, 28 methods)
+
+- `CPAImpl::vfunc0` = `0x43A790`
+- `CPAImpl::vfunc1` = `0x604E40`
+- `CPAImpl::vfunc2` = `0x57E760`
+- `CPAImpl::vfunc3` = `0x57E760`
+- `CPAImpl::vfunc4` = `0x43A390`
+- `CPAImpl::vfunc5` = `0x43A470`
+- `CPAImpl::vfunc6` = `0x680110`
+- `CPAImpl::vfunc7` = `0x64CAE0`
+- `CPAImpl::vfunc8` = `0x64CAE0`
+- `CPAImpl::vfunc9` = `0x64CAE0`
+- `CPAImpl::vfunc10` = `0x64CAE0`
+- `CPAImpl::vfunc11` = `0x47E370`
+- `CPAImpl::vfunc12` = `0x47E370`
+- `CPAImpl::vfunc13` = `0x64CAE0`
+- `CPAImpl::vfunc14` = `0x43B120`
+- `CPAImpl::vfunc15` = `0x43B190`
+- `CPAImpl::vfunc16` = `0x4BBEB0`
+- `CPAImpl::vfunc17` = `0x606DC0`
+- `CPAImpl::vfunc18` = `0x43A710`
+- `CPAImpl::vfunc19` = `0x43C2C0`
+- `CPAImpl::vfunc20` = `0x43C350`
+- `CPAImpl::vfunc21` = `0x46F7E0`
+- `CPAImpl::vfunc22` = `0x516940`
+- `CPAImpl::vfunc23` = `0x43AB00`
+- `CPAImpl::vfunc24` = `0x43A8A0`
+- `CPAImpl::vfunc25` = `0x43A780`
+- `CPAImpl::vfunc26` = `0x43C380`
+- `CPAImpl::vfunc27` = `0x43A650`
+
+## CVarDef  (vtable @ 0x788BE4, 6 methods)
+
+- `CVarDef::vfunc0` = `0x5D7B70`
+- `CVarDef::vfunc1` = `0x6E6E7D`
+- `CVarDef::vfunc2` = `0x516940`
+- `CVarDef::vfunc3` = `0x64A9B0`
+- `CVarDef::vfunc4` = `0x60EAF0`
+- `CVarDef::vfunc5` = `0x64CAE0`
+
+## CVectorBase  (vtable @ 0x761CAC, 5 methods)
+
+- `CVectorBase::vfunc0` = `0x6E6E7D`
+- `CVectorBase::vfunc1` = `0x6E6E7D`
+- `CVectorBase::vfunc2` = `0x6E6E7D`
+- `CVectorBase::vfunc3` = `0x6E6E7D`
+- `CVectorBase::vfunc4` = `0x6E6E7D`
+
+## Camera  (vtable @ 0x765C3C, 29 methods)
+
+- `Camera::vfunc0` = `0x4CF5C0`
+- `Camera::vfunc1` = `0x604E40`
+- `Camera::vfunc2` = `0x57E760`
+- `Camera::vfunc3` = `0x57E760`
+- `Camera::vfunc4` = `0x5FDAA0`
+- `Camera::vfunc5` = `0x40AC30`
+- `Camera::vfunc6` = `0x40BCC0`
+- `Camera::vfunc7` = `0x6E6E7D`
+- `Camera::vfunc8` = `0x40B3B0`
+- `Camera::vfunc9` = `0x467640`
+- `Camera::vfunc10` = `0x40B580`
+- `Camera::vfunc11` = `0x40B590`
+- `Camera::vfunc12` = `0x40B5B0`
+- `Camera::vfunc13` = `0x40B5A0`
+- `Camera::vfunc14` = `0x40B5E0`
+- `Camera::vfunc15` = `0x40B6B0`
+- `Camera::vfunc16` = `0x40B7B0`
+- `Camera::vfunc17` = `0x40B710`
+- `Camera::vfunc18` = `0x40B740`
+- `Camera::vfunc19` = `0x40B570`
+- `Camera::vfunc20` = `0x40B650`
+- `Camera::vfunc21` = `0x40AA90`
+- `Camera::vfunc22` = `0x40AAD0`
+- `Camera::vfunc23` = `0x40AAE0`
+- `Camera::vfunc24` = `0x40AAF0`
+- `Camera::vfunc25` = `0x4EDFF0`
+- `Camera::vfunc26` = `0x40B880`
+- `Camera::vfunc27` = `0x6E6E7D`
+- `Camera::vfunc28` = `0x460B60`
+
+## CameraContext  (vtable @ 0x765CC4, 8 methods)
+
+- `CameraContext::vfunc0` = `0x40C180`
+- `CameraContext::vfunc1` = `0x604E40`
+- `CameraContext::vfunc2` = `0x57E760`
+- `CameraContext::vfunc3` = `0x57E760`
+- `CameraContext::vfunc4` = `0x40C080`
+- `CameraContext::vfunc5` = `0x40C3F0`
+- `CameraContext::vfunc6` = `0x680110`
+- `CameraContext::vfunc7` = `0x40CC40`
+
+## CameraMoveCallbacks  (vtable @ 0x7661F8, 2 methods)
+
+- `CameraMoveCallbacks::vfunc0` = `0x4194D0`
+- `CameraMoveCallbacks::vfunc1` = `0x65F310`
+
+## CameraVolume  (vtable @ 0x765E10, 2 methods)
+
+- `CameraVolume::vfunc0` = `0x590B30`
+- `CameraVolume::vfunc1` = `0x622650`
+
+## CameraVolumeTag  (vtable @ 0x77EA18, 10 methods)
+
+- `CameraVolumeTag::vfunc0` = `0x584630`
+- `CameraVolumeTag::vfunc1` = `0x604E40`
+- `CameraVolumeTag::vfunc2` = `0x57E760`
+- `CameraVolumeTag::vfunc3` = `0x57E760`
+- `CameraVolumeTag::vfunc4` = `0x57DE40`
+- `CameraVolumeTag::vfunc5` = `0x57DF10`
+- `CameraVolumeTag::vfunc6` = `0x57DF30`
+- `CameraVolumeTag::vfunc7` = `0x582220`
+- `CameraVolumeTag::vfunc8` = `0x460B60`
+- `CameraVolumeTag::vfunc9` = `0x680110`
+
+## CardEffectDef  (vtable @ 0x781884, 25 methods)
+
+- `CardEffectDef::vfunc0` = `0x59F220`
+- `CardEffectDef::vfunc1` = `0x604E40`
+- `CardEffectDef::vfunc2` = `0x4041C0`
+- `CardEffectDef::vfunc3` = `0x4041C0`
+- `CardEffectDef::vfunc4` = `0x59F0B0`
+- `CardEffectDef::vfunc5` = `0x460B60`
+- `CardEffectDef::vfunc6` = `0x610BC0`
+- `CardEffectDef::vfunc7` = `0x547170`
+- `CardEffectDef::vfunc8` = `0x610BD0`
+- `CardEffectDef::vfunc9` = `0x64A9B0`
+- `CardEffectDef::vfunc10` = `0x60EAE0`
+- `CardEffectDef::vfunc11` = `0x460B60`
+- `CardEffectDef::vfunc12` = `0x437C60`
+- `CardEffectDef::vfunc13` = `0x460B60`
+- `CardEffectDef::vfunc14` = `0x64CAE0`
+- `CardEffectDef::vfunc15` = `0x59F6A0`
+- `CardEffectDef::vfunc16` = `0x437C60`
+- `CardEffectDef::vfunc17` = `0x610C00`
+- `CardEffectDef::vfunc18` = `0x59F0C0`
+- `CardEffectDef::vfunc19` = `0x59F0E0`
+- `CardEffectDef::vfunc20` = `0x5A2FC0`
+- `CardEffectDef::vfunc21` = `0x67AA00`
+- `CardEffectDef::vfunc22` = `0x65F500`
+- `CardEffectDef::vfunc23` = `0x59F2E0`
+- `CardEffectDef::vfunc24` = `0x59F380`
+
+## CardEffectInst  (vtable @ 0x781954, 33 methods)
+
+- `CardEffectInst::vfunc0` = `0x5A3310`
+- `CardEffectInst::vfunc1` = `0x604E40`
+- `CardEffectInst::vfunc2` = `0x57E760`
+- `CardEffectInst::vfunc3` = `0x57E760`
+- `CardEffectInst::vfunc4` = `0x59F8C0`
+- `CardEffectInst::vfunc5` = `0x59FA10`
+- `CardEffectInst::vfunc6` = `0x680110`
+- `CardEffectInst::vfunc7` = `0x460B60`
+- `CardEffectInst::vfunc8` = `0x460B60`
+- `CardEffectInst::vfunc9` = `0x460B60`
+- `CardEffectInst::vfunc10` = `0x460B60`
+- `CardEffectInst::vfunc11` = `0x460B60`
+- `CardEffectInst::vfunc12` = `0x460B60`
+- `CardEffectInst::vfunc13` = `0x59FC00`
+- `CardEffectInst::vfunc14` = `0x59FC70`
+- `CardEffectInst::vfunc15` = `0x59FB70`
+- `CardEffectInst::vfunc16` = `0x59F890`
+- `CardEffectInst::vfunc17` = `0x516940`
+- `CardEffectInst::vfunc18` = `0x5A3FD0`
+- `CardEffectInst::vfunc19` = `0x5A4030`
+- `CardEffectInst::vfunc20` = `0x516940`
+- `CardEffectInst::vfunc21` = `0x460B60`
+- `CardEffectInst::vfunc22` = `0x460B60`
+- `CardEffectInst::vfunc23` = `0x460B60`
+- `CardEffectInst::vfunc24` = `0x460B60`
+- `CardEffectInst::vfunc25` = `0x516940`
+- `CardEffectInst::vfunc26` = `0x516940`
+- `CardEffectInst::vfunc27` = `0x516940`
+- `CardEffectInst::vfunc28` = `0x5A03D0`
+- `CardEffectInst::vfunc29` = `0x475A90`
+- `CardEffectInst::vfunc30` = `0x65F500`
+- `CardEffectInst::vfunc31` = `0x5A3F70`
+- `CardEffectInst::vfunc32` = `0x516940`
+
+## CinematicCamera  (vtable @ 0x765E64, 29 methods)
+
+- `CinematicCamera::vfunc0` = `0x413630`
+- `CinematicCamera::vfunc1` = `0x604E40`
+- `CinematicCamera::vfunc2` = `0x57E760`
+- `CinematicCamera::vfunc3` = `0x57E760`
+- `CinematicCamera::vfunc4` = `0x4135E0`
+- `CinematicCamera::vfunc5` = `0x413730`
+- `CinematicCamera::vfunc6` = `0x40BCC0`
+- `CinematicCamera::vfunc7` = `0x4136F0`
+- `CinematicCamera::vfunc8` = `0x40B3B0`
+- `CinematicCamera::vfunc9` = `0x467640`
+- `CinematicCamera::vfunc10` = `0x40B580`
+- `CinematicCamera::vfunc11` = `0x40B590`
+- `CinematicCamera::vfunc12` = `0x40B5B0`
+- `CinematicCamera::vfunc13` = `0x40B5A0`
+- `CinematicCamera::vfunc14` = `0x40B5E0`
+- `CinematicCamera::vfunc15` = `0x40B6B0`
+- `CinematicCamera::vfunc16` = `0x40B7B0`
+- `CinematicCamera::vfunc17` = `0x40B710`
+- `CinematicCamera::vfunc18` = `0x40B740`
+- `CinematicCamera::vfunc19` = `0x40B570`
+- `CinematicCamera::vfunc20` = `0x40B650`
+- `CinematicCamera::vfunc21` = `0x40AA90`
+- `CinematicCamera::vfunc22` = `0x40AAD0`
+- `CinematicCamera::vfunc23` = `0x40AAE0`
+- `CinematicCamera::vfunc24` = `0x40AAF0`
+- `CinematicCamera::vfunc25` = `0x4EDFF0`
+- `CinematicCamera::vfunc26` = `0x413CC0`
+- `CinematicCamera::vfunc27` = `0x413AB0`
+- `CinematicCamera::vfunc28` = `0x413B00`
+
+## CinematicCameraGenerator  (vtable @ 0x77EB28, 14 methods)
+
+- `CinematicCameraGenerator::vfunc0` = `0x57E150`
+- `CinematicCameraGenerator::vfunc1` = `0x604E40`
+- `CinematicCameraGenerator::vfunc2` = `0x57E760`
+- `CinematicCameraGenerator::vfunc3` = `0x57E760`
+- `CinematicCameraGenerator::vfunc4` = `0x57DF50`
+- `CinematicCameraGenerator::vfunc5` = `0x516940`
+- `CinematicCameraGenerator::vfunc6` = `0x680110`
+- `CinematicCameraGenerator::vfunc7` = `0x57E400`
+- `CinematicCameraGenerator::vfunc8` = `0x64A9B0`
+- `CinematicCameraGenerator::vfunc9` = `0x516940`
+- `CinematicCameraGenerator::vfunc10` = `0x4BDB00`
+- `CinematicCameraGenerator::vfunc11` = `0x604E40`
+- `CinematicCameraGenerator::vfunc12` = `0x64A9B0`
+- `CinematicCameraGenerator::vfunc13` = `0x64A9B0`
+
+## CinematicCameraTag  (vtable @ 0x77EAFC, 10 methods)
+
+- `CinematicCameraTag::vfunc0` = `0x584630`
+- `CinematicCameraTag::vfunc1` = `0x604E40`
+- `CinematicCameraTag::vfunc2` = `0x57E760`
+- `CinematicCameraTag::vfunc3` = `0x57E760`
+- `CinematicCameraTag::vfunc4` = `0x57DF40`
+- `CinematicCameraTag::vfunc5` = `0x57E050`
+- `CinematicCameraTag::vfunc6` = `0x57E070`
+- `CinematicCameraTag::vfunc7` = `0x582220`
+- `CinematicCameraTag::vfunc8` = `0x460B60`
+- `CinematicCameraTag::vfunc9` = `0x680110`
+
+## Collectable  (vtable @ 0x768358, 5 methods)
+
+- `Collectable::vfunc0` = `0x4347F0`
+- `Collectable::vfunc1` = `0x6E6E7D`
+- `Collectable::vfunc2` = `0x6E6E7D`
+- `Collectable::vfunc3` = `0x6E6E7D`
+- `Collectable::vfunc4` = `0x6E6E7D`
+
+## CollectablePrefs  (vtable @ 0x76C9C4, 22 methods)
+
+- `CollectablePrefs::vfunc0` = `0x468090`
+- `CollectablePrefs::vfunc1` = `0x604E40`
+- `CollectablePrefs::vfunc2` = `0x4041C0`
+- `CollectablePrefs::vfunc3` = `0x4041C0`
+- `CollectablePrefs::vfunc4` = `0x467F50`
+- `CollectablePrefs::vfunc5` = `0x460B60`
+- `CollectablePrefs::vfunc6` = `0x610BC0`
+- `CollectablePrefs::vfunc7` = `0x547170`
+- `CollectablePrefs::vfunc8` = `0x610BD0`
+- `CollectablePrefs::vfunc9` = `0x64A9B0`
+- `CollectablePrefs::vfunc10` = `0x60EAE0`
+- `CollectablePrefs::vfunc11` = `0x460B60`
+- `CollectablePrefs::vfunc12` = `0x437C60`
+- `CollectablePrefs::vfunc13` = `0x460B60`
+- `CollectablePrefs::vfunc14` = `0x64CAE0`
+- `CollectablePrefs::vfunc15` = `0x468980`
+- `CollectablePrefs::vfunc16` = `0x437C60`
+- `CollectablePrefs::vfunc17` = `0x610C00`
+- `CollectablePrefs::vfunc18` = `0x467F60`
+- `CollectablePrefs::vfunc19` = `0x467F80`
+- `CollectablePrefs::vfunc20` = `0x468100`
+- `CollectablePrefs::vfunc21` = `0x67AA00`
+
+## CollectableSpawner  (vtable @ 0x76DFF4, 22 methods)
+
+- `CollectableSpawner::vfunc0` = `0x473350`
+- `CollectableSpawner::vfunc1` = `0x604E40`
+- `CollectableSpawner::vfunc2` = `0x4041C0`
+- `CollectableSpawner::vfunc3` = `0x4041C0`
+- `CollectableSpawner::vfunc4` = `0x473060`
+- `CollectableSpawner::vfunc5` = `0x460B60`
+- `CollectableSpawner::vfunc6` = `0x610BC0`
+- `CollectableSpawner::vfunc7` = `0x547170`
+- `CollectableSpawner::vfunc8` = `0x610BD0`
+- `CollectableSpawner::vfunc9` = `0x64A9B0`
+- `CollectableSpawner::vfunc10` = `0x60EAE0`
+- `CollectableSpawner::vfunc11` = `0x460B60`
+- `CollectableSpawner::vfunc12` = `0x437C60`
+- `CollectableSpawner::vfunc13` = `0x460B60`
+- `CollectableSpawner::vfunc14` = `0x64CAE0`
+- `CollectableSpawner::vfunc15` = `0x474140`
+- `CollectableSpawner::vfunc16` = `0x437C60`
+- `CollectableSpawner::vfunc17` = `0x610C00`
+- `CollectableSpawner::vfunc18` = `0x473070`
+- `CollectableSpawner::vfunc19` = `0x473090`
+- `CollectableSpawner::vfunc20` = `0x4733C0`
+- `CollectableSpawner::vfunc21` = `0x67AA00`
+
+## CollectableTag  (vtable @ 0x77EB98, 10 methods)
+
+- `CollectableTag::vfunc0` = `0x584630`
+- `CollectableTag::vfunc1` = `0x604E40`
+- `CollectableTag::vfunc2` = `0x57E760`
+- `CollectableTag::vfunc3` = `0x57E760`
+- `CollectableTag::vfunc4` = `0x57E540`
+- `CollectableTag::vfunc5` = `0x57E5B0`
+- `CollectableTag::vfunc6` = `0x57E5D0`
+- `CollectableTag::vfunc7` = `0x582220`
+- `CollectableTag::vfunc8` = `0x460B60`
+- `CollectableTag::vfunc9` = `0x680110`
+
+## Collidable  (vtable @ 0x78A358, 14 methods)
+
+- `Collidable::vfunc0` = `0x6389B0`
+- `Collidable::vfunc1` = `0x604E40`
+- `Collidable::vfunc2` = `0x6E6E7D`
+- `Collidable::vfunc3` = `0x6E6E7D`
+- `Collidable::vfunc4` = `0x6E6E7D`
+- `Collidable::vfunc5` = `0x6E6E7D`
+- `Collidable::vfunc6` = `0x6E6E7D`
+- `Collidable::vfunc7` = `0x516940`
+- `Collidable::vfunc8` = `0x6E6E7D`
+- `Collidable::vfunc9` = `0x6E6E7D`
+- `Collidable::vfunc10` = `0x6E6E7D`
+- `Collidable::vfunc11` = `0x67AA00`
+- `Collidable::vfunc12` = `0x638DF0`
+- `Collidable::vfunc13` = `0x638C90`
+
+## CollisionChangedReq  (vtable @ 0x780B08, 10 methods)
+
+- `CollisionChangedReq::vfunc0` = `0x4CF5C0`
+- `CollisionChangedReq::vfunc1` = `0x604E40`
+- `CollisionChangedReq::vfunc2` = `0x57E760`
+- `CollisionChangedReq::vfunc3` = `0x57E760`
+- `CollisionChangedReq::vfunc4` = `0x58A8F0`
+- `CollisionChangedReq::vfunc5` = `0x58A990`
+- `CollisionChangedReq::vfunc6` = `0x680110`
+- `CollisionChangedReq::vfunc7` = `0x58AA60`
+- `CollisionChangedReq::vfunc8` = `0x64A9B0`
+- `CollisionChangedReq::vfunc9` = `0x516940`
+
+## ColorQuickReq  (vtable @ 0x780B34, 10 methods)
+
+- `ColorQuickReq::vfunc0` = `0x58CB60`
+- `ColorQuickReq::vfunc1` = `0x604E40`
+- `ColorQuickReq::vfunc2` = `0x57E760`
+- `ColorQuickReq::vfunc3` = `0x57E760`
+- `ColorQuickReq::vfunc4` = `0x58CA90`
+- `ColorQuickReq::vfunc5` = `0x58CB10`
+- `ColorQuickReq::vfunc6` = `0x680110`
+- `ColorQuickReq::vfunc7` = `0x58CB20`
+- `ColorQuickReq::vfunc8` = `0x604E40`
+- `ColorQuickReq::vfunc9` = `0x58CB30`
+
+## CombatLocation  (vtable @ 0x76E2B0, 6 methods)
+
+- `CombatLocation::vfunc0` = `0x475A70`
+- `CombatLocation::vfunc1` = `0x475A60`
+- `CombatLocation::vfunc2` = `0x637710`
+- `CombatLocation::vfunc3` = `0x475AA0`
+- `CombatLocation::vfunc4` = `0x47E370`
+- `CombatLocation::vfunc5` = `0x475A90`
+
+## CombatLocation  (vtable @ 0x76E294, 6 methods)
+
+- `CombatLocation::vfunc0` = `0x475A80`
+- `CombatLocation::vfunc1` = `0x64CAE0`
+- `CombatLocation::vfunc2` = `0x4600D0`
+- `CombatLocation::vfunc3` = `0x46D470`
+- `CombatLocation::vfunc4` = `0x65F500`
+- `CombatLocation::vfunc5` = `0x4218E0`
+
+## CombatLocation  (vtable @ 0x76E1BC, 53 methods)
+
+- `CombatLocation::vfunc0` = `0x474D30`
+- `CombatLocation::vfunc1` = `0x604E40`
+- `CombatLocation::vfunc2` = `0x57E760`
+- `CombatLocation::vfunc3` = `0x57E760`
+- `CombatLocation::vfunc4` = `0x474BD0`
+- `CombatLocation::vfunc5` = `0x474D60`
+- `CombatLocation::vfunc6` = `0x680110`
+- `CombatLocation::vfunc7` = `0x64A9B0`
+- `CombatLocation::vfunc8` = `0x64CAE0`
+- `CombatLocation::vfunc9` = `0x64CAE0`
+- `CombatLocation::vfunc10` = `0x64CAE0`
+- `CombatLocation::vfunc11` = `0x64CAE0`
+- `CombatLocation::vfunc12` = `0x64CAE0`
+- `CombatLocation::vfunc13` = `0x64CAE0`
+- `CombatLocation::vfunc14` = `0x64CAE0`
+- `CombatLocation::vfunc15` = `0x65F310`
+- `CombatLocation::vfunc16` = `0x64CAE0`
+- `CombatLocation::vfunc17` = `0x475250`
+- `CombatLocation::vfunc18` = `0x460B60`
+- `CombatLocation::vfunc19` = `0x460260`
+- `CombatLocation::vfunc20` = `0x460280`
+- `CombatLocation::vfunc21` = `0x64CAE0`
+- `CombatLocation::vfunc22` = `0x460B60`
+- `CombatLocation::vfunc23` = `0x4829D0`
+- `CombatLocation::vfunc24` = `0x45F980`
+- `CombatLocation::vfunc25` = `0x4829E0`
+- `CombatLocation::vfunc26` = `0x482A70`
+- `CombatLocation::vfunc27` = `0x475610`
+- `CombatLocation::vfunc28` = `0x474BF0`
+- `CombatLocation::vfunc29` = `0x460160`
+- `CombatLocation::vfunc30` = `0x4605E0`
+- `CombatLocation::vfunc31` = `0x460450`
+- `CombatLocation::vfunc32` = `0x460B60`
+- `CombatLocation::vfunc33` = `0x460B60`
+- `CombatLocation::vfunc34` = `0x45FC80`
+- `CombatLocation::vfunc35` = `0x460B70`
+- `CombatLocation::vfunc36` = `0x460110`
+- `CombatLocation::vfunc37` = `0x460B60`
+- `CombatLocation::vfunc38` = `0x460B60`
+- `CombatLocation::vfunc39` = `0x64A9B0`
+- `CombatLocation::vfunc40` = `0x460610`
+- `CombatLocation::vfunc41` = `0x482700`
+- `CombatLocation::vfunc42` = `0x45FE40`
+- `CombatLocation::vfunc43` = `0x4218C0`
+- `CombatLocation::vfunc44` = `0x4600B0`
+- `CombatLocation::vfunc45` = `0x482A90`
+- `CombatLocation::vfunc46` = `0x460600`
+- `CombatLocation::vfunc47` = `0x45FC10`
+- `CombatLocation::vfunc48` = `0x45FAC0`
+- `CombatLocation::vfunc49` = `0x460B60`
+- `CombatLocation::vfunc50` = `0x460B60`
+- `CombatLocation::vfunc51` = `0x4755C0`
+- `CombatLocation::vfunc52` = `0x604E40`
+
+## CompanyPropertyTag  (vtable @ 0x77EBF4, 10 methods)
+
+- `CompanyPropertyTag::vfunc0` = `0x584630`
+- `CompanyPropertyTag::vfunc1` = `0x604E40`
+- `CompanyPropertyTag::vfunc2` = `0x57E760`
+- `CompanyPropertyTag::vfunc3` = `0x57E760`
+- `CompanyPropertyTag::vfunc4` = `0x57E6C0`
+- `CompanyPropertyTag::vfunc5` = `0x57E730`
+- `CompanyPropertyTag::vfunc6` = `0x57E750`
+- `CompanyPropertyTag::vfunc7` = `0x582220`
+- `CompanyPropertyTag::vfunc8` = `0x460B60`
+- `CompanyPropertyTag::vfunc9` = `0x680110`
+
+## CompanyPropertyVolume  (vtable @ 0x777BDC, 2 methods)
+
+- `CompanyPropertyVolume::vfunc0` = `0x590B30`
+- `CompanyPropertyVolume::vfunc1` = `0x622650`
+
+## CompiledShader  (vtable @ 0x78AF94, 19 methods)
+
+- `CompiledShader::vfunc0` = `0x647AC0`
+- `CompiledShader::vfunc1` = `0x604E40`
+- `CompiledShader::vfunc2` = `0x610CC0`
+- `CompiledShader::vfunc3` = `0x610D20`
+- `CompiledShader::vfunc4` = `0x5FDAA0`
+- `CompiledShader::vfunc5` = `0x647B40`
+- `CompiledShader::vfunc6` = `0x647B50`
+- `CompiledShader::vfunc7` = `0x547170`
+- `CompiledShader::vfunc8` = `0x610BD0`
+- `CompiledShader::vfunc9` = `0x64A9B0`
+- `CompiledShader::vfunc10` = `0x460B60`
+- `CompiledShader::vfunc11` = `0x460B60`
+- `CompiledShader::vfunc12` = `0x437C60`
+- `CompiledShader::vfunc13` = `0x460B60`
+- `CompiledShader::vfunc14` = `0x64BC40`
+- `CompiledShader::vfunc15` = `0x57B040`
+- `CompiledShader::vfunc16` = `0x610C60`
+- `CompiledShader::vfunc17` = `0x610C00`
+- `CompiledShader::vfunc18` = `0x647B70`
+
+## ConcreteInstancedTag  (vtable @ 0x77E764, 8 methods)
+
+- `ConcreteInstancedTag::vfunc0` = `0x4CF5C0`
+- `ConcreteInstancedTag::vfunc1` = `0x604E40`
+- `ConcreteInstancedTag::vfunc2` = `0x57E760`
+- `ConcreteInstancedTag::vfunc3` = `0x57E760`
+- `ConcreteInstancedTag::vfunc4` = `0x5FDAA0`
+- `ConcreteInstancedTag::vfunc5` = `0x6E6E7D`
+- `ConcreteInstancedTag::vfunc6` = `0x6E6E7D`
+- `ConcreteInstancedTag::vfunc7` = `0x516940`
+
+## ConvexHullContainer  (vtable @ 0x765E04, 2 methods)
+
+- `ConvexHullContainer::vfunc0` = `0x590B30`
+- `ConvexHullContainer::vfunc1` = `0x622650`
+
+## CoreObject  (vtable @ 0x789318, 7 methods)
+
+- `CoreObject::vfunc0` = `0x4CF5C0`
+- `CoreObject::vfunc1` = `0x604E40`
+- `CoreObject::vfunc2` = `0x57E760`
+- `CoreObject::vfunc3` = `0x57E760`
+- `CoreObject::vfunc4` = `0x5FDAA0`
+- `CoreObject::vfunc5` = `0x6E6E7D`
+- `CoreObject::vfunc6` = `0x680110`
+
+## Critter  (vtable @ 0x768340, 5 methods)
+
+- `Critter::vfunc0` = `0x436100`
+- `Critter::vfunc1` = `0x435000`
+- `Critter::vfunc2` = `0x435380`
+- `Critter::vfunc3` = `0x434FD0`
+- `Critter::vfunc4` = `0x4353C0`
+
+## Critter  (vtable @ 0x7682F4, 18 methods)
+
+- `Critter::vfunc0` = `0x4179D0`
+- `Critter::vfunc1` = `0x46B3B0`
+- `Critter::vfunc2` = `0x4360F0`
+- `Critter::vfunc3` = `0x435610`
+- `Critter::vfunc4` = `0x546E20`
+- `Critter::vfunc5` = `0x435630`
+- `Critter::vfunc6` = `0x46B350`
+- `Critter::vfunc7` = `0x435650`
+- `Critter::vfunc8` = `0x65F170`
+- `Critter::vfunc9` = `0x65F170`
+- `Critter::vfunc10` = `0x546E20`
+- `Critter::vfunc11` = `0x46B3A0`
+- `Critter::vfunc12` = `0x516940`
+- `Critter::vfunc13` = `0x437C60`
+- `Critter::vfunc14` = `0x437C60`
+- `Critter::vfunc15` = `0x437C60`
+- `Critter::vfunc16` = `0x65F220`
+- `Critter::vfunc17` = `0x547160`
+
+## Critter  (vtable @ 0x768274, 31 methods)
+
+- `Critter::vfunc0` = `0x436120`
+- `Critter::vfunc1` = `0x436130`
+- `Critter::vfunc2` = `0x46A610`
+- `Critter::vfunc3` = `0x46A630`
+- `Critter::vfunc4` = `0x46A650`
+- `Critter::vfunc5` = `0x46A660`
+- `Critter::vfunc6` = `0x64A9B0`
+- `Critter::vfunc7` = `0x64A9B0`
+- `Critter::vfunc8` = `0x64A9B0`
+- `Critter::vfunc9` = `0x46B190`
+- `Critter::vfunc10` = `0x46B190`
+- `Critter::vfunc11` = `0x46B190`
+- `Critter::vfunc12` = `0x46B1A0`
+- `Critter::vfunc13` = `0x46B2D0`
+- `Critter::vfunc14` = `0x46B1B0`
+- `Critter::vfunc15` = `0x46B1D0`
+- `Critter::vfunc16` = `0x46B210`
+- `Critter::vfunc17` = `0x46B250`
+- `Critter::vfunc18` = `0x46B270`
+- `Critter::vfunc19` = `0x46A7D0`
+- `Critter::vfunc20` = `0x65F500`
+- `Critter::vfunc21` = `0x516940`
+- `Critter::vfunc22` = `0x434DF0`
+- `Critter::vfunc23` = `0x4355D0`
+- `Critter::vfunc24` = `0x4355D0`
+- `Critter::vfunc25` = `0x460B60`
+- `Critter::vfunc26` = `0x516940`
+- `Critter::vfunc27` = `0x65F170`
+- `Critter::vfunc28` = `0x65F500`
+- `Critter::vfunc29` = `0x46B1E0`
+- `Critter::vfunc30` = `0x65F220`
+
+## Critter  (vtable @ 0x768258, 6 methods)
+
+- `Critter::vfunc0` = `0x436110`
+- `Critter::vfunc1` = `0x4607B0`
+- `Critter::vfunc2` = `0x4600D0`
+- `Critter::vfunc3` = `0x46D470`
+- `Critter::vfunc4` = `0x65F500`
+- `Critter::vfunc5` = `0x4218E0`
+
+## Critter  (vtable @ 0x76817C, 54 methods)
+
+- `Critter::vfunc0` = `0x4346F0`
+- `Critter::vfunc1` = `0x604E40`
+- `Critter::vfunc2` = `0x57E760`
+- `Critter::vfunc3` = `0x57E760`
+- `Critter::vfunc4` = `0x4341F0`
+- `Critter::vfunc5` = `0x434A80`
+- `Critter::vfunc6` = `0x680110`
+- `Critter::vfunc7` = `0x604E40`
+- `Critter::vfunc8` = `0x64CAE0`
+- `Critter::vfunc9` = `0x64CAE0`
+- `Critter::vfunc10` = `0x64CAE0`
+- `Critter::vfunc11` = `0x64CAE0`
+- `Critter::vfunc12` = `0x64CAE0`
+- `Critter::vfunc13` = `0x64CAE0`
+- `Critter::vfunc14` = `0x64CAE0`
+- `Critter::vfunc15` = `0x65F310`
+- `Critter::vfunc16` = `0x64A870`
+- `Critter::vfunc17` = `0x434E20`
+- `Critter::vfunc18` = `0x460B60`
+- `Critter::vfunc19` = `0x460260`
+- `Critter::vfunc20` = `0x460280`
+- `Critter::vfunc21` = `0x64CAE0`
+- `Critter::vfunc22` = `0x460B60`
+- `Critter::vfunc23` = `0x45F970`
+- `Critter::vfunc24` = `0x45F980`
+- `Critter::vfunc25` = `0x45F8A0`
+- `Critter::vfunc26` = `0x45F920`
+- `Critter::vfunc27` = `0x516940`
+- `Critter::vfunc28` = `0x64A9B0`
+- `Critter::vfunc29` = `0x460160`
+- `Critter::vfunc30` = `0x4605E0`
+- `Critter::vfunc31` = `0x460450`
+- `Critter::vfunc32` = `0x460830`
+- `Critter::vfunc33` = `0x460A00`
+- `Critter::vfunc34` = `0x45FC80`
+- `Critter::vfunc35` = `0x460B70`
+- `Critter::vfunc36` = `0x460110`
+- `Critter::vfunc37` = `0x434BD0`
+- `Critter::vfunc38` = `0x460B60`
+- `Critter::vfunc39` = `0x64A9B0`
+- `Critter::vfunc40` = `0x64A9B0`
+- `Critter::vfunc41` = `0x434ED0`
+- `Critter::vfunc42` = `0x45FE40`
+- `Critter::vfunc43` = `0x4218C0`
+- `Critter::vfunc44` = `0x434DE0`
+- `Critter::vfunc45` = `0x435AC0`
+- `Critter::vfunc46` = `0x460A20`
+- `Critter::vfunc47` = `0x460A70`
+- `Critter::vfunc48` = `0x460A40`
+- `Critter::vfunc49` = `0x460B60`
+- `Critter::vfunc50` = `0x435D70`
+- `Critter::vfunc51` = `0x434B80`
+- `Critter::vfunc52` = `0x435B40`
+- `Critter::vfunc53` = `0x434CE0`
+
+## CritterAction  (vtable @ 0x76837C, 28 methods)
+
+- `CritterAction::vfunc0` = `0x4361B0`
+- `CritterAction::vfunc1` = `0x604E40`
+- `CritterAction::vfunc2` = `0x57E760`
+- `CritterAction::vfunc3` = `0x57E760`
+- `CritterAction::vfunc4` = `0x5FDAA0`
+- `CritterAction::vfunc5` = `0x436250`
+- `CritterAction::vfunc6` = `0x680110`
+- `CritterAction::vfunc7` = `0x64CAE0`
+- `CritterAction::vfunc8` = `0x64CAE0`
+- `CritterAction::vfunc9` = `0x64CAE0`
+- `CritterAction::vfunc10` = `0x64CAE0`
+- `CritterAction::vfunc11` = `0x64CAE0`
+- `CritterAction::vfunc12` = `0x64CAE0`
+- `CritterAction::vfunc13` = `0x6E6E7D`
+- `CritterAction::vfunc14` = `0x6E6E7D`
+- `CritterAction::vfunc15` = `0x6E6E7D`
+- `CritterAction::vfunc16` = `0x6E6E7D`
+- `CritterAction::vfunc17` = `0x6E6E7D`
+- `CritterAction::vfunc18` = `0x460B60`
+- `CritterAction::vfunc19` = `0x6E6E7D`
+- `CritterAction::vfunc20` = `0x460B60`
+- `CritterAction::vfunc21` = `0x6E6E7D`
+- `CritterAction::vfunc22` = `0x6E6E7D`
+- `CritterAction::vfunc23` = `0x6E6E7D`
+- `CritterAction::vfunc24` = `0x6E6E7D`
+- `CritterAction::vfunc25` = `0x6E6E7D`
+- `CritterAction::vfunc26` = `0x6E6E7D`
+- `CritterAction::vfunc27` = `0x6E6E7D`
+
+## CritterActionInterface  (vtable @ 0x7684AC, 23 methods)
+
+- `CritterActionInterface::vfunc0` = `0x4CF5C0`
+- `CritterActionInterface::vfunc1` = `0x604E40`
+- `CritterActionInterface::vfunc2` = `0x57E760`
+- `CritterActionInterface::vfunc3` = `0x57E760`
+- `CritterActionInterface::vfunc4` = `0x5FDAA0`
+- `CritterActionInterface::vfunc5` = `0x6E6E7D`
+- `CritterActionInterface::vfunc6` = `0x680110`
+- `CritterActionInterface::vfunc7` = `0x64CAE0`
+- `CritterActionInterface::vfunc8` = `0x64CAE0`
+- `CritterActionInterface::vfunc9` = `0x64CAE0`
+- `CritterActionInterface::vfunc10` = `0x64CAE0`
+- `CritterActionInterface::vfunc11` = `0x64CAE0`
+- `CritterActionInterface::vfunc12` = `0x64CAE0`
+- `CritterActionInterface::vfunc13` = `0x6E6E7D`
+- `CritterActionInterface::vfunc14` = `0x6E6E7D`
+- `CritterActionInterface::vfunc15` = `0x6E6E7D`
+- `CritterActionInterface::vfunc16` = `0x6E6E7D`
+- `CritterActionInterface::vfunc17` = `0x6E6E7D`
+- `CritterActionInterface::vfunc18` = `0x460B60`
+- `CritterActionInterface::vfunc19` = `0x6E6E7D`
+- `CritterActionInterface::vfunc20` = `0x460B60`
+- `CritterActionInterface::vfunc21` = `0x6E6E7D`
+- `CritterActionInterface::vfunc22` = `0x6E6E7D`
+
+## CritterAttracterPrefs  (vtable @ 0x773C9C, 22 methods)
+
+- `CritterAttracterPrefs::vfunc0` = `0x4CF5C0`
+- `CritterAttracterPrefs::vfunc1` = `0x604E40`
+- `CritterAttracterPrefs::vfunc2` = `0x4041C0`
+- `CritterAttracterPrefs::vfunc3` = `0x4041C0`
+- `CritterAttracterPrefs::vfunc4` = `0x4A3BA0`
+- `CritterAttracterPrefs::vfunc5` = `0x460B60`
+- `CritterAttracterPrefs::vfunc6` = `0x610BC0`
+- `CritterAttracterPrefs::vfunc7` = `0x547170`
+- `CritterAttracterPrefs::vfunc8` = `0x610BD0`
+- `CritterAttracterPrefs::vfunc9` = `0x64A9B0`
+- `CritterAttracterPrefs::vfunc10` = `0x60EAE0`
+- `CritterAttracterPrefs::vfunc11` = `0x460B60`
+- `CritterAttracterPrefs::vfunc12` = `0x437C60`
+- `CritterAttracterPrefs::vfunc13` = `0x460B60`
+- `CritterAttracterPrefs::vfunc14` = `0x64CAE0`
+- `CritterAttracterPrefs::vfunc15` = `0x4A3D70`
+- `CritterAttracterPrefs::vfunc16` = `0x437C60`
+- `CritterAttracterPrefs::vfunc17` = `0x610C00`
+- `CritterAttracterPrefs::vfunc18` = `0x4A3BB0`
+- `CritterAttracterPrefs::vfunc19` = `0x4A3BD0`
+- `CritterAttracterPrefs::vfunc20` = `0x4A3CB0`
+- `CritterAttracterPrefs::vfunc21` = `0x67AA00`
+
+## CritterCuePrefs  (vtable @ 0x79B3D4, 22 methods)
+
+- `CritterCuePrefs::vfunc0` = `0x68D950`
+- `CritterCuePrefs::vfunc1` = `0x604E40`
+- `CritterCuePrefs::vfunc2` = `0x4041C0`
+- `CritterCuePrefs::vfunc3` = `0x4041C0`
+- `CritterCuePrefs::vfunc4` = `0x68D800`
+- `CritterCuePrefs::vfunc5` = `0x460B60`
+- `CritterCuePrefs::vfunc6` = `0x610BC0`
+- `CritterCuePrefs::vfunc7` = `0x547170`
+- `CritterCuePrefs::vfunc8` = `0x610BD0`
+- `CritterCuePrefs::vfunc9` = `0x64A9B0`
+- `CritterCuePrefs::vfunc10` = `0x60EAE0`
+- `CritterCuePrefs::vfunc11` = `0x460B60`
+- `CritterCuePrefs::vfunc12` = `0x437C60`
+- `CritterCuePrefs::vfunc13` = `0x460B60`
+- `CritterCuePrefs::vfunc14` = `0x64CAE0`
+- `CritterCuePrefs::vfunc15` = `0x57B040`
+- `CritterCuePrefs::vfunc16` = `0x437C60`
+- `CritterCuePrefs::vfunc17` = `0x610C00`
+- `CritterCuePrefs::vfunc18` = `0x68D810`
+- `CritterCuePrefs::vfunc19` = `0x68D830`
+- `CritterCuePrefs::vfunc20` = `0x460B60`
+- `CritterCuePrefs::vfunc21` = `0x67AA00`
+
+## CritterPath  (vtable @ 0x768878, 7 methods)
+
+- `CritterPath::vfunc0` = `0x43CC60`
+- `CritterPath::vfunc1` = `0x604E40`
+- `CritterPath::vfunc2` = `0x57E760`
+- `CritterPath::vfunc3` = `0x57E760`
+- `CritterPath::vfunc4` = `0x43C570`
+- `CritterPath::vfunc5` = `0x43C9D0`
+- `CritterPath::vfunc6` = `0x680110`
+
+## CritterPathPrefs  (vtable @ 0x76896C, 22 methods)
+
+- `CritterPathPrefs::vfunc0` = `0x4CF5C0`
+- `CritterPathPrefs::vfunc1` = `0x604E40`
+- `CritterPathPrefs::vfunc2` = `0x4041C0`
+- `CritterPathPrefs::vfunc3` = `0x4041C0`
+- `CritterPathPrefs::vfunc4` = `0x43E380`
+- `CritterPathPrefs::vfunc5` = `0x460B60`
+- `CritterPathPrefs::vfunc6` = `0x610BC0`
+- `CritterPathPrefs::vfunc7` = `0x547170`
+- `CritterPathPrefs::vfunc8` = `0x610BD0`
+- `CritterPathPrefs::vfunc9` = `0x64A9B0`
+- `CritterPathPrefs::vfunc10` = `0x60EAE0`
+- `CritterPathPrefs::vfunc11` = `0x460B60`
+- `CritterPathPrefs::vfunc12` = `0x437C60`
+- `CritterPathPrefs::vfunc13` = `0x460B60`
+- `CritterPathPrefs::vfunc14` = `0x64CAE0`
+- `CritterPathPrefs::vfunc15` = `0x57B040`
+- `CritterPathPrefs::vfunc16` = `0x437C60`
+- `CritterPathPrefs::vfunc17` = `0x610C00`
+- `CritterPathPrefs::vfunc18` = `0x43E390`
+- `CritterPathPrefs::vfunc19` = `0x43E3B0`
+- `CritterPathPrefs::vfunc20` = `0x460B60`
+- `CritterPathPrefs::vfunc21` = `0x67AA00`
+
+## CritterPathTag  (vtable @ 0x77ECCC, 10 methods)
+
+- `CritterPathTag::vfunc0` = `0x57E850`
+- `CritterPathTag::vfunc1` = `0x604E40`
+- `CritterPathTag::vfunc2` = `0x57E760`
+- `CritterPathTag::vfunc3` = `0x57E760`
+- `CritterPathTag::vfunc4` = `0x57E780`
+- `CritterPathTag::vfunc5` = `0x57E890`
+- `CritterPathTag::vfunc6` = `0x57E8B0`
+- `CritterPathTag::vfunc7` = `0x582220`
+- `CritterPathTag::vfunc8` = `0x460B60`
+- `CritterPathTag::vfunc9` = `0x680110`
+
+## CritterPrefs  (vtable @ 0x768F14, 22 methods)
+
+- `CritterPrefs::vfunc0` = `0x43F7F0`
+- `CritterPrefs::vfunc1` = `0x604E40`
+- `CritterPrefs::vfunc2` = `0x4041C0`
+- `CritterPrefs::vfunc3` = `0x4041C0`
+- `CritterPrefs::vfunc4` = `0x43F540`
+- `CritterPrefs::vfunc5` = `0x460B60`
+- `CritterPrefs::vfunc6` = `0x610BC0`
+- `CritterPrefs::vfunc7` = `0x547170`
+- `CritterPrefs::vfunc8` = `0x610BD0`
+- `CritterPrefs::vfunc9` = `0x64A9B0`
+- `CritterPrefs::vfunc10` = `0x60EAE0`
+- `CritterPrefs::vfunc11` = `0x460B60`
+- `CritterPrefs::vfunc12` = `0x437C60`
+- `CritterPrefs::vfunc13` = `0x460B60`
+- `CritterPrefs::vfunc14` = `0x64CAE0`
+- `CritterPrefs::vfunc15` = `0x43FBF0`
+- `CritterPrefs::vfunc16` = `0x437C60`
+- `CritterPrefs::vfunc17` = `0x610C00`
+- `CritterPrefs::vfunc18` = `0x43F550`
+- `CritterPrefs::vfunc19` = `0x43F570`
+- `CritterPrefs::vfunc20` = `0x43F860`
+- `CritterPrefs::vfunc21` = `0x67AA00`
+
+## CubeTexture  (vtable @ 0x788D84, 21 methods)
+
+- `CubeTexture::vfunc0` = `0x611C00`
+- `CubeTexture::vfunc1` = `0x611290`
+- `CubeTexture::vfunc2` = `0x610CC0`
+- `CubeTexture::vfunc3` = `0x610D20`
+- `CubeTexture::vfunc4` = `0x5FDAA0`
+- `CubeTexture::vfunc5` = `0x610F90`
+- `CubeTexture::vfunc6` = `0x610FE0`
+- `CubeTexture::vfunc7` = `0x547170`
+- `CubeTexture::vfunc8` = `0x610BD0`
+- `CubeTexture::vfunc9` = `0x604E40`
+- `CubeTexture::vfunc10` = `0x460B60`
+- `CubeTexture::vfunc11` = `0x460B60`
+- `CubeTexture::vfunc12` = `0x611050`
+- `CubeTexture::vfunc13` = `0x611070`
+- `CubeTexture::vfunc14` = `0x64BC40`
+- `CubeTexture::vfunc15` = `0x57B040`
+- `CubeTexture::vfunc16` = `0x610C60`
+- `CubeTexture::vfunc17` = `0x610C00`
+- `CubeTexture::vfunc18` = `0x611090`
+- `CubeTexture::vfunc19` = `0x611240`
+- `CubeTexture::vfunc20` = `0x604E40`
+
+## CueListResource  (vtable @ 0x78975C, 19 methods)
+
+- `CueListResource::vfunc0` = `0x4CF5C0`
+- `CueListResource::vfunc1` = `0x604E40`
+- `CueListResource::vfunc2` = `0x610CC0`
+- `CueListResource::vfunc3` = `0x610D20`
+- `CueListResource::vfunc4` = `0x5FDAA0`
+- `CueListResource::vfunc5` = `0x616FB0`
+- `CueListResource::vfunc6` = `0x628CA0`
+- `CueListResource::vfunc7` = `0x547170`
+- `CueListResource::vfunc8` = `0x610BD0`
+- `CueListResource::vfunc9` = `0x64A9B0`
+- `CueListResource::vfunc10` = `0x460B60`
+- `CueListResource::vfunc11` = `0x460B60`
+- `CueListResource::vfunc12` = `0x437C60`
+- `CueListResource::vfunc13` = `0x460B60`
+- `CueListResource::vfunc14` = `0x64BC40`
+- `CueListResource::vfunc15` = `0x57B040`
+- `CueListResource::vfunc16` = `0x610C60`
+- `CueListResource::vfunc17` = `0x610C00`
+- `CueListResource::vfunc18` = `0x67AA00`
+
+## CueTracker  (vtable @ 0x78A6B4, 3 methods)
+
+- `CueTracker::vfunc0` = `0x63CB10`
+- `CueTracker::vfunc1` = `0x604E40`
+- `CueTracker::vfunc2` = `0x63CB30`
+
+## CustomShaderFragment  (vtable @ 0x79D0C8, 2 methods)
+
+- `CustomShaderFragment::vfunc0` = `0x692F30`
+- `CustomShaderFragment::vfunc1` = `0x604E40`
+
+## DamageCollisionComponent  (vtable @ 0x78A3B0, 5 methods)
+
+- `DamageCollisionComponent::vfunc0` = `0x638FE0`
+- `DamageCollisionComponent::vfunc1` = `0x604E40`
+- `DamageCollisionComponent::vfunc2` = `0x639050`
+- `DamageCollisionComponent::vfunc3` = `0x639090`
+- `DamageCollisionComponent::vfunc4` = `0x638F60`
+
+## DamagePrefs  (vtable @ 0x76CCA4, 22 methods)
+
+- `DamagePrefs::vfunc0` = `0x469180`
+- `DamagePrefs::vfunc1` = `0x604E40`
+- `DamagePrefs::vfunc2` = `0x4041C0`
+- `DamagePrefs::vfunc3` = `0x4041C0`
+- `DamagePrefs::vfunc4` = `0x468F60`
+- `DamagePrefs::vfunc5` = `0x460B60`
+- `DamagePrefs::vfunc6` = `0x610BC0`
+- `DamagePrefs::vfunc7` = `0x547170`
+- `DamagePrefs::vfunc8` = `0x610BD0`
+- `DamagePrefs::vfunc9` = `0x64A9B0`
+- `DamagePrefs::vfunc10` = `0x60EAE0`
+- `DamagePrefs::vfunc11` = `0x460B60`
+- `DamagePrefs::vfunc12` = `0x437C60`
+- `DamagePrefs::vfunc13` = `0x460B60`
+- `DamagePrefs::vfunc14` = `0x64CAE0`
+- `DamagePrefs::vfunc15` = `0x469280`
+- `DamagePrefs::vfunc16` = `0x437C60`
+- `DamagePrefs::vfunc17` = `0x610C00`
+- `DamagePrefs::vfunc18` = `0x468F70`
+- `DamagePrefs::vfunc19` = `0x468F90`
+- `DamagePrefs::vfunc20` = `0x469220`
+- `DamagePrefs::vfunc21` = `0x67AA00`
+
+## DamageVolume  (vtable @ 0x76E4AC, 2 methods)
+
+- `DamageVolume::vfunc0` = `0x590B30`
+- `DamageVolume::vfunc1` = `0x622650`
+
+## DamageVolumeTag  (vtable @ 0x77EE3C, 10 methods)
+
+- `DamageVolumeTag::vfunc0` = `0x584630`
+- `DamageVolumeTag::vfunc1` = `0x604E40`
+- `DamageVolumeTag::vfunc2` = `0x57E760`
+- `DamageVolumeTag::vfunc3` = `0x57E760`
+- `DamageVolumeTag::vfunc4` = `0x57ECB0`
+- `DamageVolumeTag::vfunc5` = `0x57ED40`
+- `DamageVolumeTag::vfunc6` = `0x57ED60`
+- `DamageVolumeTag::vfunc7` = `0x582220`
+- `DamageVolumeTag::vfunc8` = `0x460B60`
+- `DamageVolumeTag::vfunc9` = `0x680110`
+
+## DamagerInstance  (vtable @ 0x76E47C, 2 methods)
+
+- `DamagerInstance::vfunc0` = `0x475D00`
+- `DamagerInstance::vfunc1` = `0x475D10`
+
+## DamagerInstance  (vtable @ 0x76E460, 6 methods)
+
+- `DamagerInstance::vfunc0` = `0x475CF0`
+- `DamagerInstance::vfunc1` = `0x485B40`
+- `DamagerInstance::vfunc2` = `0x4600D0`
+- `DamagerInstance::vfunc3` = `0x46D470`
+- `DamagerInstance::vfunc4` = `0x65F500`
+- `DamagerInstance::vfunc5` = `0x4218E0`
+
+## DamagerInstance  (vtable @ 0x76E38C, 52 methods)
+
+- `DamagerInstance::vfunc0` = `0x475BD0`
+- `DamagerInstance::vfunc1` = `0x604E40`
+- `DamagerInstance::vfunc2` = `0x57E760`
+- `DamagerInstance::vfunc3` = `0x57E760`
+- `DamagerInstance::vfunc4` = `0x475B40`
+- `DamagerInstance::vfunc5` = `0x475CA0`
+- `DamagerInstance::vfunc6` = `0x680110`
+- `DamagerInstance::vfunc7` = `0x64A9B0`
+- `DamagerInstance::vfunc8` = `0x64CAE0`
+- `DamagerInstance::vfunc9` = `0x64CAE0`
+- `DamagerInstance::vfunc10` = `0x64CAE0`
+- `DamagerInstance::vfunc11` = `0x64CAE0`
+- `DamagerInstance::vfunc12` = `0x64CAE0`
+- `DamagerInstance::vfunc13` = `0x64CAE0`
+- `DamagerInstance::vfunc14` = `0x64CAE0`
+- `DamagerInstance::vfunc15` = `0x475B20`
+- `DamagerInstance::vfunc16` = `0x64CAE0`
+- `DamagerInstance::vfunc17` = `0x475CC0`
+- `DamagerInstance::vfunc18` = `0x460B60`
+- `DamagerInstance::vfunc19` = `0x460260`
+- `DamagerInstance::vfunc20` = `0x460280`
+- `DamagerInstance::vfunc21` = `0x64CAE0`
+- `DamagerInstance::vfunc22` = `0x460B60`
+- `DamagerInstance::vfunc23` = `0x45F970`
+- `DamagerInstance::vfunc24` = `0x45F980`
+- `DamagerInstance::vfunc25` = `0x45F8A0`
+- `DamagerInstance::vfunc26` = `0x45F920`
+- `DamagerInstance::vfunc27` = `0x516940`
+- `DamagerInstance::vfunc28` = `0x64A9B0`
+- `DamagerInstance::vfunc29` = `0x460160`
+- `DamagerInstance::vfunc30` = `0x4605E0`
+- `DamagerInstance::vfunc31` = `0x460450`
+- `DamagerInstance::vfunc32` = `0x460B60`
+- `DamagerInstance::vfunc33` = `0x460B60`
+- `DamagerInstance::vfunc34` = `0x45FC80`
+- `DamagerInstance::vfunc35` = `0x460B70`
+- `DamagerInstance::vfunc36` = `0x460110`
+- `DamagerInstance::vfunc37` = `0x460B60`
+- `DamagerInstance::vfunc38` = `0x460B60`
+- `DamagerInstance::vfunc39` = `0x64A9B0`
+- `DamagerInstance::vfunc40` = `0x460610`
+- `DamagerInstance::vfunc41` = `0x45FF80`
+- `DamagerInstance::vfunc42` = `0x45FE40`
+- `DamagerInstance::vfunc43` = `0x4218C0`
+- `DamagerInstance::vfunc44` = `0x4600B0`
+- `DamagerInstance::vfunc45` = `0x4602D0`
+- `DamagerInstance::vfunc46` = `0x460600`
+- `DamagerInstance::vfunc47` = `0x45FC10`
+- `DamagerInstance::vfunc48` = `0x45FAC0`
+- `DamagerInstance::vfunc49` = `0x460B60`
+- `DamagerInstance::vfunc50` = `0x460B60`
+- `DamagerInstance::vfunc51` = `0x547170`
+
+## DamagerInstancedObject  (vtable @ 0x77EDCC, 8 methods)
+
+- `DamagerInstancedObject::vfunc0` = `0x4CF5C0`
+- `DamagerInstancedObject::vfunc1` = `0x604E40`
+- `DamagerInstancedObject::vfunc2` = `0x57E760`
+- `DamagerInstancedObject::vfunc3` = `0x57E760`
+- `DamagerInstancedObject::vfunc4` = `0x57EAD0`
+- `DamagerInstancedObject::vfunc5` = `0x57EC90`
+- `DamagerInstancedObject::vfunc6` = `0x57EB40`
+- `DamagerInstancedObject::vfunc7` = `0x516940`
+
+## DamagerMixin  (vtable @ 0x76CD90, 2 methods)
+
+- `DamagerMixin::vfunc0` = `0x469990`
+- `DamagerMixin::vfunc1` = `0x604E40`
+
+## DeadBoltInstance  (vtable @ 0x773CF8, 6 methods)
+
+- `DeadBoltInstance::vfunc0` = `0x4A3F30`
+- `DeadBoltInstance::vfunc1` = `0x4A3DC0`
+- `DeadBoltInstance::vfunc2` = `0x4A3DE0`
+- `DeadBoltInstance::vfunc3` = `0x46D470`
+- `DeadBoltInstance::vfunc4` = `0x65F500`
+- `DeadBoltInstance::vfunc5` = `0x64A9B0`
+
+## DecoratorPrefs  (vtable @ 0x7845F4, 22 methods)
+
+- `DecoratorPrefs::vfunc0` = `0x5C9F20`
+- `DecoratorPrefs::vfunc1` = `0x604E40`
+- `DecoratorPrefs::vfunc2` = `0x4041C0`
+- `DecoratorPrefs::vfunc3` = `0x4041C0`
+- `DecoratorPrefs::vfunc4` = `0x5C9EB0`
+- `DecoratorPrefs::vfunc5` = `0x460B60`
+- `DecoratorPrefs::vfunc6` = `0x610BC0`
+- `DecoratorPrefs::vfunc7` = `0x547170`
+- `DecoratorPrefs::vfunc8` = `0x610BD0`
+- `DecoratorPrefs::vfunc9` = `0x64A9B0`
+- `DecoratorPrefs::vfunc10` = `0x60EAE0`
+- `DecoratorPrefs::vfunc11` = `0x460B60`
+- `DecoratorPrefs::vfunc12` = `0x437C60`
+- `DecoratorPrefs::vfunc13` = `0x460B60`
+- `DecoratorPrefs::vfunc14` = `0x64CAE0`
+- `DecoratorPrefs::vfunc15` = `0x57B040`
+- `DecoratorPrefs::vfunc16` = `0x437C60`
+- `DecoratorPrefs::vfunc17` = `0x610C00`
+- `DecoratorPrefs::vfunc18` = `0x5C9EC0`
+- `DecoratorPrefs::vfunc19` = `0x5C9EE0`
+- `DecoratorPrefs::vfunc20` = `0x5C9EF0`
+- `DecoratorPrefs::vfunc21` = `0x67AA00`
+
+## DecoratorResource  (vtable @ 0x78F704, 22 methods)
+
+- `DecoratorResource::vfunc0` = `0x64DE50`
+- `DecoratorResource::vfunc1` = `0x604E40`
+- `DecoratorResource::vfunc2` = `0x610CC0`
+- `DecoratorResource::vfunc3` = `0x610D20`
+- `DecoratorResource::vfunc4` = `0x5FDAA0`
+- `DecoratorResource::vfunc5` = `0x64DFF0`
+- `DecoratorResource::vfunc6` = `0x64E000`
+- `DecoratorResource::vfunc7` = `0x547170`
+- `DecoratorResource::vfunc8` = `0x610BD0`
+- `DecoratorResource::vfunc9` = `0x64A9B0`
+- `DecoratorResource::vfunc10` = `0x460B60`
+- `DecoratorResource::vfunc11` = `0x460B60`
+- `DecoratorResource::vfunc12` = `0x437C60`
+- `DecoratorResource::vfunc13` = `0x460B60`
+- `DecoratorResource::vfunc14` = `0x64BC40`
+- `DecoratorResource::vfunc15` = `0x57B040`
+- `DecoratorResource::vfunc16` = `0x610C60`
+- `DecoratorResource::vfunc17` = `0x610C00`
+- `DecoratorResource::vfunc18` = `0x64E0E0`
+- `DecoratorResource::vfunc19` = `0x64E150`
+- `DecoratorResource::vfunc20` = `0x64E030`
+- `DecoratorResource::vfunc21` = `0x64E080`
+
+## DecoratorTag  (vtable @ 0x77EF98, 8 methods)
+
+- `DecoratorTag::vfunc0` = `0x4CF5C0`
+- `DecoratorTag::vfunc1` = `0x604E40`
+- `DecoratorTag::vfunc2` = `0x57E760`
+- `DecoratorTag::vfunc3` = `0x57E760`
+- `DecoratorTag::vfunc4` = `0x57F720`
+- `DecoratorTag::vfunc5` = `0x57F870`
+- `DecoratorTag::vfunc6` = `0x57F7A0`
+- `DecoratorTag::vfunc7` = `0x516940`
+
+## DestructableInstance  (vtable @ 0x76EA4C, 33 methods)
+
+- `DestructableInstance::vfunc0` = `0x47A3E0`
+- `DestructableInstance::vfunc1` = `0x47A3A0`
+- `DestructableInstance::vfunc2` = `0x46A610`
+- `DestructableInstance::vfunc3` = `0x46A630`
+- `DestructableInstance::vfunc4` = `0x46A650`
+- `DestructableInstance::vfunc5` = `0x46A660`
+- `DestructableInstance::vfunc6` = `0x64A9B0`
+- `DestructableInstance::vfunc7` = `0x64A9B0`
+- `DestructableInstance::vfunc8` = `0x64A9B0`
+- `DestructableInstance::vfunc9` = `0x46B190`
+- `DestructableInstance::vfunc10` = `0x46B190`
+- `DestructableInstance::vfunc11` = `0x46B190`
+- `DestructableInstance::vfunc12` = `0x46B1A0`
+- `DestructableInstance::vfunc13` = `0x46B2D0`
+- `DestructableInstance::vfunc14` = `0x46B1B0`
+- `DestructableInstance::vfunc15` = `0x46B1D0`
+- `DestructableInstance::vfunc16` = `0x46B210`
+- `DestructableInstance::vfunc17` = `0x46B250`
+- `DestructableInstance::vfunc18` = `0x46B270`
+- `DestructableInstance::vfunc19` = `0x46A7D0`
+- `DestructableInstance::vfunc20` = `0x65F500`
+- `DestructableInstance::vfunc21` = `0x516940`
+- `DestructableInstance::vfunc22` = `0x4786D0`
+- `DestructableInstance::vfunc23` = `0x4788B0`
+- `DestructableInstance::vfunc24` = `0x478AC0`
+- `DestructableInstance::vfunc25` = `0x460B60`
+- `DestructableInstance::vfunc26` = `0x516940`
+- `DestructableInstance::vfunc27` = `0x65F170`
+- `DestructableInstance::vfunc28` = `0x65F500`
+- `DestructableInstance::vfunc29` = `0x46B1E0`
+- `DestructableInstance::vfunc30` = `0x65F220`
+- `DestructableInstance::vfunc31` = `0x47A3C0`
+- `DestructableInstance::vfunc32` = `0x477AA0`
+
+## DestructableInstance  (vtable @ 0x76EA30, 6 methods)
+
+- `DestructableInstance::vfunc0` = `0x47A3D0`
+- `DestructableInstance::vfunc1` = `0x485B40`
+- `DestructableInstance::vfunc2` = `0x4600D0`
+- `DestructableInstance::vfunc3` = `0x46D470`
+- `DestructableInstance::vfunc4` = `0x65F500`
+- `DestructableInstance::vfunc5` = `0x4218E0`
+
+## DestructableInstance  (vtable @ 0x76E954, 54 methods)
+
+- `DestructableInstance::vfunc0` = `0x4795E0`
+- `DestructableInstance::vfunc1` = `0x604E40`
+- `DestructableInstance::vfunc2` = `0x57E760`
+- `DestructableInstance::vfunc3` = `0x57E760`
+- `DestructableInstance::vfunc4` = `0x477A70`
+- `DestructableInstance::vfunc5` = `0x479960`
+- `DestructableInstance::vfunc6` = `0x680110`
+- `DestructableInstance::vfunc7` = `0x64A9B0`
+- `DestructableInstance::vfunc8` = `0x64CAE0`
+- `DestructableInstance::vfunc9` = `0x64CAE0`
+- `DestructableInstance::vfunc10` = `0x64CAE0`
+- `DestructableInstance::vfunc11` = `0x64CAE0`
+- `DestructableInstance::vfunc12` = `0x64CAE0`
+- `DestructableInstance::vfunc13` = `0x64CAE0`
+- `DestructableInstance::vfunc14` = `0x46B680`
+- `DestructableInstance::vfunc15` = `0x477A80`
+- `DestructableInstance::vfunc16` = `0x64CAE0`
+- `DestructableInstance::vfunc17` = `0x45FA60`
+- `DestructableInstance::vfunc18` = `0x460B60`
+- `DestructableInstance::vfunc19` = `0x460260`
+- `DestructableInstance::vfunc20` = `0x460280`
+- `DestructableInstance::vfunc21` = `0x64CAE0`
+- `DestructableInstance::vfunc22` = `0x460B60`
+- `DestructableInstance::vfunc23` = `0x45F970`
+- `DestructableInstance::vfunc24` = `0x4799B0`
+- `DestructableInstance::vfunc25` = `0x45F8A0`
+- `DestructableInstance::vfunc26` = `0x45F920`
+- `DestructableInstance::vfunc27` = `0x516940`
+- `DestructableInstance::vfunc28` = `0x64A9B0`
+- `DestructableInstance::vfunc29` = `0x460160`
+- `DestructableInstance::vfunc30` = `0x4605E0`
+- `DestructableInstance::vfunc31` = `0x460450`
+- `DestructableInstance::vfunc32` = `0x460B60`
+- `DestructableInstance::vfunc33` = `0x460B60`
+- `DestructableInstance::vfunc34` = `0x45FC80`
+- `DestructableInstance::vfunc35` = `0x460B70`
+- `DestructableInstance::vfunc36` = `0x460110`
+- `DestructableInstance::vfunc37` = `0x460B60`
+- `DestructableInstance::vfunc38` = `0x460B60`
+- `DestructableInstance::vfunc39` = `0x64A9B0`
+- `DestructableInstance::vfunc40` = `0x460610`
+- `DestructableInstance::vfunc41` = `0x45FF80`
+- `DestructableInstance::vfunc42` = `0x45FE40`
+- `DestructableInstance::vfunc43` = `0x4218C0`
+- `DestructableInstance::vfunc44` = `0x4600B0`
+- `DestructableInstance::vfunc45` = `0x516940`
+- `DestructableInstance::vfunc46` = `0x460600`
+- `DestructableInstance::vfunc47` = `0x45FC10`
+- `DestructableInstance::vfunc48` = `0x45FAC0`
+- `DestructableInstance::vfunc49` = `0x460B60`
+- `DestructableInstance::vfunc50` = `0x460B60`
+- `DestructableInstance::vfunc51` = `0x547170`
+- `DestructableInstance::vfunc52` = `0x64ADD0`
+- `DestructableInstance::vfunc53` = `0x479920`
+
+## DestructableInstanceTag  (vtable @ 0x77EFE4, 8 methods)
+
+- `DestructableInstanceTag::vfunc0` = `0x4CF5C0`
+- `DestructableInstanceTag::vfunc1` = `0x604E40`
+- `DestructableInstanceTag::vfunc2` = `0x57E760`
+- `DestructableInstanceTag::vfunc3` = `0x57E760`
+- `DestructableInstanceTag::vfunc4` = `0x57FA20`
+- `DestructableInstanceTag::vfunc5` = `0x57FBA0`
+- `DestructableInstanceTag::vfunc6` = `0x57FAA0`
+- `DestructableInstanceTag::vfunc7` = `0x516940`
+
+## DestructableMixin  (vtable @ 0x76E8CC, 33 methods)
+
+- `DestructableMixin::vfunc0` = `0x478420`
+- `DestructableMixin::vfunc1` = `0x4785F0`
+- `DestructableMixin::vfunc2` = `0x46A610`
+- `DestructableMixin::vfunc3` = `0x46A630`
+- `DestructableMixin::vfunc4` = `0x46A650`
+- `DestructableMixin::vfunc5` = `0x46A660`
+- `DestructableMixin::vfunc6` = `0x64A9B0`
+- `DestructableMixin::vfunc7` = `0x64A9B0`
+- `DestructableMixin::vfunc8` = `0x64A9B0`
+- `DestructableMixin::vfunc9` = `0x46B190`
+- `DestructableMixin::vfunc10` = `0x46B190`
+- `DestructableMixin::vfunc11` = `0x46B190`
+- `DestructableMixin::vfunc12` = `0x46B1A0`
+- `DestructableMixin::vfunc13` = `0x46B2D0`
+- `DestructableMixin::vfunc14` = `0x46B1B0`
+- `DestructableMixin::vfunc15` = `0x46B1D0`
+- `DestructableMixin::vfunc16` = `0x46B210`
+- `DestructableMixin::vfunc17` = `0x46B250`
+- `DestructableMixin::vfunc18` = `0x46B270`
+- `DestructableMixin::vfunc19` = `0x46A7D0`
+- `DestructableMixin::vfunc20` = `0x65F500`
+- `DestructableMixin::vfunc21` = `0x516940`
+- `DestructableMixin::vfunc22` = `0x4786D0`
+- `DestructableMixin::vfunc23` = `0x4788B0`
+- `DestructableMixin::vfunc24` = `0x478AC0`
+- `DestructableMixin::vfunc25` = `0x460B60`
+- `DestructableMixin::vfunc26` = `0x516940`
+- `DestructableMixin::vfunc27` = `0x65F170`
+- `DestructableMixin::vfunc28` = `0x65F500`
+- `DestructableMixin::vfunc29` = `0x46B1E0`
+- `DestructableMixin::vfunc30` = `0x65F220`
+- `DestructableMixin::vfunc31` = `0x516940`
+- `DestructableMixin::vfunc32` = `0x6E6E7D`
+
+## DestructablePrefs  (vtable @ 0x76EAD4, 22 methods)
+
+- `DestructablePrefs::vfunc0` = `0x478230`
+- `DestructablePrefs::vfunc1` = `0x604E40`
+- `DestructablePrefs::vfunc2` = `0x4041C0`
+- `DestructablePrefs::vfunc3` = `0x4041C0`
+- `DestructablePrefs::vfunc4` = `0x4781A0`
+- `DestructablePrefs::vfunc5` = `0x460B60`
+- `DestructablePrefs::vfunc6` = `0x610BC0`
+- `DestructablePrefs::vfunc7` = `0x547170`
+- `DestructablePrefs::vfunc8` = `0x610BD0`
+- `DestructablePrefs::vfunc9` = `0x64A9B0`
+- `DestructablePrefs::vfunc10` = `0x60EAE0`
+- `DestructablePrefs::vfunc11` = `0x460B60`
+- `DestructablePrefs::vfunc12` = `0x437C60`
+- `DestructablePrefs::vfunc13` = `0x460B60`
+- `DestructablePrefs::vfunc14` = `0x64CAE0`
+- `DestructablePrefs::vfunc15` = `0x478070`
+- `DestructablePrefs::vfunc16` = `0x437C60`
+- `DestructablePrefs::vfunc17` = `0x610C00`
+- `DestructablePrefs::vfunc18` = `0x4781B0`
+- `DestructablePrefs::vfunc19` = `0x4781D0`
+- `DestructablePrefs::vfunc20` = `0x477CB0`
+- `DestructablePrefs::vfunc21` = `0x67AA00`
+
+## DiskEffectDef  (vtable @ 0x781C44, 25 methods)
+
+- `DiskEffectDef::vfunc0` = `0x4CF5C0`
+- `DiskEffectDef::vfunc1` = `0x604E40`
+- `DiskEffectDef::vfunc2` = `0x4041C0`
+- `DiskEffectDef::vfunc3` = `0x4041C0`
+- `DiskEffectDef::vfunc4` = `0x5A0820`
+- `DiskEffectDef::vfunc5` = `0x460B60`
+- `DiskEffectDef::vfunc6` = `0x610BC0`
+- `DiskEffectDef::vfunc7` = `0x547170`
+- `DiskEffectDef::vfunc8` = `0x610BD0`
+- `DiskEffectDef::vfunc9` = `0x64A9B0`
+- `DiskEffectDef::vfunc10` = `0x60EAE0`
+- `DiskEffectDef::vfunc11` = `0x460B60`
+- `DiskEffectDef::vfunc12` = `0x437C60`
+- `DiskEffectDef::vfunc13` = `0x460B60`
+- `DiskEffectDef::vfunc14` = `0x64CAE0`
+- `DiskEffectDef::vfunc15` = `0x5A0B60`
+- `DiskEffectDef::vfunc16` = `0x437C60`
+- `DiskEffectDef::vfunc17` = `0x610C00`
+- `DiskEffectDef::vfunc18` = `0x5A0830`
+- `DiskEffectDef::vfunc19` = `0x5A0850`
+- `DiskEffectDef::vfunc20` = `0x5A2FC0`
+- `DiskEffectDef::vfunc21` = `0x67AA00`
+- `DiskEffectDef::vfunc22` = `0x65F500`
+- `DiskEffectDef::vfunc23` = `0x5A0AC0`
+- `DiskEffectDef::vfunc24` = `0x5A0980`
+
+## DiskEffectInst  (vtable @ 0x781CDC, 33 methods)
+
+- `DiskEffectInst::vfunc0` = `0x5A3310`
+- `DiskEffectInst::vfunc1` = `0x604E40`
+- `DiskEffectInst::vfunc2` = `0x57E760`
+- `DiskEffectInst::vfunc3` = `0x57E760`
+- `DiskEffectInst::vfunc4` = `0x5A0C30`
+- `DiskEffectInst::vfunc5` = `0x5A0D40`
+- `DiskEffectInst::vfunc6` = `0x680110`
+- `DiskEffectInst::vfunc7` = `0x460B60`
+- `DiskEffectInst::vfunc8` = `0x460B60`
+- `DiskEffectInst::vfunc9` = `0x460B60`
+- `DiskEffectInst::vfunc10` = `0x460B60`
+- `DiskEffectInst::vfunc11` = `0x460B60`
+- `DiskEffectInst::vfunc12` = `0x460B60`
+- `DiskEffectInst::vfunc13` = `0x5A1080`
+- `DiskEffectInst::vfunc14` = `0x460B60`
+- `DiskEffectInst::vfunc15` = `0x5A0FF0`
+- `DiskEffectInst::vfunc16` = `0x59F890`
+- `DiskEffectInst::vfunc17` = `0x516940`
+- `DiskEffectInst::vfunc18` = `0x5A3FD0`
+- `DiskEffectInst::vfunc19` = `0x5A4030`
+- `DiskEffectInst::vfunc20` = `0x516940`
+- `DiskEffectInst::vfunc21` = `0x460B60`
+- `DiskEffectInst::vfunc22` = `0x460B60`
+- `DiskEffectInst::vfunc23` = `0x460B60`
+- `DiskEffectInst::vfunc24` = `0x460B60`
+- `DiskEffectInst::vfunc25` = `0x516940`
+- `DiskEffectInst::vfunc26` = `0x516940`
+- `DiskEffectInst::vfunc27` = `0x516940`
+- `DiskEffectInst::vfunc28` = `0x5A1370`
+- `DiskEffectInst::vfunc29` = `0x475A90`
+- `DiskEffectInst::vfunc30` = `0x65F500`
+- `DiskEffectInst::vfunc31` = `0x5A3F70`
+- `DiskEffectInst::vfunc32` = `0x516940`
+
+## DistortionCylinderDef  (vtable @ 0x781E0C, 25 methods)
+
+- `DistortionCylinderDef::vfunc0` = `0x4CF5C0`
+- `DistortionCylinderDef::vfunc1` = `0x604E40`
+- `DistortionCylinderDef::vfunc2` = `0x4041C0`
+- `DistortionCylinderDef::vfunc3` = `0x4041C0`
+- `DistortionCylinderDef::vfunc4` = `0x5A1490`
+- `DistortionCylinderDef::vfunc5` = `0x460B60`
+- `DistortionCylinderDef::vfunc6` = `0x610BC0`
+- `DistortionCylinderDef::vfunc7` = `0x547170`
+- `DistortionCylinderDef::vfunc8` = `0x610BD0`
+- `DistortionCylinderDef::vfunc9` = `0x64A9B0`
+- `DistortionCylinderDef::vfunc10` = `0x60EAE0`
+- `DistortionCylinderDef::vfunc11` = `0x460B60`
+- `DistortionCylinderDef::vfunc12` = `0x437C60`
+- `DistortionCylinderDef::vfunc13` = `0x460B60`
+- `DistortionCylinderDef::vfunc14` = `0x64CAE0`
+- `DistortionCylinderDef::vfunc15` = `0x5A1690`
+- `DistortionCylinderDef::vfunc16` = `0x437C60`
+- `DistortionCylinderDef::vfunc17` = `0x610C00`
+- `DistortionCylinderDef::vfunc18` = `0x5A14A0`
+- `DistortionCylinderDef::vfunc19` = `0x5A14C0`
+- `DistortionCylinderDef::vfunc20` = `0x5A2FC0`
+- `DistortionCylinderDef::vfunc21` = `0x67AA00`
+- `DistortionCylinderDef::vfunc22` = `0x65F500`
+- `DistortionCylinderDef::vfunc23` = `0x5A1580`
+- `DistortionCylinderDef::vfunc24` = `0x5A1620`
+
+## DistortionCylinderInst  (vtable @ 0x781EAC, 33 methods)
+
+- `DistortionCylinderInst::vfunc0` = `0x5A3310`
+- `DistortionCylinderInst::vfunc1` = `0x604E40`
+- `DistortionCylinderInst::vfunc2` = `0x57E760`
+- `DistortionCylinderInst::vfunc3` = `0x57E760`
+- `DistortionCylinderInst::vfunc4` = `0x5A16E0`
+- `DistortionCylinderInst::vfunc5` = `0x5A1800`
+- `DistortionCylinderInst::vfunc6` = `0x680110`
+- `DistortionCylinderInst::vfunc7` = `0x460B60`
+- `DistortionCylinderInst::vfunc8` = `0x460B60`
+- `DistortionCylinderInst::vfunc9` = `0x460B60`
+- `DistortionCylinderInst::vfunc10` = `0x460B60`
+- `DistortionCylinderInst::vfunc11` = `0x460B60`
+- `DistortionCylinderInst::vfunc12` = `0x460B60`
+- `DistortionCylinderInst::vfunc13` = `0x5A1890`
+- `DistortionCylinderInst::vfunc14` = `0x460B60`
+- `DistortionCylinderInst::vfunc15` = `0x460B60`
+- `DistortionCylinderInst::vfunc16` = `0x59F890`
+- `DistortionCylinderInst::vfunc17` = `0x516940`
+- `DistortionCylinderInst::vfunc18` = `0x5A3FD0`
+- `DistortionCylinderInst::vfunc19` = `0x5A4030`
+- `DistortionCylinderInst::vfunc20` = `0x516940`
+- `DistortionCylinderInst::vfunc21` = `0x460B60`
+- `DistortionCylinderInst::vfunc22` = `0x460B60`
+- `DistortionCylinderInst::vfunc23` = `0x460B60`
+- `DistortionCylinderInst::vfunc24` = `0x460B60`
+- `DistortionCylinderInst::vfunc25` = `0x516940`
+- `DistortionCylinderInst::vfunc26` = `0x516940`
+- `DistortionCylinderInst::vfunc27` = `0x516940`
+- `DistortionCylinderInst::vfunc28` = `0x5A1B10`
+- `DistortionCylinderInst::vfunc29` = `0x475A90`
+- `DistortionCylinderInst::vfunc30` = `0x65F500`
+- `DistortionCylinderInst::vfunc31` = `0x5A3F70`
+- `DistortionCylinderInst::vfunc32` = `0x516940`
+
+## DoubleBufferReadStream  (vtable @ 0x7886D4, 10 methods)
+
+- `DoubleBufferReadStream::vfunc0` = `0x601500`
+- `DoubleBufferReadStream::vfunc1` = `0x604E40`
+- `DoubleBufferReadStream::vfunc2` = `0x65B5A0`
+- `DoubleBufferReadStream::vfunc3` = `0x601660`
+- `DoubleBufferReadStream::vfunc4` = `0x601680`
+- `DoubleBufferReadStream::vfunc5` = `0x6016B0`
+- `DoubleBufferReadStream::vfunc6` = `0x64DAC0`
+- `DoubleBufferReadStream::vfunc7` = `0x601A00`
+- `DoubleBufferReadStream::vfunc8` = `0x6019A0`
+- `DoubleBufferReadStream::vfunc9` = `0x460B60`
+
+## DoubleBufferWriteStream  (vtable @ 0x7886A8, 10 methods)
+
+- `DoubleBufferWriteStream::vfunc0` = `0x600FB0`
+- `DoubleBufferWriteStream::vfunc1` = `0x604E40`
+- `DoubleBufferWriteStream::vfunc2` = `0x65B5A0`
+- `DoubleBufferWriteStream::vfunc3` = `0x601180`
+- `DoubleBufferWriteStream::vfunc4` = `0x601190`
+- `DoubleBufferWriteStream::vfunc5` = `0x6011B0`
+- `DoubleBufferWriteStream::vfunc6` = `0x64DAC0`
+- `DoubleBufferWriteStream::vfunc7` = `0x601A60`
+- `DoubleBufferWriteStream::vfunc8` = `0x601A30`
+- `DoubleBufferWriteStream::vfunc9` = `0x460B60`
+
+## DreadlockSet  (vtable @ 0x781FC0, 6 methods)
+
+- `DreadlockSet::vfunc0` = `0x5A2E60`
+- `DreadlockSet::vfunc1` = `0x62ECE0`
+- `DreadlockSet::vfunc2` = `0x637710`
+- `DreadlockSet::vfunc3` = `0x475AA0`
+- `DreadlockSet::vfunc4` = `0x47E370`
+- `DreadlockSet::vfunc5` = `0x475A90`
+
+## DreadlockSet  (vtable @ 0x781FA0, 7 methods)
+
+- `DreadlockSet::vfunc0` = `0x5A2B40`
+- `DreadlockSet::vfunc1` = `0x5A2B50`
+- `DreadlockSet::vfunc2` = `0x64A9B0`
+- `DreadlockSet::vfunc3` = `0x6269D0`
+- `DreadlockSet::vfunc4` = `0x604E40`
+- `DreadlockSet::vfunc5` = `0x64CAE0`
+- `DreadlockSet::vfunc6` = `0x430D50`
+
+## DreadlockSet  (vtable @ 0x781F44, 22 methods)
+
+- `DreadlockSet::vfunc0` = `0x5A2BC0`
+- `DreadlockSet::vfunc1` = `0x604E40`
+- `DreadlockSet::vfunc2` = `0x57E760`
+- `DreadlockSet::vfunc3` = `0x57E760`
+- `DreadlockSet::vfunc4` = `0x5A2A10`
+- `DreadlockSet::vfunc5` = `0x63A6B0`
+- `DreadlockSet::vfunc6` = `0x626990`
+- `DreadlockSet::vfunc7` = `0x64A9B0`
+- `DreadlockSet::vfunc8` = `0x6269F0`
+- `DreadlockSet::vfunc9` = `0x64A9B0`
+- `DreadlockSet::vfunc10` = `0x460B60`
+- `DreadlockSet::vfunc11` = `0x63A620`
+- `DreadlockSet::vfunc12` = `0x460B60`
+- `DreadlockSet::vfunc13` = `0x460B60`
+- `DreadlockSet::vfunc14` = `0x516940`
+- `DreadlockSet::vfunc15` = `0x547170`
+- `DreadlockSet::vfunc16` = `0x437C60`
+- `DreadlockSet::vfunc17` = `0x547170`
+- `DreadlockSet::vfunc18` = `0x604E40`
+- `DreadlockSet::vfunc19` = `0x516940`
+- `DreadlockSet::vfunc20` = `0x605BC0`
+- `DreadlockSet::vfunc21` = `0x5A2AE0`
+
+## DummyAudioEmitter  (vtable @ 0x789144, 5 methods)
+
+- `DummyAudioEmitter::vfunc0` = `0x6277B0`
+- `DummyAudioEmitter::vfunc1` = `0x604E40`
+- `DummyAudioEmitter::vfunc2` = `0x6273D0`
+- `DummyAudioEmitter::vfunc3` = `0x547140`
+- `DummyAudioEmitter::vfunc4` = `0x547140`
+
+## EaseControl  (vtable @ 0x78A734, 16 methods)
+
+- `EaseControl::vfunc0` = `0x632A70`
+- `EaseControl::vfunc1` = `0x604E40`
+- `EaseControl::vfunc2` = `0x57E760`
+- `EaseControl::vfunc3` = `0x57E760`
+- `EaseControl::vfunc4` = `0x5FDAA0`
+- `EaseControl::vfunc5` = `0x63D620`
+- `EaseControl::vfunc6` = `0x680110`
+- `EaseControl::vfunc7` = `0x62FA30`
+- `EaseControl::vfunc8` = `0x62FA40`
+- `EaseControl::vfunc9` = `0x62FA50`
+- `EaseControl::vfunc10` = `0x62FA60`
+- `EaseControl::vfunc11` = `0x62FA70`
+- `EaseControl::vfunc12` = `0x63D340`
+- `EaseControl::vfunc13` = `0x63D5A0`
+- `EaseControl::vfunc14` = `0x63D5D0`
+- `EaseControl::vfunc15` = `0x6E6E7D`
+
+## EffectDef  (vtable @ 0x78181C, 25 methods)
+
+- `EffectDef::vfunc0` = `0x4CF5C0`
+- `EffectDef::vfunc1` = `0x604E40`
+- `EffectDef::vfunc2` = `0x4041C0`
+- `EffectDef::vfunc3` = `0x4041C0`
+- `EffectDef::vfunc4` = `0x59F080`
+- `EffectDef::vfunc5` = `0x460B60`
+- `EffectDef::vfunc6` = `0x610BC0`
+- `EffectDef::vfunc7` = `0x547170`
+- `EffectDef::vfunc8` = `0x610BD0`
+- `EffectDef::vfunc9` = `0x64A9B0`
+- `EffectDef::vfunc10` = `0x60EAE0`
+- `EffectDef::vfunc11` = `0x460B60`
+- `EffectDef::vfunc12` = `0x437C60`
+- `EffectDef::vfunc13` = `0x460B60`
+- `EffectDef::vfunc14` = `0x64CAE0`
+- `EffectDef::vfunc15` = `0x57B040`
+- `EffectDef::vfunc16` = `0x437C60`
+- `EffectDef::vfunc17` = `0x610C00`
+- `EffectDef::vfunc18` = `0x59F090`
+- `EffectDef::vfunc19` = `0x5A0BE0`
+- `EffectDef::vfunc20` = `0x5A2FC0`
+- `EffectDef::vfunc21` = `0x67AA00`
+- `EffectDef::vfunc22` = `0x65F500`
+- `EffectDef::vfunc23` = `0x5A30F0`
+- `EffectDef::vfunc24` = `0x460B60`
+
+## EffectInst  (vtable @ 0x782104, 33 methods)
+
+- `EffectInst::vfunc0` = `0x5A3310`
+- `EffectInst::vfunc1` = `0x604E40`
+- `EffectInst::vfunc2` = `0x57E760`
+- `EffectInst::vfunc3` = `0x57E760`
+- `EffectInst::vfunc4` = `0x5A3240`
+- `EffectInst::vfunc5` = `0x5A3400`
+- `EffectInst::vfunc6` = `0x680110`
+- `EffectInst::vfunc7` = `0x460B60`
+- `EffectInst::vfunc8` = `0x460B60`
+- `EffectInst::vfunc9` = `0x460B60`
+- `EffectInst::vfunc10` = `0x460B60`
+- `EffectInst::vfunc11` = `0x460B60`
+- `EffectInst::vfunc12` = `0x460B60`
+- `EffectInst::vfunc13` = `0x460B60`
+- `EffectInst::vfunc14` = `0x460B60`
+- `EffectInst::vfunc15` = `0x460B60`
+- `EffectInst::vfunc16` = `0x59F890`
+- `EffectInst::vfunc17` = `0x516940`
+- `EffectInst::vfunc18` = `0x5A3FD0`
+- `EffectInst::vfunc19` = `0x5A4030`
+- `EffectInst::vfunc20` = `0x516940`
+- `EffectInst::vfunc21` = `0x460B60`
+- `EffectInst::vfunc22` = `0x460B60`
+- `EffectInst::vfunc23` = `0x460B60`
+- `EffectInst::vfunc24` = `0x460B60`
+- `EffectInst::vfunc25` = `0x516940`
+- `EffectInst::vfunc26` = `0x516940`
+- `EffectInst::vfunc27` = `0x516940`
+- `EffectInst::vfunc28` = `0x460B60`
+- `EffectInst::vfunc29` = `0x475A90`
+- `EffectInst::vfunc30` = `0x65F500`
+- `EffectInst::vfunc31` = `0x5A3F70`
+- `EffectInst::vfunc32` = `0x516940`
+
+## EffectLocation  (vtable @ 0x77F128, 6 methods)
+
+- `EffectLocation::vfunc0` = `0x580330`
+- `EffectLocation::vfunc1` = `0x64CAE0`
+- `EffectLocation::vfunc2` = `0x4600D0`
+- `EffectLocation::vfunc3` = `0x46D470`
+- `EffectLocation::vfunc4` = `0x65F500`
+- `EffectLocation::vfunc5` = `0x4218E0`
+
+## EffectLocation  (vtable @ 0x77F054, 52 methods)
+
+- `EffectLocation::vfunc0` = `0x57FCF0`
+- `EffectLocation::vfunc1` = `0x604E40`
+- `EffectLocation::vfunc2` = `0x57E760`
+- `EffectLocation::vfunc3` = `0x57E760`
+- `EffectLocation::vfunc4` = `0x57FBC0`
+- `EffectLocation::vfunc5` = `0x57FF80`
+- `EffectLocation::vfunc6` = `0x680110`
+- `EffectLocation::vfunc7` = `0x64A9B0`
+- `EffectLocation::vfunc8` = `0x64CAE0`
+- `EffectLocation::vfunc9` = `0x64CAE0`
+- `EffectLocation::vfunc10` = `0x64CAE0`
+- `EffectLocation::vfunc11` = `0x64CAE0`
+- `EffectLocation::vfunc12` = `0x64CAE0`
+- `EffectLocation::vfunc13` = `0x64CAE0`
+- `EffectLocation::vfunc14` = `0x64CAE0`
+- `EffectLocation::vfunc15` = `0x65F310`
+- `EffectLocation::vfunc16` = `0x64CAE0`
+- `EffectLocation::vfunc17` = `0x45FA60`
+- `EffectLocation::vfunc18` = `0x460B60`
+- `EffectLocation::vfunc19` = `0x460260`
+- `EffectLocation::vfunc20` = `0x460280`
+- `EffectLocation::vfunc21` = `0x64CAE0`
+- `EffectLocation::vfunc22` = `0x460B60`
+- `EffectLocation::vfunc23` = `0x45F970`
+- `EffectLocation::vfunc24` = `0x45F980`
+- `EffectLocation::vfunc25` = `0x46F7D0`
+- `EffectLocation::vfunc26` = `0x45F920`
+- `EffectLocation::vfunc27` = `0x580110`
+- `EffectLocation::vfunc28` = `0x5802B0`
+- `EffectLocation::vfunc29` = `0x460160`
+- `EffectLocation::vfunc30` = `0x4605E0`
+- `EffectLocation::vfunc31` = `0x460450`
+- `EffectLocation::vfunc32` = `0x460B60`
+- `EffectLocation::vfunc33` = `0x460B60`
+- `EffectLocation::vfunc34` = `0x45FC80`
+- `EffectLocation::vfunc35` = `0x460B70`
+- `EffectLocation::vfunc36` = `0x460110`
+- `EffectLocation::vfunc37` = `0x460B60`
+- `EffectLocation::vfunc38` = `0x460B60`
+- `EffectLocation::vfunc39` = `0x64A9B0`
+- `EffectLocation::vfunc40` = `0x460610`
+- `EffectLocation::vfunc41` = `0x45FF80`
+- `EffectLocation::vfunc42` = `0x45FE40`
+- `EffectLocation::vfunc43` = `0x4218C0`
+- `EffectLocation::vfunc44` = `0x4600B0`
+- `EffectLocation::vfunc45` = `0x4602D0`
+- `EffectLocation::vfunc46` = `0x460600`
+- `EffectLocation::vfunc47` = `0x45FC10`
+- `EffectLocation::vfunc48` = `0x45FAC0`
+- `EffectLocation::vfunc49` = `0x460B60`
+- `EffectLocation::vfunc50` = `0x460B60`
+- `EffectLocation::vfunc51` = `0x547170`
+
+## EffectMix  (vtable @ 0x78226C, 33 methods)
+
+- `EffectMix::vfunc0` = `0x5A9550`
+- `EffectMix::vfunc1` = `0x604E40`
+- `EffectMix::vfunc2` = `0x57E760`
+- `EffectMix::vfunc3` = `0x57E760`
+- `EffectMix::vfunc4` = `0x5A94D0`
+- `EffectMix::vfunc5` = `0x5A9990`
+- `EffectMix::vfunc6` = `0x680110`
+- `EffectMix::vfunc7` = `0x5A9960`
+- `EffectMix::vfunc8` = `0x5A9A40`
+- `EffectMix::vfunc9` = `0x5A9BD0`
+- `EffectMix::vfunc10` = `0x5A9D50`
+- `EffectMix::vfunc11` = `0x460B60`
+- `EffectMix::vfunc12` = `0x460B60`
+- `EffectMix::vfunc13` = `0x5A9C90`
+- `EffectMix::vfunc14` = `0x5A9CF0`
+- `EffectMix::vfunc15` = `0x5A9C30`
+- `EffectMix::vfunc16` = `0x5AA020`
+- `EffectMix::vfunc17` = `0x5A9F20`
+- `EffectMix::vfunc18` = `0x5A9E30`
+- `EffectMix::vfunc19` = `0x5A9F60`
+- `EffectMix::vfunc20` = `0x5A9FE0`
+- `EffectMix::vfunc21` = `0x460B60`
+- `EffectMix::vfunc22` = `0x460B60`
+- `EffectMix::vfunc23` = `0x460B60`
+- `EffectMix::vfunc24` = `0x460B60`
+- `EffectMix::vfunc25` = `0x5A9E60`
+- `EffectMix::vfunc26` = `0x5A9EA0`
+- `EffectMix::vfunc27` = `0x5A9EE0`
+- `EffectMix::vfunc28` = `0x5A9A60`
+- `EffectMix::vfunc29` = `0x5AA0D0`
+- `EffectMix::vfunc30` = `0x5A99B0`
+- `EffectMix::vfunc31` = `0x5A3F70`
+- `EffectMix::vfunc32` = `0x5A9FA0`
+
+## EffectMixDef  (vtable @ 0x782324, 25 methods)
+
+- `EffectMixDef::vfunc0` = `0x5AA2C0`
+- `EffectMixDef::vfunc1` = `0x604E40`
+- `EffectMixDef::vfunc2` = `0x4041C0`
+- `EffectMixDef::vfunc3` = `0x4041C0`
+- `EffectMixDef::vfunc4` = `0x5AA110`
+- `EffectMixDef::vfunc5` = `0x460B60`
+- `EffectMixDef::vfunc6` = `0x610BC0`
+- `EffectMixDef::vfunc7` = `0x547170`
+- `EffectMixDef::vfunc8` = `0x610BD0`
+- `EffectMixDef::vfunc9` = `0x64A9B0`
+- `EffectMixDef::vfunc10` = `0x60EAE0`
+- `EffectMixDef::vfunc11` = `0x460B60`
+- `EffectMixDef::vfunc12` = `0x437C60`
+- `EffectMixDef::vfunc13` = `0x460B60`
+- `EffectMixDef::vfunc14` = `0x64CAE0`
+- `EffectMixDef::vfunc15` = `0x5AA780`
+- `EffectMixDef::vfunc16` = `0x437C60`
+- `EffectMixDef::vfunc17` = `0x610C00`
+- `EffectMixDef::vfunc18` = `0x5AA120`
+- `EffectMixDef::vfunc19` = `0x5AA140`
+- `EffectMixDef::vfunc20` = `0x5AA710`
+- `EffectMixDef::vfunc21` = `0x67AA00`
+- `EffectMixDef::vfunc22` = `0x65F500`
+- `EffectMixDef::vfunc23` = `0x5AA390`
+- `EffectMixDef::vfunc24` = `0x5AA4A0`
+
+## EffectParticleSystem  (vtable @ 0x78243C, 33 methods)
+
+- `EffectParticleSystem::vfunc0` = `0x5AB2A0`
+- `EffectParticleSystem::vfunc1` = `0x604E40`
+- `EffectParticleSystem::vfunc2` = `0x57E760`
+- `EffectParticleSystem::vfunc3` = `0x57E760`
+- `EffectParticleSystem::vfunc4` = `0x5AAFE0`
+- `EffectParticleSystem::vfunc5` = `0x5AB520`
+- `EffectParticleSystem::vfunc6` = `0x680110`
+- `EffectParticleSystem::vfunc7` = `0x5AB4F0`
+- `EffectParticleSystem::vfunc8` = `0x460B60`
+- `EffectParticleSystem::vfunc9` = `0x460B60`
+- `EffectParticleSystem::vfunc10` = `0x460B60`
+- `EffectParticleSystem::vfunc11` = `0x460B60`
+- `EffectParticleSystem::vfunc12` = `0x460B60`
+- `EffectParticleSystem::vfunc13` = `0x460B60`
+- `EffectParticleSystem::vfunc14` = `0x460B60`
+- `EffectParticleSystem::vfunc15` = `0x460B60`
+- `EffectParticleSystem::vfunc16` = `0x59F890`
+- `EffectParticleSystem::vfunc17` = `0x516940`
+- `EffectParticleSystem::vfunc18` = `0x5A3FD0`
+- `EffectParticleSystem::vfunc19` = `0x5A4030`
+- `EffectParticleSystem::vfunc20` = `0x5B5F40`
+- `EffectParticleSystem::vfunc21` = `0x460B60`
+- `EffectParticleSystem::vfunc22` = `0x460B60`
+- `EffectParticleSystem::vfunc23` = `0x460B60`
+- `EffectParticleSystem::vfunc24` = `0x460B60`
+- `EffectParticleSystem::vfunc25` = `0x516940`
+- `EffectParticleSystem::vfunc26` = `0x516940`
+- `EffectParticleSystem::vfunc27` = `0x516940`
+- `EffectParticleSystem::vfunc28` = `0x5AB420`
+- `EffectParticleSystem::vfunc29` = `0x475A90`
+- `EffectParticleSystem::vfunc30` = `0x5AB540`
+- `EffectParticleSystem::vfunc31` = `0x5A3F70`
+- `EffectParticleSystem::vfunc32` = `0x5BC6B0`
+
+## EffectParticleSystemDef  (vtable @ 0x782534, 27 methods)
+
+- `EffectParticleSystemDef::vfunc0` = `0x4CF5C0`
+- `EffectParticleSystemDef::vfunc1` = `0x604E40`
+- `EffectParticleSystemDef::vfunc2` = `0x4041C0`
+- `EffectParticleSystemDef::vfunc3` = `0x4041C0`
+- `EffectParticleSystemDef::vfunc4` = `0x5AC540`
+- `EffectParticleSystemDef::vfunc5` = `0x460B60`
+- `EffectParticleSystemDef::vfunc6` = `0x610BC0`
+- `EffectParticleSystemDef::vfunc7` = `0x547170`
+- `EffectParticleSystemDef::vfunc8` = `0x610BD0`
+- `EffectParticleSystemDef::vfunc9` = `0x64A9B0`
+- `EffectParticleSystemDef::vfunc10` = `0x60EAE0`
+- `EffectParticleSystemDef::vfunc11` = `0x460B60`
+- `EffectParticleSystemDef::vfunc12` = `0x437C60`
+- `EffectParticleSystemDef::vfunc13` = `0x460B60`
+- `EffectParticleSystemDef::vfunc14` = `0x64CAE0`
+- `EffectParticleSystemDef::vfunc15` = `0x5B8660`
+- `EffectParticleSystemDef::vfunc16` = `0x437C60`
+- `EffectParticleSystemDef::vfunc17` = `0x610C00`
+- `EffectParticleSystemDef::vfunc18` = `0x5AC550`
+- `EffectParticleSystemDef::vfunc19` = `0x5AC570`
+- `EffectParticleSystemDef::vfunc20` = `0x5B6EE0`
+- `EffectParticleSystemDef::vfunc21` = `0x67AA00`
+- `EffectParticleSystemDef::vfunc22` = `0x5B8780`
+- `EffectParticleSystemDef::vfunc23` = `0x5AC5E0`
+- `EffectParticleSystemDef::vfunc24` = `0x5AC680`
+- `EffectParticleSystemDef::vfunc25` = `0x5B78B0`
+- `EffectParticleSystemDef::vfunc26` = `0x5B7EC0`
+
+## ElectricEffectDef  (vtable @ 0x78285C, 25 methods)
+
+- `ElectricEffectDef::vfunc0` = `0x4CF5C0`
+- `ElectricEffectDef::vfunc1` = `0x604E40`
+- `ElectricEffectDef::vfunc2` = `0x4041C0`
+- `ElectricEffectDef::vfunc3` = `0x4041C0`
+- `ElectricEffectDef::vfunc4` = `0x5ACC90`
+- `ElectricEffectDef::vfunc5` = `0x460B60`
+- `ElectricEffectDef::vfunc6` = `0x610BC0`
+- `ElectricEffectDef::vfunc7` = `0x547170`
+- `ElectricEffectDef::vfunc8` = `0x610BD0`
+- `ElectricEffectDef::vfunc9` = `0x64A9B0`
+- `ElectricEffectDef::vfunc10` = `0x60EAE0`
+- `ElectricEffectDef::vfunc11` = `0x460B60`
+- `ElectricEffectDef::vfunc12` = `0x437C60`
+- `ElectricEffectDef::vfunc13` = `0x460B60`
+- `ElectricEffectDef::vfunc14` = `0x64CAE0`
+- `ElectricEffectDef::vfunc15` = `0x5AD3A0`
+- `ElectricEffectDef::vfunc16` = `0x437C60`
+- `ElectricEffectDef::vfunc17` = `0x610C00`
+- `ElectricEffectDef::vfunc18` = `0x5ACCA0`
+- `ElectricEffectDef::vfunc19` = `0x5ACCC0`
+- `ElectricEffectDef::vfunc20` = `0x5A2FC0`
+- `ElectricEffectDef::vfunc21` = `0x67AA00`
+- `ElectricEffectDef::vfunc22` = `0x65F500`
+- `ElectricEffectDef::vfunc23` = `0x5ACF60`
+- `ElectricEffectDef::vfunc24` = `0x5AD000`
+
+## ElectricEffectInst  (vtable @ 0x7828F4, 33 methods)
+
+- `ElectricEffectInst::vfunc0` = `0x5AD6C0`
+- `ElectricEffectInst::vfunc1` = `0x604E40`
+- `ElectricEffectInst::vfunc2` = `0x57E760`
+- `ElectricEffectInst::vfunc3` = `0x57E760`
+- `ElectricEffectInst::vfunc4` = `0x5AD550`
+- `ElectricEffectInst::vfunc5` = `0x5AD940`
+- `ElectricEffectInst::vfunc6` = `0x680110`
+- `ElectricEffectInst::vfunc7` = `0x460B60`
+- `ElectricEffectInst::vfunc8` = `0x460B60`
+- `ElectricEffectInst::vfunc9` = `0x460B60`
+- `ElectricEffectInst::vfunc10` = `0x460B60`
+- `ElectricEffectInst::vfunc11` = `0x460B60`
+- `ElectricEffectInst::vfunc12` = `0x460B60`
+- `ElectricEffectInst::vfunc13` = `0x5AEB10`
+- `ElectricEffectInst::vfunc14` = `0x5AEC40`
+- `ElectricEffectInst::vfunc15` = `0x5AE950`
+- `ElectricEffectInst::vfunc16` = `0x59F890`
+- `ElectricEffectInst::vfunc17` = `0x516940`
+- `ElectricEffectInst::vfunc18` = `0x5A3FD0`
+- `ElectricEffectInst::vfunc19` = `0x5A4030`
+- `ElectricEffectInst::vfunc20` = `0x516940`
+- `ElectricEffectInst::vfunc21` = `0x460B60`
+- `ElectricEffectInst::vfunc22` = `0x460B60`
+- `ElectricEffectInst::vfunc23` = `0x460B60`
+- `ElectricEffectInst::vfunc24` = `0x460B60`
+- `ElectricEffectInst::vfunc25` = `0x5AF720`
+- `ElectricEffectInst::vfunc26` = `0x5AF760`
+- `ElectricEffectInst::vfunc27` = `0x5AF7A0`
+- `ElectricEffectInst::vfunc28` = `0x5AF480`
+- `ElectricEffectInst::vfunc29` = `0x475A90`
+- `ElectricEffectInst::vfunc30` = `0x65F500`
+- `ElectricEffectInst::vfunc31` = `0x5AF450`
+- `ElectricEffectInst::vfunc32` = `0x5AE7D0`
+
+## ExplosionPrefs  (vtable @ 0x76EE54, 22 methods)
+
+- `ExplosionPrefs::vfunc0` = `0x4CF5C0`
+- `ExplosionPrefs::vfunc1` = `0x604E40`
+- `ExplosionPrefs::vfunc2` = `0x4041C0`
+- `ExplosionPrefs::vfunc3` = `0x4041C0`
+- `ExplosionPrefs::vfunc4` = `0x47A430`
+- `ExplosionPrefs::vfunc5` = `0x460B60`
+- `ExplosionPrefs::vfunc6` = `0x610BC0`
+- `ExplosionPrefs::vfunc7` = `0x547170`
+- `ExplosionPrefs::vfunc8` = `0x610BD0`
+- `ExplosionPrefs::vfunc9` = `0x64A9B0`
+- `ExplosionPrefs::vfunc10` = `0x60EAE0`
+- `ExplosionPrefs::vfunc11` = `0x460B60`
+- `ExplosionPrefs::vfunc12` = `0x437C60`
+- `ExplosionPrefs::vfunc13` = `0x460B60`
+- `ExplosionPrefs::vfunc14` = `0x64CAE0`
+- `ExplosionPrefs::vfunc15` = `0x47A6B0`
+- `ExplosionPrefs::vfunc16` = `0x437C60`
+- `ExplosionPrefs::vfunc17` = `0x610C00`
+- `ExplosionPrefs::vfunc18` = `0x47A440`
+- `ExplosionPrefs::vfunc19` = `0x47A460`
+- `ExplosionPrefs::vfunc20` = `0x47A5C0`
+- `ExplosionPrefs::vfunc21` = `0x67AA00`
+
+## Explosive  (vtable @ 0x76F014, 31 methods)
+
+- `Explosive::vfunc0` = `0x47B5B0`
+- `Explosive::vfunc1` = `0x47B5C0`
+- `Explosive::vfunc2` = `0x46A610`
+- `Explosive::vfunc3` = `0x46A630`
+- `Explosive::vfunc4` = `0x46A650`
+- `Explosive::vfunc5` = `0x46A660`
+- `Explosive::vfunc6` = `0x64A9B0`
+- `Explosive::vfunc7` = `0x64A9B0`
+- `Explosive::vfunc8` = `0x64A9B0`
+- `Explosive::vfunc9` = `0x46B190`
+- `Explosive::vfunc10` = `0x46B190`
+- `Explosive::vfunc11` = `0x46B190`
+- `Explosive::vfunc12` = `0x46B1A0`
+- `Explosive::vfunc13` = `0x46B2D0`
+- `Explosive::vfunc14` = `0x46B1B0`
+- `Explosive::vfunc15` = `0x46B1D0`
+- `Explosive::vfunc16` = `0x46B210`
+- `Explosive::vfunc17` = `0x46B250`
+- `Explosive::vfunc18` = `0x46B270`
+- `Explosive::vfunc19` = `0x46A7D0`
+- `Explosive::vfunc20` = `0x65F500`
+- `Explosive::vfunc21` = `0x516940`
+- `Explosive::vfunc22` = `0x47AFB0`
+- `Explosive::vfunc23` = `0x47B0A0`
+- `Explosive::vfunc24` = `0x478AC0`
+- `Explosive::vfunc25` = `0x460B60`
+- `Explosive::vfunc26` = `0x516940`
+- `Explosive::vfunc27` = `0x65F170`
+- `Explosive::vfunc28` = `0x65F500`
+- `Explosive::vfunc29` = `0x46B1E0`
+- `Explosive::vfunc30` = `0x65F220`
+
+## Explosive  (vtable @ 0x76EFF8, 6 methods)
+
+- `Explosive::vfunc0` = `0x47B5A0`
+- `Explosive::vfunc1` = `0x485B40`
+- `Explosive::vfunc2` = `0x4600D0`
+- `Explosive::vfunc3` = `0x46D470`
+- `Explosive::vfunc4` = `0x65F500`
+- `Explosive::vfunc5` = `0x4218E0`
+
+## Explosive  (vtable @ 0x76EF24, 52 methods)
+
+- `Explosive::vfunc0` = `0x47ACD0`
+- `Explosive::vfunc1` = `0x604E40`
+- `Explosive::vfunc2` = `0x57E760`
+- `Explosive::vfunc3` = `0x57E760`
+- `Explosive::vfunc4` = `0x47ABC0`
+- `Explosive::vfunc5` = `0x47AF70`
+- `Explosive::vfunc6` = `0x680110`
+- `Explosive::vfunc7` = `0x64A9B0`
+- `Explosive::vfunc8` = `0x64CAE0`
+- `Explosive::vfunc9` = `0x64CAE0`
+- `Explosive::vfunc10` = `0x47E370`
+- `Explosive::vfunc11` = `0x64CAE0`
+- `Explosive::vfunc12` = `0x64CAE0`
+- `Explosive::vfunc13` = `0x64CAE0`
+- `Explosive::vfunc14` = `0x64CAE0`
+- `Explosive::vfunc15` = `0x65F310`
+- `Explosive::vfunc16` = `0x64CAE0`
+- `Explosive::vfunc17` = `0x45FA60`
+- `Explosive::vfunc18` = `0x460B60`
+- `Explosive::vfunc19` = `0x460260`
+- `Explosive::vfunc20` = `0x460280`
+- `Explosive::vfunc21` = `0x64CAE0`
+- `Explosive::vfunc22` = `0x460B60`
+- `Explosive::vfunc23` = `0x45F970`
+- `Explosive::vfunc24` = `0x47AFA0`
+- `Explosive::vfunc25` = `0x45F8A0`
+- `Explosive::vfunc26` = `0x45F920`
+- `Explosive::vfunc27` = `0x47B1B0`
+- `Explosive::vfunc28` = `0x64A9B0`
+- `Explosive::vfunc29` = `0x460160`
+- `Explosive::vfunc30` = `0x4605E0`
+- `Explosive::vfunc31` = `0x460450`
+- `Explosive::vfunc32` = `0x460B60`
+- `Explosive::vfunc33` = `0x460B60`
+- `Explosive::vfunc34` = `0x45FC80`
+- `Explosive::vfunc35` = `0x460B70`
+- `Explosive::vfunc36` = `0x460110`
+- `Explosive::vfunc37` = `0x460B60`
+- `Explosive::vfunc38` = `0x460B60`
+- `Explosive::vfunc39` = `0x64A9B0`
+- `Explosive::vfunc40` = `0x460610`
+- `Explosive::vfunc41` = `0x45FF80`
+- `Explosive::vfunc42` = `0x45FE40`
+- `Explosive::vfunc43` = `0x4218C0`
+- `Explosive::vfunc44` = `0x4600B0`
+- `Explosive::vfunc45` = `0x516940`
+- `Explosive::vfunc46` = `0x460600`
+- `Explosive::vfunc47` = `0x45FC10`
+- `Explosive::vfunc48` = `0x45FAC0`
+- `Explosive::vfunc49` = `0x460B60`
+- `Explosive::vfunc50` = `0x460B60`
+- `Explosive::vfunc51` = `0x547170`
+
+## ExplosiveInstanceTag  (vtable @ 0x77F1A4, 8 methods)
+
+- `ExplosiveInstanceTag::vfunc0` = `0x4CF5C0`
+- `ExplosiveInstanceTag::vfunc1` = `0x604E40`
+- `ExplosiveInstanceTag::vfunc2` = `0x57E760`
+- `ExplosiveInstanceTag::vfunc3` = `0x57E760`
+- `ExplosiveInstanceTag::vfunc4` = `0x580340`
+- `ExplosiveInstanceTag::vfunc5` = `0x5804F0`
+- `ExplosiveInstanceTag::vfunc6` = `0x5803C0`
+- `ExplosiveInstanceTag::vfunc7` = `0x516940`
+
+## ExplosivePrefs  (vtable @ 0x76F114, 22 methods)
+
+- `ExplosivePrefs::vfunc0` = `0x4CF5C0`
+- `ExplosivePrefs::vfunc1` = `0x604E40`
+- `ExplosivePrefs::vfunc2` = `0x4041C0`
+- `ExplosivePrefs::vfunc3` = `0x4041C0`
+- `ExplosivePrefs::vfunc4` = `0x47B5D0`
+- `ExplosivePrefs::vfunc5` = `0x460B60`
+- `ExplosivePrefs::vfunc6` = `0x610BC0`
+- `ExplosivePrefs::vfunc7` = `0x547170`
+- `ExplosivePrefs::vfunc8` = `0x610BD0`
+- `ExplosivePrefs::vfunc9` = `0x64A9B0`
+- `ExplosivePrefs::vfunc10` = `0x60EAE0`
+- `ExplosivePrefs::vfunc11` = `0x460B60`
+- `ExplosivePrefs::vfunc12` = `0x437C60`
+- `ExplosivePrefs::vfunc13` = `0x460B60`
+- `ExplosivePrefs::vfunc14` = `0x64CAE0`
+- `ExplosivePrefs::vfunc15` = `0x47B660`
+- `ExplosivePrefs::vfunc16` = `0x437C60`
+- `ExplosivePrefs::vfunc17` = `0x610C00`
+- `ExplosivePrefs::vfunc18` = `0x47B5E0`
+- `ExplosivePrefs::vfunc19` = `0x47B600`
+- `ExplosivePrefs::vfunc20` = `0x47B650`
+- `ExplosivePrefs::vfunc21` = `0x67AA00`
+
+## Fader  (vtable @ 0x765EE4, 8 methods)
+
+- `Fader::vfunc0` = `0x4CF5C0`
+- `Fader::vfunc1` = `0x604E40`
+- `Fader::vfunc2` = `0x57E760`
+- `Fader::vfunc3` = `0x57E760`
+- `Fader::vfunc4` = `0x413D30`
+- `Fader::vfunc5` = `0x413DF0`
+- `Fader::vfunc6` = `0x680110`
+- `Fader::vfunc7` = `0x413EC0`
+
+## FileStream  (vtable @ 0x799EB0, 10 methods)
+
+- `FileStream::vfunc0` = `0x6780C0`
+- `FileStream::vfunc1` = `0x604E40`
+- `FileStream::vfunc2` = `0x65B5A0`
+- `FileStream::vfunc3` = `0x6783C0`
+- `FileStream::vfunc4` = `0x678380`
+- `FileStream::vfunc5` = `0x678410`
+- `FileStream::vfunc6` = `0x678370`
+- `FileStream::vfunc7` = `0x678460`
+- `FileStream::vfunc8` = `0x678500`
+- `FileStream::vfunc9` = `0x6785A0`
+
+## FindPanicSpotReq  (vtable @ 0x778078, 10 methods)
+
+- `FindPanicSpotReq::vfunc0` = `0x4CF5C0`
+- `FindPanicSpotReq::vfunc1` = `0x604E40`
+- `FindPanicSpotReq::vfunc2` = `0x57E760`
+- `FindPanicSpotReq::vfunc3` = `0x57E760`
+- `FindPanicSpotReq::vfunc4` = `0x4EEDB0`
+- `FindPanicSpotReq::vfunc5` = `0x4EEE20`
+- `FindPanicSpotReq::vfunc6` = `0x680110`
+- `FindPanicSpotReq::vfunc7` = `0x4EEE30`
+- `FindPanicSpotReq::vfunc8` = `0x64A9B0`
+- `FindPanicSpotReq::vfunc9` = `0x516940`
+
+## FirstPersonCamera  (vtable @ 0x765F1C, 29 methods)
+
+- `FirstPersonCamera::vfunc0` = `0x4CF5C0`
+- `FirstPersonCamera::vfunc1` = `0x604E40`
+- `FirstPersonCamera::vfunc2` = `0x57E760`
+- `FirstPersonCamera::vfunc3` = `0x57E760`
+- `FirstPersonCamera::vfunc4` = `0x413ED0`
+- `FirstPersonCamera::vfunc5` = `0x414080`
+- `FirstPersonCamera::vfunc6` = `0x40BCC0`
+- `FirstPersonCamera::vfunc7` = `0x413F00`
+- `FirstPersonCamera::vfunc8` = `0x40B3B0`
+- `FirstPersonCamera::vfunc9` = `0x467640`
+- `FirstPersonCamera::vfunc10` = `0x40B580`
+- `FirstPersonCamera::vfunc11` = `0x40B590`
+- `FirstPersonCamera::vfunc12` = `0x40B5B0`
+- `FirstPersonCamera::vfunc13` = `0x40B5A0`
+- `FirstPersonCamera::vfunc14` = `0x40B5E0`
+- `FirstPersonCamera::vfunc15` = `0x40B6B0`
+- `FirstPersonCamera::vfunc16` = `0x40B7B0`
+- `FirstPersonCamera::vfunc17` = `0x40B710`
+- `FirstPersonCamera::vfunc18` = `0x40B740`
+- `FirstPersonCamera::vfunc19` = `0x40B570`
+- `FirstPersonCamera::vfunc20` = `0x40B650`
+- `FirstPersonCamera::vfunc21` = `0x40AA90`
+- `FirstPersonCamera::vfunc22` = `0x40AAD0`
+- `FirstPersonCamera::vfunc23` = `0x40AAE0`
+- `FirstPersonCamera::vfunc24` = `0x40AAF0`
+- `FirstPersonCamera::vfunc25` = `0x4EDFF0`
+- `FirstPersonCamera::vfunc26` = `0x40B880`
+- `FirstPersonCamera::vfunc27` = `0x415230`
+- `FirstPersonCamera::vfunc28` = `0x460B60`
+
+## FixedCamera  (vtable @ 0x765FA4, 29 methods)
+
+- `FixedCamera::vfunc0` = `0x4CF5C0`
+- `FixedCamera::vfunc1` = `0x604E40`
+- `FixedCamera::vfunc2` = `0x57E760`
+- `FixedCamera::vfunc3` = `0x57E760`
+- `FixedCamera::vfunc4` = `0x4154B0`
+- `FixedCamera::vfunc5` = `0x4155A0`
+- `FixedCamera::vfunc6` = `0x40BCC0`
+- `FixedCamera::vfunc7` = `0x415520`
+- `FixedCamera::vfunc8` = `0x40B3B0`
+- `FixedCamera::vfunc9` = `0x467640`
+- `FixedCamera::vfunc10` = `0x40B580`
+- `FixedCamera::vfunc11` = `0x40B590`
+- `FixedCamera::vfunc12` = `0x40B5B0`
+- `FixedCamera::vfunc13` = `0x40B5A0`
+- `FixedCamera::vfunc14` = `0x40B5E0`
+- `FixedCamera::vfunc15` = `0x40B6B0`
+- `FixedCamera::vfunc16` = `0x40B7B0`
+- `FixedCamera::vfunc17` = `0x40B710`
+- `FixedCamera::vfunc18` = `0x40B740`
+- `FixedCamera::vfunc19` = `0x40B570`
+- `FixedCamera::vfunc20` = `0x40B650`
+- `FixedCamera::vfunc21` = `0x40AA90`
+- `FixedCamera::vfunc22` = `0x40AAD0`
+- `FixedCamera::vfunc23` = `0x40AAE0`
+- `FixedCamera::vfunc24` = `0x40AAF0`
+- `FixedCamera::vfunc25` = `0x4EDFF0`
+- `FixedCamera::vfunc26` = `0x40B880`
+- `FixedCamera::vfunc27` = `0x415690`
+- `FixedCamera::vfunc28` = `0x415910`
+
+## FixedCameraGenerator  (vtable @ 0x77F238, 14 methods)
+
+- `FixedCameraGenerator::vfunc0` = `0x4CF5C0`
+- `FixedCameraGenerator::vfunc1` = `0x604E40`
+- `FixedCameraGenerator::vfunc2` = `0x57E760`
+- `FixedCameraGenerator::vfunc3` = `0x57E760`
+- `FixedCameraGenerator::vfunc4` = `0x580520`
+- `FixedCameraGenerator::vfunc5` = `0x5807B0`
+- `FixedCameraGenerator::vfunc6` = `0x680110`
+- `FixedCameraGenerator::vfunc7` = `0x580A30`
+- `FixedCameraGenerator::vfunc8` = `0x64A9B0`
+- `FixedCameraGenerator::vfunc9` = `0x516940`
+- `FixedCameraGenerator::vfunc10` = `0x4BDB00`
+- `FixedCameraGenerator::vfunc11` = `0x64A9B0`
+- `FixedCameraGenerator::vfunc12` = `0x64A9B0`
+- `FixedCameraGenerator::vfunc13` = `0x64A9B0`
+
+## FixedCameraTag  (vtable @ 0x77F20C, 10 methods)
+
+- `FixedCameraTag::vfunc0` = `0x584630`
+- `FixedCameraTag::vfunc1` = `0x604E40`
+- `FixedCameraTag::vfunc2` = `0x57E760`
+- `FixedCameraTag::vfunc3` = `0x57E760`
+- `FixedCameraTag::vfunc4` = `0x580510`
+- `FixedCameraTag::vfunc5` = `0x580640`
+- `FixedCameraTag::vfunc6` = `0x580660`
+- `FixedCameraTag::vfunc7` = `0x582220`
+- `FixedCameraTag::vfunc8` = `0x460B60`
+- `FixedCameraTag::vfunc9` = `0x680110`
+
+## FlowMarkerPrefs  (vtable @ 0x782B2C, 22 methods)
+
+- `FlowMarkerPrefs::vfunc0` = `0x4CF5C0`
+- `FlowMarkerPrefs::vfunc1` = `0x604E40`
+- `FlowMarkerPrefs::vfunc2` = `0x4041C0`
+- `FlowMarkerPrefs::vfunc3` = `0x4041C0`
+- `FlowMarkerPrefs::vfunc4` = `0x5AF800`
+- `FlowMarkerPrefs::vfunc5` = `0x460B60`
+- `FlowMarkerPrefs::vfunc6` = `0x610BC0`
+- `FlowMarkerPrefs::vfunc7` = `0x547170`
+- `FlowMarkerPrefs::vfunc8` = `0x610BD0`
+- `FlowMarkerPrefs::vfunc9` = `0x64A9B0`
+- `FlowMarkerPrefs::vfunc10` = `0x60EAE0`
+- `FlowMarkerPrefs::vfunc11` = `0x460B60`
+- `FlowMarkerPrefs::vfunc12` = `0x437C60`
+- `FlowMarkerPrefs::vfunc13` = `0x460B60`
+- `FlowMarkerPrefs::vfunc14` = `0x64CAE0`
+- `FlowMarkerPrefs::vfunc15` = `0x5AFB00`
+- `FlowMarkerPrefs::vfunc16` = `0x437C60`
+- `FlowMarkerPrefs::vfunc17` = `0x610C00`
+- `FlowMarkerPrefs::vfunc18` = `0x5AF810`
+- `FlowMarkerPrefs::vfunc19` = `0x5AF830`
+- `FlowMarkerPrefs::vfunc20` = `0x5AF990`
+- `FlowMarkerPrefs::vfunc21` = `0x67AA00`
+
+## FlyCamera  (vtable @ 0x766064, 29 methods)
+
+- `FlyCamera::vfunc0` = `0x4CF5C0`
+- `FlyCamera::vfunc1` = `0x604E40`
+- `FlyCamera::vfunc2` = `0x57E760`
+- `FlyCamera::vfunc3` = `0x57E760`
+- `FlyCamera::vfunc4` = `0x4159F0`
+- `FlyCamera::vfunc5` = `0x415A90`
+- `FlyCamera::vfunc6` = `0x40BCC0`
+- `FlyCamera::vfunc7` = `0x415F90`
+- `FlyCamera::vfunc8` = `0x40B3B0`
+- `FlyCamera::vfunc9` = `0x467640`
+- `FlyCamera::vfunc10` = `0x40B580`
+- `FlyCamera::vfunc11` = `0x40B590`
+- `FlyCamera::vfunc12` = `0x40B5B0`
+- `FlyCamera::vfunc13` = `0x40B5A0`
+- `FlyCamera::vfunc14` = `0x40B5E0`
+- `FlyCamera::vfunc15` = `0x40B6B0`
+- `FlyCamera::vfunc16` = `0x40B7B0`
+- `FlyCamera::vfunc17` = `0x40B710`
+- `FlyCamera::vfunc18` = `0x40B740`
+- `FlyCamera::vfunc19` = `0x40B570`
+- `FlyCamera::vfunc20` = `0x40B650`
+- `FlyCamera::vfunc21` = `0x40AA90`
+- `FlyCamera::vfunc22` = `0x40AAD0`
+- `FlyCamera::vfunc23` = `0x40AAE0`
+- `FlyCamera::vfunc24` = `0x40AAF0`
+- `FlyCamera::vfunc25` = `0x4EDFF0`
+- `FlyCamera::vfunc26` = `0x40B880`
+- `FlyCamera::vfunc27` = `0x416030`
+- `FlyCamera::vfunc28` = `0x460B60`
+
+## FollowCamera  (vtable @ 0x766134, 29 methods)
+
+- `FollowCamera::vfunc0` = `0x4167E0`
+- `FollowCamera::vfunc1` = `0x604E40`
+- `FollowCamera::vfunc2` = `0x57E760`
+- `FollowCamera::vfunc3` = `0x57E760`
+- `FollowCamera::vfunc4` = `0x416680`
+- `FollowCamera::vfunc5` = `0x4168C0`
+- `FollowCamera::vfunc6` = `0x40BCC0`
+- `FollowCamera::vfunc7` = `0x416A90`
+- `FollowCamera::vfunc8` = `0x416BF0`
+- `FollowCamera::vfunc9` = `0x467640`
+- `FollowCamera::vfunc10` = `0x40B580`
+- `FollowCamera::vfunc11` = `0x40B590`
+- `FollowCamera::vfunc12` = `0x40B5B0`
+- `FollowCamera::vfunc13` = `0x40B5A0`
+- `FollowCamera::vfunc14` = `0x40B5E0`
+- `FollowCamera::vfunc15` = `0x516940`
+- `FollowCamera::vfunc16` = `0x516940`
+- `FollowCamera::vfunc17` = `0x40B710`
+- `FollowCamera::vfunc18` = `0x40B740`
+- `FollowCamera::vfunc19` = `0x40B570`
+- `FollowCamera::vfunc20` = `0x516940`
+- `FollowCamera::vfunc21` = `0x40AA90`
+- `FollowCamera::vfunc22` = `0x40AAD0`
+- `FollowCamera::vfunc23` = `0x40AAE0`
+- `FollowCamera::vfunc24` = `0x40AAF0`
+- `FollowCamera::vfunc25` = `0x4EDFF0`
+- `FollowCamera::vfunc26` = `0x417230`
+- `FollowCamera::vfunc27` = `0x416C10`
+- `FollowCamera::vfunc28` = `0x460B60`
+
+## FollowCameraGenerator  (vtable @ 0x77F2F0, 14 methods)
+
+- `FollowCameraGenerator::vfunc0` = `0x460DD0`
+- `FollowCameraGenerator::vfunc1` = `0x604E40`
+- `FollowCameraGenerator::vfunc2` = `0x57E760`
+- `FollowCameraGenerator::vfunc3` = `0x57E760`
+- `FollowCameraGenerator::vfunc4` = `0x580C60`
+- `FollowCameraGenerator::vfunc5` = `0x580E50`
+- `FollowCameraGenerator::vfunc6` = `0x680110`
+- `FollowCameraGenerator::vfunc7` = `0x581310`
+- `FollowCameraGenerator::vfunc8` = `0x581270`
+- `FollowCameraGenerator::vfunc9` = `0x581280`
+- `FollowCameraGenerator::vfunc10` = `0x4BDB00`
+- `FollowCameraGenerator::vfunc11` = `0x64A9B0`
+- `FollowCameraGenerator::vfunc12` = `0x581420`
+- `FollowCameraGenerator::vfunc13` = `0x604E40`
+
+## FollowCameraPrefs  (vtable @ 0x7662FC, 22 methods)
+
+- `FollowCameraPrefs::vfunc0` = `0x4CF5C0`
+- `FollowCameraPrefs::vfunc1` = `0x604E40`
+- `FollowCameraPrefs::vfunc2` = `0x4041C0`
+- `FollowCameraPrefs::vfunc3` = `0x4041C0`
+- `FollowCameraPrefs::vfunc4` = `0x41BBC0`
+- `FollowCameraPrefs::vfunc5` = `0x460B60`
+- `FollowCameraPrefs::vfunc6` = `0x610BC0`
+- `FollowCameraPrefs::vfunc7` = `0x547170`
+- `FollowCameraPrefs::vfunc8` = `0x610BD0`
+- `FollowCameraPrefs::vfunc9` = `0x64A9B0`
+- `FollowCameraPrefs::vfunc10` = `0x60EAE0`
+- `FollowCameraPrefs::vfunc11` = `0x460B60`
+- `FollowCameraPrefs::vfunc12` = `0x437C60`
+- `FollowCameraPrefs::vfunc13` = `0x460B60`
+- `FollowCameraPrefs::vfunc14` = `0x64CAE0`
+- `FollowCameraPrefs::vfunc15` = `0x57B040`
+- `FollowCameraPrefs::vfunc16` = `0x437C60`
+- `FollowCameraPrefs::vfunc17` = `0x610C00`
+- `FollowCameraPrefs::vfunc18` = `0x41BBD0`
+- `FollowCameraPrefs::vfunc19` = `0x41BBF0`
+- `FollowCameraPrefs::vfunc20` = `0x41BD50`
+- `FollowCameraPrefs::vfunc21` = `0x67AA00`
+
+## FollowCameraTag  (vtable @ 0x77F2C4, 10 methods)
+
+- `FollowCameraTag::vfunc0` = `0x584630`
+- `FollowCameraTag::vfunc1` = `0x604E40`
+- `FollowCameraTag::vfunc2` = `0x57E760`
+- `FollowCameraTag::vfunc3` = `0x57E760`
+- `FollowCameraTag::vfunc4` = `0x580C50`
+- `FollowCameraTag::vfunc5` = `0x580D50`
+- `FollowCameraTag::vfunc6` = `0x580D70`
+- `FollowCameraTag::vfunc7` = `0x582220`
+- `FollowCameraTag::vfunc8` = `0x460B60`
+- `FollowCameraTag::vfunc9` = `0x680110`
+
+## FontResource  (vtable @ 0x78A6E4, 19 methods)
+
+- `FontResource::vfunc0` = `0x63CE80`
+- `FontResource::vfunc1` = `0x604E40`
+- `FontResource::vfunc2` = `0x610CC0`
+- `FontResource::vfunc3` = `0x610D20`
+- `FontResource::vfunc4` = `0x5FDAA0`
+- `FontResource::vfunc5` = `0x63CFA0`
+- `FontResource::vfunc6` = `0x63CF70`
+- `FontResource::vfunc7` = `0x547170`
+- `FontResource::vfunc8` = `0x610BD0`
+- `FontResource::vfunc9` = `0x604E40`
+- `FontResource::vfunc10` = `0x63CF00`
+- `FontResource::vfunc11` = `0x460B60`
+- `FontResource::vfunc12` = `0x437C60`
+- `FontResource::vfunc13` = `0x460B60`
+- `FontResource::vfunc14` = `0x64BC40`
+- `FontResource::vfunc15` = `0x470F40`
+- `FontResource::vfunc16` = `0x610C60`
+- `FontResource::vfunc17` = `0x610C00`
+- `FontResource::vfunc18` = `0x63CFB0`
+
+## ForceFieldInst  (vtable @ 0x789A28, 6 methods)
+
+- `ForceFieldInst::vfunc0` = `0x62ECD0`
+- `ForceFieldInst::vfunc1` = `0x62ECE0`
+- `ForceFieldInst::vfunc2` = `0x5FEE00`
+- `ForceFieldInst::vfunc3` = `0x475AA0`
+- `ForceFieldInst::vfunc4` = `0x47E370`
+- `ForceFieldInst::vfunc5` = `0x475A90`
+
+## ForceFieldInst  (vtable @ 0x789A08, 7 methods)
+
+- `ForceFieldInst::vfunc0` = `0x62D630`
+- `ForceFieldInst::vfunc1` = `0x62E320`
+- `ForceFieldInst::vfunc2` = `0x5FE3E0`
+- `ForceFieldInst::vfunc3` = `0x6269D0`
+- `ForceFieldInst::vfunc4` = `0x5FE680`
+- `ForceFieldInst::vfunc5` = `0x5FE130`
+- `ForceFieldInst::vfunc6` = `0x5FE140`
+
+## ForceFieldInst  (vtable @ 0x7899AC, 22 methods)
+
+- `ForceFieldInst::vfunc0` = `0x62D190`
+- `ForceFieldInst::vfunc1` = `0x604E40`
+- `ForceFieldInst::vfunc2` = `0x57E760`
+- `ForceFieldInst::vfunc3` = `0x57E760`
+- `ForceFieldInst::vfunc4` = `0x62CE00`
+- `ForceFieldInst::vfunc5` = `0x62D730`
+- `ForceFieldInst::vfunc6` = `0x626990`
+- `ForceFieldInst::vfunc7` = `0x5FE400`
+- `ForceFieldInst::vfunc8` = `0x6269F0`
+- `ForceFieldInst::vfunc9` = `0x5FE150`
+- `ForceFieldInst::vfunc10` = `0x5FEDF0`
+- `ForceFieldInst::vfunc11` = `0x5FEDE0`
+- `ForceFieldInst::vfunc12` = `0x460B60`
+- `ForceFieldInst::vfunc13` = `0x460B60`
+- `ForceFieldInst::vfunc14` = `0x516940`
+- `ForceFieldInst::vfunc15` = `0x5FE9D0`
+- `ForceFieldInst::vfunc16` = `0x5FEAE0`
+- `ForceFieldInst::vfunc17` = `0x5FEBC0`
+- `ForceFieldInst::vfunc18` = `0x5FE690`
+- `ForceFieldInst::vfunc19` = `0x516940`
+- `ForceFieldInst::vfunc20` = `0x605BC0`
+- `ForceFieldInst::vfunc21` = `0x460B60`
+
+## ForceFieldInstPrefs  (vtable @ 0x789C0C, 22 methods)
+
+- `ForceFieldInstPrefs::vfunc0` = `0x62EEA0`
+- `ForceFieldInstPrefs::vfunc1` = `0x604E40`
+- `ForceFieldInstPrefs::vfunc2` = `0x4041C0`
+- `ForceFieldInstPrefs::vfunc3` = `0x4041C0`
+- `ForceFieldInstPrefs::vfunc4` = `0x62ECF0`
+- `ForceFieldInstPrefs::vfunc5` = `0x460B60`
+- `ForceFieldInstPrefs::vfunc6` = `0x610BC0`
+- `ForceFieldInstPrefs::vfunc7` = `0x547170`
+- `ForceFieldInstPrefs::vfunc8` = `0x610BD0`
+- `ForceFieldInstPrefs::vfunc9` = `0x64A9B0`
+- `ForceFieldInstPrefs::vfunc10` = `0x60EAE0`
+- `ForceFieldInstPrefs::vfunc11` = `0x460B60`
+- `ForceFieldInstPrefs::vfunc12` = `0x437C60`
+- `ForceFieldInstPrefs::vfunc13` = `0x460B60`
+- `ForceFieldInstPrefs::vfunc14` = `0x64CAE0`
+- `ForceFieldInstPrefs::vfunc15` = `0x57B040`
+- `ForceFieldInstPrefs::vfunc16` = `0x437C60`
+- `ForceFieldInstPrefs::vfunc17` = `0x610C00`
+- `ForceFieldInstPrefs::vfunc18` = `0x62ED00`
+- `ForceFieldInstPrefs::vfunc19` = `0x62ED20`
+- `ForceFieldInstPrefs::vfunc20` = `0x62EF10`
+- `ForceFieldInstPrefs::vfunc21` = `0x67AA00`
+
+## ForceFieldPrefs  (vtable @ 0x766B44, 22 methods)
+
+- `ForceFieldPrefs::vfunc0` = `0x424390`
+- `ForceFieldPrefs::vfunc1` = `0x604E40`
+- `ForceFieldPrefs::vfunc2` = `0x4041C0`
+- `ForceFieldPrefs::vfunc3` = `0x4041C0`
+- `ForceFieldPrefs::vfunc4` = `0x424240`
+- `ForceFieldPrefs::vfunc5` = `0x460B60`
+- `ForceFieldPrefs::vfunc6` = `0x610BC0`
+- `ForceFieldPrefs::vfunc7` = `0x547170`
+- `ForceFieldPrefs::vfunc8` = `0x610BD0`
+- `ForceFieldPrefs::vfunc9` = `0x64A9B0`
+- `ForceFieldPrefs::vfunc10` = `0x60EAE0`
+- `ForceFieldPrefs::vfunc11` = `0x460B60`
+- `ForceFieldPrefs::vfunc12` = `0x437C60`
+- `ForceFieldPrefs::vfunc13` = `0x460B60`
+- `ForceFieldPrefs::vfunc14` = `0x64CAE0`
+- `ForceFieldPrefs::vfunc15` = `0x4244A0`
+- `ForceFieldPrefs::vfunc16` = `0x437C60`
+- `ForceFieldPrefs::vfunc17` = `0x610C00`
+- `ForceFieldPrefs::vfunc18` = `0x424250`
+- `ForceFieldPrefs::vfunc19` = `0x424270`
+- `ForceFieldPrefs::vfunc20` = `0x424400`
+- `ForceFieldPrefs::vfunc21` = `0x67AA00`
+
+## GLBaseTexture  (vtable @ 0x79F184, 4 methods)
+
+- `GLBaseTexture::vfunc0` = `0x6B2160`
+- `GLBaseTexture::vfunc1` = `0x6B2330`
+- `GLBaseTexture::vfunc2` = `0x547160`
+- `GLBaseTexture::vfunc3` = `0x516940`
+
+## GLCubeTexture  (vtable @ 0x79F198, 4 methods)
+
+- `GLCubeTexture::vfunc0` = `0x6B2160`
+- `GLCubeTexture::vfunc1` = `0x6B2330`
+- `GLCubeTexture::vfunc2` = `0x6B1FE0`
+- `GLCubeTexture::vfunc3` = `0x6B24B0`
+
+## GLIndexBuffer  (vtable @ 0x79F358, 2 methods)
+
+- `GLIndexBuffer::vfunc0` = `0x6BCA10`
+- `GLIndexBuffer::vfunc1` = `0x604E40`
+
+## GLPushBuffer  (vtable @ 0x79F1C4, 2 methods)
+
+- `GLPushBuffer::vfunc0` = `0x6B61C0`
+- `GLPushBuffer::vfunc1` = `0x604E40`
+
+## GLSurface  (vtable @ 0x79F164, 2 methods)
+
+- `GLSurface::vfunc0` = `0x6B3EA0`
+- `GLSurface::vfunc1` = `0x6B3FE0`
+
+## GLTexture  (vtable @ 0x79F170, 4 methods)
+
+- `GLTexture::vfunc0` = `0x6B2160`
+- `GLTexture::vfunc1` = `0x6B2330`
+- `GLTexture::vfunc2` = `0x6B1EB0`
+- `GLTexture::vfunc3` = `0x6B23B0`
+
+## GOAccepter  (vtable @ 0x76B0F0, 2 methods)
+
+- `GOAccepter::vfunc0` = `0x442710`
+- `GOAccepter::vfunc1` = `0x6E6E7D`
+
+## GOGroup  (vtable @ 0x76C738, 7 methods)
+
+- `GOGroup::vfunc0` = `0x58CB60`
+- `GOGroup::vfunc1` = `0x604E40`
+- `GOGroup::vfunc2` = `0x57E760`
+- `GOGroup::vfunc3` = `0x57E760`
+- `GOGroup::vfunc4` = `0x461080`
+- `GOGroup::vfunc5` = `0x461110`
+- `GOGroup::vfunc6` = `0x680110`
+
+## GOWeapon  (vtable @ 0x773DD4, 30 methods)
+
+- `GOWeapon::vfunc0` = `0x4A4D50`
+- `GOWeapon::vfunc1` = `0x604E40`
+- `GOWeapon::vfunc2` = `0x57E760`
+- `GOWeapon::vfunc3` = `0x57E760`
+- `GOWeapon::vfunc4` = `0x5FDAA0`
+- `GOWeapon::vfunc5` = `0x4A4E10`
+- `GOWeapon::vfunc6` = `0x4A55C0`
+- `GOWeapon::vfunc7` = `0x4A5300`
+- `GOWeapon::vfunc8` = `0x516940`
+- `GOWeapon::vfunc9` = `0x4A5130`
+- `GOWeapon::vfunc10` = `0x4A5770`
+- `GOWeapon::vfunc11` = `0x64A9B0`
+- `GOWeapon::vfunc12` = `0x4A5640`
+- `GOWeapon::vfunc13` = `0x4A53C0`
+- `GOWeapon::vfunc14` = `0x4A53F0`
+- `GOWeapon::vfunc15` = `0x460B60`
+- `GOWeapon::vfunc16` = `0x6E6E7D`
+- `GOWeapon::vfunc17` = `0x6E6E7D`
+- `GOWeapon::vfunc18` = `0x6E6E7D`
+- `GOWeapon::vfunc19` = `0x6E6E7D`
+- `GOWeapon::vfunc20` = `0x6E6E7D`
+- `GOWeapon::vfunc21` = `0x6E6E7D`
+- `GOWeapon::vfunc22` = `0x460B60`
+- `GOWeapon::vfunc23` = `0x64A9B0`
+- `GOWeapon::vfunc24` = `0x64A9B0`
+- `GOWeapon::vfunc25` = `0x64A9B0`
+- `GOWeapon::vfunc26` = `0x64A9B0`
+- `GOWeapon::vfunc27` = `0x516940`
+- `GOWeapon::vfunc28` = `0x65F230`
+- `GOWeapon::vfunc29` = `0x460B60`
+
+## GOWeaponTurret  (vtable @ 0x773E64, 30 methods)
+
+- `GOWeaponTurret::vfunc0` = `0x4A5D20`
+- `GOWeaponTurret::vfunc1` = `0x604E40`
+- `GOWeaponTurret::vfunc2` = `0x57E760`
+- `GOWeaponTurret::vfunc3` = `0x57E760`
+- `GOWeaponTurret::vfunc4` = `0x4A5CC0`
+- `GOWeaponTurret::vfunc5` = `0x4A5D40`
+- `GOWeaponTurret::vfunc6` = `0x4A55C0`
+- `GOWeaponTurret::vfunc7` = `0x4A5300`
+- `GOWeaponTurret::vfunc8` = `0x516940`
+- `GOWeaponTurret::vfunc9` = `0x4A5D50`
+- `GOWeaponTurret::vfunc10` = `0x4A5770`
+- `GOWeaponTurret::vfunc11` = `0x604E40`
+- `GOWeaponTurret::vfunc12` = `0x4A5640`
+- `GOWeaponTurret::vfunc13` = `0x4A53C0`
+- `GOWeaponTurret::vfunc14` = `0x4A5F50`
+- `GOWeaponTurret::vfunc15` = `0x460B60`
+- `GOWeaponTurret::vfunc16` = `0x4D3EB0`
+- `GOWeaponTurret::vfunc17` = `0x4CDC10`
+- `GOWeaponTurret::vfunc18` = `0x4C98D0`
+- `GOWeaponTurret::vfunc19` = `0x460B60`
+- `GOWeaponTurret::vfunc20` = `0x4A5D80`
+- `GOWeaponTurret::vfunc21` = `0x460B60`
+- `GOWeaponTurret::vfunc22` = `0x460B60`
+- `GOWeaponTurret::vfunc23` = `0x64A9B0`
+- `GOWeaponTurret::vfunc24` = `0x64A9B0`
+- `GOWeaponTurret::vfunc25` = `0x64A9B0`
+- `GOWeaponTurret::vfunc26` = `0x64A9B0`
+- `GOWeaponTurret::vfunc27` = `0x516940`
+- `GOWeaponTurret::vfunc28` = `0x4A5F60`
+- `GOWeaponTurret::vfunc29` = `0x460B60`
+
+## GameControlVolume  (vtable @ 0x784E04, 2 methods)
+
+- `GameControlVolume::vfunc0` = `0x5CF920`
+- `GameControlVolume::vfunc1` = `0x622650`
+
+## GameControlVolumeTag  (vtable @ 0x784E64, 10 methods)
+
+- `GameControlVolumeTag::vfunc0` = `0x5D1F40`
+- `GameControlVolumeTag::vfunc1` = `0x604E40`
+- `GameControlVolumeTag::vfunc2` = `0x57E760`
+- `GameControlVolumeTag::vfunc3` = `0x57E760`
+- `GameControlVolumeTag::vfunc4` = `0x5D1EC0`
+- `GameControlVolumeTag::vfunc5` = `0x5D1FA0`
+- `GameControlVolumeTag::vfunc6` = `0x5D1FC0`
+- `GameControlVolumeTag::vfunc7` = `0x582220`
+- `GameControlVolumeTag::vfunc8` = `0x460B60`
+- `GameControlVolumeTag::vfunc9` = `0x680110`
+
+## GameObject  (vtable @ 0x76C5C8, 6 methods)
+
+- `GameObject::vfunc0` = `0x460EB0`
+- `GameObject::vfunc1` = `0x64CAE0`
+- `GameObject::vfunc2` = `0x4600D0`
+- `GameObject::vfunc3` = `0x46D470`
+- `GameObject::vfunc4` = `0x65F500`
+- `GameObject::vfunc5` = `0x4218E0`
+
+## GameObject  (vtable @ 0x76C4F4, 52 methods)
+
+- `GameObject::vfunc0` = `0x45F3A0`
+- `GameObject::vfunc1` = `0x604E40`
+- `GameObject::vfunc2` = `0x57E760`
+- `GameObject::vfunc3` = `0x57E760`
+- `GameObject::vfunc4` = `0x5FDAA0`
+- `GameObject::vfunc5` = `0x45F7D0`
+- `GameObject::vfunc6` = `0x680110`
+- `GameObject::vfunc7` = `0x64A9B0`
+- `GameObject::vfunc8` = `0x64CAE0`
+- `GameObject::vfunc9` = `0x64CAE0`
+- `GameObject::vfunc10` = `0x64CAE0`
+- `GameObject::vfunc11` = `0x64CAE0`
+- `GameObject::vfunc12` = `0x64CAE0`
+- `GameObject::vfunc13` = `0x64CAE0`
+- `GameObject::vfunc14` = `0x64CAE0`
+- `GameObject::vfunc15` = `0x65F310`
+- `GameObject::vfunc16` = `0x64CAE0`
+- `GameObject::vfunc17` = `0x45FA60`
+- `GameObject::vfunc18` = `0x460B60`
+- `GameObject::vfunc19` = `0x460260`
+- `GameObject::vfunc20` = `0x460280`
+- `GameObject::vfunc21` = `0x64CAE0`
+- `GameObject::vfunc22` = `0x460B60`
+- `GameObject::vfunc23` = `0x45F970`
+- `GameObject::vfunc24` = `0x45F980`
+- `GameObject::vfunc25` = `0x45F8A0`
+- `GameObject::vfunc26` = `0x45F920`
+- `GameObject::vfunc27` = `0x516940`
+- `GameObject::vfunc28` = `0x64A9B0`
+- `GameObject::vfunc29` = `0x460160`
+- `GameObject::vfunc30` = `0x4605E0`
+- `GameObject::vfunc31` = `0x460450`
+- `GameObject::vfunc32` = `0x460B60`
+- `GameObject::vfunc33` = `0x460B60`
+- `GameObject::vfunc34` = `0x45FC80`
+- `GameObject::vfunc35` = `0x460B70`
+- `GameObject::vfunc36` = `0x460110`
+- `GameObject::vfunc37` = `0x460B60`
+- `GameObject::vfunc38` = `0x460B60`
+- `GameObject::vfunc39` = `0x64A9B0`
+- `GameObject::vfunc40` = `0x460610`
+- `GameObject::vfunc41` = `0x45FF80`
+- `GameObject::vfunc42` = `0x45FE40`
+- `GameObject::vfunc43` = `0x4218C0`
+- `GameObject::vfunc44` = `0x4600B0`
+- `GameObject::vfunc45` = `0x4602D0`
+- `GameObject::vfunc46` = `0x460600`
+- `GameObject::vfunc47` = `0x45FC10`
+- `GameObject::vfunc48` = `0x45FAC0`
+- `GameObject::vfunc49` = `0x460B60`
+- `GameObject::vfunc50` = `0x460B60`
+- `GameObject::vfunc51` = `0x547170`
+
+## GameObjectDynamic  (vtable @ 0x76C6B8, 6 methods)
+
+- `GameObjectDynamic::vfunc0` = `0x460E90`
+- `GameObjectDynamic::vfunc1` = `0x4607B0`
+- `GameObjectDynamic::vfunc2` = `0x4600D0`
+- `GameObjectDynamic::vfunc3` = `0x46D470`
+- `GameObjectDynamic::vfunc4` = `0x65F500`
+- `GameObjectDynamic::vfunc5` = `0x4218E0`
+
+## GameObjectDynamic  (vtable @ 0x76C5E4, 52 methods)
+
+- `GameObjectDynamic::vfunc0` = `0x460780`
+- `GameObjectDynamic::vfunc1` = `0x604E40`
+- `GameObjectDynamic::vfunc2` = `0x57E760`
+- `GameObjectDynamic::vfunc3` = `0x57E760`
+- `GameObjectDynamic::vfunc4` = `0x5FDAA0`
+- `GameObjectDynamic::vfunc5` = `0x4609C0`
+- `GameObjectDynamic::vfunc6` = `0x680110`
+- `GameObjectDynamic::vfunc7` = `0x604E40`
+- `GameObjectDynamic::vfunc8` = `0x64CAE0`
+- `GameObjectDynamic::vfunc9` = `0x64CAE0`
+- `GameObjectDynamic::vfunc10` = `0x64CAE0`
+- `GameObjectDynamic::vfunc11` = `0x64CAE0`
+- `GameObjectDynamic::vfunc12` = `0x64CAE0`
+- `GameObjectDynamic::vfunc13` = `0x64CAE0`
+- `GameObjectDynamic::vfunc14` = `0x64CAE0`
+- `GameObjectDynamic::vfunc15` = `0x65F310`
+- `GameObjectDynamic::vfunc16` = `0x64CAE0`
+- `GameObjectDynamic::vfunc17` = `0x45FA60`
+- `GameObjectDynamic::vfunc18` = `0x460B60`
+- `GameObjectDynamic::vfunc19` = `0x460260`
+- `GameObjectDynamic::vfunc20` = `0x460280`
+- `GameObjectDynamic::vfunc21` = `0x64CAE0`
+- `GameObjectDynamic::vfunc22` = `0x460B60`
+- `GameObjectDynamic::vfunc23` = `0x45F970`
+- `GameObjectDynamic::vfunc24` = `0x45F980`
+- `GameObjectDynamic::vfunc25` = `0x45F8A0`
+- `GameObjectDynamic::vfunc26` = `0x45F920`
+- `GameObjectDynamic::vfunc27` = `0x516940`
+- `GameObjectDynamic::vfunc28` = `0x64A9B0`
+- `GameObjectDynamic::vfunc29` = `0x460160`
+- `GameObjectDynamic::vfunc30` = `0x4605E0`
+- `GameObjectDynamic::vfunc31` = `0x460450`
+- `GameObjectDynamic::vfunc32` = `0x460830`
+- `GameObjectDynamic::vfunc33` = `0x460A00`
+- `GameObjectDynamic::vfunc34` = `0x45FC80`
+- `GameObjectDynamic::vfunc35` = `0x460B70`
+- `GameObjectDynamic::vfunc36` = `0x460110`
+- `GameObjectDynamic::vfunc37` = `0x460B60`
+- `GameObjectDynamic::vfunc38` = `0x460B60`
+- `GameObjectDynamic::vfunc39` = `0x64A9B0`
+- `GameObjectDynamic::vfunc40` = `0x460610`
+- `GameObjectDynamic::vfunc41` = `0x45FF80`
+- `GameObjectDynamic::vfunc42` = `0x45FE40`
+- `GameObjectDynamic::vfunc43` = `0x4218C0`
+- `GameObjectDynamic::vfunc44` = `0x4600B0`
+- `GameObjectDynamic::vfunc45` = `0x4602D0`
+- `GameObjectDynamic::vfunc46` = `0x460A20`
+- `GameObjectDynamic::vfunc47` = `0x460A70`
+- `GameObjectDynamic::vfunc48` = `0x460A40`
+- `GameObjectDynamic::vfunc49` = `0x460B60`
+- `GameObjectDynamic::vfunc50` = `0x460B60`
+- `GameObjectDynamic::vfunc51` = `0x547170`
+
+## GameObjectInterface  (vtable @ 0x76C6E4, 6 methods)
+
+- `GameObjectInterface::vfunc0` = `0x460ED0`
+- `GameObjectInterface::vfunc1` = `0x6E6E7D`
+- `GameObjectInterface::vfunc2` = `0x6E6E7D`
+- `GameObjectInterface::vfunc3` = `0x6E6E7D`
+- `GameObjectInterface::vfunc4` = `0x65F500`
+- `GameObjectInterface::vfunc5` = `0x64A9B0`
+
+## GameSpeakQuickSpeak  (vtable @ 0x7844CC, 14 methods)
+
+- `GameSpeakQuickSpeak::vfunc0` = `0x4CF5C0`
+- `GameSpeakQuickSpeak::vfunc1` = `0x604E40`
+- `GameSpeakQuickSpeak::vfunc2` = `0x57E760`
+- `GameSpeakQuickSpeak::vfunc3` = `0x57E760`
+- `GameSpeakQuickSpeak::vfunc4` = `0x5C8FA0`
+- `GameSpeakQuickSpeak::vfunc5` = `0x5C9120`
+- `GameSpeakQuickSpeak::vfunc6` = `0x680110`
+- `GameSpeakQuickSpeak::vfunc7` = `0x5C91A0`
+- `GameSpeakQuickSpeak::vfunc8` = `0x5C9210`
+- `GameSpeakQuickSpeak::vfunc9` = `0x5C91B0`
+- `GameSpeakQuickSpeak::vfunc10` = `0x460B60`
+- `GameSpeakQuickSpeak::vfunc11` = `0x64A9B0`
+- `GameSpeakQuickSpeak::vfunc12` = `0x5C9580`
+- `GameSpeakQuickSpeak::vfunc13` = `0x5C9590`
+
+## GameSpeakReceiver  (vtable @ 0x76CDB8, 3 methods)
+
+- `GameSpeakReceiver::vfunc0` = `0x46A420`
+- `GameSpeakReceiver::vfunc1` = `0x46A4F0`
+- `GameSpeakReceiver::vfunc2` = `0x534559`
+
+## GameSpeakScript  (vtable @ 0x784518, 14 methods)
+
+- `GameSpeakScript::vfunc0` = `0x5C9750`
+- `GameSpeakScript::vfunc1` = `0x604E40`
+- `GameSpeakScript::vfunc2` = `0x57E760`
+- `GameSpeakScript::vfunc3` = `0x57E760`
+- `GameSpeakScript::vfunc4` = `0x5C95F0`
+- `GameSpeakScript::vfunc5` = `0x54AFB0`
+- `GameSpeakScript::vfunc6` = `0x680110`
+- `GameSpeakScript::vfunc7` = `0x5C9810`
+- `GameSpeakScript::vfunc8` = `0x5C9820`
+- `GameSpeakScript::vfunc9` = `0x460B60`
+- `GameSpeakScript::vfunc10` = `0x5C9830`
+- `GameSpeakScript::vfunc11` = `0x5C98F0`
+- `GameSpeakScript::vfunc12` = `0x5C99C0`
+- `GameSpeakScript::vfunc13` = `0x5C99E0`
+
+## GameStringIndex  (vtable @ 0x78FC74, 19 methods)
+
+- `GameStringIndex::vfunc0` = `0x6504F0`
+- `GameStringIndex::vfunc1` = `0x604E40`
+- `GameStringIndex::vfunc2` = `0x610CC0`
+- `GameStringIndex::vfunc3` = `0x610D20`
+- `GameStringIndex::vfunc4` = `0x5FDAA0`
+- `GameStringIndex::vfunc5` = `0x650720`
+- `GameStringIndex::vfunc6` = `0x650730`
+- `GameStringIndex::vfunc7` = `0x547170`
+- `GameStringIndex::vfunc8` = `0x610BD0`
+- `GameStringIndex::vfunc9` = `0x64A9B0`
+- `GameStringIndex::vfunc10` = `0x460B60`
+- `GameStringIndex::vfunc11` = `0x460B60`
+- `GameStringIndex::vfunc12` = `0x437C60`
+- `GameStringIndex::vfunc13` = `0x460B60`
+- `GameStringIndex::vfunc14` = `0x64BC40`
+- `GameStringIndex::vfunc15` = `0x57B040`
+- `GameStringIndex::vfunc16` = `0x610C60`
+- `GameStringIndex::vfunc17` = `0x610C00`
+- `GameStringIndex::vfunc18` = `0x650750`
+
+## GameplayCamera  (vtable @ 0x76636C, 29 methods)
+
+- `GameplayCamera::vfunc0` = `0x4CF5C0`
+- `GameplayCamera::vfunc1` = `0x604E40`
+- `GameplayCamera::vfunc2` = `0x57E760`
+- `GameplayCamera::vfunc3` = `0x57E760`
+- `GameplayCamera::vfunc4` = `0x41BD60`
+- `GameplayCamera::vfunc5` = `0x41BE20`
+- `GameplayCamera::vfunc6` = `0x40BCC0`
+- `GameplayCamera::vfunc7` = `0x41BDD0`
+- `GameplayCamera::vfunc8` = `0x40B3B0`
+- `GameplayCamera::vfunc9` = `0x467640`
+- `GameplayCamera::vfunc10` = `0x40B580`
+- `GameplayCamera::vfunc11` = `0x40B590`
+- `GameplayCamera::vfunc12` = `0x40B5B0`
+- `GameplayCamera::vfunc13` = `0x40B5A0`
+- `GameplayCamera::vfunc14` = `0x40B5E0`
+- `GameplayCamera::vfunc15` = `0x40B6B0`
+- `GameplayCamera::vfunc16` = `0x40B7B0`
+- `GameplayCamera::vfunc17` = `0x40B710`
+- `GameplayCamera::vfunc18` = `0x40B740`
+- `GameplayCamera::vfunc19` = `0x40B570`
+- `GameplayCamera::vfunc20` = `0x40B650`
+- `GameplayCamera::vfunc21` = `0x40AA90`
+- `GameplayCamera::vfunc22` = `0x40AAD0`
+- `GameplayCamera::vfunc23` = `0x40AAE0`
+- `GameplayCamera::vfunc24` = `0x40AAF0`
+- `GameplayCamera::vfunc25` = `0x4EDFF0`
+- `GameplayCamera::vfunc26` = `0x40B880`
+- `GameplayCamera::vfunc27` = `0x41C440`
+- `GameplayCamera::vfunc28` = `0x460B60`
+
+## GameplayCameraGenerator  (vtable @ 0x77F40C, 14 methods)
+
+- `GameplayCameraGenerator::vfunc0` = `0x581770`
+- `GameplayCameraGenerator::vfunc1` = `0x604E40`
+- `GameplayCameraGenerator::vfunc2` = `0x57E760`
+- `GameplayCameraGenerator::vfunc3` = `0x57E760`
+- `GameplayCameraGenerator::vfunc4` = `0x581480`
+- `GameplayCameraGenerator::vfunc5` = `0x5817F0`
+- `GameplayCameraGenerator::vfunc6` = `0x680110`
+- `GameplayCameraGenerator::vfunc7` = `0x581BB0`
+- `GameplayCameraGenerator::vfunc8` = `0x64A9B0`
+- `GameplayCameraGenerator::vfunc9` = `0x516940`
+- `GameplayCameraGenerator::vfunc10` = `0x4BDB00`
+- `GameplayCameraGenerator::vfunc11` = `0x64A9B0`
+- `GameplayCameraGenerator::vfunc12` = `0x64A9B0`
+- `GameplayCameraGenerator::vfunc13` = `0x64A9B0`
+
+## GameplayCameraTag  (vtable @ 0x77F3E0, 10 methods)
+
+- `GameplayCameraTag::vfunc0` = `0x5815F0`
+- `GameplayCameraTag::vfunc1` = `0x604E40`
+- `GameplayCameraTag::vfunc2` = `0x57E760`
+- `GameplayCameraTag::vfunc3` = `0x57E760`
+- `GameplayCameraTag::vfunc4` = `0x581470`
+- `GameplayCameraTag::vfunc5` = `0x581630`
+- `GameplayCameraTag::vfunc6` = `0x581650`
+- `GameplayCameraTag::vfunc7` = `0x582220`
+- `GameplayCameraTag::vfunc8` = `0x460B60`
+- `GameplayCameraTag::vfunc9` = `0x680110`
+
+## GeoEffectDef  (vtable @ 0x782BEC, 25 methods)
+
+- `GeoEffectDef::vfunc0` = `0x4CF5C0`
+- `GeoEffectDef::vfunc1` = `0x604E40`
+- `GeoEffectDef::vfunc2` = `0x4041C0`
+- `GeoEffectDef::vfunc3` = `0x4041C0`
+- `GeoEffectDef::vfunc4` = `0x5B02D0`
+- `GeoEffectDef::vfunc5` = `0x460B60`
+- `GeoEffectDef::vfunc6` = `0x610BC0`
+- `GeoEffectDef::vfunc7` = `0x547170`
+- `GeoEffectDef::vfunc8` = `0x610BD0`
+- `GeoEffectDef::vfunc9` = `0x64A9B0`
+- `GeoEffectDef::vfunc10` = `0x60EAE0`
+- `GeoEffectDef::vfunc11` = `0x460B60`
+- `GeoEffectDef::vfunc12` = `0x437C60`
+- `GeoEffectDef::vfunc13` = `0x460B60`
+- `GeoEffectDef::vfunc14` = `0x64CAE0`
+- `GeoEffectDef::vfunc15` = `0x5BAD60`
+- `GeoEffectDef::vfunc16` = `0x437C60`
+- `GeoEffectDef::vfunc17` = `0x610C00`
+- `GeoEffectDef::vfunc18` = `0x5B02E0`
+- `GeoEffectDef::vfunc19` = `0x5B0300`
+- `GeoEffectDef::vfunc20` = `0x5A2FC0`
+- `GeoEffectDef::vfunc21` = `0x67AA00`
+- `GeoEffectDef::vfunc22` = `0x65F500`
+- `GeoEffectDef::vfunc23` = `0x5B03F0`
+- `GeoEffectDef::vfunc24` = `0x5B0490`
+
+## GeoEffectInst  (vtable @ 0x782CAC, 33 methods)
+
+- `GeoEffectInst::vfunc0` = `0x5B06A0`
+- `GeoEffectInst::vfunc1` = `0x604E40`
+- `GeoEffectInst::vfunc2` = `0x57E760`
+- `GeoEffectInst::vfunc3` = `0x57E760`
+- `GeoEffectInst::vfunc4` = `0x5B0620`
+- `GeoEffectInst::vfunc5` = `0x5B08B0`
+- `GeoEffectInst::vfunc6` = `0x680110`
+- `GeoEffectInst::vfunc7` = `0x460B60`
+- `GeoEffectInst::vfunc8` = `0x460B60`
+- `GeoEffectInst::vfunc9` = `0x5B0920`
+- `GeoEffectInst::vfunc10` = `0x460B60`
+- `GeoEffectInst::vfunc11` = `0x460B60`
+- `GeoEffectInst::vfunc12` = `0x460B60`
+- `GeoEffectInst::vfunc13` = `0x5B0960`
+- `GeoEffectInst::vfunc14` = `0x5B0980`
+- `GeoEffectInst::vfunc15` = `0x5B0940`
+- `GeoEffectInst::vfunc16` = `0x59F890`
+- `GeoEffectInst::vfunc17` = `0x516940`
+- `GeoEffectInst::vfunc18` = `0x5A3FD0`
+- `GeoEffectInst::vfunc19` = `0x5A4030`
+- `GeoEffectInst::vfunc20` = `0x516940`
+- `GeoEffectInst::vfunc21` = `0x460B60`
+- `GeoEffectInst::vfunc22` = `0x460B60`
+- `GeoEffectInst::vfunc23` = `0x460B60`
+- `GeoEffectInst::vfunc24` = `0x460B60`
+- `GeoEffectInst::vfunc25` = `0x516940`
+- `GeoEffectInst::vfunc26` = `0x516940`
+- `GeoEffectInst::vfunc27` = `0x516940`
+- `GeoEffectInst::vfunc28` = `0x5B0AF0`
+- `GeoEffectInst::vfunc29` = `0x475A90`
+- `GeoEffectInst::vfunc30` = `0x65F500`
+- `GeoEffectInst::vfunc31` = `0x5A3F70`
+- `GeoEffectInst::vfunc32` = `0x516940`
+
+## GeoParticleSystem  (vtable @ 0x782D4C, 33 methods)
+
+- `GeoParticleSystem::vfunc0` = `0x5B0EC0`
+- `GeoParticleSystem::vfunc1` = `0x604E40`
+- `GeoParticleSystem::vfunc2` = `0x57E760`
+- `GeoParticleSystem::vfunc3` = `0x57E760`
+- `GeoParticleSystem::vfunc4` = `0x5B0BD0`
+- `GeoParticleSystem::vfunc5` = `0x5B10A0`
+- `GeoParticleSystem::vfunc6` = `0x680110`
+- `GeoParticleSystem::vfunc7` = `0x5B1040`
+- `GeoParticleSystem::vfunc8` = `0x460B60`
+- `GeoParticleSystem::vfunc9` = `0x5B1120`
+- `GeoParticleSystem::vfunc10` = `0x460B60`
+- `GeoParticleSystem::vfunc11` = `0x460B60`
+- `GeoParticleSystem::vfunc12` = `0x460B60`
+- `GeoParticleSystem::vfunc13` = `0x460B60`
+- `GeoParticleSystem::vfunc14` = `0x460B60`
+- `GeoParticleSystem::vfunc15` = `0x460B60`
+- `GeoParticleSystem::vfunc16` = `0x59F890`
+- `GeoParticleSystem::vfunc17` = `0x5B10D0`
+- `GeoParticleSystem::vfunc18` = `0x5A3FD0`
+- `GeoParticleSystem::vfunc19` = `0x5A4030`
+- `GeoParticleSystem::vfunc20` = `0x516940`
+- `GeoParticleSystem::vfunc21` = `0x460B60`
+- `GeoParticleSystem::vfunc22` = `0x460B60`
+- `GeoParticleSystem::vfunc23` = `0x460B60`
+- `GeoParticleSystem::vfunc24` = `0x460B60`
+- `GeoParticleSystem::vfunc25` = `0x516940`
+- `GeoParticleSystem::vfunc26` = `0x516940`
+- `GeoParticleSystem::vfunc27` = `0x516940`
+- `GeoParticleSystem::vfunc28` = `0x5B1220`
+- `GeoParticleSystem::vfunc29` = `0x475A90`
+- `GeoParticleSystem::vfunc30` = `0x5B10C0`
+- `GeoParticleSystem::vfunc31` = `0x5A3F70`
+- `GeoParticleSystem::vfunc32` = `0x5B10E0`
+
+## GeoParticleSystemDef  (vtable @ 0x782DFC, 27 methods)
+
+- `GeoParticleSystemDef::vfunc0` = `0x4CF5C0`
+- `GeoParticleSystemDef::vfunc1` = `0x604E40`
+- `GeoParticleSystemDef::vfunc2` = `0x4041C0`
+- `GeoParticleSystemDef::vfunc3` = `0x4041C0`
+- `GeoParticleSystemDef::vfunc4` = `0x5B2490`
+- `GeoParticleSystemDef::vfunc5` = `0x460B60`
+- `GeoParticleSystemDef::vfunc6` = `0x610BC0`
+- `GeoParticleSystemDef::vfunc7` = `0x547170`
+- `GeoParticleSystemDef::vfunc8` = `0x610BD0`
+- `GeoParticleSystemDef::vfunc9` = `0x64A9B0`
+- `GeoParticleSystemDef::vfunc10` = `0x60EAE0`
+- `GeoParticleSystemDef::vfunc11` = `0x460B60`
+- `GeoParticleSystemDef::vfunc12` = `0x437C60`
+- `GeoParticleSystemDef::vfunc13` = `0x460B60`
+- `GeoParticleSystemDef::vfunc14` = `0x64CAE0`
+- `GeoParticleSystemDef::vfunc15` = `0x5B2730`
+- `GeoParticleSystemDef::vfunc16` = `0x437C60`
+- `GeoParticleSystemDef::vfunc17` = `0x610C00`
+- `GeoParticleSystemDef::vfunc18` = `0x5B24A0`
+- `GeoParticleSystemDef::vfunc19` = `0x5B24C0`
+- `GeoParticleSystemDef::vfunc20` = `0x5B6EE0`
+- `GeoParticleSystemDef::vfunc21` = `0x67AA00`
+- `GeoParticleSystemDef::vfunc22` = `0x5B8780`
+- `GeoParticleSystemDef::vfunc23` = `0x5B25B0`
+- `GeoParticleSystemDef::vfunc24` = `0x5B2650`
+- `GeoParticleSystemDef::vfunc25` = `0x5B78B0`
+- `GeoParticleSystemDef::vfunc26` = `0x5B7EC0`
+
+## Geometry  (vtable @ 0x789694, 6 methods)
+
+- `Geometry::vfunc0` = `0x626A00`
+- `Geometry::vfunc1` = `0x62ECE0`
+- `Geometry::vfunc2` = `0x637710`
+- `Geometry::vfunc3` = `0x475AA0`
+- `Geometry::vfunc4` = `0x47E370`
+- `Geometry::vfunc5` = `0x475A90`
+
+## Geometry  (vtable @ 0x789674, 7 methods)
+
+- `Geometry::vfunc0` = `0x6E6E7D`
+- `Geometry::vfunc1` = `0x6E6E7D`
+- `Geometry::vfunc2` = `0x64A9B0`
+- `Geometry::vfunc3` = `0x6269D0`
+- `Geometry::vfunc4` = `0x604E40`
+- `Geometry::vfunc5` = `0x64CAE0`
+- `Geometry::vfunc6` = `0x430D50`
+
+## Geometry  (vtable @ 0x78961C, 21 methods)
+
+- `Geometry::vfunc0` = `0x626860`
+- `Geometry::vfunc1` = `0x604E40`
+- `Geometry::vfunc2` = `0x57E760`
+- `Geometry::vfunc3` = `0x57E760`
+- `Geometry::vfunc4` = `0x5FDAA0`
+- `Geometry::vfunc5` = `0x626930`
+- `Geometry::vfunc6` = `0x626990`
+- `Geometry::vfunc7` = `0x64A9B0`
+- `Geometry::vfunc8` = `0x6269F0`
+- `Geometry::vfunc9` = `0x64A9B0`
+- `Geometry::vfunc10` = `0x460B60`
+- `Geometry::vfunc11` = `0x6E6E7D`
+- `Geometry::vfunc12` = `0x460B60`
+- `Geometry::vfunc13` = `0x460B60`
+- `Geometry::vfunc14` = `0x516940`
+- `Geometry::vfunc15` = `0x547170`
+- `Geometry::vfunc16` = `0x437C60`
+- `Geometry::vfunc17` = `0x547170`
+- `Geometry::vfunc18` = `0x604E40`
+- `Geometry::vfunc19` = `0x516940`
+- `Geometry::vfunc20` = `0x605BC0`
+
+## GeometryDef  (vtable @ 0x78A25C, 29 methods)
+
+- `GeometryDef::vfunc0` = `0x6378B0`
+- `GeometryDef::vfunc1` = `0x604E40`
+- `GeometryDef::vfunc2` = `0x610CC0`
+- `GeometryDef::vfunc3` = `0x610D20`
+- `GeometryDef::vfunc4` = `0x5FDAA0`
+- `GeometryDef::vfunc5` = `0x637940`
+- `GeometryDef::vfunc6` = `0x637990`
+- `GeometryDef::vfunc7` = `0x547170`
+- `GeometryDef::vfunc8` = `0x610BD0`
+- `GeometryDef::vfunc9` = `0x64A9B0`
+- `GeometryDef::vfunc10` = `0x460B60`
+- `GeometryDef::vfunc11` = `0x460B60`
+- `GeometryDef::vfunc12` = `0x638720`
+- `GeometryDef::vfunc13` = `0x638780`
+- `GeometryDef::vfunc14` = `0x64BC40`
+- `GeometryDef::vfunc15` = `0x6386B0`
+- `GeometryDef::vfunc16` = `0x610C60`
+- `GeometryDef::vfunc17` = `0x610C00`
+- `GeometryDef::vfunc18` = `0x6377D0`
+- `GeometryDef::vfunc19` = `0x637B60`
+- `GeometryDef::vfunc20` = `0x6380B0`
+- `GeometryDef::vfunc21` = `0x638420`
+- `GeometryDef::vfunc22` = `0x6386F0`
+- `GeometryDef::vfunc23` = `0x638390`
+- `GeometryDef::vfunc24` = `0x6379F0`
+- `GeometryDef::vfunc25` = `0x64CAE0`
+- `GeometryDef::vfunc26` = `0x6383C0`
+- `GeometryDef::vfunc27` = `0x6383F0`
+- `GeometryDef::vfunc28` = `0x64CAE0`
+
+## GeometryDestructableDef  (vtable @ 0x79B294, 29 methods)
+
+- `GeometryDestructableDef::vfunc0` = `0x68D1C0`
+- `GeometryDestructableDef::vfunc1` = `0x604E40`
+- `GeometryDestructableDef::vfunc2` = `0x610CC0`
+- `GeometryDestructableDef::vfunc3` = `0x610D20`
+- `GeometryDestructableDef::vfunc4` = `0x5FDAA0`
+- `GeometryDestructableDef::vfunc5` = `0x637940`
+- `GeometryDestructableDef::vfunc6` = `0x637990`
+- `GeometryDestructableDef::vfunc7` = `0x547170`
+- `GeometryDestructableDef::vfunc8` = `0x610BD0`
+- `GeometryDestructableDef::vfunc9` = `0x64A9B0`
+- `GeometryDestructableDef::vfunc10` = `0x460B60`
+- `GeometryDestructableDef::vfunc11` = `0x460B60`
+- `GeometryDestructableDef::vfunc12` = `0x638720`
+- `GeometryDestructableDef::vfunc13` = `0x638780`
+- `GeometryDestructableDef::vfunc14` = `0x64BC40`
+- `GeometryDestructableDef::vfunc15` = `0x6386B0`
+- `GeometryDestructableDef::vfunc16` = `0x610C60`
+- `GeometryDestructableDef::vfunc17` = `0x610C00`
+- `GeometryDestructableDef::vfunc18` = `0x68D230`
+- `GeometryDestructableDef::vfunc19` = `0x68D310`
+- `GeometryDestructableDef::vfunc20` = `0x68D670`
+- `GeometryDestructableDef::vfunc21` = `0x638420`
+- `GeometryDestructableDef::vfunc22` = `0x6386F0`
+- `GeometryDestructableDef::vfunc23` = `0x638390`
+- `GeometryDestructableDef::vfunc24` = `0x6379F0`
+- `GeometryDestructableDef::vfunc25` = `0x64CAE0`
+- `GeometryDestructableDef::vfunc26` = `0x6383C0`
+- `GeometryDestructableDef::vfunc27` = `0x6383F0`
+- `GeometryDestructableDef::vfunc28` = `0x64CAE0`
+
+## GeometryDestructableInst  (vtable @ 0x78A5C8, 6 methods)
+
+- `GeometryDestructableInst::vfunc0` = `0x63B500`
+- `GeometryDestructableInst::vfunc1` = `0x62ECE0`
+- `GeometryDestructableInst::vfunc2` = `0x5FEE00`
+- `GeometryDestructableInst::vfunc3` = `0x475AA0`
+- `GeometryDestructableInst::vfunc4` = `0x47E370`
+- `GeometryDestructableInst::vfunc5` = `0x475A90`
+
+## GeometryDestructableInst  (vtable @ 0x78A5A8, 7 methods)
+
+- `GeometryDestructableInst::vfunc0` = `0x63AEF0`
+- `GeometryDestructableInst::vfunc1` = `0x63B000`
+- `GeometryDestructableInst::vfunc2` = `0x5FE3E0`
+- `GeometryDestructableInst::vfunc3` = `0x6269D0`
+- `GeometryDestructableInst::vfunc4` = `0x5FE680`
+- `GeometryDestructableInst::vfunc5` = `0x5FE130`
+- `GeometryDestructableInst::vfunc6` = `0x5FE140`
+
+## GeometryDestructableInst  (vtable @ 0x78A54C, 22 methods)
+
+- `GeometryDestructableInst::vfunc0` = `0x63ADD0`
+- `GeometryDestructableInst::vfunc1` = `0x604E40`
+- `GeometryDestructableInst::vfunc2` = `0x57E760`
+- `GeometryDestructableInst::vfunc3` = `0x57E760`
+- `GeometryDestructableInst::vfunc4` = `0x63ACA0`
+- `GeometryDestructableInst::vfunc5` = `0x63AE80`
+- `GeometryDestructableInst::vfunc6` = `0x626990`
+- `GeometryDestructableInst::vfunc7` = `0x5FE400`
+- `GeometryDestructableInst::vfunc8` = `0x6269F0`
+- `GeometryDestructableInst::vfunc9` = `0x5FE150`
+- `GeometryDestructableInst::vfunc10` = `0x5FEDF0`
+- `GeometryDestructableInst::vfunc11` = `0x5FEDE0`
+- `GeometryDestructableInst::vfunc12` = `0x460B60`
+- `GeometryDestructableInst::vfunc13` = `0x460B60`
+- `GeometryDestructableInst::vfunc14` = `0x516940`
+- `GeometryDestructableInst::vfunc15` = `0x63B060`
+- `GeometryDestructableInst::vfunc16` = `0x63B1E0`
+- `GeometryDestructableInst::vfunc17` = `0x63B310`
+- `GeometryDestructableInst::vfunc18` = `0x5FE690`
+- `GeometryDestructableInst::vfunc19` = `0x516940`
+- `GeometryDestructableInst::vfunc20` = `0x605BC0`
+- `GeometryDestructableInst::vfunc21` = `0x460B60`
+
+## GeometryDummy  (vtable @ 0x78A4DC, 6 methods)
+
+- `GeometryDummy::vfunc0` = `0x626A00`
+- `GeometryDummy::vfunc1` = `0x62ECE0`
+- `GeometryDummy::vfunc2` = `0x637710`
+- `GeometryDummy::vfunc3` = `0x475AA0`
+- `GeometryDummy::vfunc4` = `0x47E370`
+- `GeometryDummy::vfunc5` = `0x475A90`
+
+## GeometryDummy  (vtable @ 0x78A4BC, 7 methods)
+
+- `GeometryDummy::vfunc0` = `0x516940`
+- `GeometryDummy::vfunc1` = `0x547170`
+- `GeometryDummy::vfunc2` = `0x64A9B0`
+- `GeometryDummy::vfunc3` = `0x6269D0`
+- `GeometryDummy::vfunc4` = `0x64A9B0`
+- `GeometryDummy::vfunc5` = `0x64CAE0`
+- `GeometryDummy::vfunc6` = `0x430D50`
+
+## GeometryDummy  (vtable @ 0x78A464, 21 methods)
+
+- `GeometryDummy::vfunc0` = `0x626860`
+- `GeometryDummy::vfunc1` = `0x604E40`
+- `GeometryDummy::vfunc2` = `0x57E760`
+- `GeometryDummy::vfunc3` = `0x57E760`
+- `GeometryDummy::vfunc4` = `0x63A5B0`
+- `GeometryDummy::vfunc5` = `0x63A6B0`
+- `GeometryDummy::vfunc6` = `0x626990`
+- `GeometryDummy::vfunc7` = `0x64A9B0`
+- `GeometryDummy::vfunc8` = `0x6269F0`
+- `GeometryDummy::vfunc9` = `0x64A9B0`
+- `GeometryDummy::vfunc10` = `0x460B60`
+- `GeometryDummy::vfunc11` = `0x63A620`
+- `GeometryDummy::vfunc12` = `0x460B60`
+- `GeometryDummy::vfunc13` = `0x460B60`
+- `GeometryDummy::vfunc14` = `0x516940`
+- `GeometryDummy::vfunc15` = `0x547170`
+- `GeometryDummy::vfunc16` = `0x437C60`
+- `GeometryDummy::vfunc17` = `0x547170`
+- `GeometryDummy::vfunc18` = `0x604E40`
+- `GeometryDummy::vfunc19` = `0x516940`
+- `GeometryDummy::vfunc20` = `0x605BC0`
+
+## GeometryGroup  (vtable @ 0x79AAA0, 10 methods)
+
+- `GeometryGroup::vfunc0` = `0x680E30`
+- `GeometryGroup::vfunc1` = `0x689820`
+- `GeometryGroup::vfunc2` = `0x680CC0`
+- `GeometryGroup::vfunc3` = `0x680CC0`
+- `GeometryGroup::vfunc4` = `0x680CD0`
+- `GeometryGroup::vfunc5` = `0x680CF0`
+- `GeometryGroup::vfunc6` = `0x606E30`
+- `GeometryGroup::vfunc7` = `0x680DB0`
+- `GeometryGroup::vfunc8` = `0x680DD0`
+- `GeometryGroup::vfunc9` = `0x680DF0`
+
+## GeometryGroup  (vtable @ 0x79AA84, 6 methods)
+
+- `GeometryGroup::vfunc0` = `0x680E40`
+- `GeometryGroup::vfunc1` = `0x62ECE0`
+- `GeometryGroup::vfunc2` = `0x637710`
+- `GeometryGroup::vfunc3` = `0x475AA0`
+- `GeometryGroup::vfunc4` = `0x47E370`
+- `GeometryGroup::vfunc5` = `0x680C80`
+
+## GeometryGroup  (vtable @ 0x79AA64, 7 methods)
+
+- `GeometryGroup::vfunc0` = `0x680910`
+- `GeometryGroup::vfunc1` = `0x680BF0`
+- `GeometryGroup::vfunc2` = `0x64A9B0`
+- `GeometryGroup::vfunc3` = `0x6269D0`
+- `GeometryGroup::vfunc4` = `0x680B70`
+- `GeometryGroup::vfunc5` = `0x64CAE0`
+- `GeometryGroup::vfunc6` = `0x430D50`
+
+## GeometryGroup  (vtable @ 0x79AA0C, 21 methods)
+
+- `GeometryGroup::vfunc0` = `0x680890`
+- `GeometryGroup::vfunc1` = `0x604E40`
+- `GeometryGroup::vfunc2` = `0x57E760`
+- `GeometryGroup::vfunc3` = `0x57E760`
+- `GeometryGroup::vfunc4` = `0x680780`
+- `GeometryGroup::vfunc5` = `0x680B50`
+- `GeometryGroup::vfunc6` = `0x626990`
+- `GeometryGroup::vfunc7` = `0x6808F0`
+- `GeometryGroup::vfunc8` = `0x6269F0`
+- `GeometryGroup::vfunc9` = `0x64A9B0`
+- `GeometryGroup::vfunc10` = `0x460B60`
+- `GeometryGroup::vfunc11` = `0x680E20`
+- `GeometryGroup::vfunc12` = `0x460B60`
+- `GeometryGroup::vfunc13` = `0x680C50`
+- `GeometryGroup::vfunc14` = `0x516940`
+- `GeometryGroup::vfunc15` = `0x680960`
+- `GeometryGroup::vfunc16` = `0x680A20`
+- `GeometryGroup::vfunc17` = `0x680AF0`
+- `GeometryGroup::vfunc18` = `0x680BB0`
+- `GeometryGroup::vfunc19` = `0x516940`
+- `GeometryGroup::vfunc20` = `0x605BC0`
+
+## GeometryHierarchyDef  (vtable @ 0x789DBC, 30 methods)
+
+- `GeometryHierarchyDef::vfunc0` = `0x62FE40`
+- `GeometryHierarchyDef::vfunc1` = `0x604E40`
+- `GeometryHierarchyDef::vfunc2` = `0x610CC0`
+- `GeometryHierarchyDef::vfunc3` = `0x610D20`
+- `GeometryHierarchyDef::vfunc4` = `0x5FDAA0`
+- `GeometryHierarchyDef::vfunc5` = `0x637940`
+- `GeometryHierarchyDef::vfunc6` = `0x637990`
+- `GeometryHierarchyDef::vfunc7` = `0x547170`
+- `GeometryHierarchyDef::vfunc8` = `0x610BD0`
+- `GeometryHierarchyDef::vfunc9` = `0x64A9B0`
+- `GeometryHierarchyDef::vfunc10` = `0x630B00`
+- `GeometryHierarchyDef::vfunc11` = `0x460B60`
+- `GeometryHierarchyDef::vfunc12` = `0x638720`
+- `GeometryHierarchyDef::vfunc13` = `0x638780`
+- `GeometryHierarchyDef::vfunc14` = `0x64BC40`
+- `GeometryHierarchyDef::vfunc15` = `0x630AE0`
+- `GeometryHierarchyDef::vfunc16` = `0x610C60`
+- `GeometryHierarchyDef::vfunc17` = `0x610C00`
+- `GeometryHierarchyDef::vfunc18` = `0x62FF90`
+- `GeometryHierarchyDef::vfunc19` = `0x630070`
+- `GeometryHierarchyDef::vfunc20` = `0x6306B0`
+- `GeometryHierarchyDef::vfunc21` = `0x638420`
+- `GeometryHierarchyDef::vfunc22` = `0x6386F0`
+- `GeometryHierarchyDef::vfunc23` = `0x638390`
+- `GeometryHierarchyDef::vfunc24` = `0x62FD30`
+- `GeometryHierarchyDef::vfunc25` = `0x64CAE0`
+- `GeometryHierarchyDef::vfunc26` = `0x6383C0`
+- `GeometryHierarchyDef::vfunc27` = `0x6383F0`
+- `GeometryHierarchyDef::vfunc28` = `0x630980`
+- `GeometryHierarchyDef::vfunc29` = `0x745F6D`
+
+## GeometryHierarchyInst  (vtable @ 0x788B2C, 10 methods)
+
+- `GeometryHierarchyInst::vfunc0` = `0x6078E0`
+- `GeometryHierarchyInst::vfunc1` = `0x606DC0`
+- `GeometryHierarchyInst::vfunc2` = `0x606DD0`
+- `GeometryHierarchyInst::vfunc3` = `0x606DD0`
+- `GeometryHierarchyInst::vfunc4` = `0x606DF0`
+- `GeometryHierarchyInst::vfunc5` = `0x606E60`
+- `GeometryHierarchyInst::vfunc6` = `0x606E30`
+- `GeometryHierarchyInst::vfunc7` = `0x606EB0`
+- `GeometryHierarchyInst::vfunc8` = `0x680DD0`
+- `GeometryHierarchyInst::vfunc9` = `0x606ED0`
+
+## GeometryHierarchyInst  (vtable @ 0x788B10, 6 methods)
+
+- `GeometryHierarchyInst::vfunc0` = `0x6078D0`
+- `GeometryHierarchyInst::vfunc1` = `0x62ECE0`
+- `GeometryHierarchyInst::vfunc2` = `0x637710`
+- `GeometryHierarchyInst::vfunc3` = `0x475AA0`
+- `GeometryHierarchyInst::vfunc4` = `0x47E370`
+- `GeometryHierarchyInst::vfunc5` = `0x606C80`
+
+## GeometryHierarchyInst  (vtable @ 0x788AF0, 7 methods)
+
+- `GeometryHierarchyInst::vfunc0` = `0x605880`
+- `GeometryHierarchyInst::vfunc1` = `0x605E80`
+- `GeometryHierarchyInst::vfunc2` = `0x5FE3E0`
+- `GeometryHierarchyInst::vfunc3` = `0x6269D0`
+- `GeometryHierarchyInst::vfunc4` = `0x5FE680`
+- `GeometryHierarchyInst::vfunc5` = `0x5FE130`
+- `GeometryHierarchyInst::vfunc6` = `0x5FE140`
+
+## GeometryHierarchyInst  (vtable @ 0x788A94, 22 methods)
+
+- `GeometryHierarchyInst::vfunc0` = `0x604D40`
+- `GeometryHierarchyInst::vfunc1` = `0x604E40`
+- `GeometryHierarchyInst::vfunc2` = `0x57E760`
+- `GeometryHierarchyInst::vfunc3` = `0x57E760`
+- `GeometryHierarchyInst::vfunc4` = `0x6049B0`
+- `GeometryHierarchyInst::vfunc5` = `0x605050`
+- `GeometryHierarchyInst::vfunc6` = `0x626990`
+- `GeometryHierarchyInst::vfunc7` = `0x5FE400`
+- `GeometryHierarchyInst::vfunc8` = `0x606CC0`
+- `GeometryHierarchyInst::vfunc9` = `0x5FE150`
+- `GeometryHierarchyInst::vfunc10` = `0x460B60`
+- `GeometryHierarchyInst::vfunc11` = `0x5FEDE0`
+- `GeometryHierarchyInst::vfunc12` = `0x460B60`
+- `GeometryHierarchyInst::vfunc13` = `0x460B60`
+- `GeometryHierarchyInst::vfunc14` = `0x516940`
+- `GeometryHierarchyInst::vfunc15` = `0x606440`
+- `GeometryHierarchyInst::vfunc16` = `0x606700`
+- `GeometryHierarchyInst::vfunc17` = `0x606940`
+- `GeometryHierarchyInst::vfunc18` = `0x606000`
+- `GeometryHierarchyInst::vfunc19` = `0x606F00`
+- `GeometryHierarchyInst::vfunc20` = `0x605BC0`
+- `GeometryHierarchyInst::vfunc21` = `0x460B60`
+
+## GeometryInst  (vtable @ 0x788380, 6 methods)
+
+- `GeometryInst::vfunc0` = `0x5FEE90`
+- `GeometryInst::vfunc1` = `0x62ECE0`
+- `GeometryInst::vfunc2` = `0x5FEE00`
+- `GeometryInst::vfunc3` = `0x475AA0`
+- `GeometryInst::vfunc4` = `0x47E370`
+- `GeometryInst::vfunc5` = `0x475A90`
+
+## GeometryInst  (vtable @ 0x788360, 7 methods)
+
+- `GeometryInst::vfunc0` = `0x5FE6A0`
+- `GeometryInst::vfunc1` = `0x5FED80`
+- `GeometryInst::vfunc2` = `0x5FE3E0`
+- `GeometryInst::vfunc3` = `0x6269D0`
+- `GeometryInst::vfunc4` = `0x5FE680`
+- `GeometryInst::vfunc5` = `0x5FE130`
+- `GeometryInst::vfunc6` = `0x5FE140`
+
+## GeometryInst  (vtable @ 0x788304, 22 methods)
+
+- `GeometryInst::vfunc0` = `0x5FE300`
+- `GeometryInst::vfunc1` = `0x604E40`
+- `GeometryInst::vfunc2` = `0x57E760`
+- `GeometryInst::vfunc3` = `0x57E760`
+- `GeometryInst::vfunc4` = `0x5FE120`
+- `GeometryInst::vfunc5` = `0x5FEC50`
+- `GeometryInst::vfunc6` = `0x626990`
+- `GeometryInst::vfunc7` = `0x5FE400`
+- `GeometryInst::vfunc8` = `0x6269F0`
+- `GeometryInst::vfunc9` = `0x5FE150`
+- `GeometryInst::vfunc10` = `0x5FEDF0`
+- `GeometryInst::vfunc11` = `0x5FEDE0`
+- `GeometryInst::vfunc12` = `0x460B60`
+- `GeometryInst::vfunc13` = `0x460B60`
+- `GeometryInst::vfunc14` = `0x516940`
+- `GeometryInst::vfunc15` = `0x5FE9D0`
+- `GeometryInst::vfunc16` = `0x5FEAE0`
+- `GeometryInst::vfunc17` = `0x5FEBC0`
+- `GeometryInst::vfunc18` = `0x5FE690`
+- `GeometryInst::vfunc19` = `0x516940`
+- `GeometryInst::vfunc20` = `0x605BC0`
+- `GeometryInst::vfunc21` = `0x460B60`
+
+## GeometryNodeInterface  (vtable @ 0x788A68, 10 methods)
+
+- `GeometryNodeInterface::vfunc0` = `0x604990`
+- `GeometryNodeInterface::vfunc1` = `0x6E6E7D`
+- `GeometryNodeInterface::vfunc2` = `0x6E6E7D`
+- `GeometryNodeInterface::vfunc3` = `0x6E6E7D`
+- `GeometryNodeInterface::vfunc4` = `0x6E6E7D`
+- `GeometryNodeInterface::vfunc5` = `0x6E6E7D`
+- `GeometryNodeInterface::vfunc6` = `0x6E6E7D`
+- `GeometryNodeInterface::vfunc7` = `0x6E6E7D`
+- `GeometryNodeInterface::vfunc8` = `0x6E6E7D`
+- `GeometryNodeInterface::vfunc9` = `0x6E6E7D`
+
+## GlobalMotionPrefs  (vtable @ 0x77AB24, 22 methods)
+
+- `GlobalMotionPrefs::vfunc0` = `0x4CF5C0`
+- `GlobalMotionPrefs::vfunc1` = `0x604E40`
+- `GlobalMotionPrefs::vfunc2` = `0x4041C0`
+- `GlobalMotionPrefs::vfunc3` = `0x4041C0`
+- `GlobalMotionPrefs::vfunc4` = `0x5262E0`
+- `GlobalMotionPrefs::vfunc5` = `0x460B60`
+- `GlobalMotionPrefs::vfunc6` = `0x610BC0`
+- `GlobalMotionPrefs::vfunc7` = `0x547170`
+- `GlobalMotionPrefs::vfunc8` = `0x610BD0`
+- `GlobalMotionPrefs::vfunc9` = `0x64A9B0`
+- `GlobalMotionPrefs::vfunc10` = `0x60EAE0`
+- `GlobalMotionPrefs::vfunc11` = `0x460B60`
+- `GlobalMotionPrefs::vfunc12` = `0x437C60`
+- `GlobalMotionPrefs::vfunc13` = `0x460B60`
+- `GlobalMotionPrefs::vfunc14` = `0x64CAE0`
+- `GlobalMotionPrefs::vfunc15` = `0x57B040`
+- `GlobalMotionPrefs::vfunc16` = `0x437C60`
+- `GlobalMotionPrefs::vfunc17` = `0x610C00`
+- `GlobalMotionPrefs::vfunc18` = `0x5262F0`
+- `GlobalMotionPrefs::vfunc19` = `0x526310`
+- `GlobalMotionPrefs::vfunc20` = `0x526320`
+- `GlobalMotionPrefs::vfunc21` = `0x67AA00`
+
+## GloktigiMelee  (vtable @ 0x775544, 43 methods)
+
+- `GloktigiMelee::vfunc0` = `0x4C69B0`
+- `GloktigiMelee::vfunc1` = `0x604E40`
+- `GloktigiMelee::vfunc2` = `0x57E760`
+- `GloktigiMelee::vfunc3` = `0x57E760`
+- `GloktigiMelee::vfunc4` = `0x4C68D0`
+- `GloktigiMelee::vfunc5` = `0x4C6EF0`
+- `GloktigiMelee::vfunc6` = `0x4A55C0`
+- `GloktigiMelee::vfunc7` = `0x4C7290`
+- `GloktigiMelee::vfunc8` = `0x4C7B50`
+- `GloktigiMelee::vfunc9` = `0x4A5130`
+- `GloktigiMelee::vfunc10` = `0x516940`
+- `GloktigiMelee::vfunc11` = `0x64A9B0`
+- `GloktigiMelee::vfunc12` = `0x4C83E0`
+- `GloktigiMelee::vfunc13` = `0x4A53C0`
+- `GloktigiMelee::vfunc14` = `0x4C8330`
+- `GloktigiMelee::vfunc15` = `0x460B60`
+- `GloktigiMelee::vfunc16` = `0x4C98D0`
+- `GloktigiMelee::vfunc17` = `0x4CA790`
+- `GloktigiMelee::vfunc18` = `0x4C98D0`
+- `GloktigiMelee::vfunc19` = `0x4CA9A0`
+- `GloktigiMelee::vfunc20` = `0x4C83B0`
+- `GloktigiMelee::vfunc21` = `0x4CAA30`
+- `GloktigiMelee::vfunc22` = `0x460B60`
+- `GloktigiMelee::vfunc23` = `0x64A9B0`
+- `GloktigiMelee::vfunc24` = `0x64A9B0`
+- `GloktigiMelee::vfunc25` = `0x64A9B0`
+- `GloktigiMelee::vfunc26` = `0x4D0280`
+- `GloktigiMelee::vfunc27` = `0x516940`
+- `GloktigiMelee::vfunc28` = `0x4CA770`
+- `GloktigiMelee::vfunc29` = `0x460B60`
+- `GloktigiMelee::vfunc30` = `0x4C69D0`
+- `GloktigiMelee::vfunc31` = `0x4CAA80`
+- `GloktigiMelee::vfunc32` = `0x460B60`
+- `GloktigiMelee::vfunc33` = `0x47C830`
+- `GloktigiMelee::vfunc34` = `0x437C60`
+- `GloktigiMelee::vfunc35` = `0x4C68E0`
+- `GloktigiMelee::vfunc36` = `0x4C6E70`
+- `GloktigiMelee::vfunc37` = `0x516940`
+- `GloktigiMelee::vfunc38` = `0x4C8200`
+- `GloktigiMelee::vfunc39` = `0x460B60`
+- `GloktigiMelee::vfunc40` = `0x437C60`
+- `GloktigiMelee::vfunc41` = `0x460B60`
+- `GloktigiMelee::vfunc42` = `0x460B60`
+
+## GloktigiPrefs  (vtable @ 0x766EBC, 22 methods)
+
+- `GloktigiPrefs::vfunc0` = `0x4CF5C0`
+- `GloktigiPrefs::vfunc1` = `0x604E40`
+- `GloktigiPrefs::vfunc2` = `0x4041C0`
+- `GloktigiPrefs::vfunc3` = `0x4041C0`
+- `GloktigiPrefs::vfunc4` = `0x424BB0`
+- `GloktigiPrefs::vfunc5` = `0x460B60`
+- `GloktigiPrefs::vfunc6` = `0x610BC0`
+- `GloktigiPrefs::vfunc7` = `0x547170`
+- `GloktigiPrefs::vfunc8` = `0x610BD0`
+- `GloktigiPrefs::vfunc9` = `0x64A9B0`
+- `GloktigiPrefs::vfunc10` = `0x60EAE0`
+- `GloktigiPrefs::vfunc11` = `0x460B60`
+- `GloktigiPrefs::vfunc12` = `0x437C60`
+- `GloktigiPrefs::vfunc13` = `0x460B60`
+- `GloktigiPrefs::vfunc14` = `0x64CAE0`
+- `GloktigiPrefs::vfunc15` = `0x425220`
+- `GloktigiPrefs::vfunc16` = `0x437C60`
+- `GloktigiPrefs::vfunc17` = `0x610C00`
+- `GloktigiPrefs::vfunc18` = `0x424BC0`
+- `GloktigiPrefs::vfunc19` = `0x424BE0`
+- `GloktigiPrefs::vfunc20` = `0x424DA0`
+- `GloktigiPrefs::vfunc21` = `0x67AA00`
+
+## GloktigiRanged  (vtable @ 0x77560C, 43 methods)
+
+- `GloktigiRanged::vfunc0` = `0x4CAF30`
+- `GloktigiRanged::vfunc1` = `0x604E40`
+- `GloktigiRanged::vfunc2` = `0x57E760`
+- `GloktigiRanged::vfunc3` = `0x57E760`
+- `GloktigiRanged::vfunc4` = `0x4C85F0`
+- `GloktigiRanged::vfunc5` = `0x4C8680`
+- `GloktigiRanged::vfunc6` = `0x4A55C0`
+- `GloktigiRanged::vfunc7` = `0x4A5300`
+- `GloktigiRanged::vfunc8` = `0x516940`
+- `GloktigiRanged::vfunc9` = `0x4A5130`
+- `GloktigiRanged::vfunc10` = `0x4A5770`
+- `GloktigiRanged::vfunc11` = `0x64A9B0`
+- `GloktigiRanged::vfunc12` = `0x4A5640`
+- `GloktigiRanged::vfunc13` = `0x4CAD00`
+- `GloktigiRanged::vfunc14` = `0x4C86C0`
+- `GloktigiRanged::vfunc15` = `0x4C8790`
+- `GloktigiRanged::vfunc16` = `0x4D3EB0`
+- `GloktigiRanged::vfunc17` = `0x4CDC10`
+- `GloktigiRanged::vfunc18` = `0x4C98D0`
+- `GloktigiRanged::vfunc19` = `0x4CA9A0`
+- `GloktigiRanged::vfunc20` = `0x4C87F0`
+- `GloktigiRanged::vfunc21` = `0x460B60`
+- `GloktigiRanged::vfunc22` = `0x4C8830`
+- `GloktigiRanged::vfunc23` = `0x64A9B0`
+- `GloktigiRanged::vfunc24` = `0x64A9B0`
+- `GloktigiRanged::vfunc25` = `0x64A9B0`
+- `GloktigiRanged::vfunc26` = `0x4CAC30`
+- `GloktigiRanged::vfunc27` = `0x516940`
+- `GloktigiRanged::vfunc28` = `0x4CAC10`
+- `GloktigiRanged::vfunc29` = `0x460B60`
+- `GloktigiRanged::vfunc30` = `0x4CAB90`
+- `GloktigiRanged::vfunc31` = `0x4D07C0`
+- `GloktigiRanged::vfunc32` = `0x460B60`
+- `GloktigiRanged::vfunc33` = `0x47C830`
+- `GloktigiRanged::vfunc34` = `0x437C60`
+- `GloktigiRanged::vfunc35` = `0x64CAE0`
+- `GloktigiRanged::vfunc36` = `0x64A9B0`
+- `GloktigiRanged::vfunc37` = `0x516940`
+- `GloktigiRanged::vfunc38` = `0x65F500`
+- `GloktigiRanged::vfunc39` = `0x460B60`
+- `GloktigiRanged::vfunc40` = `0x437C60`
+- `GloktigiRanged::vfunc41` = `0x460B60`
+- `GloktigiRanged::vfunc42` = `0x460B60`
+
+## HealthMixin  (vtable @ 0x76CE0C, 31 methods)
+
+- `HealthMixin::vfunc0` = `0x46B0D0`
+- `HealthMixin::vfunc1` = `0x6E6E7D`
+- `HealthMixin::vfunc2` = `0x46A610`
+- `HealthMixin::vfunc3` = `0x46A630`
+- `HealthMixin::vfunc4` = `0x46A650`
+- `HealthMixin::vfunc5` = `0x46A660`
+- `HealthMixin::vfunc6` = `0x6E6E7D`
+- `HealthMixin::vfunc7` = `0x6E6E7D`
+- `HealthMixin::vfunc8` = `0x6E6E7D`
+- `HealthMixin::vfunc9` = `0x6E6E7D`
+- `HealthMixin::vfunc10` = `0x6E6E7D`
+- `HealthMixin::vfunc11` = `0x6E6E7D`
+- `HealthMixin::vfunc12` = `0x6E6E7D`
+- `HealthMixin::vfunc13` = `0x6E6E7D`
+- `HealthMixin::vfunc14` = `0x6E6E7D`
+- `HealthMixin::vfunc15` = `0x6E6E7D`
+- `HealthMixin::vfunc16` = `0x6E6E7D`
+- `HealthMixin::vfunc17` = `0x6E6E7D`
+- `HealthMixin::vfunc18` = `0x6E6E7D`
+- `HealthMixin::vfunc19` = `0x46A7D0`
+- `HealthMixin::vfunc20` = `0x6E6E7D`
+- `HealthMixin::vfunc21` = `0x516940`
+- `HealthMixin::vfunc22` = `0x47C830`
+- `HealthMixin::vfunc23` = `0x516940`
+- `HealthMixin::vfunc24` = `0x516940`
+- `HealthMixin::vfunc25` = `0x460B60`
+- `HealthMixin::vfunc26` = `0x516940`
+- `HealthMixin::vfunc27` = `0x65F170`
+- `HealthMixin::vfunc28` = `0x65F500`
+- `HealthMixin::vfunc29` = `0x6E6E7D`
+- `HealthMixin::vfunc30` = `0x6E6E7D`
+
+## HealthMixinImpl  (vtable @ 0x76CE8C, 31 methods)
+
+- `HealthMixinImpl::vfunc0` = `0x46A880`
+- `HealthMixinImpl::vfunc1` = `0x46A8D0`
+- `HealthMixinImpl::vfunc2` = `0x46A610`
+- `HealthMixinImpl::vfunc3` = `0x46A630`
+- `HealthMixinImpl::vfunc4` = `0x46A650`
+- `HealthMixinImpl::vfunc5` = `0x46A660`
+- `HealthMixinImpl::vfunc6` = `0x46AB50`
+- `HealthMixinImpl::vfunc7` = `0x46AB70`
+- `HealthMixinImpl::vfunc8` = `0x46AB90`
+- `HealthMixinImpl::vfunc9` = `0x63DDA0`
+- `HealthMixinImpl::vfunc10` = `0x46ABC0`
+- `HealthMixinImpl::vfunc11` = `0x63DDB0`
+- `HealthMixinImpl::vfunc12` = `0x46ABD0`
+- `HealthMixinImpl::vfunc13` = `0x46AF60`
+- `HealthMixinImpl::vfunc14` = `0x46ABE0`
+- `HealthMixinImpl::vfunc15` = `0x46AC70`
+- `HealthMixinImpl::vfunc16` = `0x46B210`
+- `HealthMixinImpl::vfunc17` = `0x46ACC0`
+- `HealthMixinImpl::vfunc18` = `0x46ACF0`
+- `HealthMixinImpl::vfunc19` = `0x46A7D0`
+- `HealthMixinImpl::vfunc20` = `0x46AF00`
+- `HealthMixinImpl::vfunc21` = `0x516940`
+- `HealthMixinImpl::vfunc22` = `0x47C830`
+- `HealthMixinImpl::vfunc23` = `0x516940`
+- `HealthMixinImpl::vfunc24` = `0x516940`
+- `HealthMixinImpl::vfunc25` = `0x460B60`
+- `HealthMixinImpl::vfunc26` = `0x516940`
+- `HealthMixinImpl::vfunc27` = `0x65F170`
+- `HealthMixinImpl::vfunc28` = `0x65F500`
+- `HealthMixinImpl::vfunc29` = `0x46AC90`
+- `HealthMixinImpl::vfunc30` = `0x46AD10`
+
+## HealthMixinSimple  (vtable @ 0x76CF0C, 31 methods)
+
+- `HealthMixinSimple::vfunc0` = `0x46B0D0`
+- `HealthMixinSimple::vfunc1` = `0x46B100`
+- `HealthMixinSimple::vfunc2` = `0x46A610`
+- `HealthMixinSimple::vfunc3` = `0x46A630`
+- `HealthMixinSimple::vfunc4` = `0x46A650`
+- `HealthMixinSimple::vfunc5` = `0x46A660`
+- `HealthMixinSimple::vfunc6` = `0x64A9B0`
+- `HealthMixinSimple::vfunc7` = `0x64A9B0`
+- `HealthMixinSimple::vfunc8` = `0x64A9B0`
+- `HealthMixinSimple::vfunc9` = `0x46B190`
+- `HealthMixinSimple::vfunc10` = `0x46B190`
+- `HealthMixinSimple::vfunc11` = `0x46B190`
+- `HealthMixinSimple::vfunc12` = `0x46B1A0`
+- `HealthMixinSimple::vfunc13` = `0x46B2D0`
+- `HealthMixinSimple::vfunc14` = `0x46B1B0`
+- `HealthMixinSimple::vfunc15` = `0x46B1D0`
+- `HealthMixinSimple::vfunc16` = `0x46B210`
+- `HealthMixinSimple::vfunc17` = `0x46B250`
+- `HealthMixinSimple::vfunc18` = `0x46B270`
+- `HealthMixinSimple::vfunc19` = `0x46A7D0`
+- `HealthMixinSimple::vfunc20` = `0x65F500`
+- `HealthMixinSimple::vfunc21` = `0x516940`
+- `HealthMixinSimple::vfunc22` = `0x47C830`
+- `HealthMixinSimple::vfunc23` = `0x516940`
+- `HealthMixinSimple::vfunc24` = `0x516940`
+- `HealthMixinSimple::vfunc25` = `0x460B60`
+- `HealthMixinSimple::vfunc26` = `0x516940`
+- `HealthMixinSimple::vfunc27` = `0x65F170`
+- `HealthMixinSimple::vfunc28` = `0x65F500`
+- `HealthMixinSimple::vfunc29` = `0x46B1E0`
+- `HealthMixinSimple::vfunc30` = `0x65F220`
+
+## HideVolumeTag  (vtable @ 0x77F5B8, 10 methods)
+
+- `HideVolumeTag::vfunc0` = `0x584630`
+- `HideVolumeTag::vfunc1` = `0x604E40`
+- `HideVolumeTag::vfunc2` = `0x57E760`
+- `HideVolumeTag::vfunc3` = `0x57E760`
+- `HideVolumeTag::vfunc4` = `0x582CF0`
+- `HideVolumeTag::vfunc5` = `0x582D60`
+- `HideVolumeTag::vfunc6` = `0x582D80`
+- `HideVolumeTag::vfunc7` = `0x582220`
+- `HideVolumeTag::vfunc8` = `0x460B60`
+- `HideVolumeTag::vfunc9` = `0x680110`
+
+## IndexedRenderableVB  (vtable @ 0x79A384, 18 methods)
+
+- `IndexedRenderableVB::vfunc0` = `0x67BE80`
+- `IndexedRenderableVB::vfunc1` = `0x604E40`
+- `IndexedRenderableVB::vfunc2` = `0x649020`
+- `IndexedRenderableVB::vfunc3` = `0x649030`
+- `IndexedRenderableVB::vfunc4` = `0x67BBA0`
+- `IndexedRenderableVB::vfunc5` = `0x663950`
+- `IndexedRenderableVB::vfunc6` = `0x67BEB0`
+- `IndexedRenderableVB::vfunc7` = `0x67BF00`
+- `IndexedRenderableVB::vfunc8` = `0x67BE60`
+- `IndexedRenderableVB::vfunc9` = `0x67BE70`
+- `IndexedRenderableVB::vfunc10` = `0x67BF20`
+- `IndexedRenderableVB::vfunc11` = `0x67C0C0`
+- `IndexedRenderableVB::vfunc12` = `0x67C100`
+- `IndexedRenderableVB::vfunc13` = `0x67C130`
+- `IndexedRenderableVB::vfunc14` = `0x67C1A0`
+- `IndexedRenderableVB::vfunc15` = `0x67C230`
+- `IndexedRenderableVB::vfunc16` = `0x437C60`
+- `IndexedRenderableVB::vfunc17` = `0x60B200`
+
+## InputStatefulReceiver  (vtable @ 0x78FFC0, 7 methods)
+
+- `InputStatefulReceiver::vfunc0` = `0x604E40`
+- `InputStatefulReceiver::vfunc1` = `0x65BAC0`
+- `InputStatefulReceiver::vfunc2` = `0x65BB20`
+- `InputStatefulReceiver::vfunc3` = `0x65BC60`
+- `InputStatefulReceiver::vfunc4` = `0x547170`
+- `InputStatefulReceiver::vfunc5` = `0x547170`
+- `InputStatefulReceiver::vfunc6` = `0x65B930`
+
+## Inventory  (vtable @ 0x784DD8, 8 methods)
+
+- `Inventory::vfunc0` = `0x5CDEF0`
+- `Inventory::vfunc1` = `0x604E40`
+- `Inventory::vfunc2` = `0x57E760`
+- `Inventory::vfunc3` = `0x57E760`
+- `Inventory::vfunc4` = `0x5CDCD0`
+- `Inventory::vfunc5` = `0x5CDFD0`
+- `Inventory::vfunc6` = `0x680110`
+- `Inventory::vfunc7` = `0x516940`
+
+## Job  (vtable @ 0x777DBC, 22 methods)
+
+- `Job::vfunc0` = `0x4F2820`
+- `Job::vfunc1` = `0x604E40`
+- `Job::vfunc2` = `0x57E760`
+- `Job::vfunc3` = `0x57E760`
+- `Job::vfunc4` = `0x5FDAA0`
+- `Job::vfunc5` = `0x4EDF60`
+- `Job::vfunc6` = `0x4A55C0`
+- `Job::vfunc7` = `0x4EE210`
+- `Job::vfunc8` = `0x4EE1A0`
+- `Job::vfunc9` = `0x4EE1A0`
+- `Job::vfunc10` = `0x604E40`
+- `Job::vfunc11` = `0x64A9B0`
+- `Job::vfunc12` = `0x4EE1A0`
+- `Job::vfunc13` = `0x460B60`
+- `Job::vfunc14` = `0x460B60`
+- `Job::vfunc15` = `0x4EE220`
+- `Job::vfunc16` = `0x460B60`
+- `Job::vfunc17` = `0x437C60`
+- `Job::vfunc18` = `0x516940`
+- `Job::vfunc19` = `0x4EE310`
+- `Job::vfunc20` = `0x4EDFF0`
+- `Job::vfunc21` = `0x64BC40`
+
+## JobAlarm  (vtable @ 0x777E24, 22 methods)
+
+- `JobAlarm::vfunc0` = `0x4F4480`
+- `JobAlarm::vfunc1` = `0x604E40`
+- `JobAlarm::vfunc2` = `0x57E760`
+- `JobAlarm::vfunc3` = `0x57E760`
+- `JobAlarm::vfunc4` = `0x4EE5A0`
+- `JobAlarm::vfunc5` = `0x4FE120`
+- `JobAlarm::vfunc6` = `0x4A55C0`
+- `JobAlarm::vfunc7` = `0x4EE210`
+- `JobAlarm::vfunc8` = `0x460B60`
+- `JobAlarm::vfunc9` = `0x4EE1A0`
+- `JobAlarm::vfunc10` = `0x604E40`
+- `JobAlarm::vfunc11` = `0x64A9B0`
+- `JobAlarm::vfunc12` = `0x4EE1A0`
+- `JobAlarm::vfunc13` = `0x460B60`
+- `JobAlarm::vfunc14` = `0x460B60`
+- `JobAlarm::vfunc15` = `0x4EE220`
+- `JobAlarm::vfunc16` = `0x460B60`
+- `JobAlarm::vfunc17` = `0x437C60`
+- `JobAlarm::vfunc18` = `0x516940`
+- `JobAlarm::vfunc19` = `0x4EE630`
+- `JobAlarm::vfunc20` = `0x4EDFF0`
+- `JobAlarm::vfunc21` = `0x4EE620`
+
+## JobAttack  (vtable @ 0x777EA4, 22 methods)
+
+- `JobAttack::vfunc0` = `0x4F21A0`
+- `JobAttack::vfunc1` = `0x604E40`
+- `JobAttack::vfunc2` = `0x57E760`
+- `JobAttack::vfunc3` = `0x57E760`
+- `JobAttack::vfunc4` = `0x4EE6A0`
+- `JobAttack::vfunc5` = `0x4EEA30`
+- `JobAttack::vfunc6` = `0x4A55C0`
+- `JobAttack::vfunc7` = `0x4EE210`
+- `JobAttack::vfunc8` = `0x4EE8B0`
+- `JobAttack::vfunc9` = `0x4EE1A0`
+- `JobAttack::vfunc10` = `0x604E40`
+- `JobAttack::vfunc11` = `0x64A9B0`
+- `JobAttack::vfunc12` = `0x4EE1A0`
+- `JobAttack::vfunc13` = `0x460B60`
+- `JobAttack::vfunc14` = `0x460B60`
+- `JobAttack::vfunc15` = `0x4FB490`
+- `JobAttack::vfunc16` = `0x460B60`
+- `JobAttack::vfunc17` = `0x47C830`
+- `JobAttack::vfunc18` = `0x516940`
+- `JobAttack::vfunc19` = `0x4FFCB0`
+- `JobAttack::vfunc20` = `0x4EDFF0`
+- `JobAttack::vfunc21` = `0x4EEAA0`
+
+## JobAttackFromWindows  (vtable @ 0x77801C, 22 methods)
+
+- `JobAttackFromWindows::vfunc0` = `0x4EF100`
+- `JobAttackFromWindows::vfunc1` = `0x604E40`
+- `JobAttackFromWindows::vfunc2` = `0x57E760`
+- `JobAttackFromWindows::vfunc3` = `0x57E760`
+- `JobAttackFromWindows::vfunc4` = `0x4EED40`
+- `JobAttackFromWindows::vfunc5` = `0x4EF250`
+- `JobAttackFromWindows::vfunc6` = `0x4A55C0`
+- `JobAttackFromWindows::vfunc7` = `0x4EE210`
+- `JobAttackFromWindows::vfunc8` = `0x4EF360`
+- `JobAttackFromWindows::vfunc9` = `0x4EE1A0`
+- `JobAttackFromWindows::vfunc10` = `0x604E40`
+- `JobAttackFromWindows::vfunc11` = `0x64A9B0`
+- `JobAttackFromWindows::vfunc12` = `0x4EE1A0`
+- `JobAttackFromWindows::vfunc13` = `0x460B60`
+- `JobAttackFromWindows::vfunc14` = `0x460B60`
+- `JobAttackFromWindows::vfunc15` = `0x4EE220`
+- `JobAttackFromWindows::vfunc16` = `0x460B60`
+- `JobAttackFromWindows::vfunc17` = `0x437C60`
+- `JobAttackFromWindows::vfunc18` = `0x516940`
+- `JobAttackFromWindows::vfunc19` = `0x4F1BE0`
+- `JobAttackFromWindows::vfunc20` = `0x4EDFF0`
+- `JobAttackFromWindows::vfunc21` = `0x4EF5E0`
+
+## JobCinematic  (vtable @ 0x7780B4, 22 methods)
+
+- `JobCinematic::vfunc0` = `0x4F2820`
+- `JobCinematic::vfunc1` = `0x604E40`
+- `JobCinematic::vfunc2` = `0x57E760`
+- `JobCinematic::vfunc3` = `0x57E760`
+- `JobCinematic::vfunc4` = `0x4F1C50`
+- `JobCinematic::vfunc5` = `0x4F1DB0`
+- `JobCinematic::vfunc6` = `0x4A55C0`
+- `JobCinematic::vfunc7` = `0x4EE210`
+- `JobCinematic::vfunc8` = `0x4F1E00`
+- `JobCinematic::vfunc9` = `0x4EE1A0`
+- `JobCinematic::vfunc10` = `0x604E40`
+- `JobCinematic::vfunc11` = `0x64A9B0`
+- `JobCinematic::vfunc12` = `0x4EE1A0`
+- `JobCinematic::vfunc13` = `0x460B60`
+- `JobCinematic::vfunc14` = `0x460B60`
+- `JobCinematic::vfunc15` = `0x4EE220`
+- `JobCinematic::vfunc16` = `0x460B60`
+- `JobCinematic::vfunc17` = `0x437C60`
+- `JobCinematic::vfunc18` = `0x516940`
+- `JobCinematic::vfunc19` = `0x4F1E50`
+- `JobCinematic::vfunc20` = `0x4EDFF0`
+- `JobCinematic::vfunc21` = `0x4FC790`
+
+## JobConversation  (vtable @ 0x778124, 22 methods)
+
+- `JobConversation::vfunc0` = `0x4F21A0`
+- `JobConversation::vfunc1` = `0x604E40`
+- `JobConversation::vfunc2` = `0x57E760`
+- `JobConversation::vfunc3` = `0x57E760`
+- `JobConversation::vfunc4` = `0x4F1F20`
+- `JobConversation::vfunc5` = `0x4F2310`
+- `JobConversation::vfunc6` = `0x4A55C0`
+- `JobConversation::vfunc7` = `0x4EE210`
+- `JobConversation::vfunc8` = `0x4F2370`
+- `JobConversation::vfunc9` = `0x4EE1A0`
+- `JobConversation::vfunc10` = `0x604E40`
+- `JobConversation::vfunc11` = `0x64A9B0`
+- `JobConversation::vfunc12` = `0x4EE1A0`
+- `JobConversation::vfunc13` = `0x460B60`
+- `JobConversation::vfunc14` = `0x460B60`
+- `JobConversation::vfunc15` = `0x4EE220`
+- `JobConversation::vfunc16` = `0x460B60`
+- `JobConversation::vfunc17` = `0x437C60`
+- `JobConversation::vfunc18` = `0x516940`
+- `JobConversation::vfunc19` = `0x4FFCB0`
+- `JobConversation::vfunc20` = `0x4EDFF0`
+- `JobConversation::vfunc21` = `0x4F24D0`
+
+## JobDead  (vtable @ 0x7781A4, 22 methods)
+
+- `JobDead::vfunc0` = `0x4F2820`
+- `JobDead::vfunc1` = `0x604E40`
+- `JobDead::vfunc2` = `0x57E760`
+- `JobDead::vfunc3` = `0x57E760`
+- `JobDead::vfunc4` = `0x4F26C0`
+- `JobDead::vfunc5` = `0x4F2880`
+- `JobDead::vfunc6` = `0x4A55C0`
+- `JobDead::vfunc7` = `0x4EE210`
+- `JobDead::vfunc8` = `0x4F28E0`
+- `JobDead::vfunc9` = `0x4EE1A0`
+- `JobDead::vfunc10` = `0x604E40`
+- `JobDead::vfunc11` = `0x64A9B0`
+- `JobDead::vfunc12` = `0x4EE1A0`
+- `JobDead::vfunc13` = `0x460B60`
+- `JobDead::vfunc14` = `0x460B60`
+- `JobDead::vfunc15` = `0x4FB490`
+- `JobDead::vfunc16` = `0x460B60`
+- `JobDead::vfunc17` = `0x47C830`
+- `JobDead::vfunc18` = `0x516940`
+- `JobDead::vfunc19` = `0x4F2C20`
+- `JobDead::vfunc20` = `0x4EDFF0`
+- `JobDead::vfunc21` = `0x4F2A60`
+
+## JobDebugNeverLeave  (vtable @ 0x778214, 22 methods)
+
+- `JobDebugNeverLeave::vfunc0` = `0x4FF4B0`
+- `JobDebugNeverLeave::vfunc1` = `0x604E40`
+- `JobDebugNeverLeave::vfunc2` = `0x57E760`
+- `JobDebugNeverLeave::vfunc3` = `0x57E760`
+- `JobDebugNeverLeave::vfunc4` = `0x4F2C90`
+- `JobDebugNeverLeave::vfunc5` = `0x4FF940`
+- `JobDebugNeverLeave::vfunc6` = `0x4A55C0`
+- `JobDebugNeverLeave::vfunc7` = `0x4EE210`
+- `JobDebugNeverLeave::vfunc8` = `0x4F2D10`
+- `JobDebugNeverLeave::vfunc9` = `0x4EE1A0`
+- `JobDebugNeverLeave::vfunc10` = `0x604E40`
+- `JobDebugNeverLeave::vfunc11` = `0x64A9B0`
+- `JobDebugNeverLeave::vfunc12` = `0x4EE1A0`
+- `JobDebugNeverLeave::vfunc13` = `0x460B60`
+- `JobDebugNeverLeave::vfunc14` = `0x460B60`
+- `JobDebugNeverLeave::vfunc15` = `0x4EE220`
+- `JobDebugNeverLeave::vfunc16` = `0x460B60`
+- `JobDebugNeverLeave::vfunc17` = `0x437C60`
+- `JobDebugNeverLeave::vfunc18` = `0x516940`
+- `JobDebugNeverLeave::vfunc19` = `0x4FFCB0`
+- `JobDebugNeverLeave::vfunc20` = `0x4EDFF0`
+- `JobDebugNeverLeave::vfunc21` = `0x64CAE0`
+
+## JobDefault  (vtable @ 0x7782AC, 22 methods)
+
+- `JobDefault::vfunc0` = `0x4F2820`
+- `JobDefault::vfunc1` = `0x604E40`
+- `JobDefault::vfunc2` = `0x57E760`
+- `JobDefault::vfunc3` = `0x57E760`
+- `JobDefault::vfunc4` = `0x4F2D70`
+- `JobDefault::vfunc5` = `0x516940`
+- `JobDefault::vfunc6` = `0x4A55C0`
+- `JobDefault::vfunc7` = `0x4EE210`
+- `JobDefault::vfunc8` = `0x4F2EF0`
+- `JobDefault::vfunc9` = `0x4EE1A0`
+- `JobDefault::vfunc10` = `0x604E40`
+- `JobDefault::vfunc11` = `0x604E40`
+- `JobDefault::vfunc12` = `0x4EE1A0`
+- `JobDefault::vfunc13` = `0x460B60`
+- `JobDefault::vfunc14` = `0x460B60`
+- `JobDefault::vfunc15` = `0x4EE220`
+- `JobDefault::vfunc16` = `0x460B60`
+- `JobDefault::vfunc17` = `0x437C60`
+- `JobDefault::vfunc18` = `0x516940`
+- `JobDefault::vfunc19` = `0x4FFCB0`
+- `JobDefault::vfunc20` = `0x4EDFF0`
+- `JobDefault::vfunc21` = `0x4F3000`
+
+## JobDefaultAgitated  (vtable @ 0x778334, 22 methods)
+
+- `JobDefaultAgitated::vfunc0` = `0x4FF4B0`
+- `JobDefaultAgitated::vfunc1` = `0x604E40`
+- `JobDefaultAgitated::vfunc2` = `0x57E760`
+- `JobDefaultAgitated::vfunc3` = `0x57E760`
+- `JobDefaultAgitated::vfunc4` = `0x4F3130`
+- `JobDefaultAgitated::vfunc5` = `0x4FF940`
+- `JobDefaultAgitated::vfunc6` = `0x4A55C0`
+- `JobDefaultAgitated::vfunc7` = `0x4EE210`
+- `JobDefaultAgitated::vfunc8` = `0x4F3290`
+- `JobDefaultAgitated::vfunc9` = `0x4EE1A0`
+- `JobDefaultAgitated::vfunc10` = `0x604E40`
+- `JobDefaultAgitated::vfunc11` = `0x64A9B0`
+- `JobDefaultAgitated::vfunc12` = `0x4EE1A0`
+- `JobDefaultAgitated::vfunc13` = `0x460B60`
+- `JobDefaultAgitated::vfunc14` = `0x460B60`
+- `JobDefaultAgitated::vfunc15` = `0x4EE220`
+- `JobDefaultAgitated::vfunc16` = `0x460B60`
+- `JobDefaultAgitated::vfunc17` = `0x437C60`
+- `JobDefaultAgitated::vfunc18` = `0x516940`
+- `JobDefaultAgitated::vfunc19` = `0x4FFCB0`
+- `JobDefaultAgitated::vfunc20` = `0x4EDFF0`
+- `JobDefaultAgitated::vfunc21` = `0x4F33E0`
+
+## JobGetOutOfWater  (vtable @ 0x7783BC, 22 methods)
+
+- `JobGetOutOfWater::vfunc0` = `0x4F36E0`
+- `JobGetOutOfWater::vfunc1` = `0x604E40`
+- `JobGetOutOfWater::vfunc2` = `0x57E760`
+- `JobGetOutOfWater::vfunc3` = `0x57E760`
+- `JobGetOutOfWater::vfunc4` = `0x4F3560`
+- `JobGetOutOfWater::vfunc5` = `0x4F37C0`
+- `JobGetOutOfWater::vfunc6` = `0x4A55C0`
+- `JobGetOutOfWater::vfunc7` = `0x4EE210`
+- `JobGetOutOfWater::vfunc8` = `0x4F37F0`
+- `JobGetOutOfWater::vfunc9` = `0x4EE1A0`
+- `JobGetOutOfWater::vfunc10` = `0x604E40`
+- `JobGetOutOfWater::vfunc11` = `0x64A9B0`
+- `JobGetOutOfWater::vfunc12` = `0x4EE1A0`
+- `JobGetOutOfWater::vfunc13` = `0x460B60`
+- `JobGetOutOfWater::vfunc14` = `0x460B60`
+- `JobGetOutOfWater::vfunc15` = `0x4EE220`
+- `JobGetOutOfWater::vfunc16` = `0x460B60`
+- `JobGetOutOfWater::vfunc17` = `0x437C60`
+- `JobGetOutOfWater::vfunc18` = `0x516940`
+- `JobGetOutOfWater::vfunc19` = `0x4FFCB0`
+- `JobGetOutOfWater::vfunc20` = `0x4EDFF0`
+- `JobGetOutOfWater::vfunc21` = `0x4F3BA0`
+
+## JobGoto  (vtable @ 0x77843C, 22 methods)
+
+- `JobGoto::vfunc0` = `0x4F3E10`
+- `JobGoto::vfunc1` = `0x604E40`
+- `JobGoto::vfunc2` = `0x57E760`
+- `JobGoto::vfunc3` = `0x57E760`
+- `JobGoto::vfunc4` = `0x4F3CA0`
+- `JobGoto::vfunc5` = `0x4F4050`
+- `JobGoto::vfunc6` = `0x4A55C0`
+- `JobGoto::vfunc7` = `0x4EE210`
+- `JobGoto::vfunc8` = `0x4F40E0`
+- `JobGoto::vfunc9` = `0x4EE1A0`
+- `JobGoto::vfunc10` = `0x604E40`
+- `JobGoto::vfunc11` = `0x64A9B0`
+- `JobGoto::vfunc12` = `0x4EE1A0`
+- `JobGoto::vfunc13` = `0x460B60`
+- `JobGoto::vfunc14` = `0x460B60`
+- `JobGoto::vfunc15` = `0x4EE220`
+- `JobGoto::vfunc16` = `0x460B60`
+- `JobGoto::vfunc17` = `0x437C60`
+- `JobGoto::vfunc18` = `0x516940`
+- `JobGoto::vfunc19` = `0x4F4290`
+- `JobGoto::vfunc20` = `0x4EDFF0`
+- `JobGoto::vfunc21` = `0x4F4270`
+
+## JobGuardSpot  (vtable @ 0x7784AC, 22 methods)
+
+- `JobGuardSpot::vfunc0` = `0x4F4480`
+- `JobGuardSpot::vfunc1` = `0x604E40`
+- `JobGuardSpot::vfunc2` = `0x57E760`
+- `JobGuardSpot::vfunc3` = `0x57E760`
+- `JobGuardSpot::vfunc4` = `0x4F4320`
+- `JobGuardSpot::vfunc5` = `0x4F46D0`
+- `JobGuardSpot::vfunc6` = `0x4A55C0`
+- `JobGuardSpot::vfunc7` = `0x4EE210`
+- `JobGuardSpot::vfunc8` = `0x4F4790`
+- `JobGuardSpot::vfunc9` = `0x4EE1A0`
+- `JobGuardSpot::vfunc10` = `0x604E40`
+- `JobGuardSpot::vfunc11` = `0x64A9B0`
+- `JobGuardSpot::vfunc12` = `0x4EE1A0`
+- `JobGuardSpot::vfunc13` = `0x4F4790`
+- `JobGuardSpot::vfunc14` = `0x460B60`
+- `JobGuardSpot::vfunc15` = `0x4EE220`
+- `JobGuardSpot::vfunc16` = `0x460B60`
+- `JobGuardSpot::vfunc17` = `0x437C60`
+- `JobGuardSpot::vfunc18` = `0x516940`
+- `JobGuardSpot::vfunc19` = `0x4FFCB0`
+- `JobGuardSpot::vfunc20` = `0x4EDFF0`
+- `JobGuardSpot::vfunc21` = `0x4F4A30`
+
+## JobImmobilize  (vtable @ 0x77851C, 22 methods)
+
+- `JobImmobilize::vfunc0` = `0x4F5280`
+- `JobImmobilize::vfunc1` = `0x604E40`
+- `JobImmobilize::vfunc2` = `0x57E760`
+- `JobImmobilize::vfunc3` = `0x57E760`
+- `JobImmobilize::vfunc4` = `0x4F4D90`
+- `JobImmobilize::vfunc5` = `0x4F5510`
+- `JobImmobilize::vfunc6` = `0x4A55C0`
+- `JobImmobilize::vfunc7` = `0x4F5890`
+- `JobImmobilize::vfunc8` = `0x4F5A90`
+- `JobImmobilize::vfunc9` = `0x4EE1A0`
+- `JobImmobilize::vfunc10` = `0x4F7780`
+- `JobImmobilize::vfunc11` = `0x64A9B0`
+- `JobImmobilize::vfunc12` = `0x4EE1A0`
+- `JobImmobilize::vfunc13` = `0x460B60`
+- `JobImmobilize::vfunc14` = `0x460B60`
+- `JobImmobilize::vfunc15` = `0x4F55D0`
+- `JobImmobilize::vfunc16` = `0x460B60`
+- `JobImmobilize::vfunc17` = `0x47C830`
+- `JobImmobilize::vfunc18` = `0x516940`
+- `JobImmobilize::vfunc19` = `0x516940`
+- `JobImmobilize::vfunc20` = `0x4EDFF0`
+- `JobImmobilize::vfunc21` = `0x4F6E20`
+
+## JobInvestigate  (vtable @ 0x778674, 22 methods)
+
+- `JobInvestigate::vfunc0` = `0x4F8030`
+- `JobInvestigate::vfunc1` = `0x604E40`
+- `JobInvestigate::vfunc2` = `0x57E760`
+- `JobInvestigate::vfunc3` = `0x57E760`
+- `JobInvestigate::vfunc4` = `0x4F7E70`
+- `JobInvestigate::vfunc5` = `0x4F8100`
+- `JobInvestigate::vfunc6` = `0x4A55C0`
+- `JobInvestigate::vfunc7` = `0x4EE210`
+- `JobInvestigate::vfunc8` = `0x4F8220`
+- `JobInvestigate::vfunc9` = `0x4EE1A0`
+- `JobInvestigate::vfunc10` = `0x604E40`
+- `JobInvestigate::vfunc11` = `0x64A9B0`
+- `JobInvestigate::vfunc12` = `0x4EE1A0`
+- `JobInvestigate::vfunc13` = `0x460B60`
+- `JobInvestigate::vfunc14` = `0x460B60`
+- `JobInvestigate::vfunc15` = `0x4EE220`
+- `JobInvestigate::vfunc16` = `0x460B60`
+- `JobInvestigate::vfunc17` = `0x437C60`
+- `JobInvestigate::vfunc18` = `0x516940`
+- `JobInvestigate::vfunc19` = `0x4F90C0`
+- `JobInvestigate::vfunc20` = `0x4EDFF0`
+- `JobInvestigate::vfunc21` = `0x4F90A0`
+
+## JobLaughAtPlayer  (vtable @ 0x778704, 22 methods)
+
+- `JobLaughAtPlayer::vfunc0` = `0x4F9280`
+- `JobLaughAtPlayer::vfunc1` = `0x604E40`
+- `JobLaughAtPlayer::vfunc2` = `0x57E760`
+- `JobLaughAtPlayer::vfunc3` = `0x57E760`
+- `JobLaughAtPlayer::vfunc4` = `0x4F9140`
+- `JobLaughAtPlayer::vfunc5` = `0x4F9350`
+- `JobLaughAtPlayer::vfunc6` = `0x4A55C0`
+- `JobLaughAtPlayer::vfunc7` = `0x4EE210`
+- `JobLaughAtPlayer::vfunc8` = `0x4EE1A0`
+- `JobLaughAtPlayer::vfunc9` = `0x4EE1A0`
+- `JobLaughAtPlayer::vfunc10` = `0x604E40`
+- `JobLaughAtPlayer::vfunc11` = `0x64A9B0`
+- `JobLaughAtPlayer::vfunc12` = `0x4EE1A0`
+- `JobLaughAtPlayer::vfunc13` = `0x460B60`
+- `JobLaughAtPlayer::vfunc14` = `0x460B60`
+- `JobLaughAtPlayer::vfunc15` = `0x4EE220`
+- `JobLaughAtPlayer::vfunc16` = `0x460B60`
+- `JobLaughAtPlayer::vfunc17` = `0x437C60`
+- `JobLaughAtPlayer::vfunc18` = `0x516940`
+- `JobLaughAtPlayer::vfunc19` = `0x4FFCB0`
+- `JobLaughAtPlayer::vfunc20` = `0x4EDFF0`
+- `JobLaughAtPlayer::vfunc21` = `0x4F9420`
+
+## JobPanic  (vtable @ 0x778784, 22 methods)
+
+- `JobPanic::vfunc0` = `0x4FB350`
+- `JobPanic::vfunc1` = `0x604E40`
+- `JobPanic::vfunc2` = `0x57E760`
+- `JobPanic::vfunc3` = `0x57E760`
+- `JobPanic::vfunc4` = `0x4FB2A0`
+- `JobPanic::vfunc5` = `0x4FB420`
+- `JobPanic::vfunc6` = `0x4A55C0`
+- `JobPanic::vfunc7` = `0x4EE210`
+- `JobPanic::vfunc8` = `0x4FB510`
+- `JobPanic::vfunc9` = `0x4EE1A0`
+- `JobPanic::vfunc10` = `0x604E40`
+- `JobPanic::vfunc11` = `0x64A9B0`
+- `JobPanic::vfunc12` = `0x4EE1A0`
+- `JobPanic::vfunc13` = `0x460B60`
+- `JobPanic::vfunc14` = `0x460B60`
+- `JobPanic::vfunc15` = `0x4FB490`
+- `JobPanic::vfunc16` = `0x460B60`
+- `JobPanic::vfunc17` = `0x47C830`
+- `JobPanic::vfunc18` = `0x516940`
+- `JobPanic::vfunc19` = `0x4FC400`
+- `JobPanic::vfunc20` = `0x4EDFF0`
+- `JobPanic::vfunc21` = `0x4FC2E0`
+
+## JobPhasedLOS  (vtable @ 0x7787FC, 22 methods)
+
+- `JobPhasedLOS::vfunc0` = `0x4FC630`
+- `JobPhasedLOS::vfunc1` = `0x604E40`
+- `JobPhasedLOS::vfunc2` = `0x57E760`
+- `JobPhasedLOS::vfunc3` = `0x57E760`
+- `JobPhasedLOS::vfunc4` = `0x4FC500`
+- `JobPhasedLOS::vfunc5` = `0x4FC6F0`
+- `JobPhasedLOS::vfunc6` = `0x4A55C0`
+- `JobPhasedLOS::vfunc7` = `0x4EE210`
+- `JobPhasedLOS::vfunc8` = `0x4FC720`
+- `JobPhasedLOS::vfunc9` = `0x4EE1A0`
+- `JobPhasedLOS::vfunc10` = `0x604E40`
+- `JobPhasedLOS::vfunc11` = `0x64A9B0`
+- `JobPhasedLOS::vfunc12` = `0x4EE1A0`
+- `JobPhasedLOS::vfunc13` = `0x460B60`
+- `JobPhasedLOS::vfunc14` = `0x460B60`
+- `JobPhasedLOS::vfunc15` = `0x4EE220`
+- `JobPhasedLOS::vfunc16` = `0x460B60`
+- `JobPhasedLOS::vfunc17` = `0x437C60`
+- `JobPhasedLOS::vfunc18` = `0x516940`
+- `JobPhasedLOS::vfunc19` = `0x4FFCB0`
+- `JobPhasedLOS::vfunc20` = `0x4EDFF0`
+- `JobPhasedLOS::vfunc21` = `0x4FC790`
+
+## JobRunCrazy  (vtable @ 0x778864, 22 methods)
+
+- `JobRunCrazy::vfunc0` = `0x4F2820`
+- `JobRunCrazy::vfunc1` = `0x604E40`
+- `JobRunCrazy::vfunc2` = `0x57E760`
+- `JobRunCrazy::vfunc3` = `0x57E760`
+- `JobRunCrazy::vfunc4` = `0x4FD020`
+- `JobRunCrazy::vfunc5` = `0x4FD210`
+- `JobRunCrazy::vfunc6` = `0x4A55C0`
+- `JobRunCrazy::vfunc7` = `0x4EE210`
+- `JobRunCrazy::vfunc8` = `0x4FD250`
+- `JobRunCrazy::vfunc9` = `0x4EE1A0`
+- `JobRunCrazy::vfunc10` = `0x64A9B0`
+- `JobRunCrazy::vfunc11` = `0x64A9B0`
+- `JobRunCrazy::vfunc12` = `0x4EE1A0`
+- `JobRunCrazy::vfunc13` = `0x460B60`
+- `JobRunCrazy::vfunc14` = `0x460B60`
+- `JobRunCrazy::vfunc15` = `0x4FD430`
+- `JobRunCrazy::vfunc16` = `0x460B60`
+- `JobRunCrazy::vfunc17` = `0x47C830`
+- `JobRunCrazy::vfunc18` = `0x516940`
+- `JobRunCrazy::vfunc19` = `0x4FFCB0`
+- `JobRunCrazy::vfunc20` = `0x4EDFF0`
+- `JobRunCrazy::vfunc21` = `0x4FD600`
+
+## JobScript  (vtable @ 0x778924, 23 methods)
+
+- `JobScript::vfunc0` = `0x4F4480`
+- `JobScript::vfunc1` = `0x604E40`
+- `JobScript::vfunc2` = `0x57E760`
+- `JobScript::vfunc3` = `0x57E760`
+- `JobScript::vfunc4` = `0x4FD710`
+- `JobScript::vfunc5` = `0x4FE120`
+- `JobScript::vfunc6` = `0x4FE150`
+- `JobScript::vfunc7` = `0x4EE210`
+- `JobScript::vfunc8` = `0x4FD980`
+- `JobScript::vfunc9` = `0x4EE1A0`
+- `JobScript::vfunc10` = `0x604E40`
+- `JobScript::vfunc11` = `0x64A9B0`
+- `JobScript::vfunc12` = `0x4EE1A0`
+- `JobScript::vfunc13` = `0x460B60`
+- `JobScript::vfunc14` = `0x460B60`
+- `JobScript::vfunc15` = `0x4FDC10`
+- `JobScript::vfunc16` = `0x4FDEA0`
+- `JobScript::vfunc17` = `0x4FDF70`
+- `JobScript::vfunc18` = `0x516940`
+- `JobScript::vfunc19` = `0x516940`
+- `JobScript::vfunc20` = `0x4EDFF0`
+- `JobScript::vfunc21` = `0x4FDBD0`
+- `JobScript::vfunc22` = `0x4FE160`
+
+## JobSendTo  (vtable @ 0x7789BC, 23 methods)
+
+- `JobSendTo::vfunc0` = `0x4FE5C0`
+- `JobSendTo::vfunc1` = `0x604E40`
+- `JobSendTo::vfunc2` = `0x57E760`
+- `JobSendTo::vfunc3` = `0x57E760`
+- `JobSendTo::vfunc4` = `0x4FE280`
+- `JobSendTo::vfunc5` = `0x4FE6F0`
+- `JobSendTo::vfunc6` = `0x4A55C0`
+- `JobSendTo::vfunc7` = `0x4FF2B0`
+- `JobSendTo::vfunc8` = `0x4FECA0`
+- `JobSendTo::vfunc9` = `0x4EE1A0`
+- `JobSendTo::vfunc10` = `0x604E40`
+- `JobSendTo::vfunc11` = `0x64A9B0`
+- `JobSendTo::vfunc12` = `0x4EE1A0`
+- `JobSendTo::vfunc13` = `0x460B60`
+- `JobSendTo::vfunc14` = `0x460B60`
+- `JobSendTo::vfunc15` = `0x4FE780`
+- `JobSendTo::vfunc16` = `0x460B60`
+- `JobSendTo::vfunc17` = `0x437C60`
+- `JobSendTo::vfunc18` = `0x516940`
+- `JobSendTo::vfunc19` = `0x516940`
+- `JobSendTo::vfunc20` = `0x4EDFF0`
+- `JobSendTo::vfunc21` = `0x4FF0A0`
+- `JobSendTo::vfunc22` = `0x4FE920`
+
+## JobShortGoal  (vtable @ 0x778A2C, 22 methods)
+
+- `JobShortGoal::vfunc0` = `0x4FF4B0`
+- `JobShortGoal::vfunc1` = `0x604E40`
+- `JobShortGoal::vfunc2` = `0x57E760`
+- `JobShortGoal::vfunc3` = `0x57E760`
+- `JobShortGoal::vfunc4` = `0x4FF350`
+- `JobShortGoal::vfunc5` = `0x4FF940`
+- `JobShortGoal::vfunc6` = `0x4A55C0`
+- `JobShortGoal::vfunc7` = `0x4EE210`
+- `JobShortGoal::vfunc8` = `0x4FF5D0`
+- `JobShortGoal::vfunc9` = `0x4EE1A0`
+- `JobShortGoal::vfunc10` = `0x604E40`
+- `JobShortGoal::vfunc11` = `0x64A9B0`
+- `JobShortGoal::vfunc12` = `0x4EE1A0`
+- `JobShortGoal::vfunc13` = `0x460B60`
+- `JobShortGoal::vfunc14` = `0x460B60`
+- `JobShortGoal::vfunc15` = `0x4EE220`
+- `JobShortGoal::vfunc16` = `0x460B60`
+- `JobShortGoal::vfunc17` = `0x437C60`
+- `JobShortGoal::vfunc18` = `0x516940`
+- `JobShortGoal::vfunc19` = `0x4FFCB0`
+- `JobShortGoal::vfunc20` = `0x4EDFF0`
+- `JobShortGoal::vfunc21` = `0x4FF5E0`
+
+## JobSlogReturn  (vtable @ 0x778A9C, 22 methods)
+
+- `JobSlogReturn::vfunc0` = `0x4FF4B0`
+- `JobSlogReturn::vfunc1` = `0x604E40`
+- `JobSlogReturn::vfunc2` = `0x57E760`
+- `JobSlogReturn::vfunc3` = `0x57E760`
+- `JobSlogReturn::vfunc4` = `0x4FF790`
+- `JobSlogReturn::vfunc5` = `0x4FF940`
+- `JobSlogReturn::vfunc6` = `0x4A55C0`
+- `JobSlogReturn::vfunc7` = `0x4EE210`
+- `JobSlogReturn::vfunc8` = `0x4FF960`
+- `JobSlogReturn::vfunc9` = `0x4EE1A0`
+- `JobSlogReturn::vfunc10` = `0x604E40`
+- `JobSlogReturn::vfunc11` = `0x64A9B0`
+- `JobSlogReturn::vfunc12` = `0x4EE1A0`
+- `JobSlogReturn::vfunc13` = `0x460B60`
+- `JobSlogReturn::vfunc14` = `0x460B60`
+- `JobSlogReturn::vfunc15` = `0x4EE220`
+- `JobSlogReturn::vfunc16` = `0x460B60`
+- `JobSlogReturn::vfunc17` = `0x437C60`
+- `JobSlogReturn::vfunc18` = `0x516940`
+- `JobSlogReturn::vfunc19` = `0x4FFCB0`
+- `JobSlogReturn::vfunc20` = `0x4EDFF0`
+- `JobSlogReturn::vfunc21` = `0x4FFB20`
+
+## JobSmacked  (vtable @ 0x778B04, 22 methods)
+
+- `JobSmacked::vfunc0` = `0x4FFE20`
+- `JobSmacked::vfunc1` = `0x604E40`
+- `JobSmacked::vfunc2` = `0x57E760`
+- `JobSmacked::vfunc3` = `0x57E760`
+- `JobSmacked::vfunc4` = `0x4FFCC0`
+- `JobSmacked::vfunc5` = `0x4FFE80`
+- `JobSmacked::vfunc6` = `0x4A55C0`
+- `JobSmacked::vfunc7` = `0x4EE210`
+- `JobSmacked::vfunc8` = `0x4FFEA0`
+- `JobSmacked::vfunc9` = `0x4EE1A0`
+- `JobSmacked::vfunc10` = `0x604E40`
+- `JobSmacked::vfunc11` = `0x64A9B0`
+- `JobSmacked::vfunc12` = `0x4EE1A0`
+- `JobSmacked::vfunc13` = `0x460B60`
+- `JobSmacked::vfunc14` = `0x460B60`
+- `JobSmacked::vfunc15` = `0x4EE220`
+- `JobSmacked::vfunc16` = `0x460B60`
+- `JobSmacked::vfunc17` = `0x437C60`
+- `JobSmacked::vfunc18` = `0x516940`
+- `JobSmacked::vfunc19` = `0x4FFCB0`
+- `JobSmacked::vfunc20` = `0x4EDFF0`
+- `JobSmacked::vfunc21` = `0x5000A0`
+
+## JobSpawner  (vtable @ 0x778C88, 6 methods)
+
+- `JobSpawner::vfunc0` = `0x501550`
+- `JobSpawner::vfunc1` = `0x475A60`
+- `JobSpawner::vfunc2` = `0x637710`
+- `JobSpawner::vfunc3` = `0x475AA0`
+- `JobSpawner::vfunc4` = `0x47E370`
+- `JobSpawner::vfunc5` = `0x475A90`
+
+## JobSpawner  (vtable @ 0x778C6C, 6 methods)
+
+- `JobSpawner::vfunc0` = `0x501560`
+- `JobSpawner::vfunc1` = `0x64CAE0`
+- `JobSpawner::vfunc2` = `0x4600D0`
+- `JobSpawner::vfunc3` = `0x46D470`
+- `JobSpawner::vfunc4` = `0x65F500`
+- `JobSpawner::vfunc5` = `0x4218E0`
+
+## JobSpawner  (vtable @ 0x778B94, 53 methods)
+
+- `JobSpawner::vfunc0` = `0x500D30`
+- `JobSpawner::vfunc1` = `0x604E40`
+- `JobSpawner::vfunc2` = `0x57E760`
+- `JobSpawner::vfunc3` = `0x57E760`
+- `JobSpawner::vfunc4` = `0x500B90`
+- `JobSpawner::vfunc5` = `0x501090`
+- `JobSpawner::vfunc6` = `0x680110`
+- `JobSpawner::vfunc7` = `0x64A9B0`
+- `JobSpawner::vfunc8` = `0x64CAE0`
+- `JobSpawner::vfunc9` = `0x64CAE0`
+- `JobSpawner::vfunc10` = `0x64CAE0`
+- `JobSpawner::vfunc11` = `0x64CAE0`
+- `JobSpawner::vfunc12` = `0x64CAE0`
+- `JobSpawner::vfunc13` = `0x64CAE0`
+- `JobSpawner::vfunc14` = `0x64CAE0`
+- `JobSpawner::vfunc15` = `0x65F310`
+- `JobSpawner::vfunc16` = `0x64CAE0`
+- `JobSpawner::vfunc17` = `0x501420`
+- `JobSpawner::vfunc18` = `0x460B60`
+- `JobSpawner::vfunc19` = `0x460260`
+- `JobSpawner::vfunc20` = `0x460280`
+- `JobSpawner::vfunc21` = `0x64CAE0`
+- `JobSpawner::vfunc22` = `0x460B60`
+- `JobSpawner::vfunc23` = `0x4829D0`
+- `JobSpawner::vfunc24` = `0x45F980`
+- `JobSpawner::vfunc25` = `0x4829E0`
+- `JobSpawner::vfunc26` = `0x482A70`
+- `JobSpawner::vfunc27` = `0x501040`
+- `JobSpawner::vfunc28` = `0x501080`
+- `JobSpawner::vfunc29` = `0x460160`
+- `JobSpawner::vfunc30` = `0x4605E0`
+- `JobSpawner::vfunc31` = `0x460450`
+- `JobSpawner::vfunc32` = `0x460B60`
+- `JobSpawner::vfunc33` = `0x460B60`
+- `JobSpawner::vfunc34` = `0x45FC80`
+- `JobSpawner::vfunc35` = `0x460B70`
+- `JobSpawner::vfunc36` = `0x460110`
+- `JobSpawner::vfunc37` = `0x460B60`
+- `JobSpawner::vfunc38` = `0x460B60`
+- `JobSpawner::vfunc39` = `0x64A9B0`
+- `JobSpawner::vfunc40` = `0x460610`
+- `JobSpawner::vfunc41` = `0x482700`
+- `JobSpawner::vfunc42` = `0x45FE40`
+- `JobSpawner::vfunc43` = `0x4218C0`
+- `JobSpawner::vfunc44` = `0x4600B0`
+- `JobSpawner::vfunc45` = `0x501450`
+- `JobSpawner::vfunc46` = `0x460600`
+- `JobSpawner::vfunc47` = `0x45FC10`
+- `JobSpawner::vfunc48` = `0x45FAC0`
+- `JobSpawner::vfunc49` = `0x460B60`
+- `JobSpawner::vfunc50` = `0x460B60`
+- `JobSpawner::vfunc51` = `0x547170`
+- `JobSpawner::vfunc52` = `0x64A9B0`
+
+## JobTag  (vtable @ 0x77F798, 10 methods)
+
+- `JobTag::vfunc0` = `0x584630`
+- `JobTag::vfunc1` = `0x604E40`
+- `JobTag::vfunc2` = `0x57E760`
+- `JobTag::vfunc3` = `0x57E760`
+- `JobTag::vfunc4` = `0x583120`
+- `JobTag::vfunc5` = `0x583230`
+- `JobTag::vfunc6` = `0x583250`
+- `JobTag::vfunc7` = `0x582220`
+- `JobTag::vfunc8` = `0x460B60`
+- `JobTag::vfunc9` = `0x680110`
+
+## JobWaitForIdle  (vtable @ 0x778CB4, 22 methods)
+
+- `JobWaitForIdle::vfunc0` = `0x4F2820`
+- `JobWaitForIdle::vfunc1` = `0x604E40`
+- `JobWaitForIdle::vfunc2` = `0x57E760`
+- `JobWaitForIdle::vfunc3` = `0x57E760`
+- `JobWaitForIdle::vfunc4` = `0x501570`
+- `JobWaitForIdle::vfunc5` = `0x5016E0`
+- `JobWaitForIdle::vfunc6` = `0x4A55C0`
+- `JobWaitForIdle::vfunc7` = `0x4EE210`
+- `JobWaitForIdle::vfunc8` = `0x5016F0`
+- `JobWaitForIdle::vfunc9` = `0x4EE1A0`
+- `JobWaitForIdle::vfunc10` = `0x604E40`
+- `JobWaitForIdle::vfunc11` = `0x64A9B0`
+- `JobWaitForIdle::vfunc12` = `0x4EE1A0`
+- `JobWaitForIdle::vfunc13` = `0x460B60`
+- `JobWaitForIdle::vfunc14` = `0x460B60`
+- `JobWaitForIdle::vfunc15` = `0x501780`
+- `JobWaitForIdle::vfunc16` = `0x460B60`
+- `JobWaitForIdle::vfunc17` = `0x47C830`
+- `JobWaitForIdle::vfunc18` = `0x516940`
+- `JobWaitForIdle::vfunc19` = `0x4FFCB0`
+- `JobWaitForIdle::vfunc20` = `0x4EDFF0`
+- `JobWaitForIdle::vfunc21` = `0x5018C0`
+
+## KDTree  (vtable @ 0x79B0B4, 14 methods)
+
+- `KDTree::vfunc0` = `0x689460`
+- `KDTree::vfunc1` = `0x604E40`
+- `KDTree::vfunc2` = `0x689490`
+- `KDTree::vfunc3` = `0x689540`
+- `KDTree::vfunc4` = `0x6895D0`
+- `KDTree::vfunc5` = `0x4E6070`
+- `KDTree::vfunc6` = `0x484980`
+- `KDTree::vfunc7` = `0x689630`
+- `KDTree::vfunc8` = `0x689820`
+- `KDTree::vfunc9` = `0x689A00`
+- `KDTree::vfunc10` = `0x689A10`
+- `KDTree::vfunc11` = `0x67AA00`
+- `KDTree::vfunc12` = `0x638DF0`
+- `KDTree::vfunc13` = `0x6898B0`
+
+## KDTree2  (vtable @ 0x79B108, 14 methods)
+
+- `KDTree2::vfunc0` = `0x68AFD0`
+- `KDTree2::vfunc1` = `0x604E40`
+- `KDTree2::vfunc2` = `0x68B040`
+- `KDTree2::vfunc3` = `0x68B1B0`
+- `KDTree2::vfunc4` = `0x68B250`
+- `KDTree2::vfunc5` = `0x4E6070`
+- `KDTree2::vfunc6` = `0x484980`
+- `KDTree2::vfunc7` = `0x68B2B0`
+- `KDTree2::vfunc8` = `0x689820`
+- `KDTree2::vfunc9` = `0x689A00`
+- `KDTree2::vfunc10` = `0x68BBA0`
+- `KDTree2::vfunc11` = `0x67AA00`
+- `KDTree2::vfunc12` = `0x638DF0`
+- `KDTree2::vfunc13` = `0x68BA40`
+
+## LaneVolumeTag  (vtable @ 0x77F80C, 10 methods)
+
+- `LaneVolumeTag::vfunc0` = `0x584630`
+- `LaneVolumeTag::vfunc1` = `0x604E40`
+- `LaneVolumeTag::vfunc2` = `0x57E760`
+- `LaneVolumeTag::vfunc3` = `0x57E760`
+- `LaneVolumeTag::vfunc4` = `0x583300`
+- `LaneVolumeTag::vfunc5` = `0x583370`
+- `LaneVolumeTag::vfunc6` = `0x604E40`
+- `LaneVolumeTag::vfunc7` = `0x582220`
+- `LaneVolumeTag::vfunc8` = `0x460B60`
+- `LaneVolumeTag::vfunc9` = `0x680110`
+
+## LaserBeam  (vtable @ 0x782E94, 7 methods)
+
+- `LaserBeam::vfunc0` = `0x5B2940`
+- `LaserBeam::vfunc1` = `0x604E40`
+- `LaserBeam::vfunc2` = `0x57E760`
+- `LaserBeam::vfunc3` = `0x57E760`
+- `LaserBeam::vfunc4` = `0x5B27C0`
+- `LaserBeam::vfunc5` = `0x5B34A0`
+- `LaserBeam::vfunc6` = `0x680110`
+
+## LaserBeamPrefs  (vtable @ 0x78339C, 22 methods)
+
+- `LaserBeamPrefs::vfunc0` = `0x4CF5C0`
+- `LaserBeamPrefs::vfunc1` = `0x604E40`
+- `LaserBeamPrefs::vfunc2` = `0x4041C0`
+- `LaserBeamPrefs::vfunc3` = `0x4041C0`
+- `LaserBeamPrefs::vfunc4` = `0x5B4B70`
+- `LaserBeamPrefs::vfunc5` = `0x460B60`
+- `LaserBeamPrefs::vfunc6` = `0x610BC0`
+- `LaserBeamPrefs::vfunc7` = `0x547170`
+- `LaserBeamPrefs::vfunc8` = `0x610BD0`
+- `LaserBeamPrefs::vfunc9` = `0x64A9B0`
+- `LaserBeamPrefs::vfunc10` = `0x60EAE0`
+- `LaserBeamPrefs::vfunc11` = `0x460B60`
+- `LaserBeamPrefs::vfunc12` = `0x437C60`
+- `LaserBeamPrefs::vfunc13` = `0x460B60`
+- `LaserBeamPrefs::vfunc14` = `0x64CAE0`
+- `LaserBeamPrefs::vfunc15` = `0x5B50A0`
+- `LaserBeamPrefs::vfunc16` = `0x437C60`
+- `LaserBeamPrefs::vfunc17` = `0x610C00`
+- `LaserBeamPrefs::vfunc18` = `0x5B4B80`
+- `LaserBeamPrefs::vfunc19` = `0x5B4BA0`
+- `LaserBeamPrefs::vfunc20` = `0x5B4D90`
+- `LaserBeamPrefs::vfunc21` = `0x67AA00`
+
+## LerpProxyCamera  (vtable @ 0x7663F4, 29 methods)
+
+- `LerpProxyCamera::vfunc0` = `0x4CF5C0`
+- `LerpProxyCamera::vfunc1` = `0x604E40`
+- `LerpProxyCamera::vfunc2` = `0x57E760`
+- `LerpProxyCamera::vfunc3` = `0x57E760`
+- `LerpProxyCamera::vfunc4` = `0x41C4C0`
+- `LerpProxyCamera::vfunc5` = `0x41C4D0`
+- `LerpProxyCamera::vfunc6` = `0x40BCC0`
+- `LerpProxyCamera::vfunc7` = `0x516940`
+- `LerpProxyCamera::vfunc8` = `0x41C600`
+- `LerpProxyCamera::vfunc9` = `0x41C640`
+- `LerpProxyCamera::vfunc10` = `0x40B580`
+- `LerpProxyCamera::vfunc11` = `0x40B590`
+- `LerpProxyCamera::vfunc12` = `0x40B5B0`
+- `LerpProxyCamera::vfunc13` = `0x40B5A0`
+- `LerpProxyCamera::vfunc14` = `0x40B5E0`
+- `LerpProxyCamera::vfunc15` = `0x40B6B0`
+- `LerpProxyCamera::vfunc16` = `0x40B7B0`
+- `LerpProxyCamera::vfunc17` = `0x40B710`
+- `LerpProxyCamera::vfunc18` = `0x40B740`
+- `LerpProxyCamera::vfunc19` = `0x40B570`
+- `LerpProxyCamera::vfunc20` = `0x40B650`
+- `LerpProxyCamera::vfunc21` = `0x40AA90`
+- `LerpProxyCamera::vfunc22` = `0x40AAD0`
+- `LerpProxyCamera::vfunc23` = `0x40AAE0`
+- `LerpProxyCamera::vfunc24` = `0x40AAF0`
+- `LerpProxyCamera::vfunc25` = `0x4EDFF0`
+- `LerpProxyCamera::vfunc26` = `0x40B880`
+- `LerpProxyCamera::vfunc27` = `0x460B60`
+- `LerpProxyCamera::vfunc28` = `0x460B60`
+
+## LevelListPrefs  (vtable @ 0x785CAC, 22 methods)
+
+- `LevelListPrefs::vfunc0` = `0x5E32E0`
+- `LevelListPrefs::vfunc1` = `0x604E40`
+- `LevelListPrefs::vfunc2` = `0x4041C0`
+- `LevelListPrefs::vfunc3` = `0x4041C0`
+- `LevelListPrefs::vfunc4` = `0x5E32A0`
+- `LevelListPrefs::vfunc5` = `0x460B60`
+- `LevelListPrefs::vfunc6` = `0x610BC0`
+- `LevelListPrefs::vfunc7` = `0x547170`
+- `LevelListPrefs::vfunc8` = `0x610BD0`
+- `LevelListPrefs::vfunc9` = `0x64A9B0`
+- `LevelListPrefs::vfunc10` = `0x60EAE0`
+- `LevelListPrefs::vfunc11` = `0x460B60`
+- `LevelListPrefs::vfunc12` = `0x437C60`
+- `LevelListPrefs::vfunc13` = `0x460B60`
+- `LevelListPrefs::vfunc14` = `0x64CAE0`
+- `LevelListPrefs::vfunc15` = `0x57B040`
+- `LevelListPrefs::vfunc16` = `0x437C60`
+- `LevelListPrefs::vfunc17` = `0x610C00`
+- `LevelListPrefs::vfunc18` = `0x5E32B0`
+- `LevelListPrefs::vfunc19` = `0x5E32D0`
+- `LevelListPrefs::vfunc20` = `0x5E33F0`
+- `LevelListPrefs::vfunc21` = `0x67AA00`
+
+## Light  (vtable @ 0x78AD94, 2 methods)
+
+- `Light::vfunc0` = `0x641EC0`
+- `Light::vfunc1` = `0x604E40`
+
+## Light  (vtable @ 0x78AD60, 12 methods)
+
+- `Light::vfunc0` = `0x6419B0`
+- `Light::vfunc1` = `0x604E40`
+- `Light::vfunc2` = `0x637710`
+- `Light::vfunc3` = `0x475AA0`
+- `Light::vfunc4` = `0x47E370`
+- `Light::vfunc5` = `0x475A90`
+- `Light::vfunc6` = `0x6E6E7D`
+- `Light::vfunc7` = `0x6E6E7D`
+- `Light::vfunc8` = `0x6E6E7D`
+- `Light::vfunc9` = `0x6E6E7D`
+- `Light::vfunc10` = `0x6E6E7D`
+- `Light::vfunc11` = `0x6E6E7D`
+
+## MaterialDef  (vtable @ 0x78B0D4, 20 methods)
+
+- `MaterialDef::vfunc0` = `0x649240`
+- `MaterialDef::vfunc1` = `0x604E40`
+- `MaterialDef::vfunc2` = `0x649650`
+- `MaterialDef::vfunc3` = `0x6498D0`
+- `MaterialDef::vfunc4` = `0x5FDAA0`
+- `MaterialDef::vfunc5` = `0x6E6E7D`
+- `MaterialDef::vfunc6` = `0x6E6E7D`
+- `MaterialDef::vfunc7` = `0x65F220`
+- `MaterialDef::vfunc8` = `0x65F220`
+- `MaterialDef::vfunc9` = `0x649AC0`
+- `MaterialDef::vfunc10` = `0x64CAE0`
+- `MaterialDef::vfunc11` = `0x664110`
+- `MaterialDef::vfunc12` = `0x64CAE0`
+- `MaterialDef::vfunc13` = `0x64CAE0`
+- `MaterialDef::vfunc14` = `0x664110`
+- `MaterialDef::vfunc15` = `0x649B20`
+- `MaterialDef::vfunc16` = `0x649CA0`
+- `MaterialDef::vfunc17` = `0x516940`
+- `MaterialDef::vfunc18` = `0x516940`
+- `MaterialDef::vfunc19` = `0x6E6E7D`
+
+## MaterialDef_DynamicVertexLit  (vtable @ 0x79A91C, 20 methods)
+
+- `MaterialDef_DynamicVertexLit::vfunc0` = `0x6803D0`
+- `MaterialDef_DynamicVertexLit::vfunc1` = `0x604E40`
+- `MaterialDef_DynamicVertexLit::vfunc2` = `0x680550`
+- `MaterialDef_DynamicVertexLit::vfunc3` = `0x680630`
+- `MaterialDef_DynamicVertexLit::vfunc4` = `0x680350`
+- `MaterialDef_DynamicVertexLit::vfunc5` = `0x680470`
+- `MaterialDef_DynamicVertexLit::vfunc6` = `0x67F770`
+- `MaterialDef_DynamicVertexLit::vfunc7` = `0x65F220`
+- `MaterialDef_DynamicVertexLit::vfunc8` = `0x65F220`
+- `MaterialDef_DynamicVertexLit::vfunc9` = `0x649AC0`
+- `MaterialDef_DynamicVertexLit::vfunc10` = `0x64BC40`
+- `MaterialDef_DynamicVertexLit::vfunc11` = `0x664110`
+- `MaterialDef_DynamicVertexLit::vfunc12` = `0x64CAE0`
+- `MaterialDef_DynamicVertexLit::vfunc13` = `0x64CAE0`
+- `MaterialDef_DynamicVertexLit::vfunc14` = `0x664110`
+- `MaterialDef_DynamicVertexLit::vfunc15` = `0x649B20`
+- `MaterialDef_DynamicVertexLit::vfunc16` = `0x67F800`
+- `MaterialDef_DynamicVertexLit::vfunc17` = `0x516940`
+- `MaterialDef_DynamicVertexLit::vfunc18` = `0x516940`
+- `MaterialDef_DynamicVertexLit::vfunc19` = `0x67F280`
+
+## MaterialDef_MatteTextured  (vtable @ 0x79A424, 20 methods)
+
+- `MaterialDef_MatteTextured::vfunc0` = `0x67C5F0`
+- `MaterialDef_MatteTextured::vfunc1` = `0x604E40`
+- `MaterialDef_MatteTextured::vfunc2` = `0x67C770`
+- `MaterialDef_MatteTextured::vfunc3` = `0x67C860`
+- `MaterialDef_MatteTextured::vfunc4` = `0x67C570`
+- `MaterialDef_MatteTextured::vfunc5` = `0x67C690`
+- `MaterialDef_MatteTextured::vfunc6` = `0x67C8F0`
+- `MaterialDef_MatteTextured::vfunc7` = `0x65F220`
+- `MaterialDef_MatteTextured::vfunc8` = `0x65F220`
+- `MaterialDef_MatteTextured::vfunc9` = `0x649AC0`
+- `MaterialDef_MatteTextured::vfunc10` = `0x64ADD0`
+- `MaterialDef_MatteTextured::vfunc11` = `0x664110`
+- `MaterialDef_MatteTextured::vfunc12` = `0x64CAE0`
+- `MaterialDef_MatteTextured::vfunc13` = `0x64CAE0`
+- `MaterialDef_MatteTextured::vfunc14` = `0x664110`
+- `MaterialDef_MatteTextured::vfunc15` = `0x649B20`
+- `MaterialDef_MatteTextured::vfunc16` = `0x67F800`
+- `MaterialDef_MatteTextured::vfunc17` = `0x516940`
+- `MaterialDef_MatteTextured::vfunc18` = `0x516940`
+- `MaterialDef_MatteTextured::vfunc19` = `0x67F280`
+
+## MaterialDef_None  (vtable @ 0x79A67C, 20 methods)
+
+- `MaterialDef_None::vfunc0` = `0x67EC60`
+- `MaterialDef_None::vfunc1` = `0x604E40`
+- `MaterialDef_None::vfunc2` = `0x67ED60`
+- `MaterialDef_None::vfunc3` = `0x67EDC0`
+- `MaterialDef_None::vfunc4` = `0x67EC00`
+- `MaterialDef_None::vfunc5` = `0x67EC80`
+- `MaterialDef_None::vfunc6` = `0x67EE00`
+- `MaterialDef_None::vfunc7` = `0x65F220`
+- `MaterialDef_None::vfunc8` = `0x65F220`
+- `MaterialDef_None::vfunc9` = `0x649AC0`
+- `MaterialDef_None::vfunc10` = `0x64CAE0`
+- `MaterialDef_None::vfunc11` = `0x664110`
+- `MaterialDef_None::vfunc12` = `0x64CAE0`
+- `MaterialDef_None::vfunc13` = `0x64CAE0`
+- `MaterialDef_None::vfunc14` = `0x664110`
+- `MaterialDef_None::vfunc15` = `0x649B20`
+- `MaterialDef_None::vfunc16` = `0x649CA0`
+- `MaterialDef_None::vfunc17` = `0x516940`
+- `MaterialDef_None::vfunc18` = `0x516940`
+- `MaterialDef_None::vfunc19` = `0x460B60`
+
+## MaterialDef_NormalMapped  (vtable @ 0x79A574, 20 methods)
+
+- `MaterialDef_NormalMapped::vfunc0` = `0x67D370`
+- `MaterialDef_NormalMapped::vfunc1` = `0x604E40`
+- `MaterialDef_NormalMapped::vfunc2` = `0x67D530`
+- `MaterialDef_NormalMapped::vfunc3` = `0x67D680`
+- `MaterialDef_NormalMapped::vfunc4` = `0x67D2E0`
+- `MaterialDef_NormalMapped::vfunc5` = `0x67D450`
+- `MaterialDef_NormalMapped::vfunc6` = `0x67D720`
+- `MaterialDef_NormalMapped::vfunc7` = `0x65F220`
+- `MaterialDef_NormalMapped::vfunc8` = `0x65F220`
+- `MaterialDef_NormalMapped::vfunc9` = `0x649AC0`
+- `MaterialDef_NormalMapped::vfunc10` = `0x64BC40`
+- `MaterialDef_NormalMapped::vfunc11` = `0x67D7B0`
+- `MaterialDef_NormalMapped::vfunc12` = `0x64CAE0`
+- `MaterialDef_NormalMapped::vfunc13` = `0x64CAE0`
+- `MaterialDef_NormalMapped::vfunc14` = `0x664110`
+- `MaterialDef_NormalMapped::vfunc15` = `0x649B20`
+- `MaterialDef_NormalMapped::vfunc16` = `0x67D7C0`
+- `MaterialDef_NormalMapped::vfunc17` = `0x516940`
+- `MaterialDef_NormalMapped::vfunc18` = `0x516940`
+- `MaterialDef_NormalMapped::vfunc19` = `0x67D840`
+
+## MaterialDef_SimpleTextured  (vtable @ 0x79A724, 20 methods)
+
+- `MaterialDef_SimpleTextured::vfunc0` = `0x67EEE0`
+- `MaterialDef_SimpleTextured::vfunc1` = `0x604E40`
+- `MaterialDef_SimpleTextured::vfunc2` = `0x67F060`
+- `MaterialDef_SimpleTextured::vfunc3` = `0x67F160`
+- `MaterialDef_SimpleTextured::vfunc4` = `0x67EE60`
+- `MaterialDef_SimpleTextured::vfunc5` = `0x67EF80`
+- `MaterialDef_SimpleTextured::vfunc6` = `0x67F1F0`
+- `MaterialDef_SimpleTextured::vfunc7` = `0x65F220`
+- `MaterialDef_SimpleTextured::vfunc8` = `0x65F220`
+- `MaterialDef_SimpleTextured::vfunc9` = `0x649AC0`
+- `MaterialDef_SimpleTextured::vfunc10` = `0x64ADD0`
+- `MaterialDef_SimpleTextured::vfunc11` = `0x664110`
+- `MaterialDef_SimpleTextured::vfunc12` = `0x64CAE0`
+- `MaterialDef_SimpleTextured::vfunc13` = `0x64CAE0`
+- `MaterialDef_SimpleTextured::vfunc14` = `0x664110`
+- `MaterialDef_SimpleTextured::vfunc15` = `0x649B20`
+- `MaterialDef_SimpleTextured::vfunc16` = `0x67F800`
+- `MaterialDef_SimpleTextured::vfunc17` = `0x516940`
+- `MaterialDef_SimpleTextured::vfunc18` = `0x516940`
+- `MaterialDef_SimpleTextured::vfunc19` = `0x67F280`
+
+## MaterialDef_StaticInstance  (vtable @ 0x79A4CC, 20 methods)
+
+- `MaterialDef_StaticInstance::vfunc0` = `0x67C9B0`
+- `MaterialDef_StaticInstance::vfunc1` = `0x604E40`
+- `MaterialDef_StaticInstance::vfunc2` = `0x67CBF0`
+- `MaterialDef_StaticInstance::vfunc3` = `0x67CD80`
+- `MaterialDef_StaticInstance::vfunc4` = `0x67C910`
+- `MaterialDef_StaticInstance::vfunc5` = `0x67CB10`
+- `MaterialDef_StaticInstance::vfunc6` = `0x67CEE0`
+- `MaterialDef_StaticInstance::vfunc7` = `0x65F220`
+- `MaterialDef_StaticInstance::vfunc8` = `0x65F220`
+- `MaterialDef_StaticInstance::vfunc9` = `0x67D050`
+- `MaterialDef_StaticInstance::vfunc10` = `0x64ADD0`
+- `MaterialDef_StaticInstance::vfunc11` = `0x664110`
+- `MaterialDef_StaticInstance::vfunc12` = `0x680110`
+- `MaterialDef_StaticInstance::vfunc13` = `0x680110`
+- `MaterialDef_StaticInstance::vfunc14` = `0x664110`
+- `MaterialDef_StaticInstance::vfunc15` = `0x67D0E0`
+- `MaterialDef_StaticInstance::vfunc16` = `0x680120`
+- `MaterialDef_StaticInstance::vfunc17` = `0x67CFA0`
+- `MaterialDef_StaticInstance::vfunc18` = `0x67D000`
+- `MaterialDef_StaticInstance::vfunc19` = `0x67D150`
+
+## MaterialDef_StaticVertexLit  (vtable @ 0x79A86C, 20 methods)
+
+- `MaterialDef_StaticVertexLit::vfunc0` = `0x67F9A0`
+- `MaterialDef_StaticVertexLit::vfunc1` = `0x604E40`
+- `MaterialDef_StaticVertexLit::vfunc2` = `0x67FD60`
+- `MaterialDef_StaticVertexLit::vfunc3` = `0x67FEB0`
+- `MaterialDef_StaticVertexLit::vfunc4` = `0x67F8E0`
+- `MaterialDef_StaticVertexLit::vfunc5` = `0x67FC80`
+- `MaterialDef_StaticVertexLit::vfunc6` = `0x67FF90`
+- `MaterialDef_StaticVertexLit::vfunc7` = `0x65F220`
+- `MaterialDef_StaticVertexLit::vfunc8` = `0x65F220`
+- `MaterialDef_StaticVertexLit::vfunc9` = `0x680040`
+- `MaterialDef_StaticVertexLit::vfunc10` = `0x64ADD0`
+- `MaterialDef_StaticVertexLit::vfunc11` = `0x664110`
+- `MaterialDef_StaticVertexLit::vfunc12` = `0x64CAE0`
+- `MaterialDef_StaticVertexLit::vfunc13` = `0x680110`
+- `MaterialDef_StaticVertexLit::vfunc14` = `0x664110`
+- `MaterialDef_StaticVertexLit::vfunc15` = `0x6800A0`
+- `MaterialDef_StaticVertexLit::vfunc16` = `0x680120`
+- `MaterialDef_StaticVertexLit::vfunc17` = `0x67CFA0`
+- `MaterialDef_StaticVertexLit::vfunc18` = `0x67D000`
+- `MaterialDef_StaticVertexLit::vfunc19` = `0x6801D0`
+
+## MaterialDef_Transparent  (vtable @ 0x79A7C4, 20 methods)
+
+- `MaterialDef_Transparent::vfunc0` = `0x67F3A0`
+- `MaterialDef_Transparent::vfunc1` = `0x604E40`
+- `MaterialDef_Transparent::vfunc2` = `0x67F520`
+- `MaterialDef_Transparent::vfunc3` = `0x67F6A0`
+- `MaterialDef_Transparent::vfunc4` = `0x67F310`
+- `MaterialDef_Transparent::vfunc5` = `0x67F440`
+- `MaterialDef_Transparent::vfunc6` = `0x67F770`
+- `MaterialDef_Transparent::vfunc7` = `0x65F220`
+- `MaterialDef_Transparent::vfunc8` = `0x65F220`
+- `MaterialDef_Transparent::vfunc9` = `0x649AC0`
+- `MaterialDef_Transparent::vfunc10` = `0x64ADD0`
+- `MaterialDef_Transparent::vfunc11` = `0x664110`
+- `MaterialDef_Transparent::vfunc12` = `0x64CAE0`
+- `MaterialDef_Transparent::vfunc13` = `0x64CAE0`
+- `MaterialDef_Transparent::vfunc14` = `0x664110`
+- `MaterialDef_Transparent::vfunc15` = `0x649B20`
+- `MaterialDef_Transparent::vfunc16` = `0x67F800`
+- `MaterialDef_Transparent::vfunc17` = `0x516940`
+- `MaterialDef_Transparent::vfunc18` = `0x516940`
+- `MaterialDef_Transparent::vfunc19` = `0x67F850`
+
+## MaterialDef_TriBlended2  (vtable @ 0x79A614, 20 methods)
+
+- `MaterialDef_TriBlended2::vfunc0` = `0x67DAA0`
+- `MaterialDef_TriBlended2::vfunc1` = `0x604E40`
+- `MaterialDef_TriBlended2::vfunc2` = `0x67DEF0`
+- `MaterialDef_TriBlended2::vfunc3` = `0x67E1D0`
+- `MaterialDef_TriBlended2::vfunc4` = `0x67D930`
+- `MaterialDef_TriBlended2::vfunc5` = `0x67DE10`
+- `MaterialDef_TriBlended2::vfunc6` = `0x67E380`
+- `MaterialDef_TriBlended2::vfunc7` = `0x67E4A0`
+- `MaterialDef_TriBlended2::vfunc8` = `0x67E510`
+- `MaterialDef_TriBlended2::vfunc9` = `0x67E640`
+- `MaterialDef_TriBlended2::vfunc10` = `0x64AF40`
+- `MaterialDef_TriBlended2::vfunc11` = `0x664110`
+- `MaterialDef_TriBlended2::vfunc12` = `0x64CAE0`
+- `MaterialDef_TriBlended2::vfunc13` = `0x680110`
+- `MaterialDef_TriBlended2::vfunc14` = `0x664110`
+- `MaterialDef_TriBlended2::vfunc15` = `0x67E6B0`
+- `MaterialDef_TriBlended2::vfunc16` = `0x67E7F0`
+- `MaterialDef_TriBlended2::vfunc17` = `0x67E590`
+- `MaterialDef_TriBlended2::vfunc18` = `0x67E5F0`
+- `MaterialDef_TriBlended2::vfunc19` = `0x67E8B0`
+
+## MaterialInst  (vtable @ 0x78856C, 14 methods)
+
+- `MaterialInst::vfunc0` = `0x5FEF90`
+- `MaterialInst::vfunc1` = `0x604E40`
+- `MaterialInst::vfunc2` = `0x516940`
+- `MaterialInst::vfunc3` = `0x6E6E7D`
+- `MaterialInst::vfunc4` = `0x547170`
+- `MaterialInst::vfunc5` = `0x547170`
+- `MaterialInst::vfunc6` = `0x6E6E7D`
+- `MaterialInst::vfunc7` = `0x516940`
+- `MaterialInst::vfunc8` = `0x6E6E7D`
+- `MaterialInst::vfunc9` = `0x6E6E7D`
+- `MaterialInst::vfunc10` = `0x6E6E7D`
+- `MaterialInst::vfunc11` = `0x6E6E7D`
+- `MaterialInst::vfunc12` = `0x47C830`
+- `MaterialInst::vfunc13` = `0x547170`
+
+## MaterialInst_DynamicVertexLit  (vtable @ 0x78FECC, 14 methods)
+
+- `MaterialInst_DynamicVertexLit::vfunc0` = `0x657FB0`
+- `MaterialInst_DynamicVertexLit::vfunc1` = `0x604E40`
+- `MaterialInst_DynamicVertexLit::vfunc2` = `0x516940`
+- `MaterialInst_DynamicVertexLit::vfunc3` = `0x657FD0`
+- `MaterialInst_DynamicVertexLit::vfunc4` = `0x547170`
+- `MaterialInst_DynamicVertexLit::vfunc5` = `0x547170`
+- `MaterialInst_DynamicVertexLit::vfunc6` = `0x658230`
+- `MaterialInst_DynamicVertexLit::vfunc7` = `0x516940`
+- `MaterialInst_DynamicVertexLit::vfunc8` = `0x658290`
+- `MaterialInst_DynamicVertexLit::vfunc9` = `0x65AFC0`
+- `MaterialInst_DynamicVertexLit::vfunc10` = `0x658020`
+- `MaterialInst_DynamicVertexLit::vfunc11` = `0x6582F0`
+- `MaterialInst_DynamicVertexLit::vfunc12` = `0x47C830`
+- `MaterialInst_DynamicVertexLit::vfunc13` = `0x658740`
+
+## MaterialInst_MatteTextured  (vtable @ 0x78FF84, 14 methods)
+
+- `MaterialInst_MatteTextured::vfunc0` = `0x65ADE0`
+- `MaterialInst_MatteTextured::vfunc1` = `0x604E40`
+- `MaterialInst_MatteTextured::vfunc2` = `0x516940`
+- `MaterialInst_MatteTextured::vfunc3` = `0x65AE00`
+- `MaterialInst_MatteTextured::vfunc4` = `0x547170`
+- `MaterialInst_MatteTextured::vfunc5` = `0x547170`
+- `MaterialInst_MatteTextured::vfunc6` = `0x516940`
+- `MaterialInst_MatteTextured::vfunc7` = `0x516940`
+- `MaterialInst_MatteTextured::vfunc8` = `0x547170`
+- `MaterialInst_MatteTextured::vfunc9` = `0x65AFC0`
+- `MaterialInst_MatteTextured::vfunc10` = `0x65AE50`
+- `MaterialInst_MatteTextured::vfunc11` = `0x65AEE0`
+- `MaterialInst_MatteTextured::vfunc12` = `0x47C830`
+- `MaterialInst_MatteTextured::vfunc13` = `0x547170`
+
+## MaterialInst_None  (vtable @ 0x79DBE8, 14 methods)
+
+- `MaterialInst_None::vfunc0` = `0x6A58C0`
+- `MaterialInst_None::vfunc1` = `0x604E40`
+- `MaterialInst_None::vfunc2` = `0x516940`
+- `MaterialInst_None::vfunc3` = `0x6A58E0`
+- `MaterialInst_None::vfunc4` = `0x547170`
+- `MaterialInst_None::vfunc5` = `0x547170`
+- `MaterialInst_None::vfunc6` = `0x516940`
+- `MaterialInst_None::vfunc7` = `0x516940`
+- `MaterialInst_None::vfunc8` = `0x547170`
+- `MaterialInst_None::vfunc9` = `0x65F510`
+- `MaterialInst_None::vfunc10` = `0x547170`
+- `MaterialInst_None::vfunc11` = `0x547170`
+- `MaterialInst_None::vfunc12` = `0x47C830`
+- `MaterialInst_None::vfunc13` = `0x547170`
+
+## MaterialInst_NormalMapped  (vtable @ 0x78FF08, 14 methods)
+
+- `MaterialInst_NormalMapped::vfunc0` = `0x659210`
+- `MaterialInst_NormalMapped::vfunc1` = `0x604E40`
+- `MaterialInst_NormalMapped::vfunc2` = `0x516940`
+- `MaterialInst_NormalMapped::vfunc3` = `0x6575A0`
+- `MaterialInst_NormalMapped::vfunc4` = `0x547170`
+- `MaterialInst_NormalMapped::vfunc5` = `0x547170`
+- `MaterialInst_NormalMapped::vfunc6` = `0x659630`
+- `MaterialInst_NormalMapped::vfunc7` = `0x516940`
+- `MaterialInst_NormalMapped::vfunc8` = `0x659780`
+- `MaterialInst_NormalMapped::vfunc9` = `0x659DA0`
+- `MaterialInst_NormalMapped::vfunc10` = `0x659350`
+- `MaterialInst_NormalMapped::vfunc11` = `0x6598F0`
+- `MaterialInst_NormalMapped::vfunc12` = `0x47C830`
+- `MaterialInst_NormalMapped::vfunc13` = `0x659D20`
+
+## MaterialInst_SimpleTextured  (vtable @ 0x78FE18, 14 methods)
+
+- `MaterialInst_SimpleTextured::vfunc0` = `0x655D80`
+- `MaterialInst_SimpleTextured::vfunc1` = `0x604E40`
+- `MaterialInst_SimpleTextured::vfunc2` = `0x516940`
+- `MaterialInst_SimpleTextured::vfunc3` = `0x656730`
+- `MaterialInst_SimpleTextured::vfunc4` = `0x547170`
+- `MaterialInst_SimpleTextured::vfunc5` = `0x547170`
+- `MaterialInst_SimpleTextured::vfunc6` = `0x516940`
+- `MaterialInst_SimpleTextured::vfunc7` = `0x516940`
+- `MaterialInst_SimpleTextured::vfunc8` = `0x655DF0`
+- `MaterialInst_SimpleTextured::vfunc9` = `0x65AFC0`
+- `MaterialInst_SimpleTextured::vfunc10` = `0x655DA0`
+- `MaterialInst_SimpleTextured::vfunc11` = `0x655E20`
+- `MaterialInst_SimpleTextured::vfunc12` = `0x47C830`
+- `MaterialInst_SimpleTextured::vfunc13` = `0x547170`
+
+## MaterialInst_StaticInstance  (vtable @ 0x78FE90, 14 methods)
+
+- `MaterialInst_StaticInstance::vfunc0` = `0x657380`
+- `MaterialInst_StaticInstance::vfunc1` = `0x604E40`
+- `MaterialInst_StaticInstance::vfunc2` = `0x657560`
+- `MaterialInst_StaticInstance::vfunc3` = `0x6575A0`
+- `MaterialInst_StaticInstance::vfunc4` = `0x547170`
+- `MaterialInst_StaticInstance::vfunc5` = `0x6575E0`
+- `MaterialInst_StaticInstance::vfunc6` = `0x657810`
+- `MaterialInst_StaticInstance::vfunc7` = `0x516940`
+- `MaterialInst_StaticInstance::vfunc8` = `0x6578E0`
+- `MaterialInst_StaticInstance::vfunc9` = `0x657D10`
+- `MaterialInst_StaticInstance::vfunc10` = `0x6576E0`
+- `MaterialInst_StaticInstance::vfunc11` = `0x657A20`
+- `MaterialInst_StaticInstance::vfunc12` = `0x47C830`
+- `MaterialInst_StaticInstance::vfunc13` = `0x547170`
+
+## MaterialInst_StaticVertexLit  (vtable @ 0x78FE54, 14 methods)
+
+- `MaterialInst_StaticVertexLit::vfunc0` = `0x656510`
+- `MaterialInst_StaticVertexLit::vfunc1` = `0x604E40`
+- `MaterialInst_StaticVertexLit::vfunc2` = `0x657560`
+- `MaterialInst_StaticVertexLit::vfunc3` = `0x656730`
+- `MaterialInst_StaticVertexLit::vfunc4` = `0x547170`
+- `MaterialInst_StaticVertexLit::vfunc5` = `0x656770`
+- `MaterialInst_StaticVertexLit::vfunc6` = `0x657810`
+- `MaterialInst_StaticVertexLit::vfunc7` = `0x656950`
+- `MaterialInst_StaticVertexLit::vfunc8` = `0x656980`
+- `MaterialInst_StaticVertexLit::vfunc9` = `0x656E30`
+- `MaterialInst_StaticVertexLit::vfunc10` = `0x656820`
+- `MaterialInst_StaticVertexLit::vfunc11` = `0x656AC0`
+- `MaterialInst_StaticVertexLit::vfunc12` = `0x47C830`
+- `MaterialInst_StaticVertexLit::vfunc13` = `0x547170`
+
+## MaterialInst_Transparent  (vtable @ 0x78F760, 14 methods)
+
+- `MaterialInst_Transparent::vfunc0` = `0x64E610`
+- `MaterialInst_Transparent::vfunc1` = `0x604E40`
+- `MaterialInst_Transparent::vfunc2` = `0x516940`
+- `MaterialInst_Transparent::vfunc3` = `0x656730`
+- `MaterialInst_Transparent::vfunc4` = `0x547170`
+- `MaterialInst_Transparent::vfunc5` = `0x547170`
+- `MaterialInst_Transparent::vfunc6` = `0x516940`
+- `MaterialInst_Transparent::vfunc7` = `0x516940`
+- `MaterialInst_Transparent::vfunc8` = `0x64E7B0`
+- `MaterialInst_Transparent::vfunc9` = `0x64EC50`
+- `MaterialInst_Transparent::vfunc10` = `0x64E720`
+- `MaterialInst_Transparent::vfunc11` = `0x64E810`
+- `MaterialInst_Transparent::vfunc12` = `0x47C830`
+- `MaterialInst_Transparent::vfunc13` = `0x64ECF0`
+
+## MaterialInst_TriBlended2  (vtable @ 0x78FF44, 15 methods)
+
+- `MaterialInst_TriBlended2::vfunc0` = `0x659F70`
+- `MaterialInst_TriBlended2::vfunc1` = `0x604E40`
+- `MaterialInst_TriBlended2::vfunc2` = `0x65A170`
+- `MaterialInst_TriBlended2::vfunc3` = `0x65A1B0`
+- `MaterialInst_TriBlended2::vfunc4` = `0x547170`
+- `MaterialInst_TriBlended2::vfunc5` = `0x65A8C0`
+- `MaterialInst_TriBlended2::vfunc6` = `0x65A320`
+- `MaterialInst_TriBlended2::vfunc7` = `0x516940`
+- `MaterialInst_TriBlended2::vfunc8` = `0x65A5F0`
+- `MaterialInst_TriBlended2::vfunc9` = `0x65A830`
+- `MaterialInst_TriBlended2::vfunc10` = `0x65A200`
+- `MaterialInst_TriBlended2::vfunc11` = `0x65A600`
+- `MaterialInst_TriBlended2::vfunc12` = `0x47C830`
+- `MaterialInst_TriBlended2::vfunc13` = `0x547170`
+- `MaterialInst_TriBlended2::vfunc14` = `0x460B60`
+
+## MechDoor  (vtable @ 0x76F8A8, 2 methods)
+
+- `MechDoor::vfunc0` = `0x47E2B0`
+- `MechDoor::vfunc1` = `0x47E2C0`
+
+## MechDoor  (vtable @ 0x76F888, 7 methods)
+
+- `MechDoor::vfunc0` = `0x47DD40`
+- `MechDoor::vfunc1` = `0x465A60`
+- `MechDoor::vfunc2` = `0x516940`
+- `MechDoor::vfunc3` = `0x47DD70`
+- `MechDoor::vfunc4` = `0x47DD50`
+- `MechDoor::vfunc5` = `0x47E1C0`
+- `MechDoor::vfunc6` = `0x47D6C0`
+
+## MechDoor  (vtable @ 0x76F834, 18 methods)
+
+- `MechDoor::vfunc0` = `0x4179D0`
+- `MechDoor::vfunc1` = `0x46B3B0`
+- `MechDoor::vfunc2` = `0x47E290`
+- `MechDoor::vfunc3` = `0x546E20`
+- `MechDoor::vfunc4` = `0x546E20`
+- `MechDoor::vfunc5` = `0x46BC60`
+- `MechDoor::vfunc6` = `0x46BBC0`
+- `MechDoor::vfunc7` = `0x546E30`
+- `MechDoor::vfunc8` = `0x65F500`
+- `MechDoor::vfunc9` = `0x46BD20`
+- `MechDoor::vfunc10` = `0x546E20`
+- `MechDoor::vfunc11` = `0x46B3A0`
+- `MechDoor::vfunc12` = `0x516940`
+- `MechDoor::vfunc13` = `0x437C60`
+- `MechDoor::vfunc14` = `0x437C60`
+- `MechDoor::vfunc15` = `0x437C60`
+- `MechDoor::vfunc16` = `0x65F220`
+- `MechDoor::vfunc17` = `0x547160`
+
+## MechDoor  (vtable @ 0x76F814, 6 methods)
+
+- `MechDoor::vfunc0` = `0x47DD60`
+- `MechDoor::vfunc1` = `0x485B40`
+- `MechDoor::vfunc2` = `0x4600D0`
+- `MechDoor::vfunc3` = `0x46D470`
+- `MechDoor::vfunc4` = `0x65F500`
+- `MechDoor::vfunc5` = `0x4218E0`
+
+## MechDoor  (vtable @ 0x76F72C, 57 methods)
+
+- `MechDoor::vfunc0` = `0x47DE40`
+- `MechDoor::vfunc1` = `0x604E40`
+- `MechDoor::vfunc2` = `0x57E760`
+- `MechDoor::vfunc3` = `0x57E760`
+- `MechDoor::vfunc4` = `0x47DD80`
+- `MechDoor::vfunc5` = `0x47DE60`
+- `MechDoor::vfunc6` = `0x680110`
+- `MechDoor::vfunc7` = `0x604E40`
+- `MechDoor::vfunc8` = `0x64CAE0`
+- `MechDoor::vfunc9` = `0x64CAE0`
+- `MechDoor::vfunc10` = `0x64CAE0`
+- `MechDoor::vfunc11` = `0x47E370`
+- `MechDoor::vfunc12` = `0x64CAE0`
+- `MechDoor::vfunc13` = `0x46B680`
+- `MechDoor::vfunc14` = `0x64CAE0`
+- `MechDoor::vfunc15` = `0x65F310`
+- `MechDoor::vfunc16` = `0x47DA20`
+- `MechDoor::vfunc17` = `0x47E0F0`
+- `MechDoor::vfunc18` = `0x460B60`
+- `MechDoor::vfunc19` = `0x460260`
+- `MechDoor::vfunc20` = `0x460280`
+- `MechDoor::vfunc21` = `0x64CAE0`
+- `MechDoor::vfunc22` = `0x460B60`
+- `MechDoor::vfunc23` = `0x45F970`
+- `MechDoor::vfunc24` = `0x45F980`
+- `MechDoor::vfunc25` = `0x45F8A0`
+- `MechDoor::vfunc26` = `0x45F920`
+- `MechDoor::vfunc27` = `0x47D450`
+- `MechDoor::vfunc28` = `0x470820`
+- `MechDoor::vfunc29` = `0x460160`
+- `MechDoor::vfunc30` = `0x4605E0`
+- `MechDoor::vfunc31` = `0x460450`
+- `MechDoor::vfunc32` = `0x460B60`
+- `MechDoor::vfunc33` = `0x460B60`
+- `MechDoor::vfunc34` = `0x45FC80`
+- `MechDoor::vfunc35` = `0x460B70`
+- `MechDoor::vfunc36` = `0x460110`
+- `MechDoor::vfunc37` = `0x460B60`
+- `MechDoor::vfunc38` = `0x460B60`
+- `MechDoor::vfunc39` = `0x64A9B0`
+- `MechDoor::vfunc40` = `0x460610`
+- `MechDoor::vfunc41` = `0x45FF80`
+- `MechDoor::vfunc42` = `0x45FE40`
+- `MechDoor::vfunc43` = `0x4218C0`
+- `MechDoor::vfunc44` = `0x4600B0`
+- `MechDoor::vfunc45` = `0x516940`
+- `MechDoor::vfunc46` = `0x460600`
+- `MechDoor::vfunc47` = `0x45FC10`
+- `MechDoor::vfunc48` = `0x45FAC0`
+- `MechDoor::vfunc49` = `0x460B60`
+- `MechDoor::vfunc50` = `0x460B60`
+- `MechDoor::vfunc51` = `0x47D9B0`
+- `MechDoor::vfunc52` = `0x4EE210`
+- `MechDoor::vfunc53` = `0x46C810`
+- `MechDoor::vfunc54` = `0x47D730`
+- `MechDoor::vfunc55` = `0x47C830`
+- `MechDoor::vfunc56` = `0x47E230`
+
+## MechTurret  (vtable @ 0x76FA64, 31 methods)
+
+- `MechTurret::vfunc0` = `0x4821F0`
+- `MechTurret::vfunc1` = `0x482200`
+- `MechTurret::vfunc2` = `0x46A610`
+- `MechTurret::vfunc3` = `0x46A630`
+- `MechTurret::vfunc4` = `0x46A650`
+- `MechTurret::vfunc5` = `0x46A660`
+- `MechTurret::vfunc6` = `0x64A9B0`
+- `MechTurret::vfunc7` = `0x64A9B0`
+- `MechTurret::vfunc8` = `0x64A9B0`
+- `MechTurret::vfunc9` = `0x46B190`
+- `MechTurret::vfunc10` = `0x46B190`
+- `MechTurret::vfunc11` = `0x46B190`
+- `MechTurret::vfunc12` = `0x46B1A0`
+- `MechTurret::vfunc13` = `0x46B2D0`
+- `MechTurret::vfunc14` = `0x46B1B0`
+- `MechTurret::vfunc15` = `0x46B1D0`
+- `MechTurret::vfunc16` = `0x46B210`
+- `MechTurret::vfunc17` = `0x46B250`
+- `MechTurret::vfunc18` = `0x46B270`
+- `MechTurret::vfunc19` = `0x46A7D0`
+- `MechTurret::vfunc20` = `0x65F500`
+- `MechTurret::vfunc21` = `0x516940`
+- `MechTurret::vfunc22` = `0x47F880`
+- `MechTurret::vfunc23` = `0x47F570`
+- `MechTurret::vfunc24` = `0x47F680`
+- `MechTurret::vfunc25` = `0x460B60`
+- `MechTurret::vfunc26` = `0x516940`
+- `MechTurret::vfunc27` = `0x65F170`
+- `MechTurret::vfunc28` = `0x65F500`
+- `MechTurret::vfunc29` = `0x46B1E0`
+- `MechTurret::vfunc30` = `0x65F220`
+
+## MechTurret  (vtable @ 0x76FA58, 2 methods)
+
+- `MechTurret::vfunc0` = `0x4821E0`
+- `MechTurret::vfunc1` = `0x47E2C0`
+
+## MechTurret  (vtable @ 0x76FA38, 7 methods)
+
+- `MechTurret::vfunc0` = `0x482210`
+- `MechTurret::vfunc1` = `0x465A60`
+- `MechTurret::vfunc2` = `0x516940`
+- `MechTurret::vfunc3` = `0x47DD70`
+- `MechTurret::vfunc4` = `0x47DD50`
+- `MechTurret::vfunc5` = `0x47F0C0`
+- `MechTurret::vfunc6` = `0x47F180`
+
+## MechTurret  (vtable @ 0x76F9E4, 18 methods)
+
+- `MechTurret::vfunc0` = `0x4179D0`
+- `MechTurret::vfunc1` = `0x46B3B0`
+- `MechTurret::vfunc2` = `0x4821C0`
+- `MechTurret::vfunc3` = `0x546E20`
+- `MechTurret::vfunc4` = `0x546E20`
+- `MechTurret::vfunc5` = `0x46BC60`
+- `MechTurret::vfunc6` = `0x46BBC0`
+- `MechTurret::vfunc7` = `0x546E30`
+- `MechTurret::vfunc8` = `0x65F500`
+- `MechTurret::vfunc9` = `0x46BD20`
+- `MechTurret::vfunc10` = `0x546E20`
+- `MechTurret::vfunc11` = `0x46B3A0`
+- `MechTurret::vfunc12` = `0x516940`
+- `MechTurret::vfunc13` = `0x437C60`
+- `MechTurret::vfunc14` = `0x437C60`
+- `MechTurret::vfunc15` = `0x437C60`
+- `MechTurret::vfunc16` = `0x65F220`
+- `MechTurret::vfunc17` = `0x547160`
+
+## MechTurret  (vtable @ 0x76F9C8, 6 methods)
+
+- `MechTurret::vfunc0` = `0x482220`
+- `MechTurret::vfunc1` = `0x485B40`
+- `MechTurret::vfunc2` = `0x4600D0`
+- `MechTurret::vfunc3` = `0x46D470`
+- `MechTurret::vfunc4` = `0x65F500`
+- `MechTurret::vfunc5` = `0x4218E0`
+
+## MechTurret  (vtable @ 0x76F8DC, 58 methods)
+
+- `MechTurret::vfunc0` = `0x47E510`
+- `MechTurret::vfunc1` = `0x604E40`
+- `MechTurret::vfunc2` = `0x57E760`
+- `MechTurret::vfunc3` = `0x57E760`
+- `MechTurret::vfunc4` = `0x47E360`
+- `MechTurret::vfunc5` = `0x47E980`
+- `MechTurret::vfunc6` = `0x680110`
+- `MechTurret::vfunc7` = `0x604E40`
+- `MechTurret::vfunc8` = `0x64CAE0`
+- `MechTurret::vfunc9` = `0x64CAE0`
+- `MechTurret::vfunc10` = `0x64CAE0`
+- `MechTurret::vfunc11` = `0x47E370`
+- `MechTurret::vfunc12` = `0x47E370`
+- `MechTurret::vfunc13` = `0x46B680`
+- `MechTurret::vfunc14` = `0x64CAE0`
+- `MechTurret::vfunc15` = `0x65F310`
+- `MechTurret::vfunc16` = `0x47DA20`
+- `MechTurret::vfunc17` = `0x47EC60`
+- `MechTurret::vfunc18` = `0x460B60`
+- `MechTurret::vfunc19` = `0x460260`
+- `MechTurret::vfunc20` = `0x460280`
+- `MechTurret::vfunc21` = `0x64CAE0`
+- `MechTurret::vfunc22` = `0x460B60`
+- `MechTurret::vfunc23` = `0x45F970`
+- `MechTurret::vfunc24` = `0x47E730`
+- `MechTurret::vfunc25` = `0x45F8A0`
+- `MechTurret::vfunc26` = `0x45F920`
+- `MechTurret::vfunc27` = `0x47D450`
+- `MechTurret::vfunc28` = `0x470820`
+- `MechTurret::vfunc29` = `0x460160`
+- `MechTurret::vfunc30` = `0x4605E0`
+- `MechTurret::vfunc31` = `0x460450`
+- `MechTurret::vfunc32` = `0x460B60`
+- `MechTurret::vfunc33` = `0x460B60`
+- `MechTurret::vfunc34` = `0x45FC80`
+- `MechTurret::vfunc35` = `0x460B70`
+- `MechTurret::vfunc36` = `0x460110`
+- `MechTurret::vfunc37` = `0x460B60`
+- `MechTurret::vfunc38` = `0x460B60`
+- `MechTurret::vfunc39` = `0x47F8E0`
+- `MechTurret::vfunc40` = `0x460610`
+- `MechTurret::vfunc41` = `0x45FF80`
+- `MechTurret::vfunc42` = `0x45FE40`
+- `MechTurret::vfunc43` = `0x4218C0`
+- `MechTurret::vfunc44` = `0x4600B0`
+- `MechTurret::vfunc45` = `0x516940`
+- `MechTurret::vfunc46` = `0x460600`
+- `MechTurret::vfunc47` = `0x45FC10`
+- `MechTurret::vfunc48` = `0x45FAC0`
+- `MechTurret::vfunc49` = `0x460B60`
+- `MechTurret::vfunc50` = `0x460B60`
+- `MechTurret::vfunc51` = `0x47F080`
+- `MechTurret::vfunc52` = `0x480B60`
+- `MechTurret::vfunc53` = `0x46C810`
+- `MechTurret::vfunc54` = `0x47D730`
+- `MechTurret::vfunc55` = `0x47E7D0`
+- `MechTurret::vfunc56` = `0x47D820`
+- `MechTurret::vfunc57` = `0x47F970`
+
+## Mechanical  (vtable @ 0x76F698, 2 methods)
+
+- `Mechanical::vfunc0` = `0x47E2B0`
+- `Mechanical::vfunc1` = `0x47E2C0`
+
+## Mechanical  (vtable @ 0x76F678, 7 methods)
+
+- `Mechanical::vfunc0` = `0x47DD40`
+- `Mechanical::vfunc1` = `0x465A60`
+- `Mechanical::vfunc2` = `0x516940`
+- `Mechanical::vfunc3` = `0x47DD70`
+- `Mechanical::vfunc4` = `0x47DD50`
+- `Mechanical::vfunc5` = `0x47D690`
+- `Mechanical::vfunc6` = `0x47D6C0`
+
+## Mechanical  (vtable @ 0x76F624, 18 methods)
+
+- `Mechanical::vfunc0` = `0x4179D0`
+- `Mechanical::vfunc1` = `0x46B3B0`
+- `Mechanical::vfunc2` = `0x47E290`
+- `Mechanical::vfunc3` = `0x546E20`
+- `Mechanical::vfunc4` = `0x546E20`
+- `Mechanical::vfunc5` = `0x46BC60`
+- `Mechanical::vfunc6` = `0x46BBC0`
+- `Mechanical::vfunc7` = `0x546E30`
+- `Mechanical::vfunc8` = `0x65F500`
+- `Mechanical::vfunc9` = `0x46BD20`
+- `Mechanical::vfunc10` = `0x546E20`
+- `Mechanical::vfunc11` = `0x46B3A0`
+- `Mechanical::vfunc12` = `0x516940`
+- `Mechanical::vfunc13` = `0x437C60`
+- `Mechanical::vfunc14` = `0x437C60`
+- `Mechanical::vfunc15` = `0x437C60`
+- `Mechanical::vfunc16` = `0x65F220`
+- `Mechanical::vfunc17` = `0x547160`
+
+## Mechanical  (vtable @ 0x76F604, 6 methods)
+
+- `Mechanical::vfunc0` = `0x47DD60`
+- `Mechanical::vfunc1` = `0x485B40`
+- `Mechanical::vfunc2` = `0x4600D0`
+- `Mechanical::vfunc3` = `0x46D470`
+- `Mechanical::vfunc4` = `0x65F500`
+- `Mechanical::vfunc5` = `0x4218E0`
+
+## Mechanical  (vtable @ 0x76F51C, 57 methods)
+
+- `Mechanical::vfunc0` = `0x47DE40`
+- `Mechanical::vfunc1` = `0x604E40`
+- `Mechanical::vfunc2` = `0x57E760`
+- `Mechanical::vfunc3` = `0x57E760`
+- `Mechanical::vfunc4` = `0x47B8C0`
+- `Mechanical::vfunc5` = `0x47C840`
+- `Mechanical::vfunc6` = `0x680110`
+- `Mechanical::vfunc7` = `0x604E40`
+- `Mechanical::vfunc8` = `0x64CAE0`
+- `Mechanical::vfunc9` = `0x64CAE0`
+- `Mechanical::vfunc10` = `0x64CAE0`
+- `Mechanical::vfunc11` = `0x47E370`
+- `Mechanical::vfunc12` = `0x64CAE0`
+- `Mechanical::vfunc13` = `0x46B680`
+- `Mechanical::vfunc14` = `0x64CAE0`
+- `Mechanical::vfunc15` = `0x65F310`
+- `Mechanical::vfunc16` = `0x47DA20`
+- `Mechanical::vfunc17` = `0x47D2D0`
+- `Mechanical::vfunc18` = `0x460B60`
+- `Mechanical::vfunc19` = `0x460260`
+- `Mechanical::vfunc20` = `0x460280`
+- `Mechanical::vfunc21` = `0x64CAE0`
+- `Mechanical::vfunc22` = `0x460B60`
+- `Mechanical::vfunc23` = `0x45F970`
+- `Mechanical::vfunc24` = `0x45F980`
+- `Mechanical::vfunc25` = `0x45F8A0`
+- `Mechanical::vfunc26` = `0x45F920`
+- `Mechanical::vfunc27` = `0x47D450`
+- `Mechanical::vfunc28` = `0x470820`
+- `Mechanical::vfunc29` = `0x460160`
+- `Mechanical::vfunc30` = `0x4605E0`
+- `Mechanical::vfunc31` = `0x460450`
+- `Mechanical::vfunc32` = `0x460B60`
+- `Mechanical::vfunc33` = `0x460B60`
+- `Mechanical::vfunc34` = `0x45FC80`
+- `Mechanical::vfunc35` = `0x460B70`
+- `Mechanical::vfunc36` = `0x460110`
+- `Mechanical::vfunc37` = `0x460B60`
+- `Mechanical::vfunc38` = `0x460B60`
+- `Mechanical::vfunc39` = `0x64A9B0`
+- `Mechanical::vfunc40` = `0x460610`
+- `Mechanical::vfunc41` = `0x45FF80`
+- `Mechanical::vfunc42` = `0x45FE40`
+- `Mechanical::vfunc43` = `0x4218C0`
+- `Mechanical::vfunc44` = `0x4600B0`
+- `Mechanical::vfunc45` = `0x516940`
+- `Mechanical::vfunc46` = `0x460600`
+- `Mechanical::vfunc47` = `0x45FC10`
+- `Mechanical::vfunc48` = `0x45FAC0`
+- `Mechanical::vfunc49` = `0x460B60`
+- `Mechanical::vfunc50` = `0x460B60`
+- `Mechanical::vfunc51` = `0x47D9B0`
+- `Mechanical::vfunc52` = `0x4EE210`
+- `Mechanical::vfunc53` = `0x46C810`
+- `Mechanical::vfunc54` = `0x47D730`
+- `Mechanical::vfunc55` = `0x47C830`
+- `Mechanical::vfunc56` = `0x47D820`
+
+## MechanicalPrefs  (vtable @ 0x76F6A4, 22 methods)
+
+- `MechanicalPrefs::vfunc0` = `0x47BAF0`
+- `MechanicalPrefs::vfunc1` = `0x604E40`
+- `MechanicalPrefs::vfunc2` = `0x4041C0`
+- `MechanicalPrefs::vfunc3` = `0x4041C0`
+- `MechanicalPrefs::vfunc4` = `0x47B8D0`
+- `MechanicalPrefs::vfunc5` = `0x460B60`
+- `MechanicalPrefs::vfunc6` = `0x610BC0`
+- `MechanicalPrefs::vfunc7` = `0x547170`
+- `MechanicalPrefs::vfunc8` = `0x610BD0`
+- `MechanicalPrefs::vfunc9` = `0x64A9B0`
+- `MechanicalPrefs::vfunc10` = `0x60EAE0`
+- `MechanicalPrefs::vfunc11` = `0x460B60`
+- `MechanicalPrefs::vfunc12` = `0x437C60`
+- `MechanicalPrefs::vfunc13` = `0x460B60`
+- `MechanicalPrefs::vfunc14` = `0x64CAE0`
+- `MechanicalPrefs::vfunc15` = `0x47BF20`
+- `MechanicalPrefs::vfunc16` = `0x437C60`
+- `MechanicalPrefs::vfunc17` = `0x610C00`
+- `MechanicalPrefs::vfunc18` = `0x47B8E0`
+- `MechanicalPrefs::vfunc19` = `0x47B900`
+- `MechanicalPrefs::vfunc20` = `0x47BB90`
+- `MechanicalPrefs::vfunc21` = `0x67AA00`
+
+## MechanicalTag  (vtable @ 0x77FB90, 8 methods)
+
+- `MechanicalTag::vfunc0` = `0x4CF5C0`
+- `MechanicalTag::vfunc1` = `0x604E40`
+- `MechanicalTag::vfunc2` = `0x57E760`
+- `MechanicalTag::vfunc3` = `0x57E760`
+- `MechanicalTag::vfunc4` = `0x584A50`
+- `MechanicalTag::vfunc5` = `0x584BF0`
+- `MechanicalTag::vfunc6` = `0x584AD0`
+- `MechanicalTag::vfunc7` = `0x516940`
+
+## MemStream  (vtable @ 0x799E84, 10 methods)
+
+- `MemStream::vfunc0` = `0x677E50`
+- `MemStream::vfunc1` = `0x604E40`
+- `MemStream::vfunc2` = `0x65B5A0`
+- `MemStream::vfunc3` = `0x606DC0`
+- `MemStream::vfunc4` = `0x4EDFF0`
+- `MemStream::vfunc5` = `0x677F80`
+- `MemStream::vfunc6` = `0x677ED0`
+- `MemStream::vfunc7` = `0x677FA0`
+- `MemStream::vfunc8` = `0x678000`
+- `MemStream::vfunc9` = `0x460B60`
+
+## MemStreamWrite  (vtable @ 0x799F18, 10 methods)
+
+- `MemStreamWrite::vfunc0` = `0x678680`
+- `MemStreamWrite::vfunc1` = `0x604E40`
+- `MemStreamWrite::vfunc2` = `0x65B5A0`
+- `MemStreamWrite::vfunc3` = `0x689820`
+- `MemStreamWrite::vfunc4` = `0x4EDFF0`
+- `MemStreamWrite::vfunc5` = `0x678770`
+- `MemStreamWrite::vfunc6` = `0x678700`
+- `MemStreamWrite::vfunc7` = `0x546E30`
+- `MemStreamWrite::vfunc8` = `0x678800`
+- `MemStreamWrite::vfunc9` = `0x460B60`
+
+## Mind  (vtable @ 0x779C4C, 23 methods)
+
+- `Mind::vfunc0` = `0x4CF5C0`
+- `Mind::vfunc1` = `0x5194A0`
+- `Mind::vfunc2` = `0x57E760`
+- `Mind::vfunc3` = `0x57E760`
+- `Mind::vfunc4` = `0x5FDAA0`
+- `Mind::vfunc5` = `0x5194B0`
+- `Mind::vfunc6` = `0x4A55C0`
+- `Mind::vfunc7` = `0x519400`
+- `Mind::vfunc8` = `0x51B4E0`
+- `Mind::vfunc9` = `0x51A330`
+- `Mind::vfunc10` = `0x64A9B0`
+- `Mind::vfunc11` = `0x64A9B0`
+- `Mind::vfunc12` = `0x5199D0`
+- `Mind::vfunc13` = `0x51A440`
+- `Mind::vfunc14` = `0x460B60`
+- `Mind::vfunc15` = `0x5196D0`
+- `Mind::vfunc16` = `0x516940`
+- `Mind::vfunc17` = `0x51A060`
+- `Mind::vfunc18` = `0x519A10`
+- `Mind::vfunc19` = `0x51A210`
+- `Mind::vfunc20` = `0x51A250`
+- `Mind::vfunc21` = `0x460B60`
+- `Mind::vfunc22` = `0x51A300`
+
+## MindBasic  (vtable @ 0x779D3C, 23 methods)
+
+- `MindBasic::vfunc0` = `0x51BA40`
+- `MindBasic::vfunc1` = `0x604E40`
+- `MindBasic::vfunc2` = `0x57E760`
+- `MindBasic::vfunc3` = `0x57E760`
+- `MindBasic::vfunc4` = `0x51B8F0`
+- `MindBasic::vfunc5` = `0x51BCC0`
+- `MindBasic::vfunc6` = `0x4A55C0`
+- `MindBasic::vfunc7` = `0x51BB30`
+- `MindBasic::vfunc8` = `0x51F1E0`
+- `MindBasic::vfunc9` = `0x51A330`
+- `MindBasic::vfunc10` = `0x64A9B0`
+- `MindBasic::vfunc11` = `0x604E40`
+- `MindBasic::vfunc12` = `0x5199D0`
+- `MindBasic::vfunc13` = `0x51C220`
+- `MindBasic::vfunc14` = `0x460B60`
+- `MindBasic::vfunc15` = `0x5196D0`
+- `MindBasic::vfunc16` = `0x51F110`
+- `MindBasic::vfunc17` = `0x51C840`
+- `MindBasic::vfunc18` = `0x519A10`
+- `MindBasic::vfunc19` = `0x51C130`
+- `MindBasic::vfunc20` = `0x51C1C0`
+- `MindBasic::vfunc21` = `0x460B60`
+- `MindBasic::vfunc22` = `0x51A300`
+
+## MindDead  (vtable @ 0x779DAC, 25 methods)
+
+- `MindDead::vfunc0` = `0x4CF5C0`
+- `MindDead::vfunc1` = `0x604E40`
+- `MindDead::vfunc2` = `0x57E760`
+- `MindDead::vfunc3` = `0x57E760`
+- `MindDead::vfunc4` = `0x51F8D0`
+- `MindDead::vfunc5` = `0x51FA10`
+- `MindDead::vfunc6` = `0x4A55C0`
+- `MindDead::vfunc7` = `0x519400`
+- `MindDead::vfunc8` = `0x51FA20`
+- `MindDead::vfunc9` = `0x51A330`
+- `MindDead::vfunc10` = `0x64A9B0`
+- `MindDead::vfunc11` = `0x64A9B0`
+- `MindDead::vfunc12` = `0x5199D0`
+- `MindDead::vfunc13` = `0x460B60`
+- `MindDead::vfunc14` = `0x460B60`
+- `MindDead::vfunc15` = `0x5196D0`
+- `MindDead::vfunc16` = `0x516940`
+- `MindDead::vfunc17` = `0x51A060`
+- `MindDead::vfunc18` = `0x519A10`
+- `MindDead::vfunc19` = `0x51A210`
+- `MindDead::vfunc20` = `0x51A250`
+- `MindDead::vfunc21` = `0x460B60`
+- `MindDead::vfunc22` = `0x51A300`
+- `MindDead::vfunc23` = `0x604E40`
+- `MindDead::vfunc24` = `0x547170`
+
+## MotionImpl  (vtable @ 0x77A924, 126 methods)
+
+- `MotionImpl::vfunc0` = `0x527AB0`
+- `MotionImpl::vfunc1` = `0x604E40`
+- `MotionImpl::vfunc2` = `0x57E760`
+- `MotionImpl::vfunc3` = `0x57E760`
+- `MotionImpl::vfunc4` = `0x525FA0`
+- `MotionImpl::vfunc5` = `0x5282F0`
+- `MotionImpl::vfunc6` = `0x680110`
+- `MotionImpl::vfunc7` = `0x64A9B0`
+- `MotionImpl::vfunc8` = `0x527D20`
+- `MotionImpl::vfunc9` = `0x460B60`
+- `MotionImpl::vfunc10` = `0x516940`
+- `MotionImpl::vfunc11` = `0x52A1E0`
+- `MotionImpl::vfunc12` = `0x5288B0`
+- `MotionImpl::vfunc13` = `0x629B20`
+- `MotionImpl::vfunc14` = `0x689820`
+- `MotionImpl::vfunc15` = `0x5289E0`
+- `MotionImpl::vfunc16` = `0x5452D0`
+- `MotionImpl::vfunc17` = `0x5289F0`
+- `MotionImpl::vfunc18` = `0x5288E0`
+- `MotionImpl::vfunc19` = `0x528960`
+- `MotionImpl::vfunc20` = `0x528980`
+- `MotionImpl::vfunc21` = `0x530150`
+- `MotionImpl::vfunc22` = `0x530160`
+- `MotionImpl::vfunc23` = `0x525E60`
+- `MotionImpl::vfunc24` = `0x528C00`
+- `MotionImpl::vfunc25` = `0x528C10`
+- `MotionImpl::vfunc26` = `0x538050`
+- `MotionImpl::vfunc27` = `0x528A60`
+- `MotionImpl::vfunc28` = `0x528A70`
+- `MotionImpl::vfunc29` = `0x528A80`
+- `MotionImpl::vfunc30` = `0x528B30`
+- `MotionImpl::vfunc31` = `0x528AB0`
+- `MotionImpl::vfunc32` = `0x528A90`
+- `MotionImpl::vfunc33` = `0x535DD0`
+- `MotionImpl::vfunc34` = `0x535DB0`
+- `MotionImpl::vfunc35` = `0x535ED0`
+- `MotionImpl::vfunc36` = `0x528FB0`
+- `MotionImpl::vfunc37` = `0x528FC0`
+- `MotionImpl::vfunc38` = `0x528FA0`
+- `MotionImpl::vfunc39` = `0x528A20`
+- `MotionImpl::vfunc40` = `0x528A00`
+- `MotionImpl::vfunc41` = `0x528A40`
+- `MotionImpl::vfunc42` = `0x532AC0`
+- `MotionImpl::vfunc43` = `0x532A30`
+- `MotionImpl::vfunc44` = `0x41E360`
+- `MotionImpl::vfunc45` = `0x528A50`
+- `MotionImpl::vfunc46` = `0x5479A0`
+- `MotionImpl::vfunc47` = `0x5479C0`
+- `MotionImpl::vfunc48` = `0x529C70`
+- `MotionImpl::vfunc49` = `0x529DF0`
+- `MotionImpl::vfunc50` = `0x529CD0`
+- `MotionImpl::vfunc51` = `0x4E6070`
+- `MotionImpl::vfunc52` = `0x529CE0`
+- `MotionImpl::vfunc53` = `0x529D00`
+- `MotionImpl::vfunc54` = `0x529D80`
+- `MotionImpl::vfunc55` = `0x544D80`
+- `MotionImpl::vfunc56` = `0x545090`
+- `MotionImpl::vfunc57` = `0x545250`
+- `MotionImpl::vfunc58` = `0x544C60`
+- `MotionImpl::vfunc59` = `0x5296D0`
+- `MotionImpl::vfunc60` = `0x5299F0`
+- `MotionImpl::vfunc61` = `0x529A20`
+- `MotionImpl::vfunc62` = `0x5292F0`
+- `MotionImpl::vfunc63` = `0x52C2E0`
+- `MotionImpl::vfunc64` = `0x53F9C0`
+- `MotionImpl::vfunc65` = `0x536A10`
+- `MotionImpl::vfunc66` = `0x541510`
+- `MotionImpl::vfunc67` = `0x544B00`
+- `MotionImpl::vfunc68` = `0x53F390`
+- `MotionImpl::vfunc69` = `0x53F3E0`
+- `MotionImpl::vfunc70` = `0x53F370`
+- `MotionImpl::vfunc71` = `0x5392F0`
+- `MotionImpl::vfunc72` = `0x5370F0`
+- `MotionImpl::vfunc73` = `0x537230`
+- `MotionImpl::vfunc74` = `0x537280`
+- `MotionImpl::vfunc75` = `0x537340`
+- `MotionImpl::vfunc76` = `0x537390`
+- `MotionImpl::vfunc77` = `0x5363B0`
+- `MotionImpl::vfunc78` = `0x540350`
+- `MotionImpl::vfunc79` = `0x540410`
+- `MotionImpl::vfunc80` = `0x5343D0`
+- `MotionImpl::vfunc81` = `0x534E10`
+- `MotionImpl::vfunc82` = `0x535140`
+- `MotionImpl::vfunc83` = `0x53FD40`
+- `MotionImpl::vfunc84` = `0x53FD90`
+- `MotionImpl::vfunc85` = `0x53A9D0`
+- `MotionImpl::vfunc86` = `0x53B2A0`
+- `MotionImpl::vfunc87` = `0x542B50`
+- `MotionImpl::vfunc88` = `0x525FB0`
+- `MotionImpl::vfunc89` = `0x540AF0`
+- `MotionImpl::vfunc90` = `0x5407E0`
+- `MotionImpl::vfunc91` = `0x540F70`
+- `MotionImpl::vfunc92` = `0x540FA0`
+- `MotionImpl::vfunc93` = `0x540FC0`
+- `MotionImpl::vfunc94` = `0x540F40`
+- `MotionImpl::vfunc95` = `0x540FD0`
+- `MotionImpl::vfunc96` = `0x5410E0`
+- `MotionImpl::vfunc97` = `0x5422F0`
+- `MotionImpl::vfunc98` = `0x5463A0`
+- `MotionImpl::vfunc99` = `0x546520`
+- `MotionImpl::vfunc100` = `0x546560`
+- `MotionImpl::vfunc101` = `0x5371E0`
+- `MotionImpl::vfunc102` = `0x53FDE0`
+- `MotionImpl::vfunc103` = `0x537BE0`
+- `MotionImpl::vfunc104` = `0x537C50`
+- `MotionImpl::vfunc105` = `0x539300`
+- `MotionImpl::vfunc106` = `0x533A80`
+- `MotionImpl::vfunc107` = `0x533C50`
+- `MotionImpl::vfunc108` = `0x533CB0`
+- `MotionImpl::vfunc109` = `0x5452E0`
+- `MotionImpl::vfunc110` = `0x539340`
+- `MotionImpl::vfunc111` = `0x539330`
+- `MotionImpl::vfunc112` = `0x539350`
+- `MotionImpl::vfunc113` = `0x541EF0`
+- `MotionImpl::vfunc114` = `0x4EDFF0`
+- `MotionImpl::vfunc115` = `0x537D40`
+- `MotionImpl::vfunc116` = `0x537DE0`
+- `MotionImpl::vfunc117` = `0x538050`
+- `MotionImpl::vfunc118` = `0x537E20`
+- `MotionImpl::vfunc119` = `0x5381F0`
+- `MotionImpl::vfunc120` = `0x538070`
+- `MotionImpl::vfunc121` = `0x5380A0`
+- `MotionImpl::vfunc122` = `0x541AF0`
+- `MotionImpl::vfunc123` = `0x537CE0`
+- `MotionImpl::vfunc124` = `0x528B40`
+- `MotionImpl::vfunc125` = `0x5452F0`
+
+## MotionImplDummy  (vtable @ 0x77AC0C, 126 methods)
+
+- `MotionImplDummy::vfunc0` = `0x4CF5C0`
+- `MotionImplDummy::vfunc1` = `0x604E40`
+- `MotionImplDummy::vfunc2` = `0x57E760`
+- `MotionImplDummy::vfunc3` = `0x57E760`
+- `MotionImplDummy::vfunc4` = `0x546AE0`
+- `MotionImplDummy::vfunc5` = `0x547950`
+- `MotionImplDummy::vfunc6` = `0x680110`
+- `MotionImplDummy::vfunc7` = `0x604E40`
+- `MotionImplDummy::vfunc8` = `0x65F220`
+- `MotionImplDummy::vfunc9` = `0x460B60`
+- `MotionImplDummy::vfunc10` = `0x516940`
+- `MotionImplDummy::vfunc11` = `0x516940`
+- `MotionImplDummy::vfunc12` = `0x460B60`
+- `MotionImplDummy::vfunc13` = `0x64CAE0`
+- `MotionImplDummy::vfunc14` = `0x546AF0`
+- `MotionImplDummy::vfunc15` = `0x546AF0`
+- `MotionImplDummy::vfunc16` = `0x64CAE0`
+- `MotionImplDummy::vfunc17` = `0x64CAE0`
+- `MotionImplDummy::vfunc18` = `0x64A9B0`
+- `MotionImplDummy::vfunc19` = `0x64A9B0`
+- `MotionImplDummy::vfunc20` = `0x64A9B0`
+- `MotionImplDummy::vfunc21` = `0x546B00`
+- `MotionImplDummy::vfunc22` = `0x546B60`
+- `MotionImplDummy::vfunc23` = `0x546E20`
+- `MotionImplDummy::vfunc24` = `0x546E20`
+- `MotionImplDummy::vfunc25` = `0x546E20`
+- `MotionImplDummy::vfunc26` = `0x516940`
+- `MotionImplDummy::vfunc27` = `0x546E20`
+- `MotionImplDummy::vfunc28` = `0x546E20`
+- `MotionImplDummy::vfunc29` = `0x546E20`
+- `MotionImplDummy::vfunc30` = `0x546E20`
+- `MotionImplDummy::vfunc31` = `0x64A9B0`
+- `MotionImplDummy::vfunc32` = `0x64A9B0`
+- `MotionImplDummy::vfunc33` = `0x546D60`
+- `MotionImplDummy::vfunc34` = `0x546DC0`
+- `MotionImplDummy::vfunc35` = `0x64CAE0`
+- `MotionImplDummy::vfunc36` = `0x546E20`
+- `MotionImplDummy::vfunc37` = `0x546E30`
+- `MotionImplDummy::vfunc38` = `0x547990`
+- `MotionImplDummy::vfunc39` = `0x64CAE0`
+- `MotionImplDummy::vfunc40` = `0x64CAE0`
+- `MotionImplDummy::vfunc41` = `0x546BC0`
+- `MotionImplDummy::vfunc42` = `0x516940`
+- `MotionImplDummy::vfunc43` = `0x437C60`
+- `MotionImplDummy::vfunc44` = `0x546CA0`
+- `MotionImplDummy::vfunc45` = `0x546D00`
+- `MotionImplDummy::vfunc46` = `0x5479A0`
+- `MotionImplDummy::vfunc47` = `0x5479C0`
+- `MotionImplDummy::vfunc48` = `0x5479E0`
+- `MotionImplDummy::vfunc49` = `0x547A10`
+- `MotionImplDummy::vfunc50` = `0x547A60`
+- `MotionImplDummy::vfunc51` = `0x547AF0`
+- `MotionImplDummy::vfunc52` = `0x546E40`
+- `MotionImplDummy::vfunc53` = `0x546EA0`
+- `MotionImplDummy::vfunc54` = `0x546F00`
+- `MotionImplDummy::vfunc55` = `0x546F80`
+- `MotionImplDummy::vfunc56` = `0x546FF0`
+- `MotionImplDummy::vfunc57` = `0x547060`
+- `MotionImplDummy::vfunc58` = `0x5470D0`
+- `MotionImplDummy::vfunc59` = `0x547140`
+- `MotionImplDummy::vfunc60` = `0x460B60`
+- `MotionImplDummy::vfunc61` = `0x547150`
+- `MotionImplDummy::vfunc62` = `0x547B80`
+- `MotionImplDummy::vfunc63` = `0x547160`
+- `MotionImplDummy::vfunc64` = `0x547170`
+- `MotionImplDummy::vfunc65` = `0x437C60`
+- `MotionImplDummy::vfunc66` = `0x547180`
+- `MotionImplDummy::vfunc67` = `0x5471E0`
+- `MotionImplDummy::vfunc68` = `0x64ADD0`
+- `MotionImplDummy::vfunc69` = `0x460B60`
+- `MotionImplDummy::vfunc70` = `0x460B60`
+- `MotionImplDummy::vfunc71` = `0x516940`
+- `MotionImplDummy::vfunc72` = `0x437C60`
+- `MotionImplDummy::vfunc73` = `0x547240`
+- `MotionImplDummy::vfunc74` = `0x547240`
+- `MotionImplDummy::vfunc75` = `0x547170`
+- `MotionImplDummy::vfunc76` = `0x547150`
+- `MotionImplDummy::vfunc77` = `0x547250`
+- `MotionImplDummy::vfunc78` = `0x64A9B0`
+- `MotionImplDummy::vfunc79` = `0x64A9B0`
+- `MotionImplDummy::vfunc80` = `0x547260`
+- `MotionImplDummy::vfunc81` = `0x5472C0`
+- `MotionImplDummy::vfunc82` = `0x547320`
+- `MotionImplDummy::vfunc83` = `0x547380`
+- `MotionImplDummy::vfunc84` = `0x5473E0`
+- `MotionImplDummy::vfunc85` = `0x547440`
+- `MotionImplDummy::vfunc86` = `0x5474A0`
+- `MotionImplDummy::vfunc87` = `0x547500`
+- `MotionImplDummy::vfunc88` = `0x65F230`
+- `MotionImplDummy::vfunc89` = `0x547560`
+- `MotionImplDummy::vfunc90` = `0x5475C0`
+- `MotionImplDummy::vfunc91` = `0x64A9B0`
+- `MotionImplDummy::vfunc92` = `0x64A9B0`
+- `MotionImplDummy::vfunc93` = `0x64A9B0`
+- `MotionImplDummy::vfunc94` = `0x64A9B0`
+- `MotionImplDummy::vfunc95` = `0x547170`
+- `MotionImplDummy::vfunc96` = `0x460B60`
+- `MotionImplDummy::vfunc97` = `0x547680`
+- `MotionImplDummy::vfunc98` = `0x460B60`
+- `MotionImplDummy::vfunc99` = `0x64A9B0`
+- `MotionImplDummy::vfunc100` = `0x460B60`
+- `MotionImplDummy::vfunc101` = `0x516940`
+- `MotionImplDummy::vfunc102` = `0x64A9B0`
+- `MotionImplDummy::vfunc103` = `0x5476E0`
+- `MotionImplDummy::vfunc104` = `0x460B60`
+- `MotionImplDummy::vfunc105` = `0x547170`
+- `MotionImplDummy::vfunc106` = `0x547740`
+- `MotionImplDummy::vfunc107` = `0x5477A0`
+- `MotionImplDummy::vfunc108` = `0x64A9B0`
+- `MotionImplDummy::vfunc109` = `0x516940`
+- `MotionImplDummy::vfunc110` = `0x460B60`
+- `MotionImplDummy::vfunc111` = `0x64A9B0`
+- `MotionImplDummy::vfunc112` = `0x64A9B0`
+- `MotionImplDummy::vfunc113` = `0x437C60`
+- `MotionImplDummy::vfunc114` = `0x547800`
+- `MotionImplDummy::vfunc115` = `0x460B60`
+- `MotionImplDummy::vfunc116` = `0x516940`
+- `MotionImplDummy::vfunc117` = `0x516940`
+- `MotionImplDummy::vfunc118` = `0x65F220`
+- `MotionImplDummy::vfunc119` = `0x516940`
+- `MotionImplDummy::vfunc120` = `0x65F220`
+- `MotionImplDummy::vfunc121` = `0x460B60`
+- `MotionImplDummy::vfunc122` = `0x460B60`
+- `MotionImplDummy::vfunc123` = `0x64A9B0`
+- `MotionImplDummy::vfunc124` = `0x546E20`
+- `MotionImplDummy::vfunc125` = `0x547620`
+
+## MoveBoltRayReq  (vtable @ 0x779CAC, 10 methods)
+
+- `MoveBoltRayReq::vfunc0` = `0x4CF5C0`
+- `MoveBoltRayReq::vfunc1` = `0x604E40`
+- `MoveBoltRayReq::vfunc2` = `0x57E760`
+- `MoveBoltRayReq::vfunc3` = `0x57E760`
+- `MoveBoltRayReq::vfunc4` = `0x51AA70`
+- `MoveBoltRayReq::vfunc5` = `0x4EEE20`
+- `MoveBoltRayReq::vfunc6` = `0x680110`
+- `MoveBoltRayReq::vfunc7` = `0x51AAE0`
+- `MoveBoltRayReq::vfunc8` = `0x64A9B0`
+- `MoveBoltRayReq::vfunc9` = `0x516940`
+
+## MovieListPrefs  (vtable @ 0x786054, 22 methods)
+
+- `MovieListPrefs::vfunc0` = `0x5E51D0`
+- `MovieListPrefs::vfunc1` = `0x604E40`
+- `MovieListPrefs::vfunc2` = `0x4041C0`
+- `MovieListPrefs::vfunc3` = `0x4041C0`
+- `MovieListPrefs::vfunc4` = `0x5E5190`
+- `MovieListPrefs::vfunc5` = `0x460B60`
+- `MovieListPrefs::vfunc6` = `0x610BC0`
+- `MovieListPrefs::vfunc7` = `0x547170`
+- `MovieListPrefs::vfunc8` = `0x610BD0`
+- `MovieListPrefs::vfunc9` = `0x64A9B0`
+- `MovieListPrefs::vfunc10` = `0x60EAE0`
+- `MovieListPrefs::vfunc11` = `0x460B60`
+- `MovieListPrefs::vfunc12` = `0x437C60`
+- `MovieListPrefs::vfunc13` = `0x460B60`
+- `MovieListPrefs::vfunc14` = `0x64CAE0`
+- `MovieListPrefs::vfunc15` = `0x57B040`
+- `MovieListPrefs::vfunc16` = `0x437C60`
+- `MovieListPrefs::vfunc17` = `0x610C00`
+- `MovieListPrefs::vfunc18` = `0x5E51A0`
+- `MovieListPrefs::vfunc19` = `0x5E51C0`
+- `MovieListPrefs::vfunc20` = `0x460B60`
+- `MovieListPrefs::vfunc21` = `0x67AA00`
+
+## MutexAnimation  (vtable @ 0x77B0B4, 10 methods)
+
+- `MutexAnimation::vfunc0` = `0x54AE80`
+- `MutexAnimation::vfunc1` = `0x604E40`
+- `MutexAnimation::vfunc2` = `0x57E760`
+- `MutexAnimation::vfunc3` = `0x57E760`
+- `MutexAnimation::vfunc4` = `0x54AE70`
+- `MutexAnimation::vfunc5` = `0x54AFB0`
+- `MutexAnimation::vfunc6` = `0x680110`
+- `MutexAnimation::vfunc7` = `0x54AFC0`
+- `MutexAnimation::vfunc8` = `0x460B60`
+- `MutexAnimation::vfunc9` = `0x437C60`
+
+## MutexBoat  (vtable @ 0x77B0EC, 10 methods)
+
+- `MutexBoat::vfunc0` = `0x4CF5C0`
+- `MutexBoat::vfunc1` = `0x604E40`
+- `MutexBoat::vfunc2` = `0x57E760`
+- `MutexBoat::vfunc3` = `0x57E760`
+- `MutexBoat::vfunc4` = `0x54AFE0`
+- `MutexBoat::vfunc5` = `0x516940`
+- `MutexBoat::vfunc6` = `0x680110`
+- `MutexBoat::vfunc7` = `0x54B070`
+- `MutexBoat::vfunc8` = `0x54B090`
+- `MutexBoat::vfunc9` = `0x437C60`
+
+## MutexCameraTrans  (vtable @ 0x77B12C, 10 methods)
+
+- `MutexCameraTrans::vfunc0` = `0x4CF5C0`
+- `MutexCameraTrans::vfunc1` = `0x604E40`
+- `MutexCameraTrans::vfunc2` = `0x57E760`
+- `MutexCameraTrans::vfunc3` = `0x57E760`
+- `MutexCameraTrans::vfunc4` = `0x54B0B0`
+- `MutexCameraTrans::vfunc5` = `0x516940`
+- `MutexCameraTrans::vfunc6` = `0x680110`
+- `MutexCameraTrans::vfunc7` = `0x54B120`
+- `MutexCameraTrans::vfunc8` = `0x54B220`
+- `MutexCameraTrans::vfunc9` = `0x437C60`
+
+## MutexCinematicFade  (vtable @ 0x77B16C, 10 methods)
+
+- `MutexCinematicFade::vfunc0` = `0x4CF5C0`
+- `MutexCinematicFade::vfunc1` = `0x604E40`
+- `MutexCinematicFade::vfunc2` = `0x57E760`
+- `MutexCinematicFade::vfunc3` = `0x57E760`
+- `MutexCinematicFade::vfunc4` = `0x54B2B0`
+- `MutexCinematicFade::vfunc5` = `0x54B360`
+- `MutexCinematicFade::vfunc6` = `0x680110`
+- `MutexCinematicFade::vfunc7` = `0x54B430`
+- `MutexCinematicFade::vfunc8` = `0x54B460`
+- `MutexCinematicFade::vfunc9` = `0x437C60`
+
+## MutexConversation  (vtable @ 0x77B1AC, 10 methods)
+
+- `MutexConversation::vfunc0` = `0x4CF5C0`
+- `MutexConversation::vfunc1` = `0x604E40`
+- `MutexConversation::vfunc2` = `0x57E760`
+- `MutexConversation::vfunc3` = `0x57E760`
+- `MutexConversation::vfunc4` = `0x54B4A0`
+- `MutexConversation::vfunc5` = `0x54B520`
+- `MutexConversation::vfunc6` = `0x680110`
+- `MutexConversation::vfunc7` = `0x54B550`
+- `MutexConversation::vfunc8` = `0x460B60`
+- `MutexConversation::vfunc9` = `0x437C60`
+
+## MutexGameButtonDown  (vtable @ 0x77B1EC, 10 methods)
+
+- `MutexGameButtonDown::vfunc0` = `0x4CF5C0`
+- `MutexGameButtonDown::vfunc1` = `0x604E40`
+- `MutexGameButtonDown::vfunc2` = `0x57E760`
+- `MutexGameButtonDown::vfunc3` = `0x57E760`
+- `MutexGameButtonDown::vfunc4` = `0x54B560`
+- `MutexGameButtonDown::vfunc5` = `0x54B5D0`
+- `MutexGameButtonDown::vfunc6` = `0x680110`
+- `MutexGameButtonDown::vfunc7` = `0x54B620`
+- `MutexGameButtonDown::vfunc8` = `0x460B60`
+- `MutexGameButtonDown::vfunc9` = `0x437C60`
+
+## MutexMechanicalState  (vtable @ 0x77B230, 10 methods)
+
+- `MutexMechanicalState::vfunc0` = `0x4CF5C0`
+- `MutexMechanicalState::vfunc1` = `0x604E40`
+- `MutexMechanicalState::vfunc2` = `0x57E760`
+- `MutexMechanicalState::vfunc3` = `0x57E760`
+- `MutexMechanicalState::vfunc4` = `0x54B6B0`
+- `MutexMechanicalState::vfunc5` = `0x54B990`
+- `MutexMechanicalState::vfunc6` = `0x680110`
+- `MutexMechanicalState::vfunc7` = `0x54B7A0`
+- `MutexMechanicalState::vfunc8` = `0x54B860`
+- `MutexMechanicalState::vfunc9` = `0x437C60`
+
+## MutexShortGoal  (vtable @ 0x777CFC, 10 methods)
+
+- `MutexShortGoal::vfunc0` = `0x4CF5C0`
+- `MutexShortGoal::vfunc1` = `0x604E40`
+- `MutexShortGoal::vfunc2` = `0x57E760`
+- `MutexShortGoal::vfunc3` = `0x57E760`
+- `MutexShortGoal::vfunc4` = `0x4ED680`
+- `MutexShortGoal::vfunc5` = `0x4EEE20`
+- `MutexShortGoal::vfunc6` = `0x680110`
+- `MutexShortGoal::vfunc7` = `0x4ED760`
+- `MutexShortGoal::vfunc8` = `0x4ED7B0`
+- `MutexShortGoal::vfunc9` = `0x437C60`
+
+## MutexSimpleAnim  (vtable @ 0x77B26C, 10 methods)
+
+- `MutexSimpleAnim::vfunc0` = `0x4CF5C0`
+- `MutexSimpleAnim::vfunc1` = `0x604E40`
+- `MutexSimpleAnim::vfunc2` = `0x57E760`
+- `MutexSimpleAnim::vfunc3` = `0x57E760`
+- `MutexSimpleAnim::vfunc4` = `0x54B8A0`
+- `MutexSimpleAnim::vfunc5` = `0x54B990`
+- `MutexSimpleAnim::vfunc6` = `0x680110`
+- `MutexSimpleAnim::vfunc7` = `0x54B9D0`
+- `MutexSimpleAnim::vfunc8` = `0x54BA70`
+- `MutexSimpleAnim::vfunc9` = `0x54BAE0`
+
+## MutexSleep  (vtable @ 0x79AE78, 10 methods)
+
+- `MutexSleep::vfunc0` = `0x4CF5C0`
+- `MutexSleep::vfunc1` = `0x604E40`
+- `MutexSleep::vfunc2` = `0x57E760`
+- `MutexSleep::vfunc3` = `0x57E760`
+- `MutexSleep::vfunc4` = `0x682120`
+- `MutexSleep::vfunc5` = `0x682190`
+- `MutexSleep::vfunc6` = `0x680110`
+- `MutexSleep::vfunc7` = `0x6821C0`
+- `MutexSleep::vfunc8` = `0x6821E0`
+- `MutexSleep::vfunc9` = `0x437C60`
+
+## MutexSound  (vtable @ 0x77B2A4, 10 methods)
+
+- `MutexSound::vfunc0` = `0x4CF5C0`
+- `MutexSound::vfunc1` = `0x604E40`
+- `MutexSound::vfunc2` = `0x57E760`
+- `MutexSound::vfunc3` = `0x57E760`
+- `MutexSound::vfunc4` = `0x54BB20`
+- `MutexSound::vfunc5` = `0x54BBD0`
+- `MutexSound::vfunc6` = `0x680110`
+- `MutexSound::vfunc7` = `0x54BBF0`
+- `MutexSound::vfunc8` = `0x54BC40`
+- `MutexSound::vfunc9` = `0x437C60`
+
+## MutexVictory  (vtable @ 0x77B2E0, 10 methods)
+
+- `MutexVictory::vfunc0` = `0x4CF5C0`
+- `MutexVictory::vfunc1` = `0x604E40`
+- `MutexVictory::vfunc2` = `0x57E760`
+- `MutexVictory::vfunc3` = `0x57E760`
+- `MutexVictory::vfunc4` = `0x54BC60`
+- `MutexVictory::vfunc5` = `0x516940`
+- `MutexVictory::vfunc6` = `0x680110`
+- `MutexVictory::vfunc7` = `0x54BCD0`
+- `MutexVictory::vfunc8` = `0x54BD00`
+- `MutexVictory::vfunc9` = `0x437C60`
+
+## MutexWaitForZone  (vtable @ 0x77B320, 10 methods)
+
+- `MutexWaitForZone::vfunc0` = `0x4CF5C0`
+- `MutexWaitForZone::vfunc1` = `0x604E40`
+- `MutexWaitForZone::vfunc2` = `0x57E760`
+- `MutexWaitForZone::vfunc3` = `0x57E760`
+- `MutexWaitForZone::vfunc4` = `0x54BD30`
+- `MutexWaitForZone::vfunc5` = `0x54BE30`
+- `MutexWaitForZone::vfunc6` = `0x680110`
+- `MutexWaitForZone::vfunc7` = `0x54BE90`
+- `MutexWaitForZone::vfunc8` = `0x54BED0`
+- `MutexWaitForZone::vfunc9` = `0x437C60`
+
+## NPC  (vtable @ 0x767438, 2 methods)
+
+- `NPC::vfunc0` = `0x42A8C0`
+- `NPC::vfunc1` = `0x42A9C0`
+
+## NPC  (vtable @ 0x7673EC, 18 methods)
+
+- `NPC::vfunc0` = `0x4179D0`
+- `NPC::vfunc1` = `0x46B3B0`
+- `NPC::vfunc2` = `0x430D20`
+- `NPC::vfunc3` = `0x41DFF0`
+- `NPC::vfunc4` = `0x546E20`
+- `NPC::vfunc5` = `0x435630`
+- `NPC::vfunc6` = `0x46B350`
+- `NPC::vfunc7` = `0x41E090`
+- `NPC::vfunc8` = `0x41E1C0`
+- `NPC::vfunc9` = `0x41E2C0`
+- `NPC::vfunc10` = `0x546E20`
+- `NPC::vfunc11` = `0x46B3A0`
+- `NPC::vfunc12` = `0x516940`
+- `NPC::vfunc13` = `0x437C60`
+- `NPC::vfunc14` = `0x437C60`
+- `NPC::vfunc15` = `0x437C60`
+- `NPC::vfunc16` = `0x41E0E0`
+- `NPC::vfunc17` = `0x41E170`
+
+## NPC  (vtable @ 0x76736C, 31 methods)
+
+- `NPC::vfunc0` = `0x430D40`
+- `NPC::vfunc1` = `0x430CF0`
+- `NPC::vfunc2` = `0x46A610`
+- `NPC::vfunc3` = `0x46A630`
+- `NPC::vfunc4` = `0x46A650`
+- `NPC::vfunc5` = `0x46A660`
+- `NPC::vfunc6` = `0x46AB50`
+- `NPC::vfunc7` = `0x46AB70`
+- `NPC::vfunc8` = `0x46AB90`
+- `NPC::vfunc9` = `0x63DDA0`
+- `NPC::vfunc10` = `0x46ABC0`
+- `NPC::vfunc11` = `0x63DDB0`
+- `NPC::vfunc12` = `0x46ABD0`
+- `NPC::vfunc13` = `0x46AF60`
+- `NPC::vfunc14` = `0x46ABE0`
+- `NPC::vfunc15` = `0x46AC70`
+- `NPC::vfunc16` = `0x46B210`
+- `NPC::vfunc17` = `0x46ACC0`
+- `NPC::vfunc18` = `0x46ACF0`
+- `NPC::vfunc19` = `0x46A7D0`
+- `NPC::vfunc20` = `0x46AF00`
+- `NPC::vfunc21` = `0x429810`
+- `NPC::vfunc22` = `0x427A00`
+- `NPC::vfunc23` = `0x429CB0`
+- `NPC::vfunc24` = `0x42A000`
+- `NPC::vfunc25` = `0x42A820`
+- `NPC::vfunc26` = `0x4296A0`
+- `NPC::vfunc27` = `0x42E200`
+- `NPC::vfunc28` = `0x42E210`
+- `NPC::vfunc29` = `0x46AC90`
+- `NPC::vfunc30` = `0x46AD10`
+
+## NPC  (vtable @ 0x76733C, 6 methods)
+
+- `NPC::vfunc0` = `0x430D10`
+- `NPC::vfunc1` = `0x4607B0`
+- `NPC::vfunc2` = `0x4600D0`
+- `NPC::vfunc3` = `0x46D470`
+- `NPC::vfunc4` = `0x42ECB0`
+- `NPC::vfunc5` = `0x4218E0`
+
+## NPC  (vtable @ 0x7671B4, 97 methods)
+
+- `NPC::vfunc0` = `0x425D80`
+- `NPC::vfunc1` = `0x604E40`
+- `NPC::vfunc2` = `0x57E760`
+- `NPC::vfunc3` = `0x57E760`
+- `NPC::vfunc4` = `0x425920`
+- `NPC::vfunc5` = `0x4268F0`
+- `NPC::vfunc6` = `0x680110`
+- `NPC::vfunc7` = `0x604E40`
+- `NPC::vfunc8` = `0x47E370`
+- `NPC::vfunc9` = `0x47E370`
+- `NPC::vfunc10` = `0x64CAE0`
+- `NPC::vfunc11` = `0x64CAE0`
+- `NPC::vfunc12` = `0x64CAE0`
+- `NPC::vfunc13` = `0x41D1A0`
+- `NPC::vfunc14` = `0x64CAE0`
+- `NPC::vfunc15` = `0x65F310`
+- `NPC::vfunc16` = `0x41DB90`
+- `NPC::vfunc17` = `0x427C50`
+- `NPC::vfunc18` = `0x460B60`
+- `NPC::vfunc19` = `0x4292B0`
+- `NPC::vfunc20` = `0x429310`
+- `NPC::vfunc21` = `0x4293B0`
+- `NPC::vfunc22` = `0x4293D0`
+- `NPC::vfunc23` = `0x45F970`
+- `NPC::vfunc24` = `0x41E1A0`
+- `NPC::vfunc25` = `0x45F8A0`
+- `NPC::vfunc26` = `0x45F920`
+- `NPC::vfunc27` = `0x516940`
+- `NPC::vfunc28` = `0x64A9B0`
+- `NPC::vfunc29` = `0x426F20`
+- `NPC::vfunc30` = `0x41FB70`
+- `NPC::vfunc31` = `0x41FB50`
+- `NPC::vfunc32` = `0x426F00`
+- `NPC::vfunc33` = `0x460A00`
+- `NPC::vfunc34` = `0x421110`
+- `NPC::vfunc35` = `0x460B70`
+- `NPC::vfunc36` = `0x42B9E0`
+- `NPC::vfunc37` = `0x4203F0`
+- `NPC::vfunc38` = `0x42BB40`
+- `NPC::vfunc39` = `0x42BB00`
+- `NPC::vfunc40` = `0x460610`
+- `NPC::vfunc41` = `0x428F60`
+- `NPC::vfunc42` = `0x428E70`
+- `NPC::vfunc43` = `0x4218C0`
+- `NPC::vfunc44` = `0x426EF0`
+- `NPC::vfunc45` = `0x516940`
+- `NPC::vfunc46` = `0x460A20`
+- `NPC::vfunc47` = `0x460A70`
+- `NPC::vfunc48` = `0x460A40`
+- `NPC::vfunc49` = `0x460B60`
+- `NPC::vfunc50` = `0x42EC70`
+- `NPC::vfunc51` = `0x42B3E0`
+- `NPC::vfunc52` = `0x41D9C0`
+- `NPC::vfunc53` = `0x41E1E0`
+- `NPC::vfunc54` = `0x4526B0`
+- `NPC::vfunc55` = `0x42E8F0`
+- `NPC::vfunc56` = `0x41E010`
+- `NPC::vfunc57` = `0x41E030`
+- `NPC::vfunc58` = `0x41E050`
+- `NPC::vfunc59` = `0x41E070`
+- `NPC::vfunc60` = `0x427AC0`
+- `NPC::vfunc61` = `0x427B70`
+- `NPC::vfunc62` = `0x41F380`
+- `NPC::vfunc63` = `0x41E300`
+- `NPC::vfunc64` = `0x41E300`
+- `NPC::vfunc65` = `0x41FC80`
+- `NPC::vfunc66` = `0x41FBB0`
+- `NPC::vfunc67` = `0x460B60`
+- `NPC::vfunc68` = `0x41FD00`
+- `NPC::vfunc69` = `0x42F300`
+- `NPC::vfunc70` = `0x41FFA0`
+- `NPC::vfunc71` = `0x41DAD0`
+- `NPC::vfunc72` = `0x4203B0`
+- `NPC::vfunc73` = `0x4203D0`
+- `NPC::vfunc74` = `0x460B60`
+- `NPC::vfunc75` = `0x460B60`
+- `NPC::vfunc76` = `0x428800`
+- `NPC::vfunc77` = `0x428830`
+- `NPC::vfunc78` = `0x427170`
+- `NPC::vfunc79` = `0x426EE0`
+- `NPC::vfunc80` = `0x41E360`
+- `NPC::vfunc81` = `0x41E360`
+- `NPC::vfunc82` = `0x41E4B0`
+- `NPC::vfunc83` = `0x41E570`
+- `NPC::vfunc84` = `0x42EC40`
+- `NPC::vfunc85` = `0x41EAA0`
+- `NPC::vfunc86` = `0x41EA90`
+- `NPC::vfunc87` = `0x41E310`
+- `NPC::vfunc88` = `0x42E880`
+- `NPC::vfunc89` = `0x42E890`
+- `NPC::vfunc90` = `0x64CAE0`
+- `NPC::vfunc91` = `0x425930`
+- `NPC::vfunc92` = `0x425940`
+- `NPC::vfunc93` = `0x41E730`
+- `NPC::vfunc94` = `0x42EC60`
+- `NPC::vfunc95` = `0x428670`
+- `NPC::vfunc96` = `0x4287C0`
+
+## NPCBomberBomb  (vtable @ 0x775764, 43 methods)
+
+- `NPCBomberBomb::vfunc0` = `0x4C8900`
+- `NPCBomberBomb::vfunc1` = `0x604E40`
+- `NPCBomberBomb::vfunc2` = `0x57E760`
+- `NPCBomberBomb::vfunc3` = `0x57E760`
+- `NPCBomberBomb::vfunc4` = `0x4C8850`
+- `NPCBomberBomb::vfunc5` = `0x4C8A70`
+- `NPCBomberBomb::vfunc6` = `0x4A55C0`
+- `NPCBomberBomb::vfunc7` = `0x4C94E0`
+- `NPCBomberBomb::vfunc8` = `0x516940`
+- `NPCBomberBomb::vfunc9` = `0x4A5130`
+- `NPCBomberBomb::vfunc10` = `0x4C9C00`
+- `NPCBomberBomb::vfunc11` = `0x64A9B0`
+- `NPCBomberBomb::vfunc12` = `0x4C98E0`
+- `NPCBomberBomb::vfunc13` = `0x4A53C0`
+- `NPCBomberBomb::vfunc14` = `0x4C9A00`
+- `NPCBomberBomb::vfunc15` = `0x4C9AC0`
+- `NPCBomberBomb::vfunc16` = `0x4C98D0`
+- `NPCBomberBomb::vfunc17` = `0x4C98D0`
+- `NPCBomberBomb::vfunc18` = `0x4C98D0`
+- `NPCBomberBomb::vfunc19` = `0x460B60`
+- `NPCBomberBomb::vfunc20` = `0x64A9B0`
+- `NPCBomberBomb::vfunc21` = `0x460B60`
+- `NPCBomberBomb::vfunc22` = `0x460B60`
+- `NPCBomberBomb::vfunc23` = `0x604E40`
+- `NPCBomberBomb::vfunc24` = `0x64A9B0`
+- `NPCBomberBomb::vfunc25` = `0x64A9B0`
+- `NPCBomberBomb::vfunc26` = `0x64A9B0`
+- `NPCBomberBomb::vfunc27` = `0x516940`
+- `NPCBomberBomb::vfunc28` = `0x65F230`
+- `NPCBomberBomb::vfunc29` = `0x4C9330`
+- `NPCBomberBomb::vfunc30` = `0x4C9100`
+- `NPCBomberBomb::vfunc31` = `0x65F170`
+- `NPCBomberBomb::vfunc32` = `0x460B60`
+- `NPCBomberBomb::vfunc33` = `0x4C9B90`
+- `NPCBomberBomb::vfunc34` = `0x437C60`
+- `NPCBomberBomb::vfunc35` = `0x64CAE0`
+- `NPCBomberBomb::vfunc36` = `0x4C9B60`
+- `NPCBomberBomb::vfunc37` = `0x516940`
+- `NPCBomberBomb::vfunc38` = `0x65F500`
+- `NPCBomberBomb::vfunc39` = `0x460B60`
+- `NPCBomberBomb::vfunc40` = `0x437C60`
+- `NPCBomberBomb::vfunc41` = `0x460B60`
+- `NPCBomberBomb::vfunc42` = `0x460B60`
+
+## NPCClub  (vtable @ 0x77581C, 43 methods)
+
+- `NPCClub::vfunc0` = `0x4CAF30`
+- `NPCClub::vfunc1` = `0x604E40`
+- `NPCClub::vfunc2` = `0x57E760`
+- `NPCClub::vfunc3` = `0x57E760`
+- `NPCClub::vfunc4` = `0x4C9DF0`
+- `NPCClub::vfunc5` = `0x4C9E80`
+- `NPCClub::vfunc6` = `0x4A55C0`
+- `NPCClub::vfunc7` = `0x4A5300`
+- `NPCClub::vfunc8` = `0x516940`
+- `NPCClub::vfunc9` = `0x4A5130`
+- `NPCClub::vfunc10` = `0x4A5770`
+- `NPCClub::vfunc11` = `0x64A9B0`
+- `NPCClub::vfunc12` = `0x4CA980`
+- `NPCClub::vfunc13` = `0x4A53C0`
+- `NPCClub::vfunc14` = `0x4CA9B0`
+- `NPCClub::vfunc15` = `0x4CAA10`
+- `NPCClub::vfunc16` = `0x4C98D0`
+- `NPCClub::vfunc17` = `0x4CA790`
+- `NPCClub::vfunc18` = `0x4C98D0`
+- `NPCClub::vfunc19` = `0x4CA9A0`
+- `NPCClub::vfunc20` = `0x4CA070`
+- `NPCClub::vfunc21` = `0x4CAA30`
+- `NPCClub::vfunc22` = `0x4CB940`
+- `NPCClub::vfunc23` = `0x64A9B0`
+- `NPCClub::vfunc24` = `0x64A9B0`
+- `NPCClub::vfunc25` = `0x64A9B0`
+- `NPCClub::vfunc26` = `0x4D0280`
+- `NPCClub::vfunc27` = `0x516940`
+- `NPCClub::vfunc28` = `0x4CA770`
+- `NPCClub::vfunc29` = `0x460B60`
+- `NPCClub::vfunc30` = `0x4C9EC0`
+- `NPCClub::vfunc31` = `0x4CAA80`
+- `NPCClub::vfunc32` = `0x460B60`
+- `NPCClub::vfunc33` = `0x47C830`
+- `NPCClub::vfunc34` = `0x437C60`
+- `NPCClub::vfunc35` = `0x64CAE0`
+- `NPCClub::vfunc36` = `0x64A9B0`
+- `NPCClub::vfunc37` = `0x516940`
+- `NPCClub::vfunc38` = `0x65F500`
+- `NPCClub::vfunc39` = `0x460B60`
+- `NPCClub::vfunc40` = `0x437C60`
+- `NPCClub::vfunc41` = `0x460B60`
+- `NPCClub::vfunc42` = `0x460B60`
+
+## NPCFirearm  (vtable @ 0x7758DC, 43 methods)
+
+- `NPCFirearm::vfunc0` = `0x4CAF30`
+- `NPCFirearm::vfunc1` = `0x604E40`
+- `NPCFirearm::vfunc2` = `0x57E760`
+- `NPCFirearm::vfunc3` = `0x57E760`
+- `NPCFirearm::vfunc4` = `0x4CAAE0`
+- `NPCFirearm::vfunc5` = `0x4CAB40`
+- `NPCFirearm::vfunc6` = `0x4A55C0`
+- `NPCFirearm::vfunc7` = `0x4A5300`
+- `NPCFirearm::vfunc8` = `0x516940`
+- `NPCFirearm::vfunc9` = `0x4A5130`
+- `NPCFirearm::vfunc10` = `0x4A5770`
+- `NPCFirearm::vfunc11` = `0x64A9B0`
+- `NPCFirearm::vfunc12` = `0x4A5640`
+- `NPCFirearm::vfunc13` = `0x4CAD00`
+- `NPCFirearm::vfunc14` = `0x4CAD80`
+- `NPCFirearm::vfunc15` = `0x4CADE0`
+- `NPCFirearm::vfunc16` = `0x4D3EB0`
+- `NPCFirearm::vfunc17` = `0x4CDC10`
+- `NPCFirearm::vfunc18` = `0x4C98D0`
+- `NPCFirearm::vfunc19` = `0x4CA9A0`
+- `NPCFirearm::vfunc20` = `0x4CABC0`
+- `NPCFirearm::vfunc21` = `0x460B60`
+- `NPCFirearm::vfunc22` = `0x460B60`
+- `NPCFirearm::vfunc23` = `0x64A9B0`
+- `NPCFirearm::vfunc24` = `0x64A9B0`
+- `NPCFirearm::vfunc25` = `0x64A9B0`
+- `NPCFirearm::vfunc26` = `0x4CAC30`
+- `NPCFirearm::vfunc27` = `0x516940`
+- `NPCFirearm::vfunc28` = `0x4CAC10`
+- `NPCFirearm::vfunc29` = `0x460B60`
+- `NPCFirearm::vfunc30` = `0x4CAB90`
+- `NPCFirearm::vfunc31` = `0x4D07C0`
+- `NPCFirearm::vfunc32` = `0x460B60`
+- `NPCFirearm::vfunc33` = `0x47C830`
+- `NPCFirearm::vfunc34` = `0x437C60`
+- `NPCFirearm::vfunc35` = `0x64CAE0`
+- `NPCFirearm::vfunc36` = `0x64A9B0`
+- `NPCFirearm::vfunc37` = `0x516940`
+- `NPCFirearm::vfunc38` = `0x65F500`
+- `NPCFirearm::vfunc39` = `0x460B60`
+- `NPCFirearm::vfunc40` = `0x437C60`
+- `NPCFirearm::vfunc41` = `0x460B60`
+- `NPCFirearm::vfunc42` = `0x460B60`
+
+## NPCJump  (vtable @ 0x775994, 43 methods)
+
+- `NPCJump::vfunc0` = `0x4CAF30`
+- `NPCJump::vfunc1` = `0x604E40`
+- `NPCJump::vfunc2` = `0x57E760`
+- `NPCJump::vfunc3` = `0x57E760`
+- `NPCJump::vfunc4` = `0x4CAE90`
+- `NPCJump::vfunc5` = `0x4CAF50`
+- `NPCJump::vfunc6` = `0x4A55C0`
+- `NPCJump::vfunc7` = `0x4A5300`
+- `NPCJump::vfunc8` = `0x516940`
+- `NPCJump::vfunc9` = `0x4A5130`
+- `NPCJump::vfunc10` = `0x4A5770`
+- `NPCJump::vfunc11` = `0x64A9B0`
+- `NPCJump::vfunc12` = `0x4CB570`
+- `NPCJump::vfunc13` = `0x4A53C0`
+- `NPCJump::vfunc14` = `0x4CB580`
+- `NPCJump::vfunc15` = `0x4CAA10`
+- `NPCJump::vfunc16` = `0x4C98D0`
+- `NPCJump::vfunc17` = `0x4CA790`
+- `NPCJump::vfunc18` = `0x4C98D0`
+- `NPCJump::vfunc19` = `0x460B60`
+- `NPCJump::vfunc20` = `0x4CB4A0`
+- `NPCJump::vfunc21` = `0x460B60`
+- `NPCJump::vfunc22` = `0x4CB940`
+- `NPCJump::vfunc23` = `0x64A9B0`
+- `NPCJump::vfunc24` = `0x64A9B0`
+- `NPCJump::vfunc25` = `0x64A9B0`
+- `NPCJump::vfunc26` = `0x64A9B0`
+- `NPCJump::vfunc27` = `0x516940`
+- `NPCJump::vfunc28` = `0x4CA770`
+- `NPCJump::vfunc29` = `0x460B60`
+- `NPCJump::vfunc30` = `0x4CAFB0`
+- `NPCJump::vfunc31` = `0x4CAA80`
+- `NPCJump::vfunc32` = `0x460B60`
+- `NPCJump::vfunc33` = `0x47C830`
+- `NPCJump::vfunc34` = `0x4CB4B0`
+- `NPCJump::vfunc35` = `0x64CAE0`
+- `NPCJump::vfunc36` = `0x64A9B0`
+- `NPCJump::vfunc37` = `0x516940`
+- `NPCJump::vfunc38` = `0x65F500`
+- `NPCJump::vfunc39` = `0x460B60`
+- `NPCJump::vfunc40` = `0x4CB600`
+- `NPCJump::vfunc41` = `0x460B60`
+- `NPCJump::vfunc42` = `0x460B60`
+
+## NPCPrefs  (vtable @ 0x767E1C, 22 methods)
+
+- `NPCPrefs::vfunc0` = `0x4314E0`
+- `NPCPrefs::vfunc1` = `0x604E40`
+- `NPCPrefs::vfunc2` = `0x4041C0`
+- `NPCPrefs::vfunc3` = `0x4041C0`
+- `NPCPrefs::vfunc4` = `0x431040`
+- `NPCPrefs::vfunc5` = `0x460B60`
+- `NPCPrefs::vfunc6` = `0x610BC0`
+- `NPCPrefs::vfunc7` = `0x547170`
+- `NPCPrefs::vfunc8` = `0x610BD0`
+- `NPCPrefs::vfunc9` = `0x64A9B0`
+- `NPCPrefs::vfunc10` = `0x60EAE0`
+- `NPCPrefs::vfunc11` = `0x460B60`
+- `NPCPrefs::vfunc12` = `0x437C60`
+- `NPCPrefs::vfunc13` = `0x460B60`
+- `NPCPrefs::vfunc14` = `0x64CAE0`
+- `NPCPrefs::vfunc15` = `0x431D40`
+- `NPCPrefs::vfunc16` = `0x437C60`
+- `NPCPrefs::vfunc17` = `0x610C00`
+- `NPCPrefs::vfunc18` = `0x431050`
+- `NPCPrefs::vfunc19` = `0x431070`
+- `NPCPrefs::vfunc20` = `0x431AB0`
+- `NPCPrefs::vfunc21` = `0x67AA00`
+
+## NPCPrefsRare  (vtable @ 0x767DBC, 22 methods)
+
+- `NPCPrefsRare::vfunc0` = `0x4CF5C0`
+- `NPCPrefsRare::vfunc1` = `0x604E40`
+- `NPCPrefsRare::vfunc2` = `0x4041C0`
+- `NPCPrefsRare::vfunc3` = `0x4041C0`
+- `NPCPrefsRare::vfunc4` = `0x431080`
+- `NPCPrefsRare::vfunc5` = `0x460B60`
+- `NPCPrefsRare::vfunc6` = `0x610BC0`
+- `NPCPrefsRare::vfunc7` = `0x547170`
+- `NPCPrefsRare::vfunc8` = `0x610BD0`
+- `NPCPrefsRare::vfunc9` = `0x64A9B0`
+- `NPCPrefsRare::vfunc10` = `0x60EAE0`
+- `NPCPrefsRare::vfunc11` = `0x460B60`
+- `NPCPrefsRare::vfunc12` = `0x437C60`
+- `NPCPrefsRare::vfunc13` = `0x460B60`
+- `NPCPrefsRare::vfunc14` = `0x64CAE0`
+- `NPCPrefsRare::vfunc15` = `0x431960`
+- `NPCPrefsRare::vfunc16` = `0x437C60`
+- `NPCPrefsRare::vfunc17` = `0x610C00`
+- `NPCPrefsRare::vfunc18` = `0x431090`
+- `NPCPrefsRare::vfunc19` = `0x4310B0`
+- `NPCPrefsRare::vfunc20` = `0x431780`
+- `NPCPrefsRare::vfunc21` = `0x67AA00`
+
+## NPCShock  (vtable @ 0x775ECC, 43 methods)
+
+- `NPCShock::vfunc0` = `0x4CC430`
+- `NPCShock::vfunc1` = `0x604E40`
+- `NPCShock::vfunc2` = `0x57E760`
+- `NPCShock::vfunc3` = `0x57E760`
+- `NPCShock::vfunc4` = `0x4CBC50`
+- `NPCShock::vfunc5` = `0x4CC560`
+- `NPCShock::vfunc6` = `0x4A55C0`
+- `NPCShock::vfunc7` = `0x4CCF10`
+- `NPCShock::vfunc8` = `0x516940`
+- `NPCShock::vfunc9` = `0x4A5130`
+- `NPCShock::vfunc10` = `0x4CDD60`
+- `NPCShock::vfunc11` = `0x64A9B0`
+- `NPCShock::vfunc12` = `0x4A5640`
+- `NPCShock::vfunc13` = `0x4CDC70`
+- `NPCShock::vfunc14` = `0x4CDCB0`
+- `NPCShock::vfunc15` = `0x4CDD30`
+- `NPCShock::vfunc16` = `0x4D3EB0`
+- `NPCShock::vfunc17` = `0x4CDC10`
+- `NPCShock::vfunc18` = `0x4C98D0`
+- `NPCShock::vfunc19` = `0x460B60`
+- `NPCShock::vfunc20` = `0x4CDBD0`
+- `NPCShock::vfunc21` = `0x460B60`
+- `NPCShock::vfunc22` = `0x460B60`
+- `NPCShock::vfunc23` = `0x64A9B0`
+- `NPCShock::vfunc24` = `0x64A9B0`
+- `NPCShock::vfunc25` = `0x64A9B0`
+- `NPCShock::vfunc26` = `0x64A9B0`
+- `NPCShock::vfunc27` = `0x4CDDA0`
+- `NPCShock::vfunc28` = `0x65F230`
+- `NPCShock::vfunc29` = `0x4CDDB0`
+- `NPCShock::vfunc30` = `0x4CC7F0`
+- `NPCShock::vfunc31` = `0x4D07C0`
+- `NPCShock::vfunc32` = `0x460B60`
+- `NPCShock::vfunc33` = `0x47C830`
+- `NPCShock::vfunc34` = `0x437C60`
+- `NPCShock::vfunc35` = `0x64CAE0`
+- `NPCShock::vfunc36` = `0x64A9B0`
+- `NPCShock::vfunc37` = `0x516940`
+- `NPCShock::vfunc38` = `0x65F500`
+- `NPCShock::vfunc39` = `0x460B60`
+- `NPCShock::vfunc40` = `0x437C60`
+- `NPCShock::vfunc41` = `0x460B60`
+- `NPCShock::vfunc42` = `0x460B60`
+
+## NPCSpawnGun  (vtable @ 0x77603C, 43 methods)
+
+- `NPCSpawnGun::vfunc0` = `0x4CFB30`
+- `NPCSpawnGun::vfunc1` = `0x604E40`
+- `NPCSpawnGun::vfunc2` = `0x57E760`
+- `NPCSpawnGun::vfunc3` = `0x57E760`
+- `NPCSpawnGun::vfunc4` = `0x4CF990`
+- `NPCSpawnGun::vfunc5` = `0x4CFBC0`
+- `NPCSpawnGun::vfunc6` = `0x4A55C0`
+- `NPCSpawnGun::vfunc7` = `0x4D02F0`
+- `NPCSpawnGun::vfunc8` = `0x516940`
+- `NPCSpawnGun::vfunc9` = `0x4A5130`
+- `NPCSpawnGun::vfunc10` = `0x4A5770`
+- `NPCSpawnGun::vfunc11` = `0x64A9B0`
+- `NPCSpawnGun::vfunc12` = `0x4D01D0`
+- `NPCSpawnGun::vfunc13` = `0x4A53C0`
+- `NPCSpawnGun::vfunc14` = `0x4CFD40`
+- `NPCSpawnGun::vfunc15` = `0x4D0290`
+- `NPCSpawnGun::vfunc16` = `0x4D3EB0`
+- `NPCSpawnGun::vfunc17` = `0x4C98D0`
+- `NPCSpawnGun::vfunc18` = `0x4C98D0`
+- `NPCSpawnGun::vfunc19` = `0x4CA9A0`
+- `NPCSpawnGun::vfunc20` = `0x4CFE00`
+- `NPCSpawnGun::vfunc21` = `0x460B60`
+- `NPCSpawnGun::vfunc22` = `0x4D0000`
+- `NPCSpawnGun::vfunc23` = `0x64A9B0`
+- `NPCSpawnGun::vfunc24` = `0x604E40`
+- `NPCSpawnGun::vfunc25` = `0x64A9B0`
+- `NPCSpawnGun::vfunc26` = `0x4D0280`
+- `NPCSpawnGun::vfunc27` = `0x516940`
+- `NPCSpawnGun::vfunc28` = `0x65F230`
+- `NPCSpawnGun::vfunc29` = `0x4D0340`
+- `NPCSpawnGun::vfunc30` = `0x4CFC00`
+- `NPCSpawnGun::vfunc31` = `0x4D07C0`
+- `NPCSpawnGun::vfunc32` = `0x4D0340`
+- `NPCSpawnGun::vfunc33` = `0x47C830`
+- `NPCSpawnGun::vfunc34` = `0x437C60`
+- `NPCSpawnGun::vfunc35` = `0x64CAE0`
+- `NPCSpawnGun::vfunc36` = `0x64A9B0`
+- `NPCSpawnGun::vfunc37` = `0x516940`
+- `NPCSpawnGun::vfunc38` = `0x65F500`
+- `NPCSpawnGun::vfunc39` = `0x460B60`
+- `NPCSpawnGun::vfunc40` = `0x437C60`
+- `NPCSpawnGun::vfunc41` = `0x460B60`
+- `NPCSpawnGun::vfunc42` = `0x460B60`
+
+## NPCTag  (vtable @ 0x77FC84, 8 methods)
+
+- `NPCTag::vfunc0` = `0x584CF0`
+- `NPCTag::vfunc1` = `0x604E40`
+- `NPCTag::vfunc2` = `0x57E760`
+- `NPCTag::vfunc3` = `0x57E760`
+- `NPCTag::vfunc4` = `0x584C10`
+- `NPCTag::vfunc5` = `0x584D70`
+- `NPCTag::vfunc6` = `0x584D90`
+- `NPCTag::vfunc7` = `0x516940`
+
+## NPCWeapon  (vtable @ 0x776124, 43 methods)
+
+- `NPCWeapon::vfunc0` = `0x4CAF30`
+- `NPCWeapon::vfunc1` = `0x604E40`
+- `NPCWeapon::vfunc2` = `0x57E760`
+- `NPCWeapon::vfunc3` = `0x57E760`
+- `NPCWeapon::vfunc4` = `0x5FDAA0`
+- `NPCWeapon::vfunc5` = `0x4D03A0`
+- `NPCWeapon::vfunc6` = `0x4A55C0`
+- `NPCWeapon::vfunc7` = `0x4A5300`
+- `NPCWeapon::vfunc8` = `0x516940`
+- `NPCWeapon::vfunc9` = `0x4A5130`
+- `NPCWeapon::vfunc10` = `0x4A5770`
+- `NPCWeapon::vfunc11` = `0x64A9B0`
+- `NPCWeapon::vfunc12` = `0x4A5640`
+- `NPCWeapon::vfunc13` = `0x4A53C0`
+- `NPCWeapon::vfunc14` = `0x4A53F0`
+- `NPCWeapon::vfunc15` = `0x460B60`
+- `NPCWeapon::vfunc16` = `0x6E6E7D`
+- `NPCWeapon::vfunc17` = `0x6E6E7D`
+- `NPCWeapon::vfunc18` = `0x6E6E7D`
+- `NPCWeapon::vfunc19` = `0x6E6E7D`
+- `NPCWeapon::vfunc20` = `0x6E6E7D`
+- `NPCWeapon::vfunc21` = `0x6E6E7D`
+- `NPCWeapon::vfunc22` = `0x460B60`
+- `NPCWeapon::vfunc23` = `0x64A9B0`
+- `NPCWeapon::vfunc24` = `0x64A9B0`
+- `NPCWeapon::vfunc25` = `0x64A9B0`
+- `NPCWeapon::vfunc26` = `0x64A9B0`
+- `NPCWeapon::vfunc27` = `0x516940`
+- `NPCWeapon::vfunc28` = `0x65F230`
+- `NPCWeapon::vfunc29` = `0x460B60`
+- `NPCWeapon::vfunc30` = `0x4D07A0`
+- `NPCWeapon::vfunc31` = `0x4D07C0`
+- `NPCWeapon::vfunc32` = `0x460B60`
+- `NPCWeapon::vfunc33` = `0x47C830`
+- `NPCWeapon::vfunc34` = `0x437C60`
+- `NPCWeapon::vfunc35` = `0x64CAE0`
+- `NPCWeapon::vfunc36` = `0x64A9B0`
+- `NPCWeapon::vfunc37` = `0x516940`
+- `NPCWeapon::vfunc38` = `0x65F500`
+- `NPCWeapon::vfunc39` = `0x460B60`
+- `NPCWeapon::vfunc40` = `0x437C60`
+- `NPCWeapon::vfunc41` = `0x460B60`
+- `NPCWeapon::vfunc42` = `0x460B60`
+
+## NPCWeaponPrefs  (vtable @ 0x776454, 37 methods)
+
+- `NPCWeaponPrefs::vfunc0` = `0x4D1E70`
+- `NPCWeaponPrefs::vfunc1` = `0x604E40`
+- `NPCWeaponPrefs::vfunc2` = `0x4041C0`
+- `NPCWeaponPrefs::vfunc3` = `0x4041C0`
+- `NPCWeaponPrefs::vfunc4` = `0x4D1C80`
+- `NPCWeaponPrefs::vfunc5` = `0x460B60`
+- `NPCWeaponPrefs::vfunc6` = `0x610BC0`
+- `NPCWeaponPrefs::vfunc7` = `0x547170`
+- `NPCWeaponPrefs::vfunc8` = `0x610BD0`
+- `NPCWeaponPrefs::vfunc9` = `0x64A9B0`
+- `NPCWeaponPrefs::vfunc10` = `0x60EAE0`
+- `NPCWeaponPrefs::vfunc11` = `0x460B60`
+- `NPCWeaponPrefs::vfunc12` = `0x437C60`
+- `NPCWeaponPrefs::vfunc13` = `0x460B60`
+- `NPCWeaponPrefs::vfunc14` = `0x64CAE0`
+- `NPCWeaponPrefs::vfunc15` = `0x4D2370`
+- `NPCWeaponPrefs::vfunc16` = `0x437C60`
+- `NPCWeaponPrefs::vfunc17` = `0x610C00`
+- `NPCWeaponPrefs::vfunc18` = `0x4D1C90`
+- `NPCWeaponPrefs::vfunc19` = `0x4D1CB0`
+- `NPCWeaponPrefs::vfunc20` = `0x4D2000`
+- `NPCWeaponPrefs::vfunc21` = `0x67AA00`
+- `NPCWeaponPrefs::vfunc22` = `0x64A9B0`
+- `NPCWeaponPrefs::vfunc23` = `0x64A9B0`
+- `NPCWeaponPrefs::vfunc24` = `0x64A9B0`
+- `NPCWeaponPrefs::vfunc25` = `0x49A7E0`
+- `NPCWeaponPrefs::vfunc26` = `0x64A9B0`
+- `NPCWeaponPrefs::vfunc27` = `0x604E40`
+- `NPCWeaponPrefs::vfunc28` = `0x64A9B0`
+- `NPCWeaponPrefs::vfunc29` = `0x437C60`
+- `NPCWeaponPrefs::vfunc30` = `0x4A0020`
+- `NPCWeaponPrefs::vfunc31` = `0x49A800`
+- `NPCWeaponPrefs::vfunc32` = `0x49A810`
+- `NPCWeaponPrefs::vfunc33` = `0x4A0040`
+- `NPCWeaponPrefs::vfunc34` = `0x4A00C0`
+- `NPCWeaponPrefs::vfunc35` = `0x49E3D0`
+- `NPCWeaponPrefs::vfunc36` = `0x49E3D0`
+
+## NamedLocation  (vtable @ 0x76FBE8, 6 methods)
+
+- `NamedLocation::vfunc0` = `0x482AE0`
+- `NamedLocation::vfunc1` = `0x475A60`
+- `NamedLocation::vfunc2` = `0x637710`
+- `NamedLocation::vfunc3` = `0x475AA0`
+- `NamedLocation::vfunc4` = `0x47E370`
+- `NamedLocation::vfunc5` = `0x475A90`
+
+## NamedLocation  (vtable @ 0x76FBCC, 6 methods)
+
+- `NamedLocation::vfunc0` = `0x482AF0`
+- `NamedLocation::vfunc1` = `0x64CAE0`
+- `NamedLocation::vfunc2` = `0x4600D0`
+- `NamedLocation::vfunc3` = `0x46D470`
+- `NamedLocation::vfunc4` = `0x65F500`
+- `NamedLocation::vfunc5` = `0x4218E0`
+
+## NamedLocation  (vtable @ 0x76FAF4, 53 methods)
+
+- `NamedLocation::vfunc0` = `0x482400`
+- `NamedLocation::vfunc1` = `0x604E40`
+- `NamedLocation::vfunc2` = `0x57E760`
+- `NamedLocation::vfunc3` = `0x57E760`
+- `NamedLocation::vfunc4` = `0x482230`
+- `NamedLocation::vfunc5` = `0x482790`
+- `NamedLocation::vfunc6` = `0x680110`
+- `NamedLocation::vfunc7` = `0x64A9B0`
+- `NamedLocation::vfunc8` = `0x64CAE0`
+- `NamedLocation::vfunc9` = `0x64CAE0`
+- `NamedLocation::vfunc10` = `0x64CAE0`
+- `NamedLocation::vfunc11` = `0x64CAE0`
+- `NamedLocation::vfunc12` = `0x64CAE0`
+- `NamedLocation::vfunc13` = `0x64CAE0`
+- `NamedLocation::vfunc14` = `0x64CAE0`
+- `NamedLocation::vfunc15` = `0x65F310`
+- `NamedLocation::vfunc16` = `0x64CAE0`
+- `NamedLocation::vfunc17` = `0x482860`
+- `NamedLocation::vfunc18` = `0x460B60`
+- `NamedLocation::vfunc19` = `0x460260`
+- `NamedLocation::vfunc20` = `0x460280`
+- `NamedLocation::vfunc21` = `0x64CAE0`
+- `NamedLocation::vfunc22` = `0x460B60`
+- `NamedLocation::vfunc23` = `0x4829D0`
+- `NamedLocation::vfunc24` = `0x45F980`
+- `NamedLocation::vfunc25` = `0x4829E0`
+- `NamedLocation::vfunc26` = `0x482A70`
+- `NamedLocation::vfunc27` = `0x516940`
+- `NamedLocation::vfunc28` = `0x64A9B0`
+- `NamedLocation::vfunc29` = `0x460160`
+- `NamedLocation::vfunc30` = `0x4605E0`
+- `NamedLocation::vfunc31` = `0x460450`
+- `NamedLocation::vfunc32` = `0x460B60`
+- `NamedLocation::vfunc33` = `0x460B60`
+- `NamedLocation::vfunc34` = `0x45FC80`
+- `NamedLocation::vfunc35` = `0x460B70`
+- `NamedLocation::vfunc36` = `0x460110`
+- `NamedLocation::vfunc37` = `0x460B60`
+- `NamedLocation::vfunc38` = `0x460B60`
+- `NamedLocation::vfunc39` = `0x64A9B0`
+- `NamedLocation::vfunc40` = `0x460610`
+- `NamedLocation::vfunc41` = `0x482700`
+- `NamedLocation::vfunc42` = `0x45FE40`
+- `NamedLocation::vfunc43` = `0x4218C0`
+- `NamedLocation::vfunc44` = `0x4600B0`
+- `NamedLocation::vfunc45` = `0x482A90`
+- `NamedLocation::vfunc46` = `0x460600`
+- `NamedLocation::vfunc47` = `0x45FC10`
+- `NamedLocation::vfunc48` = `0x45FAC0`
+- `NamedLocation::vfunc49` = `0x460B60`
+- `NamedLocation::vfunc50` = `0x460B60`
+- `NamedLocation::vfunc51` = `0x547170`
+- `NamedLocation::vfunc52` = `0x64A9B0`
+
+## NavPath  (vtable @ 0x780B94, 8 methods)
+
+- `NavPath::vfunc0` = `0x58F180`
+- `NavPath::vfunc1` = `0x604E40`
+- `NavPath::vfunc2` = `0x57E760`
+- `NavPath::vfunc3` = `0x57E760`
+- `NavPath::vfunc4` = `0x58EE50`
+- `NavPath::vfunc5` = `0x58F1A0`
+- `NavPath::vfunc6` = `0x680110`
+- `NavPath::vfunc7` = `0x516940`
+
+## NavResource  (vtable @ 0x79A174, 20 methods)
+
+- `NavResource::vfunc0` = `0x67AE50`
+- `NavResource::vfunc1` = `0x604E40`
+- `NavResource::vfunc2` = `0x610CC0`
+- `NavResource::vfunc3` = `0x610D20`
+- `NavResource::vfunc4` = `0x5FDAA0`
+- `NavResource::vfunc5` = `0x67B0D0`
+- `NavResource::vfunc6` = `0x67B0F0`
+- `NavResource::vfunc7` = `0x547170`
+- `NavResource::vfunc8` = `0x547170`
+- `NavResource::vfunc9` = `0x64A9B0`
+- `NavResource::vfunc10` = `0x460B60`
+- `NavResource::vfunc11` = `0x460B60`
+- `NavResource::vfunc12` = `0x437C60`
+- `NavResource::vfunc13` = `0x460B60`
+- `NavResource::vfunc14` = `0x64BC40`
+- `NavResource::vfunc15` = `0x57B040`
+- `NavResource::vfunc16` = `0x610C60`
+- `NavResource::vfunc17` = `0x610C00`
+- `NavResource::vfunc18` = `0x67B1A0`
+- `NavResource::vfunc19` = `0x67B200`
+
+## OrbitCamera  (vtable @ 0x7664BC, 29 methods)
+
+- `OrbitCamera::vfunc0` = `0x4CF5C0`
+- `OrbitCamera::vfunc1` = `0x604E40`
+- `OrbitCamera::vfunc2` = `0x57E760`
+- `OrbitCamera::vfunc3` = `0x57E760`
+- `OrbitCamera::vfunc4` = `0x41C660`
+- `OrbitCamera::vfunc5` = `0x41C720`
+- `OrbitCamera::vfunc6` = `0x40BCC0`
+- `OrbitCamera::vfunc7` = `0x41CBF0`
+- `OrbitCamera::vfunc8` = `0x40B3B0`
+- `OrbitCamera::vfunc9` = `0x467640`
+- `OrbitCamera::vfunc10` = `0x40B580`
+- `OrbitCamera::vfunc11` = `0x40B590`
+- `OrbitCamera::vfunc12` = `0x40B5B0`
+- `OrbitCamera::vfunc13` = `0x40B5A0`
+- `OrbitCamera::vfunc14` = `0x40B5E0`
+- `OrbitCamera::vfunc15` = `0x40B6B0`
+- `OrbitCamera::vfunc16` = `0x40B7B0`
+- `OrbitCamera::vfunc17` = `0x40B710`
+- `OrbitCamera::vfunc18` = `0x40B740`
+- `OrbitCamera::vfunc19` = `0x40B570`
+- `OrbitCamera::vfunc20` = `0x40B650`
+- `OrbitCamera::vfunc21` = `0x40AA90`
+- `OrbitCamera::vfunc22` = `0x40AAD0`
+- `OrbitCamera::vfunc23` = `0x40AAE0`
+- `OrbitCamera::vfunc24` = `0x40AAF0`
+- `OrbitCamera::vfunc25` = `0x4EDFF0`
+- `OrbitCamera::vfunc26` = `0x40B880`
+- `OrbitCamera::vfunc27` = `0x41CD90`
+- `OrbitCamera::vfunc28` = `0x460B60`
+
+## PBIndexedRenderableVB  (vtable @ 0x79A2E4, 18 methods)
+
+- `PBIndexedRenderableVB::vfunc0` = `0x67C280`
+- `PBIndexedRenderableVB::vfunc1` = `0x604E40`
+- `PBIndexedRenderableVB::vfunc2` = `0x649020`
+- `PBIndexedRenderableVB::vfunc3` = `0x649030`
+- `PBIndexedRenderableVB::vfunc4` = `0x67BBC0`
+- `PBIndexedRenderableVB::vfunc5` = `0x663950`
+- `PBIndexedRenderableVB::vfunc6` = `0x67C2F0`
+- `PBIndexedRenderableVB::vfunc7` = `0x67C340`
+- `PBIndexedRenderableVB::vfunc8` = `0x67BE60`
+- `PBIndexedRenderableVB::vfunc9` = `0x67BE70`
+- `PBIndexedRenderableVB::vfunc10` = `0x67BBB0`
+- `PBIndexedRenderableVB::vfunc11` = `0x67C360`
+- `PBIndexedRenderableVB::vfunc12` = `0x67C3A0`
+- `PBIndexedRenderableVB::vfunc13` = `0x67C3E0`
+- `PBIndexedRenderableVB::vfunc14` = `0x67C480`
+- `PBIndexedRenderableVB::vfunc15` = `0x67C510`
+- `PBIndexedRenderableVB::vfunc16` = `0x437C60`
+- `PBIndexedRenderableVB::vfunc17` = `0x60B200`
+
+## PagingHintTag  (vtable @ 0x77FCC4, 10 methods)
+
+- `PagingHintTag::vfunc0` = `0x585050`
+- `PagingHintTag::vfunc1` = `0x604E40`
+- `PagingHintTag::vfunc2` = `0x57E760`
+- `PagingHintTag::vfunc3` = `0x57E760`
+- `PagingHintTag::vfunc4` = `0x584FC0`
+- `PagingHintTag::vfunc5` = `0x585090`
+- `PagingHintTag::vfunc6` = `0x5850B0`
+- `PagingHintTag::vfunc7` = `0x582220`
+- `PagingHintTag::vfunc8` = `0x460B60`
+- `PagingHintTag::vfunc9` = `0x680110`
+
+## PagingVolume  (vtable @ 0x786E20, 2 methods)
+
+- `PagingVolume::vfunc0` = `0x5EF2A0`
+- `PagingVolume::vfunc1` = `0x5EE7C0`
+
+## ParticleSystem  (vtable @ 0x78340C, 33 methods)
+
+- `ParticleSystem::vfunc0` = `0x5B52D0`
+- `ParticleSystem::vfunc1` = `0x604E40`
+- `ParticleSystem::vfunc2` = `0x57E760`
+- `ParticleSystem::vfunc3` = `0x57E760`
+- `ParticleSystem::vfunc4` = `0x5B5200`
+- `ParticleSystem::vfunc5` = `0x5B5440`
+- `ParticleSystem::vfunc6` = `0x680110`
+- `ParticleSystem::vfunc7` = `0x5B53F0`
+- `ParticleSystem::vfunc8` = `0x460B60`
+- `ParticleSystem::vfunc9` = `0x460B60`
+- `ParticleSystem::vfunc10` = `0x460B60`
+- `ParticleSystem::vfunc11` = `0x460B60`
+- `ParticleSystem::vfunc12` = `0x460B60`
+- `ParticleSystem::vfunc13` = `0x5B54C0`
+- `ParticleSystem::vfunc14` = `0x5B5540`
+- `ParticleSystem::vfunc15` = `0x5B55C0`
+- `ParticleSystem::vfunc16` = `0x59F890`
+- `ParticleSystem::vfunc17` = `0x516940`
+- `ParticleSystem::vfunc18` = `0x5A3FD0`
+- `ParticleSystem::vfunc19` = `0x5A4030`
+- `ParticleSystem::vfunc20` = `0x5B5F40`
+- `ParticleSystem::vfunc21` = `0x460B60`
+- `ParticleSystem::vfunc22` = `0x460B60`
+- `ParticleSystem::vfunc23` = `0x460B60`
+- `ParticleSystem::vfunc24` = `0x460B60`
+- `ParticleSystem::vfunc25` = `0x516940`
+- `ParticleSystem::vfunc26` = `0x516940`
+- `ParticleSystem::vfunc27` = `0x516940`
+- `ParticleSystem::vfunc28` = `0x5B5F70`
+- `ParticleSystem::vfunc29` = `0x475A90`
+- `ParticleSystem::vfunc30` = `0x5AB540`
+- `ParticleSystem::vfunc31` = `0x5A3F70`
+- `ParticleSystem::vfunc32` = `0x5BC6B0`
+
+## ParticleSystemDef  (vtable @ 0x7824C4, 27 methods)
+
+- `ParticleSystemDef::vfunc0` = `0x4CF5C0`
+- `ParticleSystemDef::vfunc1` = `0x604E40`
+- `ParticleSystemDef::vfunc2` = `0x4041C0`
+- `ParticleSystemDef::vfunc3` = `0x4041C0`
+- `ParticleSystemDef::vfunc4` = `0x5AC510`
+- `ParticleSystemDef::vfunc5` = `0x460B60`
+- `ParticleSystemDef::vfunc6` = `0x610BC0`
+- `ParticleSystemDef::vfunc7` = `0x547170`
+- `ParticleSystemDef::vfunc8` = `0x610BD0`
+- `ParticleSystemDef::vfunc9` = `0x64A9B0`
+- `ParticleSystemDef::vfunc10` = `0x60EAE0`
+- `ParticleSystemDef::vfunc11` = `0x460B60`
+- `ParticleSystemDef::vfunc12` = `0x437C60`
+- `ParticleSystemDef::vfunc13` = `0x460B60`
+- `ParticleSystemDef::vfunc14` = `0x64CAE0`
+- `ParticleSystemDef::vfunc15` = `0x5B8660`
+- `ParticleSystemDef::vfunc16` = `0x437C60`
+- `ParticleSystemDef::vfunc17` = `0x610C00`
+- `ParticleSystemDef::vfunc18` = `0x5AC520`
+- `ParticleSystemDef::vfunc19` = `0x5BDAD0`
+- `ParticleSystemDef::vfunc20` = `0x5B6EE0`
+- `ParticleSystemDef::vfunc21` = `0x67AA00`
+- `ParticleSystemDef::vfunc22` = `0x5B8780`
+- `ParticleSystemDef::vfunc23` = `0x5B6FB0`
+- `ParticleSystemDef::vfunc24` = `0x5B70F0`
+- `ParticleSystemDef::vfunc25` = `0x5B78B0`
+- `ParticleSystemDef::vfunc26` = `0x5B7EC0`
+
+## PersistentRippleDef  (vtable @ 0x783834, 25 methods)
+
+- `PersistentRippleDef::vfunc0` = `0x4CF5C0`
+- `PersistentRippleDef::vfunc1` = `0x604E40`
+- `PersistentRippleDef::vfunc2` = `0x4041C0`
+- `PersistentRippleDef::vfunc3` = `0x4041C0`
+- `PersistentRippleDef::vfunc4` = `0x5B88A0`
+- `PersistentRippleDef::vfunc5` = `0x460B60`
+- `PersistentRippleDef::vfunc6` = `0x610BC0`
+- `PersistentRippleDef::vfunc7` = `0x547170`
+- `PersistentRippleDef::vfunc8` = `0x610BD0`
+- `PersistentRippleDef::vfunc9` = `0x64A9B0`
+- `PersistentRippleDef::vfunc10` = `0x60EAE0`
+- `PersistentRippleDef::vfunc11` = `0x460B60`
+- `PersistentRippleDef::vfunc12` = `0x437C60`
+- `PersistentRippleDef::vfunc13` = `0x460B60`
+- `PersistentRippleDef::vfunc14` = `0x64CAE0`
+- `PersistentRippleDef::vfunc15` = `0x5B8B70`
+- `PersistentRippleDef::vfunc16` = `0x437C60`
+- `PersistentRippleDef::vfunc17` = `0x610C00`
+- `PersistentRippleDef::vfunc18` = `0x5B88B0`
+- `PersistentRippleDef::vfunc19` = `0x5B88D0`
+- `PersistentRippleDef::vfunc20` = `0x5A2FC0`
+- `PersistentRippleDef::vfunc21` = `0x67AA00`
+- `PersistentRippleDef::vfunc22` = `0x65F500`
+- `PersistentRippleDef::vfunc23` = `0x5B8AD0`
+- `PersistentRippleDef::vfunc24` = `0x5B89B0`
+
+## PersistentRippleInst  (vtable @ 0x7838D4, 33 methods)
+
+- `PersistentRippleInst::vfunc0` = `0x5A3310`
+- `PersistentRippleInst::vfunc1` = `0x604E40`
+- `PersistentRippleInst::vfunc2` = `0x57E760`
+- `PersistentRippleInst::vfunc3` = `0x57E760`
+- `PersistentRippleInst::vfunc4` = `0x5B8C30`
+- `PersistentRippleInst::vfunc5` = `0x5B8D50`
+- `PersistentRippleInst::vfunc6` = `0x680110`
+- `PersistentRippleInst::vfunc7` = `0x460B60`
+- `PersistentRippleInst::vfunc8` = `0x460B60`
+- `PersistentRippleInst::vfunc9` = `0x460B60`
+- `PersistentRippleInst::vfunc10` = `0x460B60`
+- `PersistentRippleInst::vfunc11` = `0x460B60`
+- `PersistentRippleInst::vfunc12` = `0x460B60`
+- `PersistentRippleInst::vfunc13` = `0x5B8ED0`
+- `PersistentRippleInst::vfunc14` = `0x460B60`
+- `PersistentRippleInst::vfunc15` = `0x5B8D90`
+- `PersistentRippleInst::vfunc16` = `0x59F890`
+- `PersistentRippleInst::vfunc17` = `0x516940`
+- `PersistentRippleInst::vfunc18` = `0x5A3FD0`
+- `PersistentRippleInst::vfunc19` = `0x5A4030`
+- `PersistentRippleInst::vfunc20` = `0x516940`
+- `PersistentRippleInst::vfunc21` = `0x460B60`
+- `PersistentRippleInst::vfunc22` = `0x460B60`
+- `PersistentRippleInst::vfunc23` = `0x460B60`
+- `PersistentRippleInst::vfunc24` = `0x460B60`
+- `PersistentRippleInst::vfunc25` = `0x516940`
+- `PersistentRippleInst::vfunc26` = `0x516940`
+- `PersistentRippleInst::vfunc27` = `0x516940`
+- `PersistentRippleInst::vfunc28` = `0x5B9280`
+- `PersistentRippleInst::vfunc29` = `0x475A90`
+- `PersistentRippleInst::vfunc30` = `0x65F500`
+- `PersistentRippleInst::vfunc31` = `0x5A3F70`
+- `PersistentRippleInst::vfunc32` = `0x516940`
+
+## PhysParticleSystem  (vtable @ 0x783ACC, 33 methods)
+
+- `PhysParticleSystem::vfunc0` = `0x5A3310`
+- `PhysParticleSystem::vfunc1` = `0x604E40`
+- `PhysParticleSystem::vfunc2` = `0x57E760`
+- `PhysParticleSystem::vfunc3` = `0x57E760`
+- `PhysParticleSystem::vfunc4` = `0x5BA650`
+- `PhysParticleSystem::vfunc5` = `0x5BA780`
+- `PhysParticleSystem::vfunc6` = `0x680110`
+- `PhysParticleSystem::vfunc7` = `0x460B60`
+- `PhysParticleSystem::vfunc8` = `0x460B60`
+- `PhysParticleSystem::vfunc9` = `0x460B60`
+- `PhysParticleSystem::vfunc10` = `0x460B60`
+- `PhysParticleSystem::vfunc11` = `0x460B60`
+- `PhysParticleSystem::vfunc12` = `0x460B60`
+- `PhysParticleSystem::vfunc13` = `0x460B60`
+- `PhysParticleSystem::vfunc14` = `0x460B60`
+- `PhysParticleSystem::vfunc15` = `0x460B60`
+- `PhysParticleSystem::vfunc16` = `0x5BA7E0`
+- `PhysParticleSystem::vfunc17` = `0x5B10D0`
+- `PhysParticleSystem::vfunc18` = `0x5A3FD0`
+- `PhysParticleSystem::vfunc19` = `0x5A4030`
+- `PhysParticleSystem::vfunc20` = `0x516940`
+- `PhysParticleSystem::vfunc21` = `0x460B60`
+- `PhysParticleSystem::vfunc22` = `0x460B60`
+- `PhysParticleSystem::vfunc23` = `0x460B60`
+- `PhysParticleSystem::vfunc24` = `0x460B60`
+- `PhysParticleSystem::vfunc25` = `0x516940`
+- `PhysParticleSystem::vfunc26` = `0x516940`
+- `PhysParticleSystem::vfunc27` = `0x516940`
+- `PhysParticleSystem::vfunc28` = `0x5BA7D0`
+- `PhysParticleSystem::vfunc29` = `0x475A90`
+- `PhysParticleSystem::vfunc30` = `0x65F500`
+- `PhysParticleSystem::vfunc31` = `0x5A3F70`
+- `PhysParticleSystem::vfunc32` = `0x516940`
+
+## PhysParticleSystemDef  (vtable @ 0x783C64, 25 methods)
+
+- `PhysParticleSystemDef::vfunc0` = `0x5BAA10`
+- `PhysParticleSystemDef::vfunc1` = `0x604E40`
+- `PhysParticleSystemDef::vfunc2` = `0x4041C0`
+- `PhysParticleSystemDef::vfunc3` = `0x4041C0`
+- `PhysParticleSystemDef::vfunc4` = `0x5BA840`
+- `PhysParticleSystemDef::vfunc5` = `0x460B60`
+- `PhysParticleSystemDef::vfunc6` = `0x610BC0`
+- `PhysParticleSystemDef::vfunc7` = `0x547170`
+- `PhysParticleSystemDef::vfunc8` = `0x610BD0`
+- `PhysParticleSystemDef::vfunc9` = `0x64A9B0`
+- `PhysParticleSystemDef::vfunc10` = `0x60EAE0`
+- `PhysParticleSystemDef::vfunc11` = `0x460B60`
+- `PhysParticleSystemDef::vfunc12` = `0x437C60`
+- `PhysParticleSystemDef::vfunc13` = `0x460B60`
+- `PhysParticleSystemDef::vfunc14` = `0x64CAE0`
+- `PhysParticleSystemDef::vfunc15` = `0x5BAD60`
+- `PhysParticleSystemDef::vfunc16` = `0x437C60`
+- `PhysParticleSystemDef::vfunc17` = `0x610C00`
+- `PhysParticleSystemDef::vfunc18` = `0x5BA850`
+- `PhysParticleSystemDef::vfunc19` = `0x5BA870`
+- `PhysParticleSystemDef::vfunc20` = `0x5A2FC0`
+- `PhysParticleSystemDef::vfunc21` = `0x67AA00`
+- `PhysParticleSystemDef::vfunc22` = `0x65F500`
+- `PhysParticleSystemDef::vfunc23` = `0x5BAA80`
+- `PhysParticleSystemDef::vfunc24` = `0x5BAB20`
+
+## PhysicalCollectable  (vtable @ 0x76FDC8, 5 methods)
+
+- `PhysicalCollectable::vfunc0` = `0x483950`
+- `PhysicalCollectable::vfunc1` = `0x4832C0`
+- `PhysicalCollectable::vfunc2` = `0x483270`
+- `PhysicalCollectable::vfunc3` = `0x4832A0`
+- `PhysicalCollectable::vfunc4` = `0x4837B0`
+
+## PhysicalCollectable  (vtable @ 0x76FD7C, 18 methods)
+
+- `PhysicalCollectable::vfunc0` = `0x4179D0`
+- `PhysicalCollectable::vfunc1` = `0x46B3B0`
+- `PhysicalCollectable::vfunc2` = `0x483960`
+- `PhysicalCollectable::vfunc3` = `0x629920`
+- `PhysicalCollectable::vfunc4` = `0x546E20`
+- `PhysicalCollectable::vfunc5` = `0x46DAC0`
+- `PhysicalCollectable::vfunc6` = `0x46B350`
+- `PhysicalCollectable::vfunc7` = `0x546E30`
+- `PhysicalCollectable::vfunc8` = `0x46DB60`
+- `PhysicalCollectable::vfunc9` = `0x46DB20`
+- `PhysicalCollectable::vfunc10` = `0x546E20`
+- `PhysicalCollectable::vfunc11` = `0x46B3A0`
+- `PhysicalCollectable::vfunc12` = `0x40B570`
+- `PhysicalCollectable::vfunc13` = `0x46DB30`
+- `PhysicalCollectable::vfunc14` = `0x437C60`
+- `PhysicalCollectable::vfunc15` = `0x437C60`
+- `PhysicalCollectable::vfunc16` = `0x483880`
+- `PhysicalCollectable::vfunc17` = `0x4838C0`
+
+## PhysicalCollectable  (vtable @ 0x76FD5C, 6 methods)
+
+- `PhysicalCollectable::vfunc0` = `0x483940`
+- `PhysicalCollectable::vfunc1` = `0x4607B0`
+- `PhysicalCollectable::vfunc2` = `0x4600D0`
+- `PhysicalCollectable::vfunc3` = `0x46D470`
+- `PhysicalCollectable::vfunc4` = `0x65F500`
+- `PhysicalCollectable::vfunc5` = `0x4218E0`
+
+## PhysicalCollectable  (vtable @ 0x76FC7C, 55 methods)
+
+- `PhysicalCollectable::vfunc0` = `0x482C40`
+- `PhysicalCollectable::vfunc1` = `0x604E40`
+- `PhysicalCollectable::vfunc2` = `0x57E760`
+- `PhysicalCollectable::vfunc3` = `0x57E760`
+- `PhysicalCollectable::vfunc4` = `0x482B50`
+- `PhysicalCollectable::vfunc5` = `0x482F40`
+- `PhysicalCollectable::vfunc6` = `0x680110`
+- `PhysicalCollectable::vfunc7` = `0x604E40`
+- `PhysicalCollectable::vfunc8` = `0x64CAE0`
+- `PhysicalCollectable::vfunc9` = `0x64CAE0`
+- `PhysicalCollectable::vfunc10` = `0x64CAE0`
+- `PhysicalCollectable::vfunc11` = `0x64CAE0`
+- `PhysicalCollectable::vfunc12` = `0x64CAE0`
+- `PhysicalCollectable::vfunc13` = `0x4D7E90`
+- `PhysicalCollectable::vfunc14` = `0x64CAE0`
+- `PhysicalCollectable::vfunc15` = `0x65F310`
+- `PhysicalCollectable::vfunc16` = `0x64CAE0`
+- `PhysicalCollectable::vfunc17` = `0x4833A0`
+- `PhysicalCollectable::vfunc18` = `0x460B60`
+- `PhysicalCollectable::vfunc19` = `0x460260`
+- `PhysicalCollectable::vfunc20` = `0x460280`
+- `PhysicalCollectable::vfunc21` = `0x64CAE0`
+- `PhysicalCollectable::vfunc22` = `0x460B60`
+- `PhysicalCollectable::vfunc23` = `0x45F970`
+- `PhysicalCollectable::vfunc24` = `0x46DB50`
+- `PhysicalCollectable::vfunc25` = `0x45F8A0`
+- `PhysicalCollectable::vfunc26` = `0x45F920`
+- `PhysicalCollectable::vfunc27` = `0x516940`
+- `PhysicalCollectable::vfunc28` = `0x64A9B0`
+- `PhysicalCollectable::vfunc29` = `0x460160`
+- `PhysicalCollectable::vfunc30` = `0x4605E0`
+- `PhysicalCollectable::vfunc31` = `0x460450`
+- `PhysicalCollectable::vfunc32` = `0x460830`
+- `PhysicalCollectable::vfunc33` = `0x460A00`
+- `PhysicalCollectable::vfunc34` = `0x45FC80`
+- `PhysicalCollectable::vfunc35` = `0x460B70`
+- `PhysicalCollectable::vfunc36` = `0x460110`
+- `PhysicalCollectable::vfunc37` = `0x460B60`
+- `PhysicalCollectable::vfunc38` = `0x460B60`
+- `PhysicalCollectable::vfunc39` = `0x64A9B0`
+- `PhysicalCollectable::vfunc40` = `0x460610`
+- `PhysicalCollectable::vfunc41` = `0x45FF80`
+- `PhysicalCollectable::vfunc42` = `0x45FE40`
+- `PhysicalCollectable::vfunc43` = `0x4218C0`
+- `PhysicalCollectable::vfunc44` = `0x4600B0`
+- `PhysicalCollectable::vfunc45` = `0x4602D0`
+- `PhysicalCollectable::vfunc46` = `0x460A20`
+- `PhysicalCollectable::vfunc47` = `0x460A70`
+- `PhysicalCollectable::vfunc48` = `0x460A40`
+- `PhysicalCollectable::vfunc49` = `0x460B60`
+- `PhysicalCollectable::vfunc50` = `0x460B60`
+- `PhysicalCollectable::vfunc51` = `0x547170`
+- `PhysicalCollectable::vfunc52` = `0x47C830`
+- `PhysicalCollectable::vfunc53` = `0x4830C0`
+- `PhysicalCollectable::vfunc54` = `0x460B60`
+
+## PhysicalInterface  (vtable @ 0x76CF8C, 18 methods)
+
+- `PhysicalInterface::vfunc0` = `0x4179D0`
+- `PhysicalInterface::vfunc1` = `0x46B3B0`
+- `PhysicalInterface::vfunc2` = `0x46B320`
+- `PhysicalInterface::vfunc3` = `0x6E6E7D`
+- `PhysicalInterface::vfunc4` = `0x546E20`
+- `PhysicalInterface::vfunc5` = `0x6E6E7D`
+- `PhysicalInterface::vfunc6` = `0x46B350`
+- `PhysicalInterface::vfunc7` = `0x6E6E7D`
+- `PhysicalInterface::vfunc8` = `0x6E6E7D`
+- `PhysicalInterface::vfunc9` = `0x6E6E7D`
+- `PhysicalInterface::vfunc10` = `0x546E20`
+- `PhysicalInterface::vfunc11` = `0x46B3A0`
+- `PhysicalInterface::vfunc12` = `0x516940`
+- `PhysicalInterface::vfunc13` = `0x6E6E7D`
+- `PhysicalInterface::vfunc14` = `0x437C60`
+- `PhysicalInterface::vfunc15` = `0x437C60`
+- `PhysicalInterface::vfunc16` = `0x6E6E7D`
+- `PhysicalInterface::vfunc17` = `0x6E6E7D`
+
+## PhysicalParticleImpl  (vtable @ 0x783A6C, 18 methods)
+
+- `PhysicalParticleImpl::vfunc0` = `0x4179D0`
+- `PhysicalParticleImpl::vfunc1` = `0x5B9690`
+- `PhysicalParticleImpl::vfunc2` = `0x5BA630`
+- `PhysicalParticleImpl::vfunc3` = `0x4895E0`
+- `PhysicalParticleImpl::vfunc4` = `0x46F7E0`
+- `PhysicalParticleImpl::vfunc5` = `0x435630`
+- `PhysicalParticleImpl::vfunc6` = `0x46B350`
+- `PhysicalParticleImpl::vfunc7` = `0x546E30`
+- `PhysicalParticleImpl::vfunc8` = `0x65F170`
+- `PhysicalParticleImpl::vfunc9` = `0x46A650`
+- `PhysicalParticleImpl::vfunc10` = `0x629920`
+- `PhysicalParticleImpl::vfunc11` = `0x46F7D0`
+- `PhysicalParticleImpl::vfunc12` = `0x46F7F0`
+- `PhysicalParticleImpl::vfunc13` = `0x46F800`
+- `PhysicalParticleImpl::vfunc14` = `0x46DB30`
+- `PhysicalParticleImpl::vfunc15` = `0x46F820`
+- `PhysicalParticleImpl::vfunc16` = `0x5B9630`
+- `PhysicalParticleImpl::vfunc17` = `0x5B9660`
+
+## PhysicalParticleImpl  (vtable @ 0x783A4C, 6 methods)
+
+- `PhysicalParticleImpl::vfunc0` = `0x5BA640`
+- `PhysicalParticleImpl::vfunc1` = `0x4607B0`
+- `PhysicalParticleImpl::vfunc2` = `0x4600D0`
+- `PhysicalParticleImpl::vfunc3` = `0x46D470`
+- `PhysicalParticleImpl::vfunc4` = `0x65F500`
+- `PhysicalParticleImpl::vfunc5` = `0x4218E0`
+
+## PhysicalParticleImpl  (vtable @ 0x783974, 53 methods)
+
+- `PhysicalParticleImpl::vfunc0` = `0x5B9E60`
+- `PhysicalParticleImpl::vfunc1` = `0x604E40`
+- `PhysicalParticleImpl::vfunc2` = `0x57E760`
+- `PhysicalParticleImpl::vfunc3` = `0x57E760`
+- `PhysicalParticleImpl::vfunc4` = `0x5B92D0`
+- `PhysicalParticleImpl::vfunc5` = `0x5B9460`
+- `PhysicalParticleImpl::vfunc6` = `0x680110`
+- `PhysicalParticleImpl::vfunc7` = `0x604E40`
+- `PhysicalParticleImpl::vfunc8` = `0x64CAE0`
+- `PhysicalParticleImpl::vfunc9` = `0x64CAE0`
+- `PhysicalParticleImpl::vfunc10` = `0x64CAE0`
+- `PhysicalParticleImpl::vfunc11` = `0x64CAE0`
+- `PhysicalParticleImpl::vfunc12` = `0x64CAE0`
+- `PhysicalParticleImpl::vfunc13` = `0x4D7E90`
+- `PhysicalParticleImpl::vfunc14` = `0x64CAE0`
+- `PhysicalParticleImpl::vfunc15` = `0x65F310`
+- `PhysicalParticleImpl::vfunc16` = `0x64CAE0`
+- `PhysicalParticleImpl::vfunc17` = `0x5B9880`
+- `PhysicalParticleImpl::vfunc18` = `0x460B60`
+- `PhysicalParticleImpl::vfunc19` = `0x460260`
+- `PhysicalParticleImpl::vfunc20` = `0x460280`
+- `PhysicalParticleImpl::vfunc21` = `0x64CAE0`
+- `PhysicalParticleImpl::vfunc22` = `0x460B60`
+- `PhysicalParticleImpl::vfunc23` = `0x45F970`
+- `PhysicalParticleImpl::vfunc24` = `0x45F980`
+- `PhysicalParticleImpl::vfunc25` = `0x45F8A0`
+- `PhysicalParticleImpl::vfunc26` = `0x45F920`
+- `PhysicalParticleImpl::vfunc27` = `0x516940`
+- `PhysicalParticleImpl::vfunc28` = `0x64A9B0`
+- `PhysicalParticleImpl::vfunc29` = `0x460160`
+- `PhysicalParticleImpl::vfunc30` = `0x4605E0`
+- `PhysicalParticleImpl::vfunc31` = `0x460450`
+- `PhysicalParticleImpl::vfunc32` = `0x460830`
+- `PhysicalParticleImpl::vfunc33` = `0x460A00`
+- `PhysicalParticleImpl::vfunc34` = `0x45FC80`
+- `PhysicalParticleImpl::vfunc35` = `0x460B70`
+- `PhysicalParticleImpl::vfunc36` = `0x460110`
+- `PhysicalParticleImpl::vfunc37` = `0x460B60`
+- `PhysicalParticleImpl::vfunc38` = `0x460B60`
+- `PhysicalParticleImpl::vfunc39` = `0x64A9B0`
+- `PhysicalParticleImpl::vfunc40` = `0x460610`
+- `PhysicalParticleImpl::vfunc41` = `0x5B9340`
+- `PhysicalParticleImpl::vfunc42` = `0x45FE40`
+- `PhysicalParticleImpl::vfunc43` = `0x4218C0`
+- `PhysicalParticleImpl::vfunc44` = `0x4600B0`
+- `PhysicalParticleImpl::vfunc45` = `0x4602D0`
+- `PhysicalParticleImpl::vfunc46` = `0x460A20`
+- `PhysicalParticleImpl::vfunc47` = `0x460A70`
+- `PhysicalParticleImpl::vfunc48` = `0x460A40`
+- `PhysicalParticleImpl::vfunc49` = `0x460B60`
+- `PhysicalParticleImpl::vfunc50` = `0x460B60`
+- `PhysicalParticleImpl::vfunc51` = `0x547170`
+- `PhysicalParticleImpl::vfunc52` = `0x47C830`
+
+## PipeTag  (vtable @ 0x77FD48, 10 methods)
+
+- `PipeTag::vfunc0` = `0x57E850`
+- `PipeTag::vfunc1` = `0x604E40`
+- `PipeTag::vfunc2` = `0x57E760`
+- `PipeTag::vfunc3` = `0x57E760`
+- `PipeTag::vfunc4` = `0x5850C0`
+- `PipeTag::vfunc5` = `0x585150`
+- `PipeTag::vfunc6` = `0x5852A0`
+- `PipeTag::vfunc7` = `0x582220`
+- `PipeTag::vfunc8` = `0x460B60`
+- `PipeTag::vfunc9` = `0x680110`
+
+## PlayerArmorPrefs  (vtable @ 0x769194, 22 methods)
+
+- `PlayerArmorPrefs::vfunc0` = `0x4417A0`
+- `PlayerArmorPrefs::vfunc1` = `0x604E40`
+- `PlayerArmorPrefs::vfunc2` = `0x4041C0`
+- `PlayerArmorPrefs::vfunc3` = `0x4041C0`
+- `PlayerArmorPrefs::vfunc4` = `0x43FF40`
+- `PlayerArmorPrefs::vfunc5` = `0x460B60`
+- `PlayerArmorPrefs::vfunc6` = `0x610BC0`
+- `PlayerArmorPrefs::vfunc7` = `0x547170`
+- `PlayerArmorPrefs::vfunc8` = `0x610BD0`
+- `PlayerArmorPrefs::vfunc9` = `0x64A9B0`
+- `PlayerArmorPrefs::vfunc10` = `0x60EAE0`
+- `PlayerArmorPrefs::vfunc11` = `0x460B60`
+- `PlayerArmorPrefs::vfunc12` = `0x437C60`
+- `PlayerArmorPrefs::vfunc13` = `0x460B60`
+- `PlayerArmorPrefs::vfunc14` = `0x64CAE0`
+- `PlayerArmorPrefs::vfunc15` = `0x441870`
+- `PlayerArmorPrefs::vfunc16` = `0x437C60`
+- `PlayerArmorPrefs::vfunc17` = `0x610C00`
+- `PlayerArmorPrefs::vfunc18` = `0x43FF50`
+- `PlayerArmorPrefs::vfunc19` = `0x43FF70`
+- `PlayerArmorPrefs::vfunc20` = `0x4418F0`
+- `PlayerArmorPrefs::vfunc21` = `0x67AA00`
+
+## PlayerBoltPrefs  (vtable @ 0x773734, 37 methods)
+
+- `PlayerBoltPrefs::vfunc0` = `0x4A0F40`
+- `PlayerBoltPrefs::vfunc1` = `0x604E40`
+- `PlayerBoltPrefs::vfunc2` = `0x4041C0`
+- `PlayerBoltPrefs::vfunc3` = `0x4041C0`
+- `PlayerBoltPrefs::vfunc4` = `0x49A820`
+- `PlayerBoltPrefs::vfunc5` = `0x460B60`
+- `PlayerBoltPrefs::vfunc6` = `0x610BC0`
+- `PlayerBoltPrefs::vfunc7` = `0x547170`
+- `PlayerBoltPrefs::vfunc8` = `0x610BD0`
+- `PlayerBoltPrefs::vfunc9` = `0x64A9B0`
+- `PlayerBoltPrefs::vfunc10` = `0x60EAE0`
+- `PlayerBoltPrefs::vfunc11` = `0x460B60`
+- `PlayerBoltPrefs::vfunc12` = `0x437C60`
+- `PlayerBoltPrefs::vfunc13` = `0x460B60`
+- `PlayerBoltPrefs::vfunc14` = `0x64CAE0`
+- `PlayerBoltPrefs::vfunc15` = `0x4A00E0`
+- `PlayerBoltPrefs::vfunc16` = `0x437C60`
+- `PlayerBoltPrefs::vfunc17` = `0x610C00`
+- `PlayerBoltPrefs::vfunc18` = `0x49A830`
+- `PlayerBoltPrefs::vfunc19` = `0x4A15D0`
+- `PlayerBoltPrefs::vfunc20` = `0x4A0820`
+- `PlayerBoltPrefs::vfunc21` = `0x67AA00`
+- `PlayerBoltPrefs::vfunc22` = `0x64A9B0`
+- `PlayerBoltPrefs::vfunc23` = `0x64A9B0`
+- `PlayerBoltPrefs::vfunc24` = `0x64A9B0`
+- `PlayerBoltPrefs::vfunc25` = `0x49A7E0`
+- `PlayerBoltPrefs::vfunc26` = `0x64A9B0`
+- `PlayerBoltPrefs::vfunc27` = `0x64A9B0`
+- `PlayerBoltPrefs::vfunc28` = `0x604E40`
+- `PlayerBoltPrefs::vfunc29` = `0x4A0170`
+- `PlayerBoltPrefs::vfunc30` = `0x4A0300`
+- `PlayerBoltPrefs::vfunc31` = `0x49A850`
+- `PlayerBoltPrefs::vfunc32` = `0x49A8F0`
+- `PlayerBoltPrefs::vfunc33` = `0x4A01D0`
+- `PlayerBoltPrefs::vfunc34` = `0x4A0250`
+- `PlayerBoltPrefs::vfunc35` = `0x4A0430`
+- `PlayerBoltPrefs::vfunc36` = `0x4A0430`
+
+## PlayerImpl  (vtable @ 0x76B0A4, 18 methods)
+
+- `PlayerImpl::vfunc0` = `0x4179D0`
+- `PlayerImpl::vfunc1` = `0x46B3B0`
+- `PlayerImpl::vfunc2` = `0x455980`
+- `PlayerImpl::vfunc3` = `0x41DFF0`
+- `PlayerImpl::vfunc4` = `0x546E20`
+- `PlayerImpl::vfunc5` = `0x435630`
+- `PlayerImpl::vfunc6` = `0x46B350`
+- `PlayerImpl::vfunc7` = `0x41E090`
+- `PlayerImpl::vfunc8` = `0x41E1C0`
+- `PlayerImpl::vfunc9` = `0x41E2C0`
+- `PlayerImpl::vfunc10` = `0x546E20`
+- `PlayerImpl::vfunc11` = `0x46B3A0`
+- `PlayerImpl::vfunc12` = `0x516940`
+- `PlayerImpl::vfunc13` = `0x437C60`
+- `PlayerImpl::vfunc14` = `0x437C60`
+- `PlayerImpl::vfunc15` = `0x437C60`
+- `PlayerImpl::vfunc16` = `0x4522A0`
+- `PlayerImpl::vfunc17` = `0x451F10`
+
+## PlayerImpl  (vtable @ 0x76B024, 31 methods)
+
+- `PlayerImpl::vfunc0` = `0x4559A0`
+- `PlayerImpl::vfunc1` = `0x4559C0`
+- `PlayerImpl::vfunc2` = `0x46A610`
+- `PlayerImpl::vfunc3` = `0x46A630`
+- `PlayerImpl::vfunc4` = `0x46A650`
+- `PlayerImpl::vfunc5` = `0x46A660`
+- `PlayerImpl::vfunc6` = `0x604E40`
+- `PlayerImpl::vfunc7` = `0x64A9B0`
+- `PlayerImpl::vfunc8` = `0x46AB90`
+- `PlayerImpl::vfunc9` = `0x63DDA0`
+- `PlayerImpl::vfunc10` = `0x46ABC0`
+- `PlayerImpl::vfunc11` = `0x63DDB0`
+- `PlayerImpl::vfunc12` = `0x46ABD0`
+- `PlayerImpl::vfunc13` = `0x46AF60`
+- `PlayerImpl::vfunc14` = `0x46ABE0`
+- `PlayerImpl::vfunc15` = `0x46AC70`
+- `PlayerImpl::vfunc16` = `0x46B210`
+- `PlayerImpl::vfunc17` = `0x46ACC0`
+- `PlayerImpl::vfunc18` = `0x46ACF0`
+- `PlayerImpl::vfunc19` = `0x46A7D0`
+- `PlayerImpl::vfunc20` = `0x46AF00`
+- `PlayerImpl::vfunc21` = `0x516940`
+- `PlayerImpl::vfunc22` = `0x44D230`
+- `PlayerImpl::vfunc23` = `0x44E1A0`
+- `PlayerImpl::vfunc24` = `0x44DA70`
+- `PlayerImpl::vfunc25` = `0x460B60`
+- `PlayerImpl::vfunc26` = `0x420590`
+- `PlayerImpl::vfunc27` = `0x65F170`
+- `PlayerImpl::vfunc28` = `0x65F500`
+- `PlayerImpl::vfunc29` = `0x46AC90`
+- `PlayerImpl::vfunc30` = `0x46AD10`
+
+## PlayerImpl  (vtable @ 0x76AFF4, 6 methods)
+
+- `PlayerImpl::vfunc0` = `0x4559E0`
+- `PlayerImpl::vfunc1` = `0x4535A0`
+- `PlayerImpl::vfunc2` = `0x4600D0`
+- `PlayerImpl::vfunc3` = `0x46D470`
+- `PlayerImpl::vfunc4` = `0x65F500`
+- `PlayerImpl::vfunc5` = `0x4218E0`
+
+## PlayerImpl  (vtable @ 0x76ACE4, 195 methods)
+
+- `PlayerImpl::vfunc0` = `0x443F10`
+- `PlayerImpl::vfunc1` = `0x604E40`
+- `PlayerImpl::vfunc2` = `0x57E760`
+- `PlayerImpl::vfunc3` = `0x57E760`
+- `PlayerImpl::vfunc4` = `0x442570`
+- `PlayerImpl::vfunc5` = `0x445720`
+- `PlayerImpl::vfunc6` = `0x680110`
+- `PlayerImpl::vfunc7` = `0x604E40`
+- `PlayerImpl::vfunc8` = `0x47E370`
+- `PlayerImpl::vfunc9` = `0x64CAE0`
+- `PlayerImpl::vfunc10` = `0x64CAE0`
+- `PlayerImpl::vfunc11` = `0x64CAE0`
+- `PlayerImpl::vfunc12` = `0x64CAE0`
+- `PlayerImpl::vfunc13` = `0x41D1A0`
+- `PlayerImpl::vfunc14` = `0x64CAE0`
+- `PlayerImpl::vfunc15` = `0x65F310`
+- `PlayerImpl::vfunc16` = `0x448FA0`
+- `PlayerImpl::vfunc17` = `0x44F550`
+- `PlayerImpl::vfunc18` = `0x460B60`
+- `PlayerImpl::vfunc19` = `0x460260`
+- `PlayerImpl::vfunc20` = `0x460280`
+- `PlayerImpl::vfunc21` = `0x64CAE0`
+- `PlayerImpl::vfunc22` = `0x460B60`
+- `PlayerImpl::vfunc23` = `0x45F970`
+- `PlayerImpl::vfunc24` = `0x41E1A0`
+- `PlayerImpl::vfunc25` = `0x45F8A0`
+- `PlayerImpl::vfunc26` = `0x453500`
+- `PlayerImpl::vfunc27` = `0x516940`
+- `PlayerImpl::vfunc28` = `0x64A9B0`
+- `PlayerImpl::vfunc29` = `0x460160`
+- `PlayerImpl::vfunc30` = `0x41FB70`
+- `PlayerImpl::vfunc31` = `0x41FB50`
+- `PlayerImpl::vfunc32` = `0x452660`
+- `PlayerImpl::vfunc33` = `0x460A00`
+- `PlayerImpl::vfunc34` = `0x421110`
+- `PlayerImpl::vfunc35` = `0x460B70`
+- `PlayerImpl::vfunc36` = `0x460110`
+- `PlayerImpl::vfunc37` = `0x4203F0`
+- `PlayerImpl::vfunc38` = `0x460B60`
+- `PlayerImpl::vfunc39` = `0x64A9B0`
+- `PlayerImpl::vfunc40` = `0x460610`
+- `PlayerImpl::vfunc41` = `0x446AB0`
+- `PlayerImpl::vfunc42` = `0x45FE40`
+- `PlayerImpl::vfunc43` = `0x4218C0`
+- `PlayerImpl::vfunc44` = `0x43FF20`
+- `PlayerImpl::vfunc45` = `0x516940`
+- `PlayerImpl::vfunc46` = `0x460A20`
+- `PlayerImpl::vfunc47` = `0x460A70`
+- `PlayerImpl::vfunc48` = `0x460A40`
+- `PlayerImpl::vfunc49` = `0x460B60`
+- `PlayerImpl::vfunc50` = `0x421160`
+- `PlayerImpl::vfunc51` = `0x446B10`
+- `PlayerImpl::vfunc52` = `0x41D9C0`
+- `PlayerImpl::vfunc53` = `0x452690`
+- `PlayerImpl::vfunc54` = `0x4526B0`
+- `PlayerImpl::vfunc55` = `0x4530F0`
+- `PlayerImpl::vfunc56` = `0x41E010`
+- `PlayerImpl::vfunc57` = `0x41E030`
+- `PlayerImpl::vfunc58` = `0x41E050`
+- `PlayerImpl::vfunc59` = `0x41E070`
+- `PlayerImpl::vfunc60` = `0x437C60`
+- `PlayerImpl::vfunc61` = `0x64A9B0`
+- `PlayerImpl::vfunc62` = `0x41F380`
+- `PlayerImpl::vfunc63` = `0x41E300`
+- `PlayerImpl::vfunc64` = `0x41E300`
+- `PlayerImpl::vfunc65` = `0x41FC80`
+- `PlayerImpl::vfunc66` = `0x44F340`
+- `PlayerImpl::vfunc67` = `0x450170`
+- `PlayerImpl::vfunc68` = `0x4467E0`
+- `PlayerImpl::vfunc69` = `0x41FCF0`
+- `PlayerImpl::vfunc70` = `0x41FFA0`
+- `PlayerImpl::vfunc71` = `0x41DAD0`
+- `PlayerImpl::vfunc72` = `0x448FC0`
+- `PlayerImpl::vfunc73` = `0x449090`
+- `PlayerImpl::vfunc74` = `0x460B60`
+- `PlayerImpl::vfunc75` = `0x460B60`
+- `PlayerImpl::vfunc76` = `0x449160`
+- `PlayerImpl::vfunc77` = `0x447D00`
+- `PlayerImpl::vfunc78` = `0x446920`
+- `PlayerImpl::vfunc79` = `0x64BC40`
+- `PlayerImpl::vfunc80` = `0x41E360`
+- `PlayerImpl::vfunc81` = `0x41E360`
+- `PlayerImpl::vfunc82` = `0x41E4B0`
+- `PlayerImpl::vfunc83` = `0x41E570`
+- `PlayerImpl::vfunc84` = `0x64A9B0`
+- `PlayerImpl::vfunc85` = `0x41EAA0`
+- `PlayerImpl::vfunc86` = `0x41EA90`
+- `PlayerImpl::vfunc87` = `0x41E310`
+- `PlayerImpl::vfunc88` = `0x44D2D0`
+- `PlayerImpl::vfunc89` = `0x44D360`
+- `PlayerImpl::vfunc90` = `0x64CAE0`
+- `PlayerImpl::vfunc91` = `0x442590`
+- `PlayerImpl::vfunc92` = `0x4425A0`
+- `PlayerImpl::vfunc93` = `0x41E730`
+- `PlayerImpl::vfunc94` = `0x44B4B0`
+- `PlayerImpl::vfunc95` = `0x44B570`
+- `PlayerImpl::vfunc96` = `0x4455C0`
+- `PlayerImpl::vfunc97` = `0x460B60`
+- `PlayerImpl::vfunc98` = `0x442580`
+- `PlayerImpl::vfunc99` = `0x446D90`
+- `PlayerImpl::vfunc100` = `0x452330`
+- `PlayerImpl::vfunc101` = `0x4523E0`
+- `PlayerImpl::vfunc102` = `0x452530`
+- `PlayerImpl::vfunc103` = `0x452560`
+- `PlayerImpl::vfunc104` = `0x4525C0`
+- `PlayerImpl::vfunc105` = `0x452710`
+- `PlayerImpl::vfunc106` = `0x456090`
+- `PlayerImpl::vfunc107` = `0x456AD0`
+- `PlayerImpl::vfunc108` = `0x452810`
+- `PlayerImpl::vfunc109` = `0x4528A0`
+- `PlayerImpl::vfunc110` = `0x4528E0`
+- `PlayerImpl::vfunc111` = `0x4528B0`
+- `PlayerImpl::vfunc112` = `0x4528D0`
+- `PlayerImpl::vfunc113` = `0x447AE0`
+- `PlayerImpl::vfunc114` = `0x447AF0`
+- `PlayerImpl::vfunc115` = `0x447BB0`
+- `PlayerImpl::vfunc116` = `0x447BF0`
+- `PlayerImpl::vfunc117` = `0x447C40`
+- `PlayerImpl::vfunc118` = `0x447C80`
+- `PlayerImpl::vfunc119` = `0x447C90`
+- `PlayerImpl::vfunc120` = `0x455EF0`
+- `PlayerImpl::vfunc121` = `0x4468A0`
+- `PlayerImpl::vfunc122` = `0x460B60`
+- `PlayerImpl::vfunc123` = `0x45A4F0`
+- `PlayerImpl::vfunc124` = `0x45A530`
+- `PlayerImpl::vfunc125` = `0x45C590`
+- `PlayerImpl::vfunc126` = `0x460B60`
+- `PlayerImpl::vfunc127` = `0x45BD80`
+- `PlayerImpl::vfunc128` = `0x45BF80`
+- `PlayerImpl::vfunc129` = `0x45A6A0`
+- `PlayerImpl::vfunc130` = `0x453260`
+- `PlayerImpl::vfunc131` = `0x452320`
+- `PlayerImpl::vfunc132` = `0x44EB80`
+- `PlayerImpl::vfunc133` = `0x44EAD0`
+- `PlayerImpl::vfunc134` = `0x44EBD0`
+- `PlayerImpl::vfunc135` = `0x44F4F0`
+- `PlayerImpl::vfunc136` = `0x447880`
+- `PlayerImpl::vfunc137` = `0x4478B0`
+- `PlayerImpl::vfunc138` = `0x45BFB0`
+- `PlayerImpl::vfunc139` = `0x44FEF0`
+- `PlayerImpl::vfunc140` = `0x44FF10`
+- `PlayerImpl::vfunc141` = `0x44FF20`
+- `PlayerImpl::vfunc142` = `0x44FF20`
+- `PlayerImpl::vfunc143` = `0x44FEA0`
+- `PlayerImpl::vfunc144` = `0x44FEB0`
+- `PlayerImpl::vfunc145` = `0x44FF30`
+- `PlayerImpl::vfunc146` = `0x44FF50`
+- `PlayerImpl::vfunc147` = `0x453620`
+- `PlayerImpl::vfunc148` = `0x453630`
+- `PlayerImpl::vfunc149` = `0x44CFA0`
+- `PlayerImpl::vfunc150` = `0x45C690`
+- `PlayerImpl::vfunc151` = `0x447D20`
+- `PlayerImpl::vfunc152` = `0x447D50`
+- `PlayerImpl::vfunc153` = `0x448460`
+- `PlayerImpl::vfunc154` = `0x4530A0`
+- `PlayerImpl::vfunc155` = `0x44D3B0`
+- `PlayerImpl::vfunc156` = `0x44D470`
+- `PlayerImpl::vfunc157` = `0x44DA40`
+- `PlayerImpl::vfunc158` = `0x44C9A0`
+- `PlayerImpl::vfunc159` = `0x44D2C0`
+- `PlayerImpl::vfunc160` = `0x44D130`
+- `PlayerImpl::vfunc161` = `0x44D210`
+- `PlayerImpl::vfunc162` = `0x44D220`
+- `PlayerImpl::vfunc163` = `0x453390`
+- `PlayerImpl::vfunc164` = `0x4533D0`
+- `PlayerImpl::vfunc165` = `0x450340`
+- `PlayerImpl::vfunc166` = `0x4503A0`
+- `PlayerImpl::vfunc167` = `0x450440`
+- `PlayerImpl::vfunc168` = `0x450400`
+- `PlayerImpl::vfunc169` = `0x4513F0`
+- `PlayerImpl::vfunc170` = `0x451470`
+- `PlayerImpl::vfunc171` = `0x4519E0`
+- `PlayerImpl::vfunc172` = `0x451A10`
+- `PlayerImpl::vfunc173` = `0x451DF0`
+- `PlayerImpl::vfunc174` = `0x451E10`
+- `PlayerImpl::vfunc175` = `0x450C10`
+- `PlayerImpl::vfunc176` = `0x450BD0`
+- `PlayerImpl::vfunc177` = `0x452DE0`
+- `PlayerImpl::vfunc178` = `0x452F90`
+- `PlayerImpl::vfunc179` = `0x444570`
+- `PlayerImpl::vfunc180` = `0x444580`
+- `PlayerImpl::vfunc181` = `0x449370`
+- `PlayerImpl::vfunc182` = `0x4494D0`
+- `PlayerImpl::vfunc183` = `0x449560`
+- `PlayerImpl::vfunc184` = `0x453100`
+- `PlayerImpl::vfunc185` = `0x453110`
+- `PlayerImpl::vfunc186` = `0x45B150`
+- `PlayerImpl::vfunc187` = `0x4534F0`
+- `PlayerImpl::vfunc188` = `0x44EAA0`
+- `PlayerImpl::vfunc189` = `0x4535F0`
+- `PlayerImpl::vfunc190` = `0x453610`
+- `PlayerImpl::vfunc191` = `0x453640`
+- `PlayerImpl::vfunc192` = `0x4525E0`
+- `PlayerImpl::vfunc193` = `0x447230`
+- `PlayerImpl::vfunc194` = `0x449170`
+
+## PlayerNoisesPrefs  (vtable @ 0x76C0F4, 22 methods)
+
+- `PlayerNoisesPrefs::vfunc0` = `0x4CF5C0`
+- `PlayerNoisesPrefs::vfunc1` = `0x604E40`
+- `PlayerNoisesPrefs::vfunc2` = `0x4041C0`
+- `PlayerNoisesPrefs::vfunc3` = `0x4041C0`
+- `PlayerNoisesPrefs::vfunc4` = `0x459D60`
+- `PlayerNoisesPrefs::vfunc5` = `0x460B60`
+- `PlayerNoisesPrefs::vfunc6` = `0x610BC0`
+- `PlayerNoisesPrefs::vfunc7` = `0x547170`
+- `PlayerNoisesPrefs::vfunc8` = `0x610BD0`
+- `PlayerNoisesPrefs::vfunc9` = `0x64A9B0`
+- `PlayerNoisesPrefs::vfunc10` = `0x60EAE0`
+- `PlayerNoisesPrefs::vfunc11` = `0x460B60`
+- `PlayerNoisesPrefs::vfunc12` = `0x437C60`
+- `PlayerNoisesPrefs::vfunc13` = `0x460B60`
+- `PlayerNoisesPrefs::vfunc14` = `0x64CAE0`
+- `PlayerNoisesPrefs::vfunc15` = `0x57B040`
+- `PlayerNoisesPrefs::vfunc16` = `0x437C60`
+- `PlayerNoisesPrefs::vfunc17` = `0x610C00`
+- `PlayerNoisesPrefs::vfunc18` = `0x459D70`
+- `PlayerNoisesPrefs::vfunc19` = `0x459D90`
+- `PlayerNoisesPrefs::vfunc20` = `0x459CB0`
+- `PlayerNoisesPrefs::vfunc21` = `0x67AA00`
+
+## PlayerPrefs  (vtable @ 0x76AC84, 22 methods)
+
+- `PlayerPrefs::vfunc0` = `0x4424E0`
+- `PlayerPrefs::vfunc1` = `0x604E40`
+- `PlayerPrefs::vfunc2` = `0x4041C0`
+- `PlayerPrefs::vfunc3` = `0x4041C0`
+- `PlayerPrefs::vfunc4` = `0x4424A0`
+- `PlayerPrefs::vfunc5` = `0x460B60`
+- `PlayerPrefs::vfunc6` = `0x610BC0`
+- `PlayerPrefs::vfunc7` = `0x547170`
+- `PlayerPrefs::vfunc8` = `0x610BD0`
+- `PlayerPrefs::vfunc9` = `0x64A9B0`
+- `PlayerPrefs::vfunc10` = `0x60EAE0`
+- `PlayerPrefs::vfunc11` = `0x460B60`
+- `PlayerPrefs::vfunc12` = `0x437C60`
+- `PlayerPrefs::vfunc13` = `0x460B60`
+- `PlayerPrefs::vfunc14` = `0x64CAE0`
+- `PlayerPrefs::vfunc15` = `0x442F60`
+- `PlayerPrefs::vfunc16` = `0x437C60`
+- `PlayerPrefs::vfunc17` = `0x610C00`
+- `PlayerPrefs::vfunc18` = `0x4424B0`
+- `PlayerPrefs::vfunc19` = `0x4424D0`
+- `PlayerPrefs::vfunc20` = `0x442820`
+- `PlayerPrefs::vfunc21` = `0x67AA00`
+
+## PointLight  (vtable @ 0x78ADD4, 2 methods)
+
+- `PointLight::vfunc0` = `0x641EC0`
+- `PointLight::vfunc1` = `0x604E40`
+
+## PointLight  (vtable @ 0x78ADA0, 12 methods)
+
+- `PointLight::vfunc0` = `0x6419B0`
+- `PointLight::vfunc1` = `0x604E40`
+- `PointLight::vfunc2` = `0x637710`
+- `PointLight::vfunc3` = `0x475AA0`
+- `PointLight::vfunc4` = `0x47E370`
+- `PointLight::vfunc5` = `0x475A90`
+- `PointLight::vfunc6` = `0x64A9B0`
+- `PointLight::vfunc7` = `0x64CAE0`
+- `PointLight::vfunc8` = `0x641A10`
+- `PointLight::vfunc9` = `0x641B30`
+- `PointLight::vfunc10` = `0x641CA0`
+- `PointLight::vfunc11` = `0x60B200`
+
+## PrefsRumble  (vtable @ 0x77E310, 3 methods)
+
+- `PrefsRumble::vfunc0` = `0x579060`
+- `PrefsRumble::vfunc1` = `0x604E40`
+- `PrefsRumble::vfunc2` = `0x579310`
+
+## QuadAnimationControl  (vtable @ 0x78A7CC, 16 methods)
+
+- `QuadAnimationControl::vfunc0` = `0x63D9E0`
+- `QuadAnimationControl::vfunc1` = `0x604E40`
+- `QuadAnimationControl::vfunc2` = `0x57E760`
+- `QuadAnimationControl::vfunc3` = `0x57E760`
+- `QuadAnimationControl::vfunc4` = `0x63D8E0`
+- `QuadAnimationControl::vfunc5` = `0x63DE90`
+- `QuadAnimationControl::vfunc6` = `0x680110`
+- `QuadAnimationControl::vfunc7` = `0x63DE10`
+- `QuadAnimationControl::vfunc8` = `0x63DDA0`
+- `QuadAnimationControl::vfunc9` = `0x63DDB0`
+- `QuadAnimationControl::vfunc10` = `0x63DDC0`
+- `QuadAnimationControl::vfunc11` = `0x63DDD0`
+- `QuadAnimationControl::vfunc12` = `0x63D340`
+- `QuadAnimationControl::vfunc13` = `0x63D5A0`
+- `QuadAnimationControl::vfunc14` = `0x63D5D0`
+- `QuadAnimationControl::vfunc15` = `0x63DFC0`
+
+## RadarLocation  (vtable @ 0x77FEE8, 6 methods)
+
+- `RadarLocation::vfunc0` = `0x585B20`
+- `RadarLocation::vfunc1` = `0x475A60`
+- `RadarLocation::vfunc2` = `0x637710`
+- `RadarLocation::vfunc3` = `0x475AA0`
+- `RadarLocation::vfunc4` = `0x47E370`
+- `RadarLocation::vfunc5` = `0x475A90`
+
+## RadarLocation  (vtable @ 0x77FECC, 6 methods)
+
+- `RadarLocation::vfunc0` = `0x585B30`
+- `RadarLocation::vfunc1` = `0x64CAE0`
+- `RadarLocation::vfunc2` = `0x4600D0`
+- `RadarLocation::vfunc3` = `0x46D470`
+- `RadarLocation::vfunc4` = `0x65F500`
+- `RadarLocation::vfunc5` = `0x4218E0`
+
+## RadarLocation  (vtable @ 0x77FDF4, 53 methods)
+
+- `RadarLocation::vfunc0` = `0x585600`
+- `RadarLocation::vfunc1` = `0x604E40`
+- `RadarLocation::vfunc2` = `0x57E760`
+- `RadarLocation::vfunc3` = `0x57E760`
+- `RadarLocation::vfunc4` = `0x585390`
+- `RadarLocation::vfunc5` = `0x585800`
+- `RadarLocation::vfunc6` = `0x680110`
+- `RadarLocation::vfunc7` = `0x64A9B0`
+- `RadarLocation::vfunc8` = `0x64CAE0`
+- `RadarLocation::vfunc9` = `0x64CAE0`
+- `RadarLocation::vfunc10` = `0x64CAE0`
+- `RadarLocation::vfunc11` = `0x64CAE0`
+- `RadarLocation::vfunc12` = `0x64CAE0`
+- `RadarLocation::vfunc13` = `0x64CAE0`
+- `RadarLocation::vfunc14` = `0x64CAE0`
+- `RadarLocation::vfunc15` = `0x65F310`
+- `RadarLocation::vfunc16` = `0x64CAE0`
+- `RadarLocation::vfunc17` = `0x482860`
+- `RadarLocation::vfunc18` = `0x460B60`
+- `RadarLocation::vfunc19` = `0x460260`
+- `RadarLocation::vfunc20` = `0x460280`
+- `RadarLocation::vfunc21` = `0x64CAE0`
+- `RadarLocation::vfunc22` = `0x460B60`
+- `RadarLocation::vfunc23` = `0x4829D0`
+- `RadarLocation::vfunc24` = `0x45F980`
+- `RadarLocation::vfunc25` = `0x4829E0`
+- `RadarLocation::vfunc26` = `0x482A70`
+- `RadarLocation::vfunc27` = `0x585AC0`
+- `RadarLocation::vfunc28` = `0x585B10`
+- `RadarLocation::vfunc29` = `0x460160`
+- `RadarLocation::vfunc30` = `0x4605E0`
+- `RadarLocation::vfunc31` = `0x460450`
+- `RadarLocation::vfunc32` = `0x460B60`
+- `RadarLocation::vfunc33` = `0x460B60`
+- `RadarLocation::vfunc34` = `0x45FC80`
+- `RadarLocation::vfunc35` = `0x460B70`
+- `RadarLocation::vfunc36` = `0x460110`
+- `RadarLocation::vfunc37` = `0x460B60`
+- `RadarLocation::vfunc38` = `0x585A60`
+- `RadarLocation::vfunc39` = `0x585A30`
+- `RadarLocation::vfunc40` = `0x460610`
+- `RadarLocation::vfunc41` = `0x482700`
+- `RadarLocation::vfunc42` = `0x45FE40`
+- `RadarLocation::vfunc43` = `0x4218C0`
+- `RadarLocation::vfunc44` = `0x4600B0`
+- `RadarLocation::vfunc45` = `0x482A90`
+- `RadarLocation::vfunc46` = `0x460600`
+- `RadarLocation::vfunc47` = `0x45FC10`
+- `RadarLocation::vfunc48` = `0x45FAC0`
+- `RadarLocation::vfunc49` = `0x460B60`
+- `RadarLocation::vfunc50` = `0x460B60`
+- `RadarLocation::vfunc51` = `0x547170`
+- `RadarLocation::vfunc52` = `0x64A9B0`
+
+## RadarPrefs  (vtable @ 0x786BF4, 22 methods)
+
+- `RadarPrefs::vfunc0` = `0x5EC170`
+- `RadarPrefs::vfunc1` = `0x604E40`
+- `RadarPrefs::vfunc2` = `0x4041C0`
+- `RadarPrefs::vfunc3` = `0x4041C0`
+- `RadarPrefs::vfunc4` = `0x5EBAB0`
+- `RadarPrefs::vfunc5` = `0x460B60`
+- `RadarPrefs::vfunc6` = `0x610BC0`
+- `RadarPrefs::vfunc7` = `0x547170`
+- `RadarPrefs::vfunc8` = `0x610BD0`
+- `RadarPrefs::vfunc9` = `0x64A9B0`
+- `RadarPrefs::vfunc10` = `0x60EAE0`
+- `RadarPrefs::vfunc11` = `0x460B60`
+- `RadarPrefs::vfunc12` = `0x437C60`
+- `RadarPrefs::vfunc13` = `0x460B60`
+- `RadarPrefs::vfunc14` = `0x64CAE0`
+- `RadarPrefs::vfunc15` = `0x5ECA90`
+- `RadarPrefs::vfunc16` = `0x437C60`
+- `RadarPrefs::vfunc17` = `0x610C00`
+- `RadarPrefs::vfunc18` = `0x5EBAC0`
+- `RadarPrefs::vfunc19` = `0x5EBAE0`
+- `RadarPrefs::vfunc20` = `0x5EC710`
+- `RadarPrefs::vfunc21` = `0x67AA00`
+
+## ReInitNavReq  (vtable @ 0x779148, 10 methods)
+
+- `ReInitNavReq::vfunc0` = `0x4CF5C0`
+- `ReInitNavReq::vfunc1` = `0x604E40`
+- `ReInitNavReq::vfunc2` = `0x57E760`
+- `ReInitNavReq::vfunc3` = `0x57E760`
+- `ReInitNavReq::vfunc4` = `0x50D690`
+- `ReInitNavReq::vfunc5` = `0x50D5A0`
+- `ReInitNavReq::vfunc6` = `0x680110`
+- `ReInitNavReq::vfunc7` = `0x50D700`
+- `ReInitNavReq::vfunc8` = `0x64A9B0`
+- `ReInitNavReq::vfunc9` = `0x516940`
+
+## ReadBufferStream  (vtable @ 0x79CE9C, 10 methods)
+
+- `ReadBufferStream::vfunc0` = `0x691EF0`
+- `ReadBufferStream::vfunc1` = `0x604E40`
+- `ReadBufferStream::vfunc2` = `0x65B5A0`
+- `ReadBufferStream::vfunc3` = `0x6921C0`
+- `ReadBufferStream::vfunc4` = `0x6921A0`
+- `ReadBufferStream::vfunc5` = `0x6921D0`
+- `ReadBufferStream::vfunc6` = `0x691FA0`
+- `ReadBufferStream::vfunc7` = `0x692200`
+- `ReadBufferStream::vfunc8` = `0x692230`
+- `ReadBufferStream::vfunc9` = `0x460B60`
+
+## ReadWholeStream  (vtable @ 0x78F6D8, 10 methods)
+
+- `ReadWholeStream::vfunc0` = `0x64DAA0`
+- `ReadWholeStream::vfunc1` = `0x604E40`
+- `ReadWholeStream::vfunc2` = `0x65B5A0`
+- `ReadWholeStream::vfunc3` = `0x64DBF0`
+- `ReadWholeStream::vfunc4` = `0x689820`
+- `ReadWholeStream::vfunc5` = `0x64DC20`
+- `ReadWholeStream::vfunc6` = `0x64DAC0`
+- `ReadWholeStream::vfunc7` = `0x64DC30`
+- `ReadWholeStream::vfunc8` = `0x64DCC0`
+- `ReadWholeStream::vfunc9` = `0x460B60`
+
+## RecolorAllReq  (vtable @ 0x780B60, 10 methods)
+
+- `RecolorAllReq::vfunc0` = `0x4CF5C0`
+- `RecolorAllReq::vfunc1` = `0x604E40`
+- `RecolorAllReq::vfunc2` = `0x57E760`
+- `RecolorAllReq::vfunc3` = `0x57E760`
+- `RecolorAllReq::vfunc4` = `0x58CC40`
+- `RecolorAllReq::vfunc5` = `0x516940`
+- `RecolorAllReq::vfunc6` = `0x680110`
+- `RecolorAllReq::vfunc7` = `0x58CC50`
+- `RecolorAllReq::vfunc8` = `0x64A9B0`
+- `RecolorAllReq::vfunc9` = `0x516940`
+
+## RefCounted  (vtable @ 0x78874C, 2 methods)
+
+- `RefCounted::vfunc0` = `0x4CF5C0`
+- `RefCounted::vfunc1` = `0x604E40`
+
+## RegroupSpot  (vtable @ 0x76FEE0, 6 methods)
+
+- `RegroupSpot::vfunc0` = `0x482AE0`
+- `RegroupSpot::vfunc1` = `0x475A60`
+- `RegroupSpot::vfunc2` = `0x637710`
+- `RegroupSpot::vfunc3` = `0x475AA0`
+- `RegroupSpot::vfunc4` = `0x47E370`
+- `RegroupSpot::vfunc5` = `0x475A90`
+
+## RegroupSpot  (vtable @ 0x76FEC4, 6 methods)
+
+- `RegroupSpot::vfunc0` = `0x482AF0`
+- `RegroupSpot::vfunc1` = `0x64CAE0`
+- `RegroupSpot::vfunc2` = `0x4600D0`
+- `RegroupSpot::vfunc3` = `0x46D470`
+- `RegroupSpot::vfunc4` = `0x65F500`
+- `RegroupSpot::vfunc5` = `0x4218E0`
+
+## RegroupSpot  (vtable @ 0x76FDEC, 53 methods)
+
+- `RegroupSpot::vfunc0` = `0x482400`
+- `RegroupSpot::vfunc1` = `0x604E40`
+- `RegroupSpot::vfunc2` = `0x57E760`
+- `RegroupSpot::vfunc3` = `0x57E760`
+- `RegroupSpot::vfunc4` = `0x483970`
+- `RegroupSpot::vfunc5` = `0x483AC0`
+- `RegroupSpot::vfunc6` = `0x680110`
+- `RegroupSpot::vfunc7` = `0x64A9B0`
+- `RegroupSpot::vfunc8` = `0x64CAE0`
+- `RegroupSpot::vfunc9` = `0x64CAE0`
+- `RegroupSpot::vfunc10` = `0x64CAE0`
+- `RegroupSpot::vfunc11` = `0x64CAE0`
+- `RegroupSpot::vfunc12` = `0x64CAE0`
+- `RegroupSpot::vfunc13` = `0x64CAE0`
+- `RegroupSpot::vfunc14` = `0x64CAE0`
+- `RegroupSpot::vfunc15` = `0x65F310`
+- `RegroupSpot::vfunc16` = `0x660020`
+- `RegroupSpot::vfunc17` = `0x483E90`
+- `RegroupSpot::vfunc18` = `0x460B60`
+- `RegroupSpot::vfunc19` = `0x460260`
+- `RegroupSpot::vfunc20` = `0x460280`
+- `RegroupSpot::vfunc21` = `0x64CAE0`
+- `RegroupSpot::vfunc22` = `0x460B60`
+- `RegroupSpot::vfunc23` = `0x4829D0`
+- `RegroupSpot::vfunc24` = `0x45F980`
+- `RegroupSpot::vfunc25` = `0x4829E0`
+- `RegroupSpot::vfunc26` = `0x482A70`
+- `RegroupSpot::vfunc27` = `0x516940`
+- `RegroupSpot::vfunc28` = `0x64A9B0`
+- `RegroupSpot::vfunc29` = `0x460160`
+- `RegroupSpot::vfunc30` = `0x4605E0`
+- `RegroupSpot::vfunc31` = `0x460450`
+- `RegroupSpot::vfunc32` = `0x460B60`
+- `RegroupSpot::vfunc33` = `0x460B60`
+- `RegroupSpot::vfunc34` = `0x45FC80`
+- `RegroupSpot::vfunc35` = `0x460B70`
+- `RegroupSpot::vfunc36` = `0x460110`
+- `RegroupSpot::vfunc37` = `0x460B60`
+- `RegroupSpot::vfunc38` = `0x460B60`
+- `RegroupSpot::vfunc39` = `0x64A9B0`
+- `RegroupSpot::vfunc40` = `0x460610`
+- `RegroupSpot::vfunc41` = `0x482700`
+- `RegroupSpot::vfunc42` = `0x45FE40`
+- `RegroupSpot::vfunc43` = `0x4218C0`
+- `RegroupSpot::vfunc44` = `0x4600B0`
+- `RegroupSpot::vfunc45` = `0x482A90`
+- `RegroupSpot::vfunc46` = `0x460600`
+- `RegroupSpot::vfunc47` = `0x45FC10`
+- `RegroupSpot::vfunc48` = `0x45FAC0`
+- `RegroupSpot::vfunc49` = `0x483B70`
+- `RegroupSpot::vfunc50` = `0x460B60`
+- `RegroupSpot::vfunc51` = `0x547170`
+- `RegroupSpot::vfunc52` = `0x64A9B0`
+
+## RegroupTag  (vtable @ 0x77FF80, 10 methods)
+
+- `RegroupTag::vfunc0` = `0x584630`
+- `RegroupTag::vfunc1` = `0x604E40`
+- `RegroupTag::vfunc2` = `0x57E760`
+- `RegroupTag::vfunc3` = `0x57E760`
+- `RegroupTag::vfunc4` = `0x585B40`
+- `RegroupTag::vfunc5` = `0x585BB0`
+- `RegroupTag::vfunc6` = `0x585BD0`
+- `RegroupTag::vfunc7` = `0x582220`
+- `RegroupTag::vfunc8` = `0x460B60`
+- `RegroupTag::vfunc9` = `0x680110`
+
+## RenderContext  (vtable @ 0x788768, 12 methods)
+
+- `RenderContext::vfunc0` = `0x4CF5C0`
+- `RenderContext::vfunc1` = `0x604E40`
+- `RenderContext::vfunc2` = `0x57E760`
+- `RenderContext::vfunc3` = `0x57E760`
+- `RenderContext::vfunc4` = `0x601B30`
+- `RenderContext::vfunc5` = `0x602A70`
+- `RenderContext::vfunc6` = `0x680110`
+- `RenderContext::vfunc7` = `0x601EE0`
+- `RenderContext::vfunc8` = `0x615F6D`
+- `RenderContext::vfunc9` = `0x625F6D`
+- `RenderContext::vfunc10` = `0x675F6D`
+- `RenderContext::vfunc11` = `0x725F6D`
+
+## RenderTarget  (vtable @ 0x78AE58, 8 methods)
+
+- `RenderTarget::vfunc0` = `0x6450B0`
+- `RenderTarget::vfunc1` = `0x604E40`
+- `RenderTarget::vfunc2` = `0x57E760`
+- `RenderTarget::vfunc3` = `0x57E760`
+- `RenderTarget::vfunc4` = `0x645010`
+- `RenderTarget::vfunc5` = `0x602A70`
+- `RenderTarget::vfunc6` = `0x680110`
+- `RenderTarget::vfunc7` = `0x645510`
+
+## RenderableVB  (vtable @ 0x79A334, 18 methods)
+
+- `RenderableVB::vfunc0` = `0x67BD90`
+- `RenderableVB::vfunc1` = `0x604E40`
+- `RenderableVB::vfunc2` = `0x649020`
+- `RenderableVB::vfunc3` = `0x649030`
+- `RenderableVB::vfunc4` = `0x67BB90`
+- `RenderableVB::vfunc5` = `0x663950`
+- `RenderableVB::vfunc6` = `0x67BE30`
+- `RenderableVB::vfunc7` = `0x460B60`
+- `RenderableVB::vfunc8` = `0x67BE60`
+- `RenderableVB::vfunc9` = `0x67BE70`
+- `RenderableVB::vfunc10` = `0x64CAE0`
+- `RenderableVB::vfunc11` = `0x67BF30`
+- `RenderableVB::vfunc12` = `0x67BF60`
+- `RenderableVB::vfunc13` = `0x67BF80`
+- `RenderableVB::vfunc14` = `0x67C010`
+- `RenderableVB::vfunc15` = `0x67C0B0`
+- `RenderableVB::vfunc16` = `0x437C60`
+- `RenderableVB::vfunc17` = `0x60B200`
+
+## RendererHook  (vtable @ 0x767190, 7 methods)
+
+- `RendererHook::vfunc0` = `0x6E6E7D`
+- `RendererHook::vfunc1` = `0x6E6E7D`
+- `RendererHook::vfunc2` = `0x64A9B0`
+- `RendererHook::vfunc3` = `0x64CAE0`
+- `RendererHook::vfunc4` = `0x604E40`
+- `RendererHook::vfunc5` = `0x64CAE0`
+- `RendererHook::vfunc6` = `0x430D50`
+
+## Resource  (vtable @ 0x788CCC, 18 methods)
+
+- `Resource::vfunc0` = `0x4CF5C0`
+- `Resource::vfunc1` = `0x604E40`
+- `Resource::vfunc2` = `0x610CC0`
+- `Resource::vfunc3` = `0x610D20`
+- `Resource::vfunc4` = `0x5FDAA0`
+- `Resource::vfunc5` = `0x616FB0`
+- `Resource::vfunc6` = `0x610BC0`
+- `Resource::vfunc7` = `0x547170`
+- `Resource::vfunc8` = `0x610BD0`
+- `Resource::vfunc9` = `0x6E6E7D`
+- `Resource::vfunc10` = `0x460B60`
+- `Resource::vfunc11` = `0x460B60`
+- `Resource::vfunc12` = `0x437C60`
+- `Resource::vfunc13` = `0x460B60`
+- `Resource::vfunc14` = `0x64BC40`
+- `Resource::vfunc15` = `0x57B040`
+- `Resource::vfunc16` = `0x610C60`
+- `Resource::vfunc17` = `0x610C00`
+
+## RumblePref_Sub  (vtable @ 0x77E304, 2 methods)
+
+- `RumblePref_Sub::vfunc0` = `0x57A740`
+- `RumblePref_Sub::vfunc1` = `0x57A7B0`
+
+## RumblePrefs  (vtable @ 0x77E324, 22 methods)
+
+- `RumblePrefs::vfunc0` = `0x57AF90`
+- `RumblePrefs::vfunc1` = `0x604E40`
+- `RumblePrefs::vfunc2` = `0x4041C0`
+- `RumblePrefs::vfunc3` = `0x4041C0`
+- `RumblePrefs::vfunc4` = `0x578A50`
+- `RumblePrefs::vfunc5` = `0x460B60`
+- `RumblePrefs::vfunc6` = `0x610BC0`
+- `RumblePrefs::vfunc7` = `0x547170`
+- `RumblePrefs::vfunc8` = `0x610BD0`
+- `RumblePrefs::vfunc9` = `0x64A9B0`
+- `RumblePrefs::vfunc10` = `0x60EAE0`
+- `RumblePrefs::vfunc11` = `0x460B60`
+- `RumblePrefs::vfunc12` = `0x437C60`
+- `RumblePrefs::vfunc13` = `0x460B60`
+- `RumblePrefs::vfunc14` = `0x64CAE0`
+- `RumblePrefs::vfunc15` = `0x57B040`
+- `RumblePrefs::vfunc16` = `0x437C60`
+- `RumblePrefs::vfunc17` = `0x610C00`
+- `RumblePrefs::vfunc18` = `0x578A60`
+- `RumblePrefs::vfunc19` = `0x578A80`
+- `RumblePrefs::vfunc20` = `0x57B050`
+- `RumblePrefs::vfunc21` = `0x67AA00`
+
+## SGAttack  (vtable @ 0x778D84, 17 methods)
+
+- `SGAttack::vfunc0` = `0x501B30`
+- `SGAttack::vfunc1` = `0x604E40`
+- `SGAttack::vfunc2` = `0x57E760`
+- `SGAttack::vfunc3` = `0x57E760`
+- `SGAttack::vfunc4` = `0x5019C0`
+- `SGAttack::vfunc5` = `0x502090`
+- `SGAttack::vfunc6` = `0x502080`
+- `SGAttack::vfunc7` = `0x460B60`
+- `SGAttack::vfunc8` = `0x460B60`
+- `SGAttack::vfunc9` = `0x460B60`
+- `SGAttack::vfunc10` = `0x509510`
+- `SGAttack::vfunc11` = `0x5115B0`
+- `SGAttack::vfunc12` = `0x516940`
+- `SGAttack::vfunc13` = `0x5036D0`
+- `SGAttack::vfunc14` = `0x460B60`
+- `SGAttack::vfunc15` = `0x460B60`
+- `SGAttack::vfunc16` = `0x503710`
+
+## SGFireWeapon  (vtable @ 0x778DEC, 17 methods)
+
+- `SGFireWeapon::vfunc0` = `0x509F50`
+- `SGFireWeapon::vfunc1` = `0x604E40`
+- `SGFireWeapon::vfunc2` = `0x57E760`
+- `SGFireWeapon::vfunc3` = `0x57E760`
+- `SGFireWeapon::vfunc4` = `0x509E80`
+- `SGFireWeapon::vfunc5` = `0x50A210`
+- `SGFireWeapon::vfunc6` = `0x4A55C0`
+- `SGFireWeapon::vfunc7` = `0x460B60`
+- `SGFireWeapon::vfunc8` = `0x460B60`
+- `SGFireWeapon::vfunc9` = `0x460B60`
+- `SGFireWeapon::vfunc10` = `0x460B60`
+- `SGFireWeapon::vfunc11` = `0x5115B0`
+- `SGFireWeapon::vfunc12` = `0x516940`
+- `SGFireWeapon::vfunc13` = `0x460B60`
+- `SGFireWeapon::vfunc14` = `0x460B60`
+- `SGFireWeapon::vfunc15` = `0x460B60`
+- `SGFireWeapon::vfunc16` = `0x50A390`
+
+## SGGoThroughDoor  (vtable @ 0x778E44, 17 methods)
+
+- `SGGoThroughDoor::vfunc0` = `0x512DA0`
+- `SGGoThroughDoor::vfunc1` = `0x604E40`
+- `SGGoThroughDoor::vfunc2` = `0x57E760`
+- `SGGoThroughDoor::vfunc3` = `0x57E760`
+- `SGGoThroughDoor::vfunc4` = `0x50A9E0`
+- `SGGoThroughDoor::vfunc5` = `0x50AC70`
+- `SGGoThroughDoor::vfunc6` = `0x4A55C0`
+- `SGGoThroughDoor::vfunc7` = `0x50AFF0`
+- `SGGoThroughDoor::vfunc8` = `0x460B60`
+- `SGGoThroughDoor::vfunc9` = `0x460B60`
+- `SGGoThroughDoor::vfunc10` = `0x460B60`
+- `SGGoThroughDoor::vfunc11` = `0x5115B0`
+- `SGGoThroughDoor::vfunc12` = `0x516940`
+- `SGGoThroughDoor::vfunc13` = `0x460B60`
+- `SGGoThroughDoor::vfunc14` = `0x50B000`
+- `SGGoThroughDoor::vfunc15` = `0x460B60`
+- `SGGoThroughDoor::vfunc16` = `0x50AD10`
+
+## SGGotoDirect  (vtable @ 0x778EB4, 17 methods)
+
+- `SGGotoDirect::vfunc0` = `0x50B970`
+- `SGGotoDirect::vfunc1` = `0x604E40`
+- `SGGotoDirect::vfunc2` = `0x57E760`
+- `SGGotoDirect::vfunc3` = `0x57E760`
+- `SGGotoDirect::vfunc4` = `0x50B800`
+- `SGGotoDirect::vfunc5` = `0x50BAE0`
+- `SGGotoDirect::vfunc6` = `0x4A55C0`
+- `SGGotoDirect::vfunc7` = `0x460B60`
+- `SGGotoDirect::vfunc8` = `0x460B60`
+- `SGGotoDirect::vfunc9` = `0x460B60`
+- `SGGotoDirect::vfunc10` = `0x460B60`
+- `SGGotoDirect::vfunc11` = `0x5115B0`
+- `SGGotoDirect::vfunc12` = `0x50C200`
+- `SGGotoDirect::vfunc13` = `0x460B60`
+- `SGGotoDirect::vfunc14` = `0x460B60`
+- `SGGotoDirect::vfunc15` = `0x460B60`
+- `SGGotoDirect::vfunc16` = `0x50BC60`
+
+## SGGotoNav  (vtable @ 0x778F44, 17 methods)
+
+- `SGGotoNav::vfunc0` = `0x50CC70`
+- `SGGotoNav::vfunc1` = `0x604E40`
+- `SGGotoNav::vfunc2` = `0x57E760`
+- `SGGotoNav::vfunc3` = `0x57E760`
+- `SGGotoNav::vfunc4` = `0x50C380`
+- `SGGotoNav::vfunc5` = `0x50CF50`
+- `SGGotoNav::vfunc6` = `0x50D410`
+- `SGGotoNav::vfunc7` = `0x460B60`
+- `SGGotoNav::vfunc8` = `0x460B60`
+- `SGGotoNav::vfunc9` = `0x50D130`
+- `SGGotoNav::vfunc10` = `0x460B60`
+- `SGGotoNav::vfunc11` = `0x5115B0`
+- `SGGotoNav::vfunc12` = `0x50D460`
+- `SGGotoNav::vfunc13` = `0x50D3D0`
+- `SGGotoNav::vfunc14` = `0x460B60`
+- `SGGotoNav::vfunc15` = `0x460B60`
+- `SGGotoNav::vfunc16` = `0x50D230`
+
+## SGGotoNavWork  (vtable @ 0x7790D4, 17 methods)
+
+- `SGGotoNavWork::vfunc0` = `0x50DB20`
+- `SGGotoNavWork::vfunc1` = `0x604E40`
+- `SGGotoNavWork::vfunc2` = `0x57E760`
+- `SGGotoNavWork::vfunc3` = `0x57E760`
+- `SGGotoNavWork::vfunc4` = `0x50D4C0`
+- `SGGotoNavWork::vfunc5` = `0x50E170`
+- `SGGotoNavWork::vfunc6` = `0x4A55C0`
+- `SGGotoNavWork::vfunc7` = `0x460B60`
+- `SGGotoNavWork::vfunc8` = `0x460B60`
+- `SGGotoNavWork::vfunc9` = `0x50E1D0`
+- `SGGotoNavWork::vfunc10` = `0x460B60`
+- `SGGotoNavWork::vfunc11` = `0x5115B0`
+- `SGGotoNavWork::vfunc12` = `0x50FD00`
+- `SGGotoNavWork::vfunc13` = `0x460B60`
+- `SGGotoNavWork::vfunc14` = `0x460B60`
+- `SGGotoNavWork::vfunc15` = `0x460B60`
+- `SGGotoNavWork::vfunc16` = `0x50E440`
+
+## SGGotoTurnWork  (vtable @ 0x779184, 17 methods)
+
+- `SGGotoTurnWork::vfunc0` = `0x50FF20`
+- `SGGotoTurnWork::vfunc1` = `0x604E40`
+- `SGGotoTurnWork::vfunc2` = `0x57E760`
+- `SGGotoTurnWork::vfunc3` = `0x57E760`
+- `SGGotoTurnWork::vfunc4` = `0x50FDC0`
+- `SGGotoTurnWork::vfunc5` = `0x510100`
+- `SGGotoTurnWork::vfunc6` = `0x4A55C0`
+- `SGGotoTurnWork::vfunc7` = `0x460B60`
+- `SGGotoTurnWork::vfunc8` = `0x460B60`
+- `SGGotoTurnWork::vfunc9` = `0x510140`
+- `SGGotoTurnWork::vfunc10` = `0x460B60`
+- `SGGotoTurnWork::vfunc11` = `0x5115B0`
+- `SGGotoTurnWork::vfunc12` = `0x516940`
+- `SGGotoTurnWork::vfunc13` = `0x460B60`
+- `SGGotoTurnWork::vfunc14` = `0x460B60`
+- `SGGotoTurnWork::vfunc15` = `0x460B60`
+- `SGGotoTurnWork::vfunc16` = `0x510150`
+
+## SGSay  (vtable @ 0x7791D4, 17 methods)
+
+- `SGSay::vfunc0` = `0x518CF0`
+- `SGSay::vfunc1` = `0x604E40`
+- `SGSay::vfunc2` = `0x57E760`
+- `SGSay::vfunc3` = `0x57E760`
+- `SGSay::vfunc4` = `0x5106F0`
+- `SGSay::vfunc5` = `0x510FA0`
+- `SGSay::vfunc6` = `0x4A55C0`
+- `SGSay::vfunc7` = `0x460B60`
+- `SGSay::vfunc8` = `0x460B60`
+- `SGSay::vfunc9` = `0x460B60`
+- `SGSay::vfunc10` = `0x460B60`
+- `SGSay::vfunc11` = `0x5115B0`
+- `SGSay::vfunc12` = `0x516940`
+- `SGSay::vfunc13` = `0x460B60`
+- `SGSay::vfunc14` = `0x460B60`
+- `SGSay::vfunc15` = `0x460B60`
+- `SGSay::vfunc16` = `0x510FE0`
+
+## SGSequence  (vtable @ 0x77922C, 17 methods)
+
+- `SGSequence::vfunc0` = `0x511280`
+- `SGSequence::vfunc1` = `0x604E40`
+- `SGSequence::vfunc2` = `0x57E760`
+- `SGSequence::vfunc3` = `0x57E760`
+- `SGSequence::vfunc4` = `0x511120`
+- `SGSequence::vfunc5` = `0x511310`
+- `SGSequence::vfunc6` = `0x4A55C0`
+- `SGSequence::vfunc7` = `0x460B60`
+- `SGSequence::vfunc8` = `0x460B60`
+- `SGSequence::vfunc9` = `0x460B60`
+- `SGSequence::vfunc10` = `0x460B60`
+- `SGSequence::vfunc11` = `0x5115B0`
+- `SGSequence::vfunc12` = `0x5113A0`
+- `SGSequence::vfunc13` = `0x460B60`
+- `SGSequence::vfunc14` = `0x460B60`
+- `SGSequence::vfunc15` = `0x460B60`
+- `SGSequence::vfunc16` = `0x511360`
+
+## SWFMovie  (vtable @ 0x78A510, 7 methods)
+
+- `SWFMovie::vfunc0` = `0x63A7A0`
+- `SWFMovie::vfunc1` = `0x604E40`
+- `SWFMovie::vfunc2` = `0x57E760`
+- `SWFMovie::vfunc3` = `0x57E760`
+- `SWFMovie::vfunc4` = `0x63A6C0`
+- `SWFMovie::vfunc5` = `0x516940`
+- `SWFMovie::vfunc6` = `0x680110`
+
+## SWFMovieDef  (vtable @ 0x78FCC4, 21 methods)
+
+- `SWFMovieDef::vfunc0` = `0x650BD0`
+- `SWFMovieDef::vfunc1` = `0x604E40`
+- `SWFMovieDef::vfunc2` = `0x610CC0`
+- `SWFMovieDef::vfunc3` = `0x610D20`
+- `SWFMovieDef::vfunc4` = `0x5FDAA0`
+- `SWFMovieDef::vfunc5` = `0x650DD0`
+- `SWFMovieDef::vfunc6` = `0x650E10`
+- `SWFMovieDef::vfunc7` = `0x547170`
+- `SWFMovieDef::vfunc8` = `0x610BD0`
+- `SWFMovieDef::vfunc9` = `0x604E40`
+- `SWFMovieDef::vfunc10` = `0x651190`
+- `SWFMovieDef::vfunc11` = `0x460B60`
+- `SWFMovieDef::vfunc12` = `0x437C60`
+- `SWFMovieDef::vfunc13` = `0x460B60`
+- `SWFMovieDef::vfunc14` = `0x64BC40`
+- `SWFMovieDef::vfunc15` = `0x651150`
+- `SWFMovieDef::vfunc16` = `0x610C60`
+- `SWFMovieDef::vfunc17` = `0x610C00`
+- `SWFMovieDef::vfunc18` = `0x650F80`
+- `SWFMovieDef::vfunc19` = `0x650D70`
+- `SWFMovieDef::vfunc20` = `0x650D20`
+
+## SaveMetaData  (vtable @ 0x7652D8, 2 methods)
+
+- `SaveMetaData::vfunc0` = `0x408FE0`
+- `SaveMetaData::vfunc1` = `0x604E40`
+
+## ScriptVolumeTag  (vtable @ 0x77FFF8, 10 methods)
+
+- `ScriptVolumeTag::vfunc0` = `0x584630`
+- `ScriptVolumeTag::vfunc1` = `0x604E40`
+- `ScriptVolumeTag::vfunc2` = `0x57E760`
+- `ScriptVolumeTag::vfunc3` = `0x57E760`
+- `ScriptVolumeTag::vfunc4` = `0x585CC0`
+- `ScriptVolumeTag::vfunc5` = `0x585D30`
+- `ScriptVolumeTag::vfunc6` = `0x585D50`
+- `ScriptVolumeTag::vfunc7` = `0x582220`
+- `ScriptVolumeTag::vfunc8` = `0x460B60`
+- `ScriptVolumeTag::vfunc9` = `0x680110`
+
+## SektoPrefs  (vtable @ 0x77676C, 22 methods)
+
+- `SektoPrefs::vfunc0` = `0x4D2BC0`
+- `SektoPrefs::vfunc1` = `0x604E40`
+- `SektoPrefs::vfunc2` = `0x4041C0`
+- `SektoPrefs::vfunc3` = `0x4041C0`
+- `SektoPrefs::vfunc4` = `0x4D2B80`
+- `SektoPrefs::vfunc5` = `0x460B60`
+- `SektoPrefs::vfunc6` = `0x610BC0`
+- `SektoPrefs::vfunc7` = `0x547170`
+- `SektoPrefs::vfunc8` = `0x610BD0`
+- `SektoPrefs::vfunc9` = `0x64A9B0`
+- `SektoPrefs::vfunc10` = `0x60EAE0`
+- `SektoPrefs::vfunc11` = `0x460B60`
+- `SektoPrefs::vfunc12` = `0x437C60`
+- `SektoPrefs::vfunc13` = `0x460B60`
+- `SektoPrefs::vfunc14` = `0x64CAE0`
+- `SektoPrefs::vfunc15` = `0x4D2B40`
+- `SektoPrefs::vfunc16` = `0x437C60`
+- `SektoPrefs::vfunc17` = `0x610C00`
+- `SektoPrefs::vfunc18` = `0x4D2B90`
+- `SektoPrefs::vfunc19` = `0x4D2BB0`
+- `SektoPrefs::vfunc20` = `0x4D2A90`
+- `SektoPrefs::vfunc21` = `0x67AA00`
+
+## SektoWeapon  (vtable @ 0x7766BC, 43 methods)
+
+- `SektoWeapon::vfunc0` = `0x4D2E90`
+- `SektoWeapon::vfunc1` = `0x604E40`
+- `SektoWeapon::vfunc2` = `0x57E760`
+- `SektoWeapon::vfunc3` = `0x57E760`
+- `SektoWeapon::vfunc4` = `0x4D28F0`
+- `SektoWeapon::vfunc5` = `0x4D2FA0`
+- `SektoWeapon::vfunc6` = `0x4A55C0`
+- `SektoWeapon::vfunc7` = `0x4D34D0`
+- `SektoWeapon::vfunc8` = `0x516940`
+- `SektoWeapon::vfunc9` = `0x4A5130`
+- `SektoWeapon::vfunc10` = `0x4D3F50`
+- `SektoWeapon::vfunc11` = `0x64A9B0`
+- `SektoWeapon::vfunc12` = `0x4A5640`
+- `SektoWeapon::vfunc13` = `0x4D3EC0`
+- `SektoWeapon::vfunc14` = `0x4D3F00`
+- `SektoWeapon::vfunc15` = `0x4D3F30`
+- `SektoWeapon::vfunc16` = `0x4D3EB0`
+- `SektoWeapon::vfunc17` = `0x4CDC10`
+- `SektoWeapon::vfunc18` = `0x4C98D0`
+- `SektoWeapon::vfunc19` = `0x460B60`
+- `SektoWeapon::vfunc20` = `0x4D3E80`
+- `SektoWeapon::vfunc21` = `0x460B60`
+- `SektoWeapon::vfunc22` = `0x460B60`
+- `SektoWeapon::vfunc23` = `0x64A9B0`
+- `SektoWeapon::vfunc24` = `0x64A9B0`
+- `SektoWeapon::vfunc25` = `0x604E40`
+- `SektoWeapon::vfunc26` = `0x64A9B0`
+- `SektoWeapon::vfunc27` = `0x4D3F90`
+- `SektoWeapon::vfunc28` = `0x65F230`
+- `SektoWeapon::vfunc29` = `0x460B60`
+- `SektoWeapon::vfunc30` = `0x4D3190`
+- `SektoWeapon::vfunc31` = `0x4D07C0`
+- `SektoWeapon::vfunc32` = `0x460B60`
+- `SektoWeapon::vfunc33` = `0x47C830`
+- `SektoWeapon::vfunc34` = `0x437C60`
+- `SektoWeapon::vfunc35` = `0x64CAE0`
+- `SektoWeapon::vfunc36` = `0x64A9B0`
+- `SektoWeapon::vfunc37` = `0x516940`
+- `SektoWeapon::vfunc38` = `0x65F500`
+- `SektoWeapon::vfunc39` = `0x4D3FA0`
+- `SektoWeapon::vfunc40` = `0x437C60`
+- `SektoWeapon::vfunc41` = `0x460B60`
+- `SektoWeapon::vfunc42` = `0x460B60`
+
+## Sentence  (vtable @ 0x78A3D4, 7 methods)
+
+- `Sentence::vfunc0` = `0x639190`
+- `Sentence::vfunc1` = `0x604E40`
+- `Sentence::vfunc2` = `0x57E760`
+- `Sentence::vfunc3` = `0x57E760`
+- `Sentence::vfunc4` = `0x6390D0`
+- `Sentence::vfunc5` = `0x639550`
+- `Sentence::vfunc6` = `0x680110`
+
+## SetupNavReq  (vtable @ 0x77911C, 10 methods)
+
+- `SetupNavReq::vfunc0` = `0x4CF5C0`
+- `SetupNavReq::vfunc1` = `0x604E40`
+- `SetupNavReq::vfunc2` = `0x57E760`
+- `SetupNavReq::vfunc3` = `0x57E760`
+- `SetupNavReq::vfunc4` = `0x50D530`
+- `SetupNavReq::vfunc5` = `0x50D5A0`
+- `SetupNavReq::vfunc6` = `0x680110`
+- `SetupNavReq::vfunc7` = `0x50D5C0`
+- `SetupNavReq::vfunc8` = `0x64A9B0`
+- `SetupNavReq::vfunc9` = `0x516940`
+
+## SharedMemoryBlock  (vtable @ 0x788FFC, 2 methods)
+
+- `SharedMemoryBlock::vfunc0` = `0x613D30`
+- `SharedMemoryBlock::vfunc1` = `0x613D40`
+
+## SharedMemoryBlock  (vtable @ 0x788FF0, 2 methods)
+
+- `SharedMemoryBlock::vfunc0` = `0x612A40`
+- `SharedMemoryBlock::vfunc1` = `0x604E40`
+
+## ShockPrefs  (vtable @ 0x775FA4, 22 methods)
+
+- `ShockPrefs::vfunc0` = `0x4CF5C0`
+- `ShockPrefs::vfunc1` = `0x604E40`
+- `ShockPrefs::vfunc2` = `0x4041C0`
+- `ShockPrefs::vfunc3` = `0x4041C0`
+- `ShockPrefs::vfunc4` = `0x4CC1D0`
+- `ShockPrefs::vfunc5` = `0x460B60`
+- `ShockPrefs::vfunc6` = `0x610BC0`
+- `ShockPrefs::vfunc7` = `0x547170`
+- `ShockPrefs::vfunc8` = `0x610BD0`
+- `ShockPrefs::vfunc9` = `0x64A9B0`
+- `ShockPrefs::vfunc10` = `0x60EAE0`
+- `ShockPrefs::vfunc11` = `0x460B60`
+- `ShockPrefs::vfunc12` = `0x437C60`
+- `ShockPrefs::vfunc13` = `0x460B60`
+- `ShockPrefs::vfunc14` = `0x64CAE0`
+- `ShockPrefs::vfunc15` = `0x4CC0B0`
+- `ShockPrefs::vfunc16` = `0x437C60`
+- `ShockPrefs::vfunc17` = `0x610C00`
+- `ShockPrefs::vfunc18` = `0x4CC1E0`
+- `ShockPrefs::vfunc19` = `0x4CC200`
+- `ShockPrefs::vfunc20` = `0x4CBE90`
+- `ShockPrefs::vfunc21` = `0x67AA00`
+
+## ShortGoalCinematic  (vtable @ 0x779334, 17 methods)
+
+- `ShortGoalCinematic::vfunc0` = `0x518CF0`
+- `ShortGoalCinematic::vfunc1` = `0x604E40`
+- `ShortGoalCinematic::vfunc2` = `0x57E760`
+- `ShortGoalCinematic::vfunc3` = `0x57E760`
+- `ShortGoalCinematic::vfunc4` = `0x511640`
+- `ShortGoalCinematic::vfunc5` = `0x519150`
+- `ShortGoalCinematic::vfunc6` = `0x4A55C0`
+- `ShortGoalCinematic::vfunc7` = `0x460B60`
+- `ShortGoalCinematic::vfunc8` = `0x460B60`
+- `ShortGoalCinematic::vfunc9` = `0x460B60`
+- `ShortGoalCinematic::vfunc10` = `0x460B60`
+- `ShortGoalCinematic::vfunc11` = `0x5115B0`
+- `ShortGoalCinematic::vfunc12` = `0x516940`
+- `ShortGoalCinematic::vfunc13` = `0x460B60`
+- `ShortGoalCinematic::vfunc14` = `0x460B60`
+- `ShortGoalCinematic::vfunc15` = `0x460B60`
+- `ShortGoalCinematic::vfunc16` = `0x5116C0`
+
+## ShortGoalConversation  (vtable @ 0x77946C, 17 methods)
+
+- `ShortGoalConversation::vfunc0` = `0x511870`
+- `ShortGoalConversation::vfunc1` = `0x604E40`
+- `ShortGoalConversation::vfunc2` = `0x57E760`
+- `ShortGoalConversation::vfunc3` = `0x57E760`
+- `ShortGoalConversation::vfunc4` = `0x511720`
+- `ShortGoalConversation::vfunc5` = `0x511E70`
+- `ShortGoalConversation::vfunc6` = `0x511E20`
+- `ShortGoalConversation::vfunc7` = `0x460B60`
+- `ShortGoalConversation::vfunc8` = `0x460B60`
+- `ShortGoalConversation::vfunc9` = `0x460B60`
+- `ShortGoalConversation::vfunc10` = `0x460B60`
+- `ShortGoalConversation::vfunc11` = `0x460B60`
+- `ShortGoalConversation::vfunc12` = `0x5128A0`
+- `ShortGoalConversation::vfunc13` = `0x460B60`
+- `ShortGoalConversation::vfunc14` = `0x460B60`
+- `ShortGoalConversation::vfunc15` = `0x460B60`
+- `ShortGoalConversation::vfunc16` = `0x511FB0`
+
+## ShortGoalDead  (vtable @ 0x7794C4, 17 methods)
+
+- `ShortGoalDead::vfunc0` = `0x518CF0`
+- `ShortGoalDead::vfunc1` = `0x604E40`
+- `ShortGoalDead::vfunc2` = `0x57E760`
+- `ShortGoalDead::vfunc3` = `0x57E760`
+- `ShortGoalDead::vfunc4` = `0x512AD0`
+- `ShortGoalDead::vfunc5` = `0x519150`
+- `ShortGoalDead::vfunc6` = `0x4A55C0`
+- `ShortGoalDead::vfunc7` = `0x460B60`
+- `ShortGoalDead::vfunc8` = `0x460B60`
+- `ShortGoalDead::vfunc9` = `0x460B60`
+- `ShortGoalDead::vfunc10` = `0x460B60`
+- `ShortGoalDead::vfunc11` = `0x5115B0`
+- `ShortGoalDead::vfunc12` = `0x516940`
+- `ShortGoalDead::vfunc13` = `0x460B60`
+- `ShortGoalDead::vfunc14` = `0x460B60`
+- `ShortGoalDead::vfunc15` = `0x460B60`
+- `ShortGoalDead::vfunc16` = `0x512C00`
+
+## ShortGoalDevice  (vtable @ 0x779534, 17 methods)
+
+- `ShortGoalDevice::vfunc0` = `0x512DA0`
+- `ShortGoalDevice::vfunc1` = `0x604E40`
+- `ShortGoalDevice::vfunc2` = `0x57E760`
+- `ShortGoalDevice::vfunc3` = `0x57E760`
+- `ShortGoalDevice::vfunc4` = `0x512C70`
+- `ShortGoalDevice::vfunc5` = `0x512FE0`
+- `ShortGoalDevice::vfunc6` = `0x4A55C0`
+- `ShortGoalDevice::vfunc7` = `0x460B60`
+- `ShortGoalDevice::vfunc8` = `0x460B60`
+- `ShortGoalDevice::vfunc9` = `0x460B60`
+- `ShortGoalDevice::vfunc10` = `0x460B60`
+- `ShortGoalDevice::vfunc11` = `0x5115B0`
+- `ShortGoalDevice::vfunc12` = `0x5130F0`
+- `ShortGoalDevice::vfunc13` = `0x460B60`
+- `ShortGoalDevice::vfunc14` = `0x460B60`
+- `ShortGoalDevice::vfunc15` = `0x460B60`
+- `ShortGoalDevice::vfunc16` = `0x513060`
+
+## ShortGoalDone  (vtable @ 0x77958C, 17 methods)
+
+- `ShortGoalDone::vfunc0` = `0x518CF0`
+- `ShortGoalDone::vfunc1` = `0x604E40`
+- `ShortGoalDone::vfunc2` = `0x57E760`
+- `ShortGoalDone::vfunc3` = `0x57E760`
+- `ShortGoalDone::vfunc4` = `0x5131C0`
+- `ShortGoalDone::vfunc5` = `0x519150`
+- `ShortGoalDone::vfunc6` = `0x4A55C0`
+- `ShortGoalDone::vfunc7` = `0x460B60`
+- `ShortGoalDone::vfunc8` = `0x460B60`
+- `ShortGoalDone::vfunc9` = `0x460B60`
+- `ShortGoalDone::vfunc10` = `0x460B60`
+- `ShortGoalDone::vfunc11` = `0x5115B0`
+- `ShortGoalDone::vfunc12` = `0x516940`
+- `ShortGoalDone::vfunc13` = `0x460B60`
+- `ShortGoalDone::vfunc14` = `0x460B60`
+- `ShortGoalDone::vfunc15` = `0x460B60`
+- `ShortGoalDone::vfunc16` = `0x64BC40`
+
+## ShortGoalIdle  (vtable @ 0x77973C, 17 methods)
+
+- `ShortGoalIdle::vfunc0` = `0x513480`
+- `ShortGoalIdle::vfunc1` = `0x604E40`
+- `ShortGoalIdle::vfunc2` = `0x57E760`
+- `ShortGoalIdle::vfunc3` = `0x57E760`
+- `ShortGoalIdle::vfunc4` = `0x5132F0`
+- `ShortGoalIdle::vfunc5` = `0x5135E0`
+- `ShortGoalIdle::vfunc6` = `0x4A55C0`
+- `ShortGoalIdle::vfunc7` = `0x460B60`
+- `ShortGoalIdle::vfunc8` = `0x460B60`
+- `ShortGoalIdle::vfunc9` = `0x460B60`
+- `ShortGoalIdle::vfunc10` = `0x460B60`
+- `ShortGoalIdle::vfunc11` = `0x5115B0`
+- `ShortGoalIdle::vfunc12` = `0x515870`
+- `ShortGoalIdle::vfunc13` = `0x460B60`
+- `ShortGoalIdle::vfunc14` = `0x5137E0`
+- `ShortGoalIdle::vfunc15` = `0x460B60`
+- `ShortGoalIdle::vfunc16` = `0x5137F0`
+
+## ShortGoalImmobilize  (vtable @ 0x77979C, 17 methods)
+
+- `ShortGoalImmobilize::vfunc0` = `0x518CF0`
+- `ShortGoalImmobilize::vfunc1` = `0x604E40`
+- `ShortGoalImmobilize::vfunc2` = `0x57E760`
+- `ShortGoalImmobilize::vfunc3` = `0x57E760`
+- `ShortGoalImmobilize::vfunc4` = `0x5161E0`
+- `ShortGoalImmobilize::vfunc5` = `0x5164D0`
+- `ShortGoalImmobilize::vfunc6` = `0x4A55C0`
+- `ShortGoalImmobilize::vfunc7` = `0x460B60`
+- `ShortGoalImmobilize::vfunc8` = `0x516950`
+- `ShortGoalImmobilize::vfunc9` = `0x460B60`
+- `ShortGoalImmobilize::vfunc10` = `0x460B60`
+- `ShortGoalImmobilize::vfunc11` = `0x516840`
+- `ShortGoalImmobilize::vfunc12` = `0x516940`
+- `ShortGoalImmobilize::vfunc13` = `0x460B60`
+- `ShortGoalImmobilize::vfunc14` = `0x460B60`
+- `ShortGoalImmobilize::vfunc15` = `0x460B60`
+- `ShortGoalImmobilize::vfunc16` = `0x516540`
+
+## ShortGoalPanic  (vtable @ 0x7797F4, 17 methods)
+
+- `ShortGoalPanic::vfunc0` = `0x518CF0`
+- `ShortGoalPanic::vfunc1` = `0x604E40`
+- `ShortGoalPanic::vfunc2` = `0x57E760`
+- `ShortGoalPanic::vfunc3` = `0x57E760`
+- `ShortGoalPanic::vfunc4` = `0x516A50`
+- `ShortGoalPanic::vfunc5` = `0x519150`
+- `ShortGoalPanic::vfunc6` = `0x4A55C0`
+- `ShortGoalPanic::vfunc7` = `0x460B60`
+- `ShortGoalPanic::vfunc8` = `0x460B60`
+- `ShortGoalPanic::vfunc9` = `0x460B60`
+- `ShortGoalPanic::vfunc10` = `0x460B60`
+- `ShortGoalPanic::vfunc11` = `0x5115B0`
+- `ShortGoalPanic::vfunc12` = `0x516940`
+- `ShortGoalPanic::vfunc13` = `0x460B60`
+- `ShortGoalPanic::vfunc14` = `0x460B60`
+- `ShortGoalPanic::vfunc15` = `0x460B60`
+- `ShortGoalPanic::vfunc16` = `0x64CAE0`
+
+## ShortGoalPlayAnim  (vtable @ 0x779854, 17 methods)
+
+- `ShortGoalPlayAnim::vfunc0` = `0x518CF0`
+- `ShortGoalPlayAnim::vfunc1` = `0x604E40`
+- `ShortGoalPlayAnim::vfunc2` = `0x57E760`
+- `ShortGoalPlayAnim::vfunc3` = `0x57E760`
+- `ShortGoalPlayAnim::vfunc4` = `0x516AD0`
+- `ShortGoalPlayAnim::vfunc5` = `0x516D30`
+- `ShortGoalPlayAnim::vfunc6` = `0x4A55C0`
+- `ShortGoalPlayAnim::vfunc7` = `0x460B60`
+- `ShortGoalPlayAnim::vfunc8` = `0x5171B0`
+- `ShortGoalPlayAnim::vfunc9` = `0x5171A0`
+- `ShortGoalPlayAnim::vfunc10` = `0x460B60`
+- `ShortGoalPlayAnim::vfunc11` = `0x5115B0`
+- `ShortGoalPlayAnim::vfunc12` = `0x516940`
+- `ShortGoalPlayAnim::vfunc13` = `0x460B60`
+- `ShortGoalPlayAnim::vfunc14` = `0x5171F0`
+- `ShortGoalPlayAnim::vfunc15` = `0x5171F0`
+- `ShortGoalPlayAnim::vfunc16` = `0x516E20`
+
+## ShortGoalRunCrazy  (vtable @ 0x7798B4, 17 methods)
+
+- `ShortGoalRunCrazy::vfunc0` = `0x518CF0`
+- `ShortGoalRunCrazy::vfunc1` = `0x604E40`
+- `ShortGoalRunCrazy::vfunc2` = `0x57E760`
+- `ShortGoalRunCrazy::vfunc3` = `0x57E760`
+- `ShortGoalRunCrazy::vfunc4` = `0x517290`
+- `ShortGoalRunCrazy::vfunc5` = `0x517400`
+- `ShortGoalRunCrazy::vfunc6` = `0x4A55C0`
+- `ShortGoalRunCrazy::vfunc7` = `0x460B60`
+- `ShortGoalRunCrazy::vfunc8` = `0x460B60`
+- `ShortGoalRunCrazy::vfunc9` = `0x460B60`
+- `ShortGoalRunCrazy::vfunc10` = `0x460B60`
+- `ShortGoalRunCrazy::vfunc11` = `0x5115B0`
+- `ShortGoalRunCrazy::vfunc12` = `0x517520`
+- `ShortGoalRunCrazy::vfunc13` = `0x460B60`
+- `ShortGoalRunCrazy::vfunc14` = `0x460B60`
+- `ShortGoalRunCrazy::vfunc15` = `0x460B60`
+- `ShortGoalRunCrazy::vfunc16` = `0x517830`
+
+## ShortGoalSendTo  (vtable @ 0x77993C, 17 methods)
+
+- `ShortGoalSendTo::vfunc0` = `0x517E80`
+- `ShortGoalSendTo::vfunc1` = `0x604E40`
+- `ShortGoalSendTo::vfunc2` = `0x57E760`
+- `ShortGoalSendTo::vfunc3` = `0x57E760`
+- `ShortGoalSendTo::vfunc4` = `0x517D10`
+- `ShortGoalSendTo::vfunc5` = `0x518160`
+- `ShortGoalSendTo::vfunc6` = `0x4A55C0`
+- `ShortGoalSendTo::vfunc7` = `0x460B60`
+- `ShortGoalSendTo::vfunc8` = `0x460B60`
+- `ShortGoalSendTo::vfunc9` = `0x460B60`
+- `ShortGoalSendTo::vfunc10` = `0x460B60`
+- `ShortGoalSendTo::vfunc11` = `0x5115B0`
+- `ShortGoalSendTo::vfunc12` = `0x5183B0`
+- `ShortGoalSendTo::vfunc13` = `0x460B60`
+- `ShortGoalSendTo::vfunc14` = `0x460B60`
+- `ShortGoalSendTo::vfunc15` = `0x460B60`
+- `ShortGoalSendTo::vfunc16` = `0x5182B0`
+
+## ShortGoalTalk  (vtable @ 0x7799EC, 17 methods)
+
+- `ShortGoalTalk::vfunc0` = `0x518CF0`
+- `ShortGoalTalk::vfunc1` = `0x604E40`
+- `ShortGoalTalk::vfunc2` = `0x57E760`
+- `ShortGoalTalk::vfunc3` = `0x57E760`
+- `ShortGoalTalk::vfunc4` = `0x518420`
+- `ShortGoalTalk::vfunc5` = `0x518590`
+- `ShortGoalTalk::vfunc6` = `0x4A55C0`
+- `ShortGoalTalk::vfunc7` = `0x460B60`
+- `ShortGoalTalk::vfunc8` = `0x460B60`
+- `ShortGoalTalk::vfunc9` = `0x460B60`
+- `ShortGoalTalk::vfunc10` = `0x460B60`
+- `ShortGoalTalk::vfunc11` = `0x460B60`
+- `ShortGoalTalk::vfunc12` = `0x518A00`
+- `ShortGoalTalk::vfunc13` = `0x460B60`
+- `ShortGoalTalk::vfunc14` = `0x460B60`
+- `ShortGoalTalk::vfunc15` = `0x460B60`
+- `ShortGoalTalk::vfunc16` = `0x5186C0`
+
+## ShortGoalTurnTo  (vtable @ 0x779A44, 17 methods)
+
+- `ShortGoalTurnTo::vfunc0` = `0x518CF0`
+- `ShortGoalTurnTo::vfunc1` = `0x604E40`
+- `ShortGoalTurnTo::vfunc2` = `0x57E760`
+- `ShortGoalTurnTo::vfunc3` = `0x57E760`
+- `ShortGoalTurnTo::vfunc4` = `0x518AB0`
+- `ShortGoalTurnTo::vfunc5` = `0x518D40`
+- `ShortGoalTurnTo::vfunc6` = `0x4A55C0`
+- `ShortGoalTurnTo::vfunc7` = `0x460B60`
+- `ShortGoalTurnTo::vfunc8` = `0x460B60`
+- `ShortGoalTurnTo::vfunc9` = `0x460B60`
+- `ShortGoalTurnTo::vfunc10` = `0x460B60`
+- `ShortGoalTurnTo::vfunc11` = `0x5115B0`
+- `ShortGoalTurnTo::vfunc12` = `0x516940`
+- `ShortGoalTurnTo::vfunc13` = `0x460B60`
+- `ShortGoalTurnTo::vfunc14` = `0x460B60`
+- `ShortGoalTurnTo::vfunc15` = `0x460B60`
+- `ShortGoalTurnTo::vfunc16` = `0x518D80`
+
+## ShortGoalWait  (vtable @ 0x779A9C, 17 methods)
+
+- `ShortGoalWait::vfunc0` = `0x518CF0`
+- `ShortGoalWait::vfunc1` = `0x604E40`
+- `ShortGoalWait::vfunc2` = `0x57E760`
+- `ShortGoalWait::vfunc3` = `0x57E760`
+- `ShortGoalWait::vfunc4` = `0x518DB0`
+- `ShortGoalWait::vfunc5` = `0x518F10`
+- `ShortGoalWait::vfunc6` = `0x4A55C0`
+- `ShortGoalWait::vfunc7` = `0x460B60`
+- `ShortGoalWait::vfunc8` = `0x460B60`
+- `ShortGoalWait::vfunc9` = `0x460B60`
+- `ShortGoalWait::vfunc10` = `0x460B60`
+- `ShortGoalWait::vfunc11` = `0x5115B0`
+- `ShortGoalWait::vfunc12` = `0x516940`
+- `ShortGoalWait::vfunc13` = `0x460B60`
+- `ShortGoalWait::vfunc14` = `0x460B60`
+- `ShortGoalWait::vfunc15` = `0x460B60`
+- `ShortGoalWait::vfunc16` = `0x518F70`
+
+## ShortGoalWaitForAIMotion  (vtable @ 0x779B04, 17 methods)
+
+- `ShortGoalWaitForAIMotion::vfunc0` = `0x518CF0`
+- `ShortGoalWaitForAIMotion::vfunc1` = `0x604E40`
+- `ShortGoalWaitForAIMotion::vfunc2` = `0x57E760`
+- `ShortGoalWaitForAIMotion::vfunc3` = `0x57E760`
+- `ShortGoalWaitForAIMotion::vfunc4` = `0x519020`
+- `ShortGoalWaitForAIMotion::vfunc5` = `0x519150`
+- `ShortGoalWaitForAIMotion::vfunc6` = `0x4A55C0`
+- `ShortGoalWaitForAIMotion::vfunc7` = `0x460B60`
+- `ShortGoalWaitForAIMotion::vfunc8` = `0x460B60`
+- `ShortGoalWaitForAIMotion::vfunc9` = `0x460B60`
+- `ShortGoalWaitForAIMotion::vfunc10` = `0x460B60`
+- `ShortGoalWaitForAIMotion::vfunc11` = `0x5115B0`
+- `ShortGoalWaitForAIMotion::vfunc12` = `0x516940`
+- `ShortGoalWaitForAIMotion::vfunc13` = `0x460B60`
+- `ShortGoalWaitForAIMotion::vfunc14` = `0x460B60`
+- `ShortGoalWaitForAIMotion::vfunc15` = `0x460B60`
+- `ShortGoalWaitForAIMotion::vfunc16` = `0x519160`
+
+## ShortGoal_template  (vtable @ 0x77928C, 17 methods)
+
+- `ShortGoal_template::vfunc0` = `0x518CF0`
+- `ShortGoal_template::vfunc1` = `0x604E40`
+- `ShortGoal_template::vfunc2` = `0x57E760`
+- `ShortGoal_template::vfunc3` = `0x57E760`
+- `ShortGoal_template::vfunc4` = `0x5115C0`
+- `ShortGoal_template::vfunc5` = `0x519150`
+- `ShortGoal_template::vfunc6` = `0x4A55C0`
+- `ShortGoal_template::vfunc7` = `0x460B60`
+- `ShortGoal_template::vfunc8` = `0x460B60`
+- `ShortGoal_template::vfunc9` = `0x460B60`
+- `ShortGoal_template::vfunc10` = `0x460B60`
+- `ShortGoal_template::vfunc11` = `0x5115B0`
+- `ShortGoal_template::vfunc12` = `0x516940`
+- `ShortGoal_template::vfunc13` = `0x460B60`
+- `ShortGoal_template::vfunc14` = `0x460B60`
+- `ShortGoal_template::vfunc15` = `0x460B60`
+- `ShortGoal_template::vfunc16` = `0x64CAE0`
+
+## SimpleActivatable  (vtable @ 0x770014, 7 methods)
+
+- `SimpleActivatable::vfunc0` = `0x484960`
+- `SimpleActivatable::vfunc1` = `0x465A60`
+- `SimpleActivatable::vfunc2` = `0x516940`
+- `SimpleActivatable::vfunc3` = `0x484940`
+- `SimpleActivatable::vfunc4` = `0x484970`
+- `SimpleActivatable::vfunc5` = `0x484800`
+- `SimpleActivatable::vfunc6` = `0x4848A0`
+
+## SimpleActivatable  (vtable @ 0x76FFF8, 6 methods)
+
+- `SimpleActivatable::vfunc0` = `0x484950`
+- `SimpleActivatable::vfunc1` = `0x485B40`
+- `SimpleActivatable::vfunc2` = `0x4600D0`
+- `SimpleActivatable::vfunc3` = `0x46D470`
+- `SimpleActivatable::vfunc4` = `0x65F500`
+- `SimpleActivatable::vfunc5` = `0x4218E0`
+
+## SimpleActivatable  (vtable @ 0x76FF24, 52 methods)
+
+- `SimpleActivatable::vfunc0` = `0x484430`
+- `SimpleActivatable::vfunc1` = `0x604E40`
+- `SimpleActivatable::vfunc2` = `0x57E760`
+- `SimpleActivatable::vfunc3` = `0x57E760`
+- `SimpleActivatable::vfunc4` = `0x4842F0`
+- `SimpleActivatable::vfunc5` = `0x4845D0`
+- `SimpleActivatable::vfunc6` = `0x680110`
+- `SimpleActivatable::vfunc7` = `0x64A9B0`
+- `SimpleActivatable::vfunc8` = `0x64CAE0`
+- `SimpleActivatable::vfunc9` = `0x64CAE0`
+- `SimpleActivatable::vfunc10` = `0x64CAE0`
+- `SimpleActivatable::vfunc11` = `0x64CAE0`
+- `SimpleActivatable::vfunc12` = `0x64CAE0`
+- `SimpleActivatable::vfunc13` = `0x64CAE0`
+- `SimpleActivatable::vfunc14` = `0x64CAE0`
+- `SimpleActivatable::vfunc15` = `0x65F310`
+- `SimpleActivatable::vfunc16` = `0x64CAE0`
+- `SimpleActivatable::vfunc17` = `0x484660`
+- `SimpleActivatable::vfunc18` = `0x460B60`
+- `SimpleActivatable::vfunc19` = `0x460260`
+- `SimpleActivatable::vfunc20` = `0x460280`
+- `SimpleActivatable::vfunc21` = `0x64CAE0`
+- `SimpleActivatable::vfunc22` = `0x460B60`
+- `SimpleActivatable::vfunc23` = `0x45F970`
+- `SimpleActivatable::vfunc24` = `0x45F980`
+- `SimpleActivatable::vfunc25` = `0x45F8A0`
+- `SimpleActivatable::vfunc26` = `0x45F920`
+- `SimpleActivatable::vfunc27` = `0x484670`
+- `SimpleActivatable::vfunc28` = `0x4E5D80`
+- `SimpleActivatable::vfunc29` = `0x460160`
+- `SimpleActivatable::vfunc30` = `0x4605E0`
+- `SimpleActivatable::vfunc31` = `0x460450`
+- `SimpleActivatable::vfunc32` = `0x460B60`
+- `SimpleActivatable::vfunc33` = `0x460B60`
+- `SimpleActivatable::vfunc34` = `0x45FC80`
+- `SimpleActivatable::vfunc35` = `0x460B70`
+- `SimpleActivatable::vfunc36` = `0x460110`
+- `SimpleActivatable::vfunc37` = `0x460B60`
+- `SimpleActivatable::vfunc38` = `0x460B60`
+- `SimpleActivatable::vfunc39` = `0x64A9B0`
+- `SimpleActivatable::vfunc40` = `0x460610`
+- `SimpleActivatable::vfunc41` = `0x45FF80`
+- `SimpleActivatable::vfunc42` = `0x45FE40`
+- `SimpleActivatable::vfunc43` = `0x4218C0`
+- `SimpleActivatable::vfunc44` = `0x4600B0`
+- `SimpleActivatable::vfunc45` = `0x516940`
+- `SimpleActivatable::vfunc46` = `0x460600`
+- `SimpleActivatable::vfunc47` = `0x45FC10`
+- `SimpleActivatable::vfunc48` = `0x45FAC0`
+- `SimpleActivatable::vfunc49` = `0x460B60`
+- `SimpleActivatable::vfunc50` = `0x460B60`
+- `SimpleActivatable::vfunc51` = `0x547170`
+
+## SimpleActivatableInstanceTag  (vtable @ 0x780094, 8 methods)
+
+- `SimpleActivatableInstanceTag::vfunc0` = `0x4CF5C0`
+- `SimpleActivatableInstanceTag::vfunc1` = `0x604E40`
+- `SimpleActivatableInstanceTag::vfunc2` = `0x57E760`
+- `SimpleActivatableInstanceTag::vfunc3` = `0x57E760`
+- `SimpleActivatableInstanceTag::vfunc4` = `0x585D60`
+- `SimpleActivatableInstanceTag::vfunc5` = `0x585F10`
+- `SimpleActivatableInstanceTag::vfunc6` = `0x585DE0`
+- `SimpleActivatableInstanceTag::vfunc7` = `0x516940`
+
+## SimpleAnimMixin  (vtable @ 0x76D19C, 18 methods)
+
+- `SimpleAnimMixin::vfunc0` = `0x4179D0`
+- `SimpleAnimMixin::vfunc1` = `0x46B3B0`
+- `SimpleAnimMixin::vfunc2` = `0x46D870`
+- `SimpleAnimMixin::vfunc3` = `0x546E20`
+- `SimpleAnimMixin::vfunc4` = `0x546E20`
+- `SimpleAnimMixin::vfunc5` = `0x46BC60`
+- `SimpleAnimMixin::vfunc6` = `0x46BBC0`
+- `SimpleAnimMixin::vfunc7` = `0x546E30`
+- `SimpleAnimMixin::vfunc8` = `0x65F500`
+- `SimpleAnimMixin::vfunc9` = `0x46BD20`
+- `SimpleAnimMixin::vfunc10` = `0x546E20`
+- `SimpleAnimMixin::vfunc11` = `0x46B3A0`
+- `SimpleAnimMixin::vfunc12` = `0x516940`
+- `SimpleAnimMixin::vfunc13` = `0x437C60`
+- `SimpleAnimMixin::vfunc14` = `0x437C60`
+- `SimpleAnimMixin::vfunc15` = `0x437C60`
+- `SimpleAnimMixin::vfunc16` = `0x65F220`
+- `SimpleAnimMixin::vfunc17` = `0x547160`
+
+## SimpleAnimMixin  (vtable @ 0x76D17C, 6 methods)
+
+- `SimpleAnimMixin::vfunc0` = `0x46D860`
+- `SimpleAnimMixin::vfunc1` = `0x485B40`
+- `SimpleAnimMixin::vfunc2` = `0x4600D0`
+- `SimpleAnimMixin::vfunc3` = `0x46D470`
+- `SimpleAnimMixin::vfunc4` = `0x65F500`
+- `SimpleAnimMixin::vfunc5` = `0x4218E0`
+
+## SimpleAnimMixin  (vtable @ 0x76D09C, 55 methods)
+
+- `SimpleAnimMixin::vfunc0` = `0x46B730`
+- `SimpleAnimMixin::vfunc1` = `0x604E40`
+- `SimpleAnimMixin::vfunc2` = `0x57E760`
+- `SimpleAnimMixin::vfunc3` = `0x57E760`
+- `SimpleAnimMixin::vfunc4` = `0x46B670`
+- `SimpleAnimMixin::vfunc5` = `0x46BD30`
+- `SimpleAnimMixin::vfunc6` = `0x680110`
+- `SimpleAnimMixin::vfunc7` = `0x604E40`
+- `SimpleAnimMixin::vfunc8` = `0x64CAE0`
+- `SimpleAnimMixin::vfunc9` = `0x64CAE0`
+- `SimpleAnimMixin::vfunc10` = `0x64CAE0`
+- `SimpleAnimMixin::vfunc11` = `0x64CAE0`
+- `SimpleAnimMixin::vfunc12` = `0x64CAE0`
+- `SimpleAnimMixin::vfunc13` = `0x46B680`
+- `SimpleAnimMixin::vfunc14` = `0x64CAE0`
+- `SimpleAnimMixin::vfunc15` = `0x65F310`
+- `SimpleAnimMixin::vfunc16` = `0x64CAE0`
+- `SimpleAnimMixin::vfunc17` = `0x45FA60`
+- `SimpleAnimMixin::vfunc18` = `0x460B60`
+- `SimpleAnimMixin::vfunc19` = `0x460260`
+- `SimpleAnimMixin::vfunc20` = `0x460280`
+- `SimpleAnimMixin::vfunc21` = `0x64CAE0`
+- `SimpleAnimMixin::vfunc22` = `0x460B60`
+- `SimpleAnimMixin::vfunc23` = `0x45F970`
+- `SimpleAnimMixin::vfunc24` = `0x45F980`
+- `SimpleAnimMixin::vfunc25` = `0x45F8A0`
+- `SimpleAnimMixin::vfunc26` = `0x45F920`
+- `SimpleAnimMixin::vfunc27` = `0x516940`
+- `SimpleAnimMixin::vfunc28` = `0x64A9B0`
+- `SimpleAnimMixin::vfunc29` = `0x460160`
+- `SimpleAnimMixin::vfunc30` = `0x4605E0`
+- `SimpleAnimMixin::vfunc31` = `0x460450`
+- `SimpleAnimMixin::vfunc32` = `0x460B60`
+- `SimpleAnimMixin::vfunc33` = `0x460B60`
+- `SimpleAnimMixin::vfunc34` = `0x45FC80`
+- `SimpleAnimMixin::vfunc35` = `0x460B70`
+- `SimpleAnimMixin::vfunc36` = `0x460110`
+- `SimpleAnimMixin::vfunc37` = `0x460B60`
+- `SimpleAnimMixin::vfunc38` = `0x460B60`
+- `SimpleAnimMixin::vfunc39` = `0x64A9B0`
+- `SimpleAnimMixin::vfunc40` = `0x460610`
+- `SimpleAnimMixin::vfunc41` = `0x45FF80`
+- `SimpleAnimMixin::vfunc42` = `0x45FE40`
+- `SimpleAnimMixin::vfunc43` = `0x4218C0`
+- `SimpleAnimMixin::vfunc44` = `0x4600B0`
+- `SimpleAnimMixin::vfunc45` = `0x4602D0`
+- `SimpleAnimMixin::vfunc46` = `0x460600`
+- `SimpleAnimMixin::vfunc47` = `0x45FC10`
+- `SimpleAnimMixin::vfunc48` = `0x45FAC0`
+- `SimpleAnimMixin::vfunc49` = `0x460B60`
+- `SimpleAnimMixin::vfunc50` = `0x460B60`
+- `SimpleAnimMixin::vfunc51` = `0x547170`
+- `SimpleAnimMixin::vfunc52` = `0x4EE210`
+- `SimpleAnimMixin::vfunc53` = `0x46C810`
+- `SimpleAnimMixin::vfunc54` = `0x516940`
+
+## SimpleAnimatedDestructableInstance  (vtable @ 0x76EC2C, 33 methods)
+
+- `SimpleAnimatedDestructableInstance::vfunc0` = `0x47A390`
+- `SimpleAnimatedDestructableInstance::vfunc1` = `0x47A3B0`
+- `SimpleAnimatedDestructableInstance::vfunc2` = `0x46A610`
+- `SimpleAnimatedDestructableInstance::vfunc3` = `0x46A630`
+- `SimpleAnimatedDestructableInstance::vfunc4` = `0x46A650`
+- `SimpleAnimatedDestructableInstance::vfunc5` = `0x46A660`
+- `SimpleAnimatedDestructableInstance::vfunc6` = `0x64A9B0`
+- `SimpleAnimatedDestructableInstance::vfunc7` = `0x64A9B0`
+- `SimpleAnimatedDestructableInstance::vfunc8` = `0x64A9B0`
+- `SimpleAnimatedDestructableInstance::vfunc9` = `0x46B190`
+- `SimpleAnimatedDestructableInstance::vfunc10` = `0x46B190`
+- `SimpleAnimatedDestructableInstance::vfunc11` = `0x46B190`
+- `SimpleAnimatedDestructableInstance::vfunc12` = `0x46B1A0`
+- `SimpleAnimatedDestructableInstance::vfunc13` = `0x46B2D0`
+- `SimpleAnimatedDestructableInstance::vfunc14` = `0x46B1B0`
+- `SimpleAnimatedDestructableInstance::vfunc15` = `0x46B1D0`
+- `SimpleAnimatedDestructableInstance::vfunc16` = `0x46B210`
+- `SimpleAnimatedDestructableInstance::vfunc17` = `0x46B250`
+- `SimpleAnimatedDestructableInstance::vfunc18` = `0x46B270`
+- `SimpleAnimatedDestructableInstance::vfunc19` = `0x46A7D0`
+- `SimpleAnimatedDestructableInstance::vfunc20` = `0x65F500`
+- `SimpleAnimatedDestructableInstance::vfunc21` = `0x516940`
+- `SimpleAnimatedDestructableInstance::vfunc22` = `0x4786D0`
+- `SimpleAnimatedDestructableInstance::vfunc23` = `0x4788B0`
+- `SimpleAnimatedDestructableInstance::vfunc24` = `0x478AC0`
+- `SimpleAnimatedDestructableInstance::vfunc25` = `0x460B60`
+- `SimpleAnimatedDestructableInstance::vfunc26` = `0x516940`
+- `SimpleAnimatedDestructableInstance::vfunc27` = `0x65F170`
+- `SimpleAnimatedDestructableInstance::vfunc28` = `0x65F500`
+- `SimpleAnimatedDestructableInstance::vfunc29` = `0x46B1E0`
+- `SimpleAnimatedDestructableInstance::vfunc30` = `0x65F220`
+- `SimpleAnimatedDestructableInstance::vfunc31` = `0x47A3C0`
+- `SimpleAnimatedDestructableInstance::vfunc32` = `0x477AA0`
+
+## SimpleAnimatedDestructableInstance  (vtable @ 0x76EC10, 6 methods)
+
+- `SimpleAnimatedDestructableInstance::vfunc0` = `0x47A380`
+- `SimpleAnimatedDestructableInstance::vfunc1` = `0x485B40`
+- `SimpleAnimatedDestructableInstance::vfunc2` = `0x4600D0`
+- `SimpleAnimatedDestructableInstance::vfunc3` = `0x46D470`
+- `SimpleAnimatedDestructableInstance::vfunc4` = `0x65F500`
+- `SimpleAnimatedDestructableInstance::vfunc5` = `0x4218E0`
+
+## SimpleAnimatedDestructableInstance  (vtable @ 0x76EB34, 54 methods)
+
+- `SimpleAnimatedDestructableInstance::vfunc0` = `0x479B40`
+- `SimpleAnimatedDestructableInstance::vfunc1` = `0x604E40`
+- `SimpleAnimatedDestructableInstance::vfunc2` = `0x57E760`
+- `SimpleAnimatedDestructableInstance::vfunc3` = `0x57E760`
+- `SimpleAnimatedDestructableInstance::vfunc4` = `0x477AB0`
+- `SimpleAnimatedDestructableInstance::vfunc5` = `0x479BF0`
+- `SimpleAnimatedDestructableInstance::vfunc6` = `0x680110`
+- `SimpleAnimatedDestructableInstance::vfunc7` = `0x604E40`
+- `SimpleAnimatedDestructableInstance::vfunc8` = `0x64CAE0`
+- `SimpleAnimatedDestructableInstance::vfunc9` = `0x64CAE0`
+- `SimpleAnimatedDestructableInstance::vfunc10` = `0x64CAE0`
+- `SimpleAnimatedDestructableInstance::vfunc11` = `0x64CAE0`
+- `SimpleAnimatedDestructableInstance::vfunc12` = `0x64CAE0`
+- `SimpleAnimatedDestructableInstance::vfunc13` = `0x64CAE0`
+- `SimpleAnimatedDestructableInstance::vfunc14` = `0x46B680`
+- `SimpleAnimatedDestructableInstance::vfunc15` = `0x477A80`
+- `SimpleAnimatedDestructableInstance::vfunc16` = `0x64CAE0`
+- `SimpleAnimatedDestructableInstance::vfunc17` = `0x479DF0`
+- `SimpleAnimatedDestructableInstance::vfunc18` = `0x460B60`
+- `SimpleAnimatedDestructableInstance::vfunc19` = `0x460260`
+- `SimpleAnimatedDestructableInstance::vfunc20` = `0x460280`
+- `SimpleAnimatedDestructableInstance::vfunc21` = `0x64CAE0`
+- `SimpleAnimatedDestructableInstance::vfunc22` = `0x460B60`
+- `SimpleAnimatedDestructableInstance::vfunc23` = `0x45F970`
+- `SimpleAnimatedDestructableInstance::vfunc24` = `0x4799B0`
+- `SimpleAnimatedDestructableInstance::vfunc25` = `0x45F8A0`
+- `SimpleAnimatedDestructableInstance::vfunc26` = `0x45F920`
+- `SimpleAnimatedDestructableInstance::vfunc27` = `0x516940`
+- `SimpleAnimatedDestructableInstance::vfunc28` = `0x64A9B0`
+- `SimpleAnimatedDestructableInstance::vfunc29` = `0x460160`
+- `SimpleAnimatedDestructableInstance::vfunc30` = `0x4605E0`
+- `SimpleAnimatedDestructableInstance::vfunc31` = `0x460450`
+- `SimpleAnimatedDestructableInstance::vfunc32` = `0x460B60`
+- `SimpleAnimatedDestructableInstance::vfunc33` = `0x460B60`
+- `SimpleAnimatedDestructableInstance::vfunc34` = `0x45FC80`
+- `SimpleAnimatedDestructableInstance::vfunc35` = `0x460B70`
+- `SimpleAnimatedDestructableInstance::vfunc36` = `0x460110`
+- `SimpleAnimatedDestructableInstance::vfunc37` = `0x460B60`
+- `SimpleAnimatedDestructableInstance::vfunc38` = `0x460B60`
+- `SimpleAnimatedDestructableInstance::vfunc39` = `0x64A9B0`
+- `SimpleAnimatedDestructableInstance::vfunc40` = `0x460610`
+- `SimpleAnimatedDestructableInstance::vfunc41` = `0x45FF80`
+- `SimpleAnimatedDestructableInstance::vfunc42` = `0x45FE40`
+- `SimpleAnimatedDestructableInstance::vfunc43` = `0x4218C0`
+- `SimpleAnimatedDestructableInstance::vfunc44` = `0x4600B0`
+- `SimpleAnimatedDestructableInstance::vfunc45` = `0x516940`
+- `SimpleAnimatedDestructableInstance::vfunc46` = `0x460600`
+- `SimpleAnimatedDestructableInstance::vfunc47` = `0x45FC10`
+- `SimpleAnimatedDestructableInstance::vfunc48` = `0x45FAC0`
+- `SimpleAnimatedDestructableInstance::vfunc49` = `0x460B60`
+- `SimpleAnimatedDestructableInstance::vfunc50` = `0x460B60`
+- `SimpleAnimatedDestructableInstance::vfunc51` = `0x479C40`
+- `SimpleAnimatedDestructableInstance::vfunc52` = `0x64CAE0`
+- `SimpleAnimatedDestructableInstance::vfunc53` = `0x479A50`
+
+## SimpleInstancedObject  (vtable @ 0x7800F8, 8 methods)
+
+- `SimpleInstancedObject::vfunc0` = `0x4CF5C0`
+- `SimpleInstancedObject::vfunc1` = `0x604E40`
+- `SimpleInstancedObject::vfunc2` = `0x57E760`
+- `SimpleInstancedObject::vfunc3` = `0x57E760`
+- `SimpleInstancedObject::vfunc4` = `0x585F30`
+- `SimpleInstancedObject::vfunc5` = `0x5860D0`
+- `SimpleInstancedObject::vfunc6` = `0x585FA0`
+- `SimpleInstancedObject::vfunc7` = `0x516940`
+
+## SimplePhysicalGO  (vtable @ 0x76D3CC, 18 methods)
+
+- `SimplePhysicalGO::vfunc0` = `0x4179D0`
+- `SimplePhysicalGO::vfunc1` = `0x46B3B0`
+- `SimplePhysicalGO::vfunc2` = `0x46E4B0`
+- `SimplePhysicalGO::vfunc3` = `0x629920`
+- `SimplePhysicalGO::vfunc4` = `0x546E20`
+- `SimplePhysicalGO::vfunc5` = `0x46DAC0`
+- `SimplePhysicalGO::vfunc6` = `0x46B350`
+- `SimplePhysicalGO::vfunc7` = `0x546E30`
+- `SimplePhysicalGO::vfunc8` = `0x46DB60`
+- `SimplePhysicalGO::vfunc9` = `0x46DB20`
+- `SimplePhysicalGO::vfunc10` = `0x546E20`
+- `SimplePhysicalGO::vfunc11` = `0x46B3A0`
+- `SimplePhysicalGO::vfunc12` = `0x40B570`
+- `SimplePhysicalGO::vfunc13` = `0x46DB30`
+- `SimplePhysicalGO::vfunc14` = `0x437C60`
+- `SimplePhysicalGO::vfunc15` = `0x437C60`
+- `SimplePhysicalGO::vfunc16` = `0x46DAE0`
+- `SimplePhysicalGO::vfunc17` = `0x46DB00`
+
+## SimplePhysicalGO  (vtable @ 0x76D3AC, 6 methods)
+
+- `SimplePhysicalGO::vfunc0` = `0x46E4C0`
+- `SimplePhysicalGO::vfunc1` = `0x4607B0`
+- `SimplePhysicalGO::vfunc2` = `0x4600D0`
+- `SimplePhysicalGO::vfunc3` = `0x46D470`
+- `SimplePhysicalGO::vfunc4` = `0x65F500`
+- `SimplePhysicalGO::vfunc5` = `0x4218E0`
+
+## SimplePhysicalGO  (vtable @ 0x76D2CC, 55 methods)
+
+- `SimplePhysicalGO::vfunc0` = `0x46D9C0`
+- `SimplePhysicalGO::vfunc1` = `0x604E40`
+- `SimplePhysicalGO::vfunc2` = `0x57E760`
+- `SimplePhysicalGO::vfunc3` = `0x57E760`
+- `SimplePhysicalGO::vfunc4` = `0x5FDAA0`
+- `SimplePhysicalGO::vfunc5` = `0x46DA10`
+- `SimplePhysicalGO::vfunc6` = `0x680110`
+- `SimplePhysicalGO::vfunc7` = `0x604E40`
+- `SimplePhysicalGO::vfunc8` = `0x64CAE0`
+- `SimplePhysicalGO::vfunc9` = `0x64CAE0`
+- `SimplePhysicalGO::vfunc10` = `0x64CAE0`
+- `SimplePhysicalGO::vfunc11` = `0x64CAE0`
+- `SimplePhysicalGO::vfunc12` = `0x64CAE0`
+- `SimplePhysicalGO::vfunc13` = `0x4D7E90`
+- `SimplePhysicalGO::vfunc14` = `0x64CAE0`
+- `SimplePhysicalGO::vfunc15` = `0x65F310`
+- `SimplePhysicalGO::vfunc16` = `0x64CAE0`
+- `SimplePhysicalGO::vfunc17` = `0x45FA60`
+- `SimplePhysicalGO::vfunc18` = `0x460B60`
+- `SimplePhysicalGO::vfunc19` = `0x460260`
+- `SimplePhysicalGO::vfunc20` = `0x460280`
+- `SimplePhysicalGO::vfunc21` = `0x64CAE0`
+- `SimplePhysicalGO::vfunc22` = `0x460B60`
+- `SimplePhysicalGO::vfunc23` = `0x45F970`
+- `SimplePhysicalGO::vfunc24` = `0x46DB50`
+- `SimplePhysicalGO::vfunc25` = `0x45F8A0`
+- `SimplePhysicalGO::vfunc26` = `0x45F920`
+- `SimplePhysicalGO::vfunc27` = `0x516940`
+- `SimplePhysicalGO::vfunc28` = `0x64A9B0`
+- `SimplePhysicalGO::vfunc29` = `0x460160`
+- `SimplePhysicalGO::vfunc30` = `0x4605E0`
+- `SimplePhysicalGO::vfunc31` = `0x460450`
+- `SimplePhysicalGO::vfunc32` = `0x460830`
+- `SimplePhysicalGO::vfunc33` = `0x460A00`
+- `SimplePhysicalGO::vfunc34` = `0x45FC80`
+- `SimplePhysicalGO::vfunc35` = `0x460B70`
+- `SimplePhysicalGO::vfunc36` = `0x460110`
+- `SimplePhysicalGO::vfunc37` = `0x460B60`
+- `SimplePhysicalGO::vfunc38` = `0x460B60`
+- `SimplePhysicalGO::vfunc39` = `0x64A9B0`
+- `SimplePhysicalGO::vfunc40` = `0x460610`
+- `SimplePhysicalGO::vfunc41` = `0x45FF80`
+- `SimplePhysicalGO::vfunc42` = `0x45FE40`
+- `SimplePhysicalGO::vfunc43` = `0x4218C0`
+- `SimplePhysicalGO::vfunc44` = `0x4600B0`
+- `SimplePhysicalGO::vfunc45` = `0x4602D0`
+- `SimplePhysicalGO::vfunc46` = `0x460A20`
+- `SimplePhysicalGO::vfunc47` = `0x460A70`
+- `SimplePhysicalGO::vfunc48` = `0x460A40`
+- `SimplePhysicalGO::vfunc49` = `0x460B60`
+- `SimplePhysicalGO::vfunc50` = `0x460B60`
+- `SimplePhysicalGO::vfunc51` = `0x547170`
+- `SimplePhysicalGO::vfunc52` = `0x6E6E7D`
+- `SimplePhysicalGO::vfunc53` = `0x6E6E7D`
+- `SimplePhysicalGO::vfunc54` = `0x460B60`
+
+## SkeletonResource  (vtable @ 0x79A104, 19 methods)
+
+- `SkeletonResource::vfunc0` = `0x67AA70`
+- `SkeletonResource::vfunc1` = `0x604E40`
+- `SkeletonResource::vfunc2` = `0x610CC0`
+- `SkeletonResource::vfunc3` = `0x610D20`
+- `SkeletonResource::vfunc4` = `0x5FDAA0`
+- `SkeletonResource::vfunc5` = `0x616FB0`
+- `SkeletonResource::vfunc6` = `0x610BC0`
+- `SkeletonResource::vfunc7` = `0x547170`
+- `SkeletonResource::vfunc8` = `0x610BD0`
+- `SkeletonResource::vfunc9` = `0x64A9B0`
+- `SkeletonResource::vfunc10` = `0x460B60`
+- `SkeletonResource::vfunc11` = `0x460B60`
+- `SkeletonResource::vfunc12` = `0x437C60`
+- `SkeletonResource::vfunc13` = `0x460B60`
+- `SkeletonResource::vfunc14` = `0x64BC40`
+- `SkeletonResource::vfunc15` = `0x57B040`
+- `SkeletonResource::vfunc16` = `0x610C60`
+- `SkeletonResource::vfunc17` = `0x610C00`
+- `SkeletonResource::vfunc18` = `0x67AA00`
+
+## SkyInstance  (vtable @ 0x7850EC, 7 methods)
+
+- `SkyInstance::vfunc0` = `0x5D52B0`
+- `SkyInstance::vfunc1` = `0x5D52A0`
+- `SkyInstance::vfunc2` = `0x64A9B0`
+- `SkyInstance::vfunc3` = `0x64CAE0`
+- `SkyInstance::vfunc4` = `0x604E40`
+- `SkyInstance::vfunc5` = `0x64CAE0`
+- `SkyInstance::vfunc6` = `0x430D50`
+
+## SkyPrefs  (vtable @ 0x785024, 22 methods)
+
+- `SkyPrefs::vfunc0` = `0x5D4EF0`
+- `SkyPrefs::vfunc1` = `0x604E40`
+- `SkyPrefs::vfunc2` = `0x4041C0`
+- `SkyPrefs::vfunc3` = `0x4041C0`
+- `SkyPrefs::vfunc4` = `0x5D4E10`
+- `SkyPrefs::vfunc5` = `0x460B60`
+- `SkyPrefs::vfunc6` = `0x610BC0`
+- `SkyPrefs::vfunc7` = `0x547170`
+- `SkyPrefs::vfunc8` = `0x610BD0`
+- `SkyPrefs::vfunc9` = `0x64A9B0`
+- `SkyPrefs::vfunc10` = `0x60EAE0`
+- `SkyPrefs::vfunc11` = `0x460B60`
+- `SkyPrefs::vfunc12` = `0x437C60`
+- `SkyPrefs::vfunc13` = `0x460B60`
+- `SkyPrefs::vfunc14` = `0x64CAE0`
+- `SkyPrefs::vfunc15` = `0x5D4EB0`
+- `SkyPrefs::vfunc16` = `0x437C60`
+- `SkyPrefs::vfunc17` = `0x610C00`
+- `SkyPrefs::vfunc18` = `0x5D4E20`
+- `SkyPrefs::vfunc19` = `0x5D4E40`
+- `SkyPrefs::vfunc20` = `0x5D4E50`
+- `SkyPrefs::vfunc21` = `0x67AA00`
+
+## SnapIn  (vtable @ 0x77402C, 7 methods)
+
+- `SnapIn::vfunc0` = `0x4A8150`
+- `SnapIn::vfunc1` = `0x604E40`
+- `SnapIn::vfunc2` = `0x57E760`
+- `SnapIn::vfunc3` = `0x57E760`
+- `SnapIn::vfunc4` = `0x4A7DE0`
+- `SnapIn::vfunc5` = `0x4A8650`
+- `SnapIn::vfunc6` = `0x680110`
+
+## SnapInStateMachine  (vtable @ 0x7740FC, 22 methods)
+
+- `SnapInStateMachine::vfunc0` = `0x4AECC0`
+- `SnapInStateMachine::vfunc1` = `0x604E40`
+- `SnapInStateMachine::vfunc2` = `0x4041C0`
+- `SnapInStateMachine::vfunc3` = `0x4041C0`
+- `SnapInStateMachine::vfunc4` = `0x4AEC40`
+- `SnapInStateMachine::vfunc5` = `0x460B60`
+- `SnapInStateMachine::vfunc6` = `0x610BC0`
+- `SnapInStateMachine::vfunc7` = `0x547170`
+- `SnapInStateMachine::vfunc8` = `0x610BD0`
+- `SnapInStateMachine::vfunc9` = `0x64A9B0`
+- `SnapInStateMachine::vfunc10` = `0x60EAE0`
+- `SnapInStateMachine::vfunc11` = `0x460B60`
+- `SnapInStateMachine::vfunc12` = `0x437C60`
+- `SnapInStateMachine::vfunc13` = `0x460B60`
+- `SnapInStateMachine::vfunc14` = `0x64CAE0`
+- `SnapInStateMachine::vfunc15` = `0x57B040`
+- `SnapInStateMachine::vfunc16` = `0x437C60`
+- `SnapInStateMachine::vfunc17` = `0x610C00`
+- `SnapInStateMachine::vfunc18` = `0x4AEC50`
+- `SnapInStateMachine::vfunc19` = `0x4AEC70`
+- `SnapInStateMachine::vfunc20` = `0x460B60`
+- `SnapInStateMachine::vfunc21` = `0x67AA00`
+
+## SoundBank  (vtable @ 0x79A254, 19 methods)
+
+- `SoundBank::vfunc0` = `0x67B860`
+- `SoundBank::vfunc1` = `0x604E40`
+- `SoundBank::vfunc2` = `0x610CC0`
+- `SoundBank::vfunc3` = `0x610D20`
+- `SoundBank::vfunc4` = `0x5FDAA0`
+- `SoundBank::vfunc5` = `0x67BAB0`
+- `SoundBank::vfunc6` = `0x67BA80`
+- `SoundBank::vfunc7` = `0x547170`
+- `SoundBank::vfunc8` = `0x547170`
+- `SoundBank::vfunc9` = `0x64A9B0`
+- `SoundBank::vfunc10` = `0x460B60`
+- `SoundBank::vfunc11` = `0x460B60`
+- `SoundBank::vfunc12` = `0x437C60`
+- `SoundBank::vfunc13` = `0x460B60`
+- `SoundBank::vfunc14` = `0x64BC40`
+- `SoundBank::vfunc15` = `0x57B040`
+- `SoundBank::vfunc16` = `0x610C60`
+- `SoundBank::vfunc17` = `0x610C00`
+- `SoundBank::vfunc18` = `0x67AA00`
+
+## SoundSource  (vtable @ 0x78A6A4, 3 methods)
+
+- `SoundSource::vfunc0` = `0x63C9E0`
+- `SoundSource::vfunc1` = `0x604E40`
+- `SoundSource::vfunc2` = `0x63CA20`
+
+## SparkParticleSystem  (vtable @ 0x783D5C, 33 methods)
+
+- `SparkParticleSystem::vfunc0` = `0x5BB760`
+- `SparkParticleSystem::vfunc1` = `0x604E40`
+- `SparkParticleSystem::vfunc2` = `0x57E760`
+- `SparkParticleSystem::vfunc3` = `0x57E760`
+- `SparkParticleSystem::vfunc4` = `0x5BB410`
+- `SparkParticleSystem::vfunc5` = `0x5BB880`
+- `SparkParticleSystem::vfunc6` = `0x680110`
+- `SparkParticleSystem::vfunc7` = `0x5B53F0`
+- `SparkParticleSystem::vfunc8` = `0x460B60`
+- `SparkParticleSystem::vfunc9` = `0x460B60`
+- `SparkParticleSystem::vfunc10` = `0x460B60`
+- `SparkParticleSystem::vfunc11` = `0x460B60`
+- `SparkParticleSystem::vfunc12` = `0x460B60`
+- `SparkParticleSystem::vfunc13` = `0x460B60`
+- `SparkParticleSystem::vfunc14` = `0x5BB900`
+- `SparkParticleSystem::vfunc15` = `0x5BB970`
+- `SparkParticleSystem::vfunc16` = `0x59F890`
+- `SparkParticleSystem::vfunc17` = `0x516940`
+- `SparkParticleSystem::vfunc18` = `0x5A3FD0`
+- `SparkParticleSystem::vfunc19` = `0x5A4030`
+- `SparkParticleSystem::vfunc20` = `0x516940`
+- `SparkParticleSystem::vfunc21` = `0x460B60`
+- `SparkParticleSystem::vfunc22` = `0x460B60`
+- `SparkParticleSystem::vfunc23` = `0x460B60`
+- `SparkParticleSystem::vfunc24` = `0x460B60`
+- `SparkParticleSystem::vfunc25` = `0x516940`
+- `SparkParticleSystem::vfunc26` = `0x516940`
+- `SparkParticleSystem::vfunc27` = `0x516940`
+- `SparkParticleSystem::vfunc28` = `0x5BC6F0`
+- `SparkParticleSystem::vfunc29` = `0x475A90`
+- `SparkParticleSystem::vfunc30` = `0x5B10C0`
+- `SparkParticleSystem::vfunc31` = `0x5A3F70`
+- `SparkParticleSystem::vfunc32` = `0x5BC6B0`
+
+## SparkParticleSystemDef  (vtable @ 0x783F34, 27 methods)
+
+- `SparkParticleSystemDef::vfunc0` = `0x4CF5C0`
+- `SparkParticleSystemDef::vfunc1` = `0x604E40`
+- `SparkParticleSystemDef::vfunc2` = `0x4041C0`
+- `SparkParticleSystemDef::vfunc3` = `0x4041C0`
+- `SparkParticleSystemDef::vfunc4` = `0x5BD7B0`
+- `SparkParticleSystemDef::vfunc5` = `0x460B60`
+- `SparkParticleSystemDef::vfunc6` = `0x610BC0`
+- `SparkParticleSystemDef::vfunc7` = `0x547170`
+- `SparkParticleSystemDef::vfunc8` = `0x610BD0`
+- `SparkParticleSystemDef::vfunc9` = `0x64A9B0`
+- `SparkParticleSystemDef::vfunc10` = `0x60EAE0`
+- `SparkParticleSystemDef::vfunc11` = `0x460B60`
+- `SparkParticleSystemDef::vfunc12` = `0x437C60`
+- `SparkParticleSystemDef::vfunc13` = `0x460B60`
+- `SparkParticleSystemDef::vfunc14` = `0x64CAE0`
+- `SparkParticleSystemDef::vfunc15` = `0x5BDA40`
+- `SparkParticleSystemDef::vfunc16` = `0x437C60`
+- `SparkParticleSystemDef::vfunc17` = `0x610C00`
+- `SparkParticleSystemDef::vfunc18` = `0x5BD7C0`
+- `SparkParticleSystemDef::vfunc19` = `0x5BD7E0`
+- `SparkParticleSystemDef::vfunc20` = `0x5B6EE0`
+- `SparkParticleSystemDef::vfunc21` = `0x67AA00`
+- `SparkParticleSystemDef::vfunc22` = `0x5B8780`
+- `SparkParticleSystemDef::vfunc23` = `0x5BD900`
+- `SparkParticleSystemDef::vfunc24` = `0x5BD9A0`
+- `SparkParticleSystemDef::vfunc25` = `0x5B78B0`
+- `SparkParticleSystemDef::vfunc26` = `0x5B7EC0`
+
+## Spatial  (vtable @ 0x76FC4C, 6 methods)
+
+- `Spatial::vfunc0` = `0x482B00`
+- `Spatial::vfunc1` = `0x604E40`
+- `Spatial::vfunc2` = `0x637710`
+- `Spatial::vfunc3` = `0x475AA0`
+- `Spatial::vfunc4` = `0x47E370`
+- `Spatial::vfunc5` = `0x475A90`
+
+## SpatialIndex  (vtable @ 0x79AF0C, 20 methods)
+
+- `SpatialIndex::vfunc0` = `0x686230`
+- `SpatialIndex::vfunc1` = `0x6E6E7D`
+- `SpatialIndex::vfunc2` = `0x6E6E7D`
+- `SpatialIndex::vfunc3` = `0x6E6E7D`
+- `SpatialIndex::vfunc4` = `0x6E6E7D`
+- `SpatialIndex::vfunc5` = `0x47E370`
+- `SpatialIndex::vfunc6` = `0x6E6E7D`
+- `SpatialIndex::vfunc7` = `0x6E6E7D`
+- `SpatialIndex::vfunc8` = `0x6E6E7D`
+- `SpatialIndex::vfunc9` = `0x6E6E7D`
+- `SpatialIndex::vfunc10` = `0x6E6E7D`
+- `SpatialIndex::vfunc11` = `0x6E6E7D`
+- `SpatialIndex::vfunc12` = `0x6E6E7D`
+- `SpatialIndex::vfunc13` = `0x6E6E7D`
+- `SpatialIndex::vfunc14` = `0x6E6E7D`
+- `SpatialIndex::vfunc15` = `0x6E6E7D`
+- `SpatialIndex::vfunc16` = `0x6E6E7D`
+- `SpatialIndex::vfunc17` = `0x6E6E7D`
+- `SpatialIndex::vfunc18` = `0x64CAE0`
+- `SpatialIndex::vfunc19` = `0x64CAE0`
+
+## SpatialIndexHash  (vtable @ 0x79AF64, 20 methods)
+
+- `SpatialIndexHash::vfunc0` = `0x6863F0`
+- `SpatialIndexHash::vfunc1` = `0x686490`
+- `SpatialIndexHash::vfunc2` = `0x604E40`
+- `SpatialIndexHash::vfunc3` = `0x604E40`
+- `SpatialIndexHash::vfunc4` = `0x44FF20`
+- `SpatialIndexHash::vfunc5` = `0x47E370`
+- `SpatialIndexHash::vfunc6` = `0x6864D0`
+- `SpatialIndexHash::vfunc7` = `0x686BB0`
+- `SpatialIndexHash::vfunc8` = `0x686750`
+- `SpatialIndexHash::vfunc9` = `0x686A50`
+- `SpatialIndexHash::vfunc10` = `0x686A30`
+- `SpatialIndexHash::vfunc11` = `0x686AA0`
+- `SpatialIndexHash::vfunc12` = `0x686A80`
+- `SpatialIndexHash::vfunc13` = `0x686A50`
+- `SpatialIndexHash::vfunc14` = `0x686A30`
+- `SpatialIndexHash::vfunc15` = `0x6867E0`
+- `SpatialIndexHash::vfunc16` = `0x686AC0`
+- `SpatialIndexHash::vfunc17` = `0x686A70`
+- `SpatialIndexHash::vfunc18` = `0x64CAE0`
+- `SpatialIndexHash::vfunc19` = `0x47E370`
+
+## SpatialIndexSingle  (vtable @ 0x79AFBC, 20 methods)
+
+- `SpatialIndexSingle::vfunc0` = `0x686AE0`
+- `SpatialIndexSingle::vfunc1` = `0x686B60`
+- `SpatialIndexSingle::vfunc2` = `0x604E40`
+- `SpatialIndexSingle::vfunc3` = `0x604E40`
+- `SpatialIndexSingle::vfunc4` = `0x65B5A0`
+- `SpatialIndexSingle::vfunc5` = `0x47E370`
+- `SpatialIndexSingle::vfunc6` = `0x686B90`
+- `SpatialIndexSingle::vfunc7` = `0x686BB0`
+- `SpatialIndexSingle::vfunc8` = `0x516940`
+- `SpatialIndexSingle::vfunc9` = `0x686C40`
+- `SpatialIndexSingle::vfunc10` = `0x686C10`
+- `SpatialIndexSingle::vfunc11` = `0x686CF0`
+- `SpatialIndexSingle::vfunc12` = `0x686CD0`
+- `SpatialIndexSingle::vfunc13` = `0x686C90`
+- `SpatialIndexSingle::vfunc14` = `0x686C70`
+- `SpatialIndexSingle::vfunc15` = `0x686BE0`
+- `SpatialIndexSingle::vfunc16` = `0x686D10`
+- `SpatialIndexSingle::vfunc17` = `0x686CB0`
+- `SpatialIndexSingle::vfunc18` = `0x47E370`
+- `SpatialIndexSingle::vfunc19` = `0x64CAE0`
+
+## SpatialMultiLink  (vtable @ 0x79DC64, 20 methods)
+
+- `SpatialMultiLink::vfunc0` = `0x6A5DF0`
+- `SpatialMultiLink::vfunc1` = `0x6A5900`
+- `SpatialMultiLink::vfunc2` = `0x604E40`
+- `SpatialMultiLink::vfunc3` = `0x604E40`
+- `SpatialMultiLink::vfunc4` = `0x6A5F40`
+- `SpatialMultiLink::vfunc5` = `0x4BDB00`
+- `SpatialMultiLink::vfunc6` = `0x6A5950`
+- `SpatialMultiLink::vfunc7` = `0x6A5F50`
+- `SpatialMultiLink::vfunc8` = `0x516940`
+- `SpatialMultiLink::vfunc9` = `0x6A5B30`
+- `SpatialMultiLink::vfunc10` = `0x6A5AE0`
+- `SpatialMultiLink::vfunc11` = `0x6A5A90`
+- `SpatialMultiLink::vfunc12` = `0x6A5A40`
+- `SpatialMultiLink::vfunc13` = `0x6A59F0`
+- `SpatialMultiLink::vfunc14` = `0x6A59A0`
+- `SpatialMultiLink::vfunc15` = `0x6A5C20`
+- `SpatialMultiLink::vfunc16` = `0x6A5BD0`
+- `SpatialMultiLink::vfunc17` = `0x6A5B80`
+- `SpatialMultiLink::vfunc18` = `0x64CAE0`
+- `SpatialMultiLink::vfunc19` = `0x64CAE0`
+
+## SpatialProxy  (vtable @ 0x79DCB8, 6 methods)
+
+- `SpatialProxy::vfunc0` = `0x6A5E10`
+- `SpatialProxy::vfunc1` = `0x604E40`
+- `SpatialProxy::vfunc2` = `0x637710`
+- `SpatialProxy::vfunc3` = `0x6A5CD0`
+- `SpatialProxy::vfunc4` = `0x6A5CF0`
+- `SpatialProxy::vfunc5` = `0x475A90`
+
+## SpawnPoint  (vtable @ 0x770138, 6 methods)
+
+- `SpawnPoint::vfunc0` = `0x484C90`
+- `SpawnPoint::vfunc1` = `0x64CAE0`
+- `SpawnPoint::vfunc2` = `0x4600D0`
+- `SpawnPoint::vfunc3` = `0x46D470`
+- `SpawnPoint::vfunc4` = `0x65F500`
+- `SpawnPoint::vfunc5` = `0x4218E0`
+
+## SpawnPoint  (vtable @ 0x770064, 52 methods)
+
+- `SpawnPoint::vfunc0` = `0x484A80`
+- `SpawnPoint::vfunc1` = `0x604E40`
+- `SpawnPoint::vfunc2` = `0x57E760`
+- `SpawnPoint::vfunc3` = `0x57E760`
+- `SpawnPoint::vfunc4` = `0x484990`
+- `SpawnPoint::vfunc5` = `0x484AB0`
+- `SpawnPoint::vfunc6` = `0x680110`
+- `SpawnPoint::vfunc7` = `0x64A9B0`
+- `SpawnPoint::vfunc8` = `0x64CAE0`
+- `SpawnPoint::vfunc9` = `0x64CAE0`
+- `SpawnPoint::vfunc10` = `0x64CAE0`
+- `SpawnPoint::vfunc11` = `0x64CAE0`
+- `SpawnPoint::vfunc12` = `0x64CAE0`
+- `SpawnPoint::vfunc13` = `0x64CAE0`
+- `SpawnPoint::vfunc14` = `0x64CAE0`
+- `SpawnPoint::vfunc15` = `0x65F310`
+- `SpawnPoint::vfunc16` = `0x64CAE0`
+- `SpawnPoint::vfunc17` = `0x45FA60`
+- `SpawnPoint::vfunc18` = `0x460B60`
+- `SpawnPoint::vfunc19` = `0x460260`
+- `SpawnPoint::vfunc20` = `0x460280`
+- `SpawnPoint::vfunc21` = `0x64CAE0`
+- `SpawnPoint::vfunc22` = `0x460B60`
+- `SpawnPoint::vfunc23` = `0x45F970`
+- `SpawnPoint::vfunc24` = `0x45F980`
+- `SpawnPoint::vfunc25` = `0x484980`
+- `SpawnPoint::vfunc26` = `0x45F920`
+- `SpawnPoint::vfunc27` = `0x516940`
+- `SpawnPoint::vfunc28` = `0x64A9B0`
+- `SpawnPoint::vfunc29` = `0x460160`
+- `SpawnPoint::vfunc30` = `0x4605E0`
+- `SpawnPoint::vfunc31` = `0x460450`
+- `SpawnPoint::vfunc32` = `0x460B60`
+- `SpawnPoint::vfunc33` = `0x460B60`
+- `SpawnPoint::vfunc34` = `0x45FC80`
+- `SpawnPoint::vfunc35` = `0x460B70`
+- `SpawnPoint::vfunc36` = `0x460110`
+- `SpawnPoint::vfunc37` = `0x460B60`
+- `SpawnPoint::vfunc38` = `0x460B60`
+- `SpawnPoint::vfunc39` = `0x64A9B0`
+- `SpawnPoint::vfunc40` = `0x460610`
+- `SpawnPoint::vfunc41` = `0x45FF80`
+- `SpawnPoint::vfunc42` = `0x45FE40`
+- `SpawnPoint::vfunc43` = `0x4218C0`
+- `SpawnPoint::vfunc44` = `0x4600B0`
+- `SpawnPoint::vfunc45` = `0x4602D0`
+- `SpawnPoint::vfunc46` = `0x460600`
+- `SpawnPoint::vfunc47` = `0x45FC10`
+- `SpawnPoint::vfunc48` = `0x45FAC0`
+- `SpawnPoint::vfunc49` = `0x460B60`
+- `SpawnPoint::vfunc50` = `0x460B60`
+- `SpawnPoint::vfunc51` = `0x547170`
+
+## SphereSetPhysicalGO  (vtable @ 0x76D49C, 18 methods)
+
+- `SphereSetPhysicalGO::vfunc0` = `0x4179D0`
+- `SphereSetPhysicalGO::vfunc1` = `0x46FA10`
+- `SphereSetPhysicalGO::vfunc2` = `0x46B320`
+- `SphereSetPhysicalGO::vfunc3` = `0x4895E0`
+- `SphereSetPhysicalGO::vfunc4` = `0x46F7E0`
+- `SphereSetPhysicalGO::vfunc5` = `0x6E6E7D`
+- `SphereSetPhysicalGO::vfunc6` = `0x46B350`
+- `SphereSetPhysicalGO::vfunc7` = `0x6E6E7D`
+- `SphereSetPhysicalGO::vfunc8` = `0x65F170`
+- `SphereSetPhysicalGO::vfunc9` = `0x46A650`
+- `SphereSetPhysicalGO::vfunc10` = `0x629920`
+- `SphereSetPhysicalGO::vfunc11` = `0x46F7D0`
+- `SphereSetPhysicalGO::vfunc12` = `0x46F7F0`
+- `SphereSetPhysicalGO::vfunc13` = `0x46F800`
+- `SphereSetPhysicalGO::vfunc14` = `0x46DB30`
+- `SphereSetPhysicalGO::vfunc15` = `0x46F820`
+- `SphereSetPhysicalGO::vfunc16` = `0x6E6E7D`
+- `SphereSetPhysicalGO::vfunc17` = `0x46DB00`
+
+## SpotLight  (vtable @ 0x78AE14, 2 methods)
+
+- `SpotLight::vfunc0` = `0x641EC0`
+- `SpotLight::vfunc1` = `0x604E40`
+
+## SpotLight  (vtable @ 0x78ADE0, 12 methods)
+
+- `SpotLight::vfunc0` = `0x6419B0`
+- `SpotLight::vfunc1` = `0x604E40`
+- `SpotLight::vfunc2` = `0x637710`
+- `SpotLight::vfunc3` = `0x475AA0`
+- `SpotLight::vfunc4` = `0x47E370`
+- `SpotLight::vfunc5` = `0x475A90`
+- `SpotLight::vfunc6` = `0x64A9B0`
+- `SpotLight::vfunc7` = `0x64ADD0`
+- `SpotLight::vfunc8` = `0x641ED0`
+- `SpotLight::vfunc9` = `0x641F10`
+- `SpotLight::vfunc10` = `0x641F60`
+- `SpotLight::vfunc11` = `0x60B200`
+
+## StackShortGoal  (vtable @ 0x779B5C, 8 methods)
+
+- `StackShortGoal::vfunc0` = `0x519290`
+- `StackShortGoal::vfunc1` = `0x604E40`
+- `StackShortGoal::vfunc2` = `0x57E760`
+- `StackShortGoal::vfunc3` = `0x57E760`
+- `StackShortGoal::vfunc4` = `0x519210`
+- `StackShortGoal::vfunc5` = `0x516940`
+- `StackShortGoal::vfunc6` = `0x680110`
+- `StackShortGoal::vfunc7` = `0x516940`
+
+## StandardFSCommandHandler  (vtable @ 0x785C10, 2 methods)
+
+- `StandardFSCommandHandler::vfunc0` = `0x4CF5C0`
+- `StandardFSCommandHandler::vfunc1` = `0x604E40`
+
+## StaticCollectable  (vtable @ 0x7702DC, 5 methods)
+
+- `StaticCollectable::vfunc0` = `0x485450`
+- `StaticCollectable::vfunc1` = `0x485240`
+- `StaticCollectable::vfunc2` = `0x485210`
+- `StaticCollectable::vfunc3` = `0x47C830`
+- `StaticCollectable::vfunc4` = `0x4837B0`
+
+## StaticCollectable  (vtable @ 0x7702C0, 6 methods)
+
+- `StaticCollectable::vfunc0` = `0x485440`
+- `StaticCollectable::vfunc1` = `0x64CAE0`
+- `StaticCollectable::vfunc2` = `0x4600D0`
+- `StaticCollectable::vfunc3` = `0x46D470`
+- `StaticCollectable::vfunc4` = `0x65F500`
+- `StaticCollectable::vfunc5` = `0x4218E0`
+
+## StaticCollectable  (vtable @ 0x7701EC, 52 methods)
+
+- `StaticCollectable::vfunc0` = `0x484D50`
+- `StaticCollectable::vfunc1` = `0x604E40`
+- `StaticCollectable::vfunc2` = `0x57E760`
+- `StaticCollectable::vfunc3` = `0x57E760`
+- `StaticCollectable::vfunc4` = `0x484CA0`
+- `StaticCollectable::vfunc5` = `0x4851B0`
+- `StaticCollectable::vfunc6` = `0x680110`
+- `StaticCollectable::vfunc7` = `0x64A9B0`
+- `StaticCollectable::vfunc8` = `0x64CAE0`
+- `StaticCollectable::vfunc9` = `0x64CAE0`
+- `StaticCollectable::vfunc10` = `0x64CAE0`
+- `StaticCollectable::vfunc11` = `0x64CAE0`
+- `StaticCollectable::vfunc12` = `0x64CAE0`
+- `StaticCollectable::vfunc13` = `0x64CAE0`
+- `StaticCollectable::vfunc14` = `0x64CAE0`
+- `StaticCollectable::vfunc15` = `0x65F310`
+- `StaticCollectable::vfunc16` = `0x64CAE0`
+- `StaticCollectable::vfunc17` = `0x4853E0`
+- `StaticCollectable::vfunc18` = `0x460B60`
+- `StaticCollectable::vfunc19` = `0x460260`
+- `StaticCollectable::vfunc20` = `0x460280`
+- `StaticCollectable::vfunc21` = `0x64CAE0`
+- `StaticCollectable::vfunc22` = `0x460B60`
+- `StaticCollectable::vfunc23` = `0x45F970`
+- `StaticCollectable::vfunc24` = `0x45F980`
+- `StaticCollectable::vfunc25` = `0x4853D0`
+- `StaticCollectable::vfunc26` = `0x45F920`
+- `StaticCollectable::vfunc27` = `0x516940`
+- `StaticCollectable::vfunc28` = `0x64A9B0`
+- `StaticCollectable::vfunc29` = `0x460160`
+- `StaticCollectable::vfunc30` = `0x4605E0`
+- `StaticCollectable::vfunc31` = `0x460450`
+- `StaticCollectable::vfunc32` = `0x460B60`
+- `StaticCollectable::vfunc33` = `0x460B60`
+- `StaticCollectable::vfunc34` = `0x45FC80`
+- `StaticCollectable::vfunc35` = `0x460B70`
+- `StaticCollectable::vfunc36` = `0x460110`
+- `StaticCollectable::vfunc37` = `0x460B60`
+- `StaticCollectable::vfunc38` = `0x460B60`
+- `StaticCollectable::vfunc39` = `0x64A9B0`
+- `StaticCollectable::vfunc40` = `0x460610`
+- `StaticCollectable::vfunc41` = `0x45FF80`
+- `StaticCollectable::vfunc42` = `0x45FE40`
+- `StaticCollectable::vfunc43` = `0x4218C0`
+- `StaticCollectable::vfunc44` = `0x4600B0`
+- `StaticCollectable::vfunc45` = `0x4602D0`
+- `StaticCollectable::vfunc46` = `0x460600`
+- `StaticCollectable::vfunc47` = `0x45FC10`
+- `StaticCollectable::vfunc48` = `0x45FAC0`
+- `StaticCollectable::vfunc49` = `0x460B60`
+- `StaticCollectable::vfunc50` = `0x460B60`
+- `StaticCollectable::vfunc51` = `0x547170`
+
+## StaticInstance  (vtable @ 0x7703D8, 6 methods)
+
+- `StaticInstance::vfunc0` = `0x485E10`
+- `StaticInstance::vfunc1` = `0x485B40`
+- `StaticInstance::vfunc2` = `0x4600D0`
+- `StaticInstance::vfunc3` = `0x46D470`
+- `StaticInstance::vfunc4` = `0x65F500`
+- `StaticInstance::vfunc5` = `0x4218E0`
+
+## StaticInstance  (vtable @ 0x770304, 52 methods)
+
+- `StaticInstance::vfunc0` = `0x4854D0`
+- `StaticInstance::vfunc1` = `0x604E40`
+- `StaticInstance::vfunc2` = `0x57E760`
+- `StaticInstance::vfunc3` = `0x57E760`
+- `StaticInstance::vfunc4` = `0x46B670`
+- `StaticInstance::vfunc5` = `0x485E90`
+- `StaticInstance::vfunc6` = `0x680110`
+- `StaticInstance::vfunc7` = `0x64A9B0`
+- `StaticInstance::vfunc8` = `0x64CAE0`
+- `StaticInstance::vfunc9` = `0x64CAE0`
+- `StaticInstance::vfunc10` = `0x64CAE0`
+- `StaticInstance::vfunc11` = `0x64CAE0`
+- `StaticInstance::vfunc12` = `0x64CAE0`
+- `StaticInstance::vfunc13` = `0x64CAE0`
+- `StaticInstance::vfunc14` = `0x64CAE0`
+- `StaticInstance::vfunc15` = `0x65F310`
+- `StaticInstance::vfunc16` = `0x64CAE0`
+- `StaticInstance::vfunc17` = `0x45FA60`
+- `StaticInstance::vfunc18` = `0x460B60`
+- `StaticInstance::vfunc19` = `0x460260`
+- `StaticInstance::vfunc20` = `0x460280`
+- `StaticInstance::vfunc21` = `0x64CAE0`
+- `StaticInstance::vfunc22` = `0x460B60`
+- `StaticInstance::vfunc23` = `0x45F970`
+- `StaticInstance::vfunc24` = `0x45F980`
+- `StaticInstance::vfunc25` = `0x45F8A0`
+- `StaticInstance::vfunc26` = `0x45F920`
+- `StaticInstance::vfunc27` = `0x516940`
+- `StaticInstance::vfunc28` = `0x64A9B0`
+- `StaticInstance::vfunc29` = `0x460160`
+- `StaticInstance::vfunc30` = `0x4605E0`
+- `StaticInstance::vfunc31` = `0x460450`
+- `StaticInstance::vfunc32` = `0x460B60`
+- `StaticInstance::vfunc33` = `0x460B60`
+- `StaticInstance::vfunc34` = `0x45FC80`
+- `StaticInstance::vfunc35` = `0x460B70`
+- `StaticInstance::vfunc36` = `0x460110`
+- `StaticInstance::vfunc37` = `0x460B60`
+- `StaticInstance::vfunc38` = `0x460B60`
+- `StaticInstance::vfunc39` = `0x64A9B0`
+- `StaticInstance::vfunc40` = `0x460610`
+- `StaticInstance::vfunc41` = `0x45FF80`
+- `StaticInstance::vfunc42` = `0x45FE40`
+- `StaticInstance::vfunc43` = `0x4218C0`
+- `StaticInstance::vfunc44` = `0x4600B0`
+- `StaticInstance::vfunc45` = `0x4602D0`
+- `StaticInstance::vfunc46` = `0x460600`
+- `StaticInstance::vfunc47` = `0x45FC10`
+- `StaticInstance::vfunc48` = `0x45FAC0`
+- `StaticInstance::vfunc49` = `0x460B60`
+- `StaticInstance::vfunc50` = `0x460B60`
+- `StaticInstance::vfunc51` = `0x547170`
+
+## StaticObject  (vtable @ 0x7704D8, 6 methods)
+
+- `StaticObject::vfunc0` = `0x460EB0`
+- `StaticObject::vfunc1` = `0x64CAE0`
+- `StaticObject::vfunc2` = `0x4600D0`
+- `StaticObject::vfunc3` = `0x46D470`
+- `StaticObject::vfunc4` = `0x65F500`
+- `StaticObject::vfunc5` = `0x4218E0`
+
+## StaticObject  (vtable @ 0x770404, 52 methods)
+
+- `StaticObject::vfunc0` = `0x45F3A0`
+- `StaticObject::vfunc1` = `0x604E40`
+- `StaticObject::vfunc2` = `0x57E760`
+- `StaticObject::vfunc3` = `0x57E760`
+- `StaticObject::vfunc4` = `0x485E20`
+- `StaticObject::vfunc5` = `0x485E90`
+- `StaticObject::vfunc6` = `0x680110`
+- `StaticObject::vfunc7` = `0x64A9B0`
+- `StaticObject::vfunc8` = `0x64CAE0`
+- `StaticObject::vfunc9` = `0x64CAE0`
+- `StaticObject::vfunc10` = `0x64CAE0`
+- `StaticObject::vfunc11` = `0x64CAE0`
+- `StaticObject::vfunc12` = `0x64CAE0`
+- `StaticObject::vfunc13` = `0x64CAE0`
+- `StaticObject::vfunc14` = `0x64CAE0`
+- `StaticObject::vfunc15` = `0x65F310`
+- `StaticObject::vfunc16` = `0x64CAE0`
+- `StaticObject::vfunc17` = `0x460B60`
+- `StaticObject::vfunc18` = `0x460B60`
+- `StaticObject::vfunc19` = `0x460260`
+- `StaticObject::vfunc20` = `0x460280`
+- `StaticObject::vfunc21` = `0x64CAE0`
+- `StaticObject::vfunc22` = `0x460B60`
+- `StaticObject::vfunc23` = `0x45F970`
+- `StaticObject::vfunc24` = `0x45F980`
+- `StaticObject::vfunc25` = `0x45F8A0`
+- `StaticObject::vfunc26` = `0x45F920`
+- `StaticObject::vfunc27` = `0x516940`
+- `StaticObject::vfunc28` = `0x64A9B0`
+- `StaticObject::vfunc29` = `0x460160`
+- `StaticObject::vfunc30` = `0x4605E0`
+- `StaticObject::vfunc31` = `0x460450`
+- `StaticObject::vfunc32` = `0x460B60`
+- `StaticObject::vfunc33` = `0x460B60`
+- `StaticObject::vfunc34` = `0x45FC80`
+- `StaticObject::vfunc35` = `0x460B70`
+- `StaticObject::vfunc36` = `0x460110`
+- `StaticObject::vfunc37` = `0x460B60`
+- `StaticObject::vfunc38` = `0x460B60`
+- `StaticObject::vfunc39` = `0x64A9B0`
+- `StaticObject::vfunc40` = `0x460610`
+- `StaticObject::vfunc41` = `0x45FF80`
+- `StaticObject::vfunc42` = `0x45FE40`
+- `StaticObject::vfunc43` = `0x4218C0`
+- `StaticObject::vfunc44` = `0x4600B0`
+- `StaticObject::vfunc45` = `0x4602D0`
+- `StaticObject::vfunc46` = `0x460600`
+- `StaticObject::vfunc47` = `0x45FC10`
+- `StaticObject::vfunc48` = `0x45FAC0`
+- `StaticObject::vfunc49` = `0x460B60`
+- `StaticObject::vfunc50` = `0x460B60`
+- `StaticObject::vfunc51` = `0x547170`
+
+## Store  (vtable @ 0x770808, 6 methods)
+
+- `Store::vfunc0` = `0x488EC0`
+- `Store::vfunc1` = `0x64CAE0`
+- `Store::vfunc2` = `0x4600D0`
+- `Store::vfunc3` = `0x46D470`
+- `Store::vfunc4` = `0x65F500`
+- `Store::vfunc5` = `0x4218E0`
+
+## Store  (vtable @ 0x770734, 52 methods)
+
+- `Store::vfunc0` = `0x486540`
+- `Store::vfunc1` = `0x604E40`
+- `Store::vfunc2` = `0x57E760`
+- `Store::vfunc3` = `0x57E760`
+- `Store::vfunc4` = `0x485F20`
+- `Store::vfunc5` = `0x486B10`
+- `Store::vfunc6` = `0x680110`
+- `Store::vfunc7` = `0x64A9B0`
+- `Store::vfunc8` = `0x64CAE0`
+- `Store::vfunc9` = `0x64CAE0`
+- `Store::vfunc10` = `0x64CAE0`
+- `Store::vfunc11` = `0x64CAE0`
+- `Store::vfunc12` = `0x64CAE0`
+- `Store::vfunc13` = `0x64CAE0`
+- `Store::vfunc14` = `0x64CAE0`
+- `Store::vfunc15` = `0x65F310`
+- `Store::vfunc16` = `0x64CAE0`
+- `Store::vfunc17` = `0x45FA60`
+- `Store::vfunc18` = `0x460B60`
+- `Store::vfunc19` = `0x64BC40`
+- `Store::vfunc20` = `0x487FC0`
+- `Store::vfunc21` = `0x64CAE0`
+- `Store::vfunc22` = `0x460B60`
+- `Store::vfunc23` = `0x45F970`
+- `Store::vfunc24` = `0x45F980`
+- `Store::vfunc25` = `0x45F8A0`
+- `Store::vfunc26` = `0x45F920`
+- `Store::vfunc27` = `0x486D60`
+- `Store::vfunc28` = `0x486D80`
+- `Store::vfunc29` = `0x460160`
+- `Store::vfunc30` = `0x4605E0`
+- `Store::vfunc31` = `0x460450`
+- `Store::vfunc32` = `0x460B60`
+- `Store::vfunc33` = `0x460B60`
+- `Store::vfunc34` = `0x45FC80`
+- `Store::vfunc35` = `0x460B70`
+- `Store::vfunc36` = `0x460110`
+- `Store::vfunc37` = `0x460B60`
+- `Store::vfunc38` = `0x460B60`
+- `Store::vfunc39` = `0x64A9B0`
+- `Store::vfunc40` = `0x460610`
+- `Store::vfunc41` = `0x45FF80`
+- `Store::vfunc42` = `0x45FE40`
+- `Store::vfunc43` = `0x4218C0`
+- `Store::vfunc44` = `0x4600B0`
+- `Store::vfunc45` = `0x4602D0`
+- `Store::vfunc46` = `0x460600`
+- `Store::vfunc47` = `0x45FC10`
+- `Store::vfunc48` = `0x45FAC0`
+- `Store::vfunc49` = `0x460B60`
+- `Store::vfunc50` = `0x460B60`
+- `Store::vfunc51` = `0x547170`
+
+## StorePrefs  (vtable @ 0x7706D4, 22 methods)
+
+- `StorePrefs::vfunc0` = `0x4862B0`
+- `StorePrefs::vfunc1` = `0x604E40`
+- `StorePrefs::vfunc2` = `0x4041C0`
+- `StorePrefs::vfunc3` = `0x4041C0`
+- `StorePrefs::vfunc4` = `0x485FA0`
+- `StorePrefs::vfunc5` = `0x460B60`
+- `StorePrefs::vfunc6` = `0x610BC0`
+- `StorePrefs::vfunc7` = `0x547170`
+- `StorePrefs::vfunc8` = `0x610BD0`
+- `StorePrefs::vfunc9` = `0x64A9B0`
+- `StorePrefs::vfunc10` = `0x60EAE0`
+- `StorePrefs::vfunc11` = `0x460B60`
+- `StorePrefs::vfunc12` = `0x437C60`
+- `StorePrefs::vfunc13` = `0x460B60`
+- `StorePrefs::vfunc14` = `0x64CAE0`
+- `StorePrefs::vfunc15` = `0x4861D0`
+- `StorePrefs::vfunc16` = `0x437C60`
+- `StorePrefs::vfunc17` = `0x610C00`
+- `StorePrefs::vfunc18` = `0x485FB0`
+- `StorePrefs::vfunc19` = `0x485FD0`
+- `StorePrefs::vfunc20` = `0x486070`
+- `StorePrefs::vfunc21` = `0x67AA00`
+
+## StreamedWaveBank  (vtable @ 0x78FDE8, 5 methods)
+
+- `StreamedWaveBank::vfunc0` = `0x654050`
+- `StreamedWaveBank::vfunc1` = `0x653AF0`
+- `StreamedWaveBank::vfunc2` = `0x653B00`
+- `StreamedWaveBank::vfunc3` = `0x64CAE0`
+- `StreamedWaveBank::vfunc4` = `0x6540D0`
+
+## StreamedWaveBank  (vtable @ 0x78FDDC, 2 methods)
+
+- `StreamedWaveBank::vfunc0` = `0x653F60`
+- `StreamedWaveBank::vfunc1` = `0x604E40`
+
+## TextOverlayPrefs  (vtable @ 0x79AC9C, 22 methods)
+
+- `TextOverlayPrefs::vfunc0` = `0x681120`
+- `TextOverlayPrefs::vfunc1` = `0x604E40`
+- `TextOverlayPrefs::vfunc2` = `0x4041C0`
+- `TextOverlayPrefs::vfunc3` = `0x4041C0`
+- `TextOverlayPrefs::vfunc4` = `0x680E50`
+- `TextOverlayPrefs::vfunc5` = `0x460B60`
+- `TextOverlayPrefs::vfunc6` = `0x610BC0`
+- `TextOverlayPrefs::vfunc7` = `0x547170`
+- `TextOverlayPrefs::vfunc8` = `0x610BD0`
+- `TextOverlayPrefs::vfunc9` = `0x64A9B0`
+- `TextOverlayPrefs::vfunc10` = `0x60EAE0`
+- `TextOverlayPrefs::vfunc11` = `0x460B60`
+- `TextOverlayPrefs::vfunc12` = `0x437C60`
+- `TextOverlayPrefs::vfunc13` = `0x460B60`
+- `TextOverlayPrefs::vfunc14` = `0x64CAE0`
+- `TextOverlayPrefs::vfunc15` = `0x681200`
+- `TextOverlayPrefs::vfunc16` = `0x437C60`
+- `TextOverlayPrefs::vfunc17` = `0x610C00`
+- `TextOverlayPrefs::vfunc18` = `0x680E60`
+- `TextOverlayPrefs::vfunc19` = `0x680E80`
+- `TextOverlayPrefs::vfunc20` = `0x6811D0`
+- `TextOverlayPrefs::vfunc21` = `0x67AA00`
+
+## Texture  (vtable @ 0x788DDC, 21 methods)
+
+- `Texture::vfunc0` = `0x611600`
+- `Texture::vfunc1` = `0x611290`
+- `Texture::vfunc2` = `0x610CC0`
+- `Texture::vfunc3` = `0x610D20`
+- `Texture::vfunc4` = `0x5FDAA0`
+- `Texture::vfunc5` = `0x610F90`
+- `Texture::vfunc6` = `0x610FE0`
+- `Texture::vfunc7` = `0x547170`
+- `Texture::vfunc8` = `0x610BD0`
+- `Texture::vfunc9` = `0x604E40`
+- `Texture::vfunc10` = `0x460B60`
+- `Texture::vfunc11` = `0x460B60`
+- `Texture::vfunc12` = `0x611050`
+- `Texture::vfunc13` = `0x611070`
+- `Texture::vfunc14` = `0x64BC40`
+- `Texture::vfunc15` = `0x57B040`
+- `Texture::vfunc16` = `0x610C60`
+- `Texture::vfunc17` = `0x610C00`
+- `Texture::vfunc18` = `0x611090`
+- `Texture::vfunc19` = `0x611620`
+- `Texture::vfunc20` = `0x604E40`
+
+## TownPanicController  (vtable @ 0x770B5C, 10 methods)
+
+- `TownPanicController::vfunc0` = `0x489300`
+- `TownPanicController::vfunc1` = `0x604E40`
+- `TownPanicController::vfunc2` = `0x57E760`
+- `TownPanicController::vfunc3` = `0x57E760`
+- `TownPanicController::vfunc4` = `0x488EF0`
+- `TownPanicController::vfunc5` = `0x48A310`
+- `TownPanicController::vfunc6` = `0x680110`
+- `TownPanicController::vfunc7` = `0x4895E0`
+- `TownPanicController::vfunc8` = `0x4895F0`
+- `TownPanicController::vfunc9` = `0x48A740`
+
+## TownPanicPrefs  (vtable @ 0x770B8C, 22 methods)
+
+- `TownPanicPrefs::vfunc0` = `0x4CF5C0`
+- `TownPanicPrefs::vfunc1` = `0x604E40`
+- `TownPanicPrefs::vfunc2` = `0x4041C0`
+- `TownPanicPrefs::vfunc3` = `0x4041C0`
+- `TownPanicPrefs::vfunc4` = `0x4890B0`
+- `TownPanicPrefs::vfunc5` = `0x460B60`
+- `TownPanicPrefs::vfunc6` = `0x610BC0`
+- `TownPanicPrefs::vfunc7` = `0x547170`
+- `TownPanicPrefs::vfunc8` = `0x610BD0`
+- `TownPanicPrefs::vfunc9` = `0x64A9B0`
+- `TownPanicPrefs::vfunc10` = `0x60EAE0`
+- `TownPanicPrefs::vfunc11` = `0x460B60`
+- `TownPanicPrefs::vfunc12` = `0x437C60`
+- `TownPanicPrefs::vfunc13` = `0x460B60`
+- `TownPanicPrefs::vfunc14` = `0x64CAE0`
+- `TownPanicPrefs::vfunc15` = `0x57B040`
+- `TownPanicPrefs::vfunc16` = `0x437C60`
+- `TownPanicPrefs::vfunc17` = `0x610C00`
+- `TownPanicPrefs::vfunc18` = `0x4890C0`
+- `TownPanicPrefs::vfunc19` = `0x4890E0`
+- `TownPanicPrefs::vfunc20` = `0x489030`
+- `TownPanicPrefs::vfunc21` = `0x67AA00`
+
+## TumbleParticleSystem  (vtable @ 0x7840F4, 33 methods)
+
+- `TumbleParticleSystem::vfunc0` = `0x5BF100`
+- `TumbleParticleSystem::vfunc1` = `0x604E40`
+- `TumbleParticleSystem::vfunc2` = `0x57E760`
+- `TumbleParticleSystem::vfunc3` = `0x57E760`
+- `TumbleParticleSystem::vfunc4` = `0x5BF030`
+- `TumbleParticleSystem::vfunc5` = `0x5BF220`
+- `TumbleParticleSystem::vfunc6` = `0x680110`
+- `TumbleParticleSystem::vfunc7` = `0x5B53F0`
+- `TumbleParticleSystem::vfunc8` = `0x460B60`
+- `TumbleParticleSystem::vfunc9` = `0x460B60`
+- `TumbleParticleSystem::vfunc10` = `0x460B60`
+- `TumbleParticleSystem::vfunc11` = `0x460B60`
+- `TumbleParticleSystem::vfunc12` = `0x460B60`
+- `TumbleParticleSystem::vfunc13` = `0x5BF2A0`
+- `TumbleParticleSystem::vfunc14` = `0x5BF320`
+- `TumbleParticleSystem::vfunc15` = `0x5BF3A0`
+- `TumbleParticleSystem::vfunc16` = `0x59F890`
+- `TumbleParticleSystem::vfunc17` = `0x516940`
+- `TumbleParticleSystem::vfunc18` = `0x5A3FD0`
+- `TumbleParticleSystem::vfunc19` = `0x5A4030`
+- `TumbleParticleSystem::vfunc20` = `0x516940`
+- `TumbleParticleSystem::vfunc21` = `0x460B60`
+- `TumbleParticleSystem::vfunc22` = `0x460B60`
+- `TumbleParticleSystem::vfunc23` = `0x460B60`
+- `TumbleParticleSystem::vfunc24` = `0x460B60`
+- `TumbleParticleSystem::vfunc25` = `0x516940`
+- `TumbleParticleSystem::vfunc26` = `0x516940`
+- `TumbleParticleSystem::vfunc27` = `0x516940`
+- `TumbleParticleSystem::vfunc28` = `0x5BFB30`
+- `TumbleParticleSystem::vfunc29` = `0x475A90`
+- `TumbleParticleSystem::vfunc30` = `0x5B10C0`
+- `TumbleParticleSystem::vfunc31` = `0x5A3F70`
+- `TumbleParticleSystem::vfunc32` = `0x5BC6B0`
+
+## TumbleParticleSystemDef  (vtable @ 0x78417C, 27 methods)
+
+- `TumbleParticleSystemDef::vfunc0` = `0x4CF5C0`
+- `TumbleParticleSystemDef::vfunc1` = `0x604E40`
+- `TumbleParticleSystemDef::vfunc2` = `0x4041C0`
+- `TumbleParticleSystemDef::vfunc3` = `0x4041C0`
+- `TumbleParticleSystemDef::vfunc4` = `0x5C0830`
+- `TumbleParticleSystemDef::vfunc5` = `0x460B60`
+- `TumbleParticleSystemDef::vfunc6` = `0x610BC0`
+- `TumbleParticleSystemDef::vfunc7` = `0x547170`
+- `TumbleParticleSystemDef::vfunc8` = `0x610BD0`
+- `TumbleParticleSystemDef::vfunc9` = `0x64A9B0`
+- `TumbleParticleSystemDef::vfunc10` = `0x60EAE0`
+- `TumbleParticleSystemDef::vfunc11` = `0x460B60`
+- `TumbleParticleSystemDef::vfunc12` = `0x437C60`
+- `TumbleParticleSystemDef::vfunc13` = `0x460B60`
+- `TumbleParticleSystemDef::vfunc14` = `0x64CAE0`
+- `TumbleParticleSystemDef::vfunc15` = `0x5B8660`
+- `TumbleParticleSystemDef::vfunc16` = `0x437C60`
+- `TumbleParticleSystemDef::vfunc17` = `0x610C00`
+- `TumbleParticleSystemDef::vfunc18` = `0x5C0840`
+- `TumbleParticleSystemDef::vfunc19` = `0x5C0860`
+- `TumbleParticleSystemDef::vfunc20` = `0x5B6EE0`
+- `TumbleParticleSystemDef::vfunc21` = `0x67AA00`
+- `TumbleParticleSystemDef::vfunc22` = `0x5B8780`
+- `TumbleParticleSystemDef::vfunc23` = `0x5C08D0`
+- `TumbleParticleSystemDef::vfunc24` = `0x5C0970`
+- `TumbleParticleSystemDef::vfunc25` = `0x5B78B0`
+- `TumbleParticleSystemDef::vfunc26` = `0x5B7EC0`
+
+## VMClass  (vtable @ 0x79A02C, 6 methods)
+
+- `VMClass::vfunc0` = `0x679520`
+- `VMClass::vfunc1` = `0x63ED00`
+- `VMClass::vfunc2` = `0x65F220`
+- `VMClass::vfunc3` = `0x516940`
+- `VMClass::vfunc4` = `0x516940`
+- `VMClass::vfunc5` = `0x516940`
+
+## VMClass  (vtable @ 0x799FC4, 25 methods)
+
+- `VMClass::vfunc0` = `0x678990`
+- `VMClass::vfunc1` = `0x604E40`
+- `VMClass::vfunc2` = `0x610CC0`
+- `VMClass::vfunc3` = `0x610D20`
+- `VMClass::vfunc4` = `0x5FDAA0`
+- `VMClass::vfunc5` = `0x678A70`
+- `VMClass::vfunc6` = `0x678A90`
+- `VMClass::vfunc7` = `0x547170`
+- `VMClass::vfunc8` = `0x547170`
+- `VMClass::vfunc9` = `0x604E40`
+- `VMClass::vfunc10` = `0x679FE0`
+- `VMClass::vfunc11` = `0x460B60`
+- `VMClass::vfunc12` = `0x437C60`
+- `VMClass::vfunc13` = `0x460B60`
+- `VMClass::vfunc14` = `0x64BC40`
+- `VMClass::vfunc15` = `0x679F80`
+- `VMClass::vfunc16` = `0x610C60`
+- `VMClass::vfunc17` = `0x610C00`
+- `VMClass::vfunc18` = `0x679270`
+- `VMClass::vfunc19` = `0x678B10`
+- `VMClass::vfunc20` = `0x678AD0`
+- `VMClass::vfunc21` = `0x678AC0`
+- `VMClass::vfunc22` = `0x679510`
+- `VMClass::vfunc23` = `0x679660`
+- `VMClass::vfunc24` = `0x6796A0`
+
+## VMFunctionRegisterInterface  (vtable @ 0x789218, 6 methods)
+
+- `VMFunctionRegisterInterface::vfunc0` = `0x6E6E7D`
+- `VMFunctionRegisterInterface::vfunc1` = `0x63ED00`
+- `VMFunctionRegisterInterface::vfunc2` = `0x6E6E7D`
+- `VMFunctionRegisterInterface::vfunc3` = `0x6E6E7D`
+- `VMFunctionRegisterInterface::vfunc4` = `0x6E6E7D`
+- `VMFunctionRegisterInterface::vfunc5` = `0x6E6E7D`
+
+## VMInstanceInternal  (vtable @ 0x7897E4, 40 methods)
+
+- `VMInstanceInternal::vfunc0` = `0x6294A0`
+- `VMInstanceInternal::vfunc1` = `0x604E40`
+- `VMInstanceInternal::vfunc2` = `0x57E760`
+- `VMInstanceInternal::vfunc3` = `0x57E760`
+- `VMInstanceInternal::vfunc4` = `0x629210`
+- `VMInstanceInternal::vfunc5` = `0x629730`
+- `VMInstanceInternal::vfunc6` = `0x629200`
+- `VMInstanceInternal::vfunc7` = `0x629B30`
+- `VMInstanceInternal::vfunc8` = `0x629AE0`
+- `VMInstanceInternal::vfunc9` = `0x629B20`
+- `VMInstanceInternal::vfunc10` = `0x629F50`
+- `VMInstanceInternal::vfunc11` = `0x62A1E0`
+- `VMInstanceInternal::vfunc12` = `0x62AA50`
+- `VMInstanceInternal::vfunc13` = `0x62A9C0`
+- `VMInstanceInternal::vfunc14` = `0x62A930`
+- `VMInstanceInternal::vfunc15` = `0x62A8B0`
+- `VMInstanceInternal::vfunc16` = `0x62A840`
+- `VMInstanceInternal::vfunc17` = `0x62ADC0`
+- `VMInstanceInternal::vfunc18` = `0x62AD00`
+- `VMInstanceInternal::vfunc19` = `0x62AC40`
+- `VMInstanceInternal::vfunc20` = `0x62AB90`
+- `VMInstanceInternal::vfunc21` = `0x62AAF0`
+- `VMInstanceInternal::vfunc22` = `0x62AE90`
+- `VMInstanceInternal::vfunc23` = `0x62AFC0`
+- `VMInstanceInternal::vfunc24` = `0x62AF40`
+- `VMInstanceInternal::vfunc25` = `0x629720`
+- `VMInstanceInternal::vfunc26` = `0x629820`
+- `VMInstanceInternal::vfunc27` = `0x629830`
+- `VMInstanceInternal::vfunc28` = `0x629850`
+- `VMInstanceInternal::vfunc29` = `0x629870`
+- `VMInstanceInternal::vfunc30` = `0x629890`
+- `VMInstanceInternal::vfunc31` = `0x6298F0`
+- `VMInstanceInternal::vfunc32` = `0x629920`
+- `VMInstanceInternal::vfunc33` = `0x629930`
+- `VMInstanceInternal::vfunc34` = `0x6299E0`
+- `VMInstanceInternal::vfunc35` = `0x6299F0`
+- `VMInstanceInternal::vfunc36` = `0x6295D0`
+- `VMInstanceInternal::vfunc37` = `0x62A460`
+- `VMInstanceInternal::vfunc38` = `0x62B000`
+- `VMInstanceInternal::vfunc39` = `0x62A2A0`
+
+## VertexBufferResource  (vtable @ 0x79A094, 18 methods)
+
+- `VertexBufferResource::vfunc0` = `0x67A760`
+- `VertexBufferResource::vfunc1` = `0x604E40`
+- `VertexBufferResource::vfunc2` = `0x610CC0`
+- `VertexBufferResource::vfunc3` = `0x610D20`
+- `VertexBufferResource::vfunc4` = `0x5FDAA0`
+- `VertexBufferResource::vfunc5` = `0x67A9B0`
+- `VertexBufferResource::vfunc6` = `0x67A9E0`
+- `VertexBufferResource::vfunc7` = `0x547170`
+- `VertexBufferResource::vfunc8` = `0x610BD0`
+- `VertexBufferResource::vfunc9` = `0x604E40`
+- `VertexBufferResource::vfunc10` = `0x460B60`
+- `VertexBufferResource::vfunc11` = `0x460B60`
+- `VertexBufferResource::vfunc12` = `0x437C60`
+- `VertexBufferResource::vfunc13` = `0x60B200`
+- `VertexBufferResource::vfunc14` = `0x64BC40`
+- `VertexBufferResource::vfunc15` = `0x57B040`
+- `VertexBufferResource::vfunc16` = `0x610C60`
+- `VertexBufferResource::vfunc17` = `0x610C00`
+
+## VisibilityCollisionCallback  (vtable @ 0x7661EC, 2 methods)
+
+- `VisibilityCollisionCallback::vfunc0` = `0x4193C0`
+- `VisibilityCollisionCallback::vfunc1` = `0x65F310`
+
+## VolumeTag  (vtable @ 0x78018C, 10 methods)
+
+- `VolumeTag::vfunc0` = `0x584630`
+- `VolumeTag::vfunc1` = `0x604E40`
+- `VolumeTag::vfunc2` = `0x57E760`
+- `VolumeTag::vfunc3` = `0x57E760`
+- `VolumeTag::vfunc4` = `0x5FDAA0`
+- `VolumeTag::vfunc5` = `0x6E6E7D`
+- `VolumeTag::vfunc6` = `0x6E6E7D`
+- `VolumeTag::vfunc7` = `0x582220`
+- `VolumeTag::vfunc8` = `0x460B60`
+- `VolumeTag::vfunc9` = `0x680110`
+
+## VolumeTexture  (vtable @ 0x788E8C, 21 methods)
+
+- `VolumeTexture::vfunc0` = `0x611C90`
+- `VolumeTexture::vfunc1` = `0x611290`
+- `VolumeTexture::vfunc2` = `0x610CC0`
+- `VolumeTexture::vfunc3` = `0x610D20`
+- `VolumeTexture::vfunc4` = `0x5FDAA0`
+- `VolumeTexture::vfunc5` = `0x610F90`
+- `VolumeTexture::vfunc6` = `0x610FE0`
+- `VolumeTexture::vfunc7` = `0x547170`
+- `VolumeTexture::vfunc8` = `0x610BD0`
+- `VolumeTexture::vfunc9` = `0x604E40`
+- `VolumeTexture::vfunc10` = `0x460B60`
+- `VolumeTexture::vfunc11` = `0x460B60`
+- `VolumeTexture::vfunc12` = `0x611050`
+- `VolumeTexture::vfunc13` = `0x611070`
+- `VolumeTexture::vfunc14` = `0x64BC40`
+- `VolumeTexture::vfunc15` = `0x57B040`
+- `VolumeTexture::vfunc16` = `0x610C60`
+- `VolumeTexture::vfunc17` = `0x610C00`
+- `VolumeTexture::vfunc18` = `0x611090`
+- `VolumeTexture::vfunc19` = `0x611240`
+- `VolumeTexture::vfunc20` = `0x604E40`
+
+## WAImpl  (vtable @ 0x774E14, 50 methods)
+
+- `WAImpl::vfunc0` = `0x4BDB90`
+- `WAImpl::vfunc1` = `0x604E40`
+- `WAImpl::vfunc2` = `0x57E760`
+- `WAImpl::vfunc3` = `0x57E760`
+- `WAImpl::vfunc4` = `0x4BB820`
+- `WAImpl::vfunc5` = `0x4BB9E0`
+- `WAImpl::vfunc6` = `0x680110`
+- `WAImpl::vfunc7` = `0x4BDCC0`
+- `WAImpl::vfunc8` = `0x4BB960`
+- `WAImpl::vfunc9` = `0x4BE7A0`
+- `WAImpl::vfunc10` = `0x4BE490`
+- `WAImpl::vfunc11` = `0x4BD1F0`
+- `WAImpl::vfunc12` = `0x4BD090`
+- `WAImpl::vfunc13` = `0x4BEFE0`
+- `WAImpl::vfunc14` = `0x4BF000`
+- `WAImpl::vfunc15` = `0x4EDFF0`
+- `WAImpl::vfunc16` = `0x4BEB90`
+- `WAImpl::vfunc17` = `0x4BEBA0`
+- `WAImpl::vfunc18` = `0x4BD0C0`
+- `WAImpl::vfunc19` = `0x4BE7B0`
+- `WAImpl::vfunc20` = `0x4BBE00`
+- `WAImpl::vfunc21` = `0x4BD7D0`
+- `WAImpl::vfunc22` = `0x4BBE20`
+- `WAImpl::vfunc23` = `0x4BC090`
+- `WAImpl::vfunc24` = `0x4BE8C0`
+- `WAImpl::vfunc25` = `0x4BEA80`
+- `WAImpl::vfunc26` = `0x516940`
+- `WAImpl::vfunc27` = `0x4BD700`
+- `WAImpl::vfunc28` = `0x4BD7B0`
+- `WAImpl::vfunc29` = `0x4BBE40`
+- `WAImpl::vfunc30` = `0x4BBEB0`
+- `WAImpl::vfunc31` = `0x4BBEC0`
+- `WAImpl::vfunc32` = `0x4BD9F0`
+- `WAImpl::vfunc33` = `0x4BDA00`
+- `WAImpl::vfunc34` = `0x4BDA70`
+- `WAImpl::vfunc35` = `0x4BDAE0`
+- `WAImpl::vfunc36` = `0x4BDB00`
+- `WAImpl::vfunc37` = `0x4BDB00`
+- `WAImpl::vfunc38` = `0x65B5A0`
+- `WAImpl::vfunc39` = `0x4BDB10`
+- `WAImpl::vfunc40` = `0x4BDB30`
+- `WAImpl::vfunc41` = `0x4BDB50`
+- `WAImpl::vfunc42` = `0x516940`
+- `WAImpl::vfunc43` = `0x4BDB60`
+- `WAImpl::vfunc44` = `0x4BDB60`
+- `WAImpl::vfunc45` = `0x4BDB70`
+- `WAImpl::vfunc46` = `0x4BB9A0`
+- `WAImpl::vfunc47` = `0x4BF020`
+- `WAImpl::vfunc48` = `0x4BE820`
+- `WAImpl::vfunc49` = `0x689820`
+
+## WaterCurrentSplines  (vtable @ 0x780234, 2 methods)
+
+- `WaterCurrentSplines::vfunc0` = `0x5865D0`
+- `WaterCurrentSplines::vfunc1` = `0x586610`
+
+## WaterFlowMarkerGeneratorTag  (vtable @ 0x780350, 10 methods)
+
+- `WaterFlowMarkerGeneratorTag::vfunc0` = `0x584630`
+- `WaterFlowMarkerGeneratorTag::vfunc1` = `0x604E40`
+- `WaterFlowMarkerGeneratorTag::vfunc2` = `0x57E760`
+- `WaterFlowMarkerGeneratorTag::vfunc3` = `0x57E760`
+- `WaterFlowMarkerGeneratorTag::vfunc4` = `0x586D90`
+- `WaterFlowMarkerGeneratorTag::vfunc5` = `0x586DF0`
+- `WaterFlowMarkerGeneratorTag::vfunc6` = `0x586E10`
+- `WaterFlowMarkerGeneratorTag::vfunc7` = `0x582220`
+- `WaterFlowMarkerGeneratorTag::vfunc8` = `0x460B60`
+- `WaterFlowMarkerGeneratorTag::vfunc9` = `0x680110`
+
+## WaterGeometry  (vtable @ 0x780FAC, 7 methods)
+
+- `WaterGeometry::vfunc0` = `0x596990`
+- `WaterGeometry::vfunc1` = `0x604E40`
+- `WaterGeometry::vfunc2` = `0x57E760`
+- `WaterGeometry::vfunc3` = `0x57E760`
+- `WaterGeometry::vfunc4` = `0x596830`
+- `WaterGeometry::vfunc5` = `0x516940`
+- `WaterGeometry::vfunc6` = `0x680110`
+
+## WaterGeometryProxy  (vtable @ 0x7811DC, 7 methods)
+
+- `WaterGeometryProxy::vfunc0` = `0x516940`
+- `WaterGeometryProxy::vfunc1` = `0x59B690`
+- `WaterGeometryProxy::vfunc2` = `0x64A9B0`
+- `WaterGeometryProxy::vfunc3` = `0x64CAE0`
+- `WaterGeometryProxy::vfunc4` = `0x604E40`
+- `WaterGeometryProxy::vfunc5` = `0x64CAE0`
+- `WaterGeometryProxy::vfunc6` = `0x430D50`
+
+## WaterPrefs  (vtable @ 0x781164, 22 methods)
+
+- `WaterPrefs::vfunc0` = `0x4CF5C0`
+- `WaterPrefs::vfunc1` = `0x604E40`
+- `WaterPrefs::vfunc2` = `0x4041C0`
+- `WaterPrefs::vfunc3` = `0x4041C0`
+- `WaterPrefs::vfunc4` = `0x598EE0`
+- `WaterPrefs::vfunc5` = `0x460B60`
+- `WaterPrefs::vfunc6` = `0x610BC0`
+- `WaterPrefs::vfunc7` = `0x547170`
+- `WaterPrefs::vfunc8` = `0x610BD0`
+- `WaterPrefs::vfunc9` = `0x64A9B0`
+- `WaterPrefs::vfunc10` = `0x60EAE0`
+- `WaterPrefs::vfunc11` = `0x460B60`
+- `WaterPrefs::vfunc12` = `0x437C60`
+- `WaterPrefs::vfunc13` = `0x460B60`
+- `WaterPrefs::vfunc14` = `0x64CAE0`
+- `WaterPrefs::vfunc15` = `0x57B040`
+- `WaterPrefs::vfunc16` = `0x437C60`
+- `WaterPrefs::vfunc17` = `0x610C00`
+- `WaterPrefs::vfunc18` = `0x598EF0`
+- `WaterPrefs::vfunc19` = `0x598F10`
+- `WaterPrefs::vfunc20` = `0x460B60`
+- `WaterPrefs::vfunc21` = `0x67AA00`
+
+## WaterTagHookup  (vtable @ 0x7803D8, 10 methods)
+
+- `WaterTagHookup::vfunc0` = `0x586EC0`
+- `WaterTagHookup::vfunc1` = `0x604E40`
+- `WaterTagHookup::vfunc2` = `0x57E760`
+- `WaterTagHookup::vfunc3` = `0x57E760`
+- `WaterTagHookup::vfunc4` = `0x586E20`
+- `WaterTagHookup::vfunc5` = `0x586F70`
+- `WaterTagHookup::vfunc6` = `0x586F60`
+- `WaterTagHookup::vfunc7` = `0x582220`
+- `WaterTagHookup::vfunc8` = `0x460B60`
+- `WaterTagHookup::vfunc9` = `0x680110`
+
+## WaveBank  (vtable @ 0x78FDC4, 5 methods)
+
+- `WaveBank::vfunc0` = `0x653C20`
+- `WaveBank::vfunc1` = `0x653AE0`
+- `WaveBank::vfunc2` = `0x64CAE0`
+- `WaveBank::vfunc3` = `0x606DC0`
+- `WaveBank::vfunc4` = `0x6540E0`
+
+## WaveBank  (vtable @ 0x78FD74, 19 methods)
+
+- `WaveBank::vfunc0` = `0x653C00`
+- `WaveBank::vfunc1` = `0x604E40`
+- `WaveBank::vfunc2` = `0x610CC0`
+- `WaveBank::vfunc3` = `0x610D20`
+- `WaveBank::vfunc4` = `0x5FDAA0`
+- `WaveBank::vfunc5` = `0x653E60`
+- `WaveBank::vfunc6` = `0x653DF0`
+- `WaveBank::vfunc7` = `0x547170`
+- `WaveBank::vfunc8` = `0x547170`
+- `WaveBank::vfunc9` = `0x64A9B0`
+- `WaveBank::vfunc10` = `0x460B60`
+- `WaveBank::vfunc11` = `0x460B60`
+- `WaveBank::vfunc12` = `0x437C60`
+- `WaveBank::vfunc13` = `0x460B60`
+- `WaveBank::vfunc14` = `0x64BC40`
+- `WaveBank::vfunc15` = `0x57B040`
+- `WaveBank::vfunc16` = `0x610C60`
+- `WaveBank::vfunc17` = `0x610C00`
+- `WaveBank::vfunc18` = `0x67AA00`
+
+## WaveBankData  (vtable @ 0x78FE00, 5 methods)
+
+- `WaveBankData::vfunc0` = `0x6E6E7D`
+- `WaveBankData::vfunc1` = `0x6E6E7D`
+- `WaveBankData::vfunc2` = `0x6E6E7D`
+- `WaveBankData::vfunc3` = `0x6E6E7D`
+- `WaveBankData::vfunc4` = `0x653B10`
+
+## Wavefront  (vtable @ 0x770CFC, 15 methods)
+
+- `Wavefront::vfunc0` = `0x48B7F0`
+- `Wavefront::vfunc1` = `0x604E40`
+- `Wavefront::vfunc2` = `0x57E760`
+- `Wavefront::vfunc3` = `0x57E760`
+- `Wavefront::vfunc4` = `0x5FDAA0`
+- `Wavefront::vfunc5` = `0x48B910`
+- `Wavefront::vfunc6` = `0x680110`
+- `Wavefront::vfunc7` = `0x6E6E7D`
+- `Wavefront::vfunc8` = `0x460B60`
+- `Wavefront::vfunc9` = `0x460B60`
+- `Wavefront::vfunc10` = `0x48B9F0`
+- `Wavefront::vfunc11` = `0x48BAB0`
+- `Wavefront::vfunc12` = `0x6E6E7D`
+- `Wavefront::vfunc13` = `0x6E6E7D`
+- `Wavefront::vfunc14` = `0x6E6E7D`
+
+## WavefrontBoltExplosion  (vtable @ 0x770D3C, 25 methods)
+
+- `WavefrontBoltExplosion::vfunc0` = `0x47A9D0`
+- `WavefrontBoltExplosion::vfunc1` = `0x604E40`
+- `WavefrontBoltExplosion::vfunc2` = `0x57E760`
+- `WavefrontBoltExplosion::vfunc3` = `0x57E760`
+- `WavefrontBoltExplosion::vfunc4` = `0x48B770`
+- `WavefrontBoltExplosion::vfunc5` = `0x48BD40`
+- `WavefrontBoltExplosion::vfunc6` = `0x680110`
+- `WavefrontBoltExplosion::vfunc7` = `0x48C060`
+- `WavefrontBoltExplosion::vfunc8` = `0x460B60`
+- `WavefrontBoltExplosion::vfunc9` = `0x460B60`
+- `WavefrontBoltExplosion::vfunc10` = `0x48B9F0`
+- `WavefrontBoltExplosion::vfunc11` = `0x48BAB0`
+- `WavefrontBoltExplosion::vfunc12` = `0x48C1A0`
+- `WavefrontBoltExplosion::vfunc13` = `0x48C240`
+- `WavefrontBoltExplosion::vfunc14` = `0x48BD60`
+- `WavefrontBoltExplosion::vfunc15` = `0x48BD50`
+- `WavefrontBoltExplosion::vfunc16` = `0x48BD70`
+- `WavefrontBoltExplosion::vfunc17` = `0x48BD90`
+- `WavefrontBoltExplosion::vfunc18` = `0x48BDB0`
+- `WavefrontBoltExplosion::vfunc19` = `0x48BDC0`
+- `WavefrontBoltExplosion::vfunc20` = `0x48BDF0`
+- `WavefrontBoltExplosion::vfunc21` = `0x604E40`
+- `WavefrontBoltExplosion::vfunc22` = `0x64A9B0`
+- `WavefrontBoltExplosion::vfunc23` = `0x604E40`
+- `WavefrontBoltExplosion::vfunc24` = `0x48BE00`
+
+## WavefrontExplosiveExplosion  (vtable @ 0x76EEB4, 25 methods)
+
+- `WavefrontExplosiveExplosion::vfunc0` = `0x47A9D0`
+- `WavefrontExplosiveExplosion::vfunc1` = `0x604E40`
+- `WavefrontExplosiveExplosion::vfunc2` = `0x57E760`
+- `WavefrontExplosiveExplosion::vfunc3` = `0x57E760`
+- `WavefrontExplosiveExplosion::vfunc4` = `0x47A470`
+- `WavefrontExplosiveExplosion::vfunc5` = `0x47AA70`
+- `WavefrontExplosiveExplosion::vfunc6` = `0x680110`
+- `WavefrontExplosiveExplosion::vfunc7` = `0x48C060`
+- `WavefrontExplosiveExplosion::vfunc8` = `0x460B60`
+- `WavefrontExplosiveExplosion::vfunc9` = `0x460B60`
+- `WavefrontExplosiveExplosion::vfunc10` = `0x48B9F0`
+- `WavefrontExplosiveExplosion::vfunc11` = `0x48BAB0`
+- `WavefrontExplosiveExplosion::vfunc12` = `0x48C1A0`
+- `WavefrontExplosiveExplosion::vfunc13` = `0x48C240`
+- `WavefrontExplosiveExplosion::vfunc14` = `0x47AAA0`
+- `WavefrontExplosiveExplosion::vfunc15` = `0x47AA90`
+- `WavefrontExplosiveExplosion::vfunc16` = `0x47AAB0`
+- `WavefrontExplosiveExplosion::vfunc17` = `0x47AAE0`
+- `WavefrontExplosiveExplosion::vfunc18` = `0x47AB10`
+- `WavefrontExplosiveExplosion::vfunc19` = `0x47AB20`
+- `WavefrontExplosiveExplosion::vfunc20` = `0x64CAE0`
+- `WavefrontExplosiveExplosion::vfunc21` = `0x47AB50`
+- `WavefrontExplosiveExplosion::vfunc22` = `0x47AB60`
+- `WavefrontExplosiveExplosion::vfunc23` = `0x47AB70`
+- `WavefrontExplosiveExplosion::vfunc24` = `0x47AB80`
+
+## Weapon  (vtable @ 0x774BB8, 7 methods)
+
+- `Weapon::vfunc0` = `0x4BB710`
+- `Weapon::vfunc1` = `0x604E40`
+- `Weapon::vfunc2` = `0x57E760`
+- `Weapon::vfunc3` = `0x57E760`
+- `Weapon::vfunc4` = `0x4B06B0`
+- `Weapon::vfunc5` = `0x4B1BF0`
+- `Weapon::vfunc6` = `0x680110`
+
+## Weapon  (vtable @ 0x774B9C, 6 methods)
+
+- `Weapon::vfunc0` = `0x4B15E0`
+- `Weapon::vfunc1` = `0x64CAE0`
+- `Weapon::vfunc2` = `0x4B93A0`
+- `Weapon::vfunc3` = `0x4B9430`
+- `Weapon::vfunc4` = `0x65F500`
+- `Weapon::vfunc5` = `0x64A9B0`
+
+## WeaponPrefs  (vtable @ 0x774BDC, 22 methods)
+
+- `WeaponPrefs::vfunc0` = `0x4B09E0`
+- `WeaponPrefs::vfunc1` = `0x604E40`
+- `WeaponPrefs::vfunc2` = `0x4041C0`
+- `WeaponPrefs::vfunc3` = `0x4041C0`
+- `WeaponPrefs::vfunc4` = `0x4B0670`
+- `WeaponPrefs::vfunc5` = `0x460B60`
+- `WeaponPrefs::vfunc6` = `0x610BC0`
+- `WeaponPrefs::vfunc7` = `0x547170`
+- `WeaponPrefs::vfunc8` = `0x610BD0`
+- `WeaponPrefs::vfunc9` = `0x64A9B0`
+- `WeaponPrefs::vfunc10` = `0x60EAE0`
+- `WeaponPrefs::vfunc11` = `0x460B60`
+- `WeaponPrefs::vfunc12` = `0x437C60`
+- `WeaponPrefs::vfunc13` = `0x460B60`
+- `WeaponPrefs::vfunc14` = `0x64CAE0`
+- `WeaponPrefs::vfunc15` = `0x4B0BF0`
+- `WeaponPrefs::vfunc16` = `0x437C60`
+- `WeaponPrefs::vfunc17` = `0x610C00`
+- `WeaponPrefs::vfunc18` = `0x4B0680`
+- `WeaponPrefs::vfunc19` = `0x4B06A0`
+- `WeaponPrefs::vfunc20` = `0x4B0E10`
+- `WeaponPrefs::vfunc21` = `0x67AA00`
+
+## WeatherCube  (vtable @ 0x784288, 7 methods)
+
+- `WeatherCube::vfunc0` = `0x516940`
+- `WeatherCube::vfunc1` = `0x547170`
+- `WeatherCube::vfunc2` = `0x64A9B0`
+- `WeatherCube::vfunc3` = `0x64CAE0`
+- `WeatherCube::vfunc4` = `0x604E40`
+- `WeatherCube::vfunc5` = `0x64CAE0`
+- `WeatherCube::vfunc6` = `0x430D50`
+
+## WeatherCube  (vtable @ 0x784268, 7 methods)
+
+- `WeatherCube::vfunc0` = `0x5C1D30`
+- `WeatherCube::vfunc1` = `0x604E40`
+- `WeatherCube::vfunc2` = `0x57E760`
+- `WeatherCube::vfunc3` = `0x57E760`
+- `WeatherCube::vfunc4` = `0x5FDAA0`
+- `WeatherCube::vfunc5` = `0x516940`
+- `WeatherCube::vfunc6` = `0x680110`
+
+## WeatherVolumePrefs  (vtable @ 0x78441C, 22 methods)
+
+- `WeatherVolumePrefs::vfunc0` = `0x5C5280`
+- `WeatherVolumePrefs::vfunc1` = `0x604E40`
+- `WeatherVolumePrefs::vfunc2` = `0x4041C0`
+- `WeatherVolumePrefs::vfunc3` = `0x4041C0`
+- `WeatherVolumePrefs::vfunc4` = `0x5C5100`
+- `WeatherVolumePrefs::vfunc5` = `0x460B60`
+- `WeatherVolumePrefs::vfunc6` = `0x610BC0`
+- `WeatherVolumePrefs::vfunc7` = `0x547170`
+- `WeatherVolumePrefs::vfunc8` = `0x610BD0`
+- `WeatherVolumePrefs::vfunc9` = `0x64A9B0`
+- `WeatherVolumePrefs::vfunc10` = `0x60EAE0`
+- `WeatherVolumePrefs::vfunc11` = `0x460B60`
+- `WeatherVolumePrefs::vfunc12` = `0x437C60`
+- `WeatherVolumePrefs::vfunc13` = `0x460B60`
+- `WeatherVolumePrefs::vfunc14` = `0x64CAE0`
+- `WeatherVolumePrefs::vfunc15` = `0x5C5A00`
+- `WeatherVolumePrefs::vfunc16` = `0x437C60`
+- `WeatherVolumePrefs::vfunc17` = `0x610C00`
+- `WeatherVolumePrefs::vfunc18` = `0x5C5110`
+- `WeatherVolumePrefs::vfunc19` = `0x5C5130`
+- `WeatherVolumePrefs::vfunc20` = `0x5C5520`
+- `WeatherVolumePrefs::vfunc21` = `0x67AA00`
+
+## WeatherVolumeTag  (vtable @ 0x7804B8, 10 methods)
+
+- `WeatherVolumeTag::vfunc0` = `0x584630`
+- `WeatherVolumeTag::vfunc1` = `0x604E40`
+- `WeatherVolumeTag::vfunc2` = `0x57E760`
+- `WeatherVolumeTag::vfunc3` = `0x57E760`
+- `WeatherVolumeTag::vfunc4` = `0x587060`
+- `WeatherVolumeTag::vfunc5` = `0x5870F0`
+- `WeatherVolumeTag::vfunc6` = `0x587110`
+- `WeatherVolumeTag::vfunc7` = `0x582220`
+- `WeatherVolumeTag::vfunc8` = `0x460B60`
+- `WeatherVolumeTag::vfunc9` = `0x680110`
+
+## WorldTag  (vtable @ 0x780720, 10 methods)
+
+- `WorldTag::vfunc0` = `0x587240`
+- `WorldTag::vfunc1` = `0x604E40`
+- `WorldTag::vfunc2` = `0x57E760`
+- `WorldTag::vfunc3` = `0x57E760`
+- `WorldTag::vfunc4` = `0x587120`
+- `WorldTag::vfunc5` = `0x587420`
+- `WorldTag::vfunc6` = `0x587860`
+- `WorldTag::vfunc7` = `0x582220`
+- `WorldTag::vfunc8` = `0x460B60`
+- `WorldTag::vfunc9` = `0x680110`
+
+## glShader  (vtable @ 0x79F7C4, 3 methods)
+
+- `glShader::vfunc0` = `0x6BD7F0`
+- `glShader::vfunc1` = `0x604E40`
+- `glShader::vfunc2` = `0x460B60`
+
+## glVertexStream  (vtable @ 0x79F364, 2 methods)
+
+- `glVertexStream::vfunc0` = `0x6BCD80`
+- `glVertexStream::vfunc1` = `0x604E40`

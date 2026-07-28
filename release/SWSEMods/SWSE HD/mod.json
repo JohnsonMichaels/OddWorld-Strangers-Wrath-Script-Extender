@@ -1,0 +1,6 @@
+{
+  "name": "SWSE HD",
+  "author": "Johnson Michaels",
+  "version": "1.0",
+  "description": "HD texture pack: 960 textures upscaled to 2x, swapped in by the SWSE DLL at GPU upload. The game's archives are never modified. NOTE: this folder is runtime data read directly by the SWSE DLL. Turn it on or off in SWSEMods/features.txt, not in the load order."
+}

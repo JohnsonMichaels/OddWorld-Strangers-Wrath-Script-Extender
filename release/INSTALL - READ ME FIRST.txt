@@ -1,0 +1,133 @@
+================================================================
+                      SWSE  for
+        Oddworld: Stranger's Wrath HD  (Steam)
+
+   SWSE Graphics  +  SWSE Console
+   by Johnson Michaels
+================================================================
+
+WHAT THIS IS
+------------
+SWSE (the Stranger's Wrath Script Extender) is a small DLL that loads
+with the game and powers these mods:
+
+  * SWSE Graphics - a graphics overhaul: sharpening, bloom, filmic
+    tonemapping, colour grading, ambient occlusion, optional RTGI, and
+    vignette. Only the 3D scene is touched; menus and HUD stay clean.
+
+  * SWSE Console - an in-game command console. Press the ` / ~ key,
+    type commands, hit Enter. God mode, ammo, health, transform into
+    Steef, music, money, and access to 181 of the game's own functions.
+
+
+REQUIREMENTS
+------------
+  * Oddworld: Stranger's Wrath HD (the Steam version).
+  * Windows.
+  * That's it. No other tools needed.
+
+
+================================================================
+  INSTALLATION  -  step by step
+================================================================
+
+STEP 1.  Find your game folder.
+   In Steam: right-click Stranger's Wrath -> Manage -> Browse local
+   files. A folder opens. This is your GAME FOLDER. It contains a
+   "bin" folder and "data" folder. The usual path is:
+
+   C:\Program Files (x86)\Steam\steamapps\common\Stranger's Wrath
+
+
+STEP 2.  Copy the mod files in.
+   From this download, copy these TWO items into your GAME FOLDER:
+
+     - the "bin" folder          (merges with the game's bin folder)
+     - the "SWSEMods" folder
+
+   When Windows asks to merge/replace the "bin" folder, say YES -
+   it only adds one new file (dinput8.dll), it does not delete anything.
+
+
+STEP 3.  Run the installer helper (one click).
+   In your GAME FOLDER, double-click:
+
+        SWSE-install.bat
+
+   It copies one Windows system file next to the mod so the loader
+   works (creates bin\dinput8_real.dll). You only do this once.
+   If Windows SmartScreen warns, click "More info" -> "Run anyway"
+   (the .bat is plain text - you can open it in Notepad to read it).
+
+
+STEP 4.  Launch the game (from Steam, normally).
+   To confirm it loaded: after you reach the main menu, there will be
+   a file  bin\swse_log.txt  in your game folder. If it exists, SWSE
+   is running.
+
+
+================================================================
+  USING THE MODS
+================================================================
+
+SWSE GRAPHICS
+   * Press  F10  in-game to toggle the graphics effects on/off.
+   * Press  F11  to reload settings live after editing them.
+   * To tune the look, open in a text editor:
+        SWSEMods\SWSE Graphics\settings.txt
+     Change a value, save, press F11 in-game. Every effect has a
+     comment explaining what it does.
+
+SWSE CONSOLE
+   * Press the  ` / ~  key (top-left of the keyboard) to open/close it.
+   * Type a command and press Enter.  Esc closes.  Tab autocompletes.
+   * IMPORTANT - prime it once:  most cheats need a "player context"
+     first. Just PICK UP ANY AMMO in-game once, then the commands work.
+   * Type  help   to see the built-in commands.
+   * Type  list <word>   to search all 181 game functions
+       e.g.  list music     list npc     list boat
+   * Type  call <function> [number]   to run any of them.
+
+   Handy commands:
+       god                 toggle invulnerability
+       ammo                give all ammo
+       heal                full health + stamina
+       steef / stranger    transform between forms
+       money 50000         set your moolah
+       combatmusic 1       force combat music (0 to stop)
+       help <command>      details for one command
+
+
+================================================================
+  LOAD ORDER / ENABLING-DISABLING
+================================================================
+   SWSEMods\load_order.txt controls which mods are on.
+     - a line with just the mod name  = enabled
+     - put "!" in front of the name   = disabled
+     - lines starting with "#"        = comments
+   Both mods are enabled by default.
+
+
+================================================================
+  UNINSTALL
+================================================================
+   Delete these from your game folder:
+     bin\dinput8.dll
+     bin\dinput8_real.dll
+     the SWSEMods folder
+   The game returns to 100% vanilla. Your saves are never touched.
+
+
+================================================================
+  TROUBLESHOOTING
+================================================================
+   * No swse_log.txt after launching?  The dinput8.dll files aren't in
+     the "bin" folder, or Step 3 wasn't run. Redo Steps 2-3.
+   * Console cheats say "no context"?  Pick up ammo once to prime.
+   * Graphics look wrong?  Press F10 to toggle off, or edit settings.txt
+     and press F11. Set any effect's *_enable to 0 to turn it off.
+   * Want vanilla files back?  Steam -> right-click game -> Properties ->
+     Installed Files -> Verify integrity of game files.
+
+   Mods by Johnson Michaels. Have fun.
+================================================================

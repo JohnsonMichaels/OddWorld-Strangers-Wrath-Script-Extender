@@ -1,0 +1,67 @@
+# SWSE foliage list - which textures the wind moves.
+# Curated from every alpha-cutout (.tga) texture in the game.
+# Excludes trunks, cacti, particles, terrain grass and non-plant cutouts.
+# Add lines from all_alpha_textures.txt, then run: foliage reload
+DFFEE4E0  Alder_01_hirez.tga  nopush
+15C803AB  BunchBerry_01.tga
+3877DE4E  Fern_02.tga
+D64565C5  Huckleberry_01.tga
+8D093579  IndianPaintbrush2.tga
+3EA997C5  LongStem_fern_01.tga
+D18BBD50  Red_daisy_01.tga
+53F34DCA  Yellow_daisy_01.tga
+87D8FF77  agave_01.tga
+752FB3E8  aspen_01.tga  nopush
+44D13763  autumn_shrub_01.tga
+CAE80E71  bamboo_leaves_AT.tga  nopush
+E6AA8EC5  big_leaf_tree.tga  nopush
+8EBA35C5  brown_deadbush_01.tga
+0F6670C5  brown_deadbush_02.tga
+03F4CAC6  cattail_01.tga
+DB5D9995  cave_shrub_01.tga
+15B067BD  cedar_fir_tree_01_AT.tga  nopush
+AABBFB03  corn.tga
+A01639C5  dead_bush_02.tga
+F2954354  dead_bush_03.tga
+018BD025  dead_bush_04.tga
+47D0E355  dead_corn_01.tga
+AEBB9215  dead_fir_02_AT.tga  nopush
+B563F09D  dead_snow_tree_01.tga  nopush
+397DB97A  fir_tree_01_AT.tga  nopush
+72A9A0A5  flower_01.tga
+3EF217C5  grass_page_01.tga
+870E3F33  greenTan_canopy_02_AT.tga  nopush
+D972B177  greenWallCover.tga
+E26E9EDD  green_bush_02.tga
+75C606CF  green_canopy_02_AT.tga  nopush
+62DA745C  green_fern_01.tga
+2EC5DCD9  green_fir_03_AT.tga  nopush
+E26DF022  green_grass_02.tga
+ECB70F85  green_grassclump_01.tga
+D8B9BE94  green_lowgroundcover_01.tga
+CAF0AFD4  green_seaweed_03.tga
+EB872441  green_waterlily_01.tga
+6BC63161  grey_dead_tree_02_AT.tga  nopush
+62A29551  joshua_tree_01.tga  nopush
+5D247BE4  juniper_shrub_01.tga
+7625AE5D  lichenStrands.tga
+41E78016  lichenStrands_02.tga
+4102B1C5  lodgepole_pine_01_AT.tga  nopush
+5D71B8D7  milkweed_02.tga
+1C231CCF  opple_bushes_01.tga
+888F62FA  pine_lores_02.tga  nopush
+CCDE5325  rattle_plant_01b.tga
+E3220BFA  red_grass_01.tga
+FA8C5C7C  red_mushroom_01.tga
+F69A65FA  savanna_tree_01_AT.tga  nopush
+2F5ABF20  snow_bush_01.tga
+B8A4F273  snow_grass_01.tga
+E9F5C673  snow_pine_01.tga  nopush
+541102D5  snow_tree_02_AT.tga  nopush
+0F481D57  snow_tree_03_AT.tga  nopush
+A0D8DF51  squrrel_bush_01.tga
+E1E09571  stalk_01.tga
+59337551  stalk_02.tga
+54A8DF5B  strawStrands.tga
+37D4BD1F  swamp_tree_AT.tga  nopush
+1CEBDEE4  yellow_flower_01.tga

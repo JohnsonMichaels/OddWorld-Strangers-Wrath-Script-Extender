@@ -1,0 +1,6 @@
+{
+  "name": "SWSE Wind",
+  "author": "Johnson Michaels",
+  "version": "1.0",
+  "description": "Foliage wind data for the SWSE DLL: which plants move (foliage.txt) and how (wind.txt). NOTE: this folder is runtime data read directly by the SWSE DLL. Turn it on or off in SWSEMods/features.txt, not in the load order."
+}

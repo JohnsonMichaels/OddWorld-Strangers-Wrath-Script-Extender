@@ -1,0 +1,35 @@
+{
+  "_comment": "Field labels for stat blocks. status: confirmed = verified in-game, candidate = educated guess pending a test. Slots are float positions relative to the anchor string (negative = before it). Grows as the community confirms fields.",
+  "anchors": {
+    "Firearm": {
+      "description": "Enemy/NPC ranged weapon config (one per weapon instance, in level *_tgl.smb and npc archives)",
+      "fields": {
+        "1": {"label": "fire rate / burst?", "status": "candidate"},
+        "3": {"label": "spread / accuracy?", "status": "candidate"},
+        "4": {"label": "aim cone (rad)?", "status": "candidate"},
+        "6": {"label": "damage?", "status": "candidate"},
+        "9": {"label": "burst count?", "status": "candidate"},
+        "10": {"label": "refire delay?", "status": "candidate"},
+        "11": {"label": "shot variance?", "status": "candidate"},
+        "-3": {"label": "range? (often 100)", "status": "candidate"},
+        "-5": {"label": "range? (often 100)", "status": "candidate"}
+      }
+    },
+    "Club": {
+      "description": "Enemy/NPC melee weapon config",
+      "fields": {}
+    }
+  },
+  "named": {
+    "_comment": "Labels for named records (bounty characters, hit configs) found by find_named_blocks. Keyed by exact record name.",
+    "Blisterz Booty": {"0": {"label": "bounty alive (moolah)", "status": "candidate"}, "1": {"label": "bounty dead (moolah)", "status": "candidate"}},
+    "Fatty McBoomboom": {"0": {"label": "bounty alive (moolah)", "status": "candidate"}, "1": {"label": "bounty dead (moolah)", "status": "candidate"}},
+    "Elboze Freely": {"0": {"label": "bounty alive (moolah)", "status": "candidate"}, "1": {"label": "bounty dead (moolah)", "status": "candidate"}},
+    "Lootin' Duke": {"0": {"label": "bounty alive (moolah)", "status": "candidate"}, "1": {"label": "bounty dead (moolah)", "status": "candidate"}},
+    "The Tooth Merchant": {"0": {"label": "bounty alive (moolah)", "status": "candidate"}, "1": {"label": "bounty dead (moolah)", "status": "candidate"}},
+    "Eugene": {"0": {"label": "bounty alive (moolah)", "status": "candidate"}, "1": {"label": "bounty dead (moolah)", "status": "candidate"}},
+    "X'plosives Macgee": {"0": {"label": "bounty alive (moolah)", "status": "candidate"}, "1": {"label": "bounty dead (moolah)", "status": "candidate"}},
+    "EffectMixDef\\char_punch_hit_01": {"0": {"label": "melee punch damage?", "status": "candidate"}, "2": {"label": "knockback force?", "status": "candidate"}},
+    "EffectMixDef\\char_spin_hit_01": {"0": {"label": "melee spin damage?", "status": "candidate"}, "2": {"label": "knockback force?", "status": "candidate"}}
+  }
+}

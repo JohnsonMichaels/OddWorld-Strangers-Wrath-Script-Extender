@@ -1,0 +1,407 @@
+# 327 distinct /data/prefs/**.txt paths referenced in the game
+# grouped by folder; extracted from .smb/.smh/stranger.exe
+
+/data/prefs/   (14)
+    aveventprefs.txt
+    boatprefs.txt
+    gameprefs.txt
+    levellist.txt
+    materialprefs.txt
+    materialprefshidetail.txt
+    motionglobals.txt
+    movieviewlist.txt
+    playernoises.txt
+    playerprefs.txt
+    radarprefs.txt
+    sektoprefs.txt
+    shockprefs.txt
+    textoverlayprefs.txt
+
+/data/prefs/ai/   (1)
+    townpanic.txt
+
+/data/prefs/artifacts/   (53)
+    activatehivequeen.txt
+    activatehivequeencharged.txt
+    ammobaglarge.txt
+    ammobagmedium.txt
+    ammobagsmall.txt
+    artifact_vase.txt
+    attracterbolamite.txt
+    attracterchipmunk.txt
+    attracterfuzzle.txt
+    attracterimmobilizeskunkbomb.txt
+    attracterthudslug.txt
+    binoculars.txt
+    breederbag.txt
+    damagearmadillo.txt
+    damagearmadilloloader.txt
+    damagearmadilloloaderextender.txt
+    damagebeegun.txt
+    damagebeegunextendersmall.txt
+    damageboombatqueen.txt
+    damagedynamite.txt
+    damagedynamiteextender.txt
+    damagedynamiteextenderloader.txt
+    damageriotslug.txt
+    damagestingbee.txt
+    endurancemaxboost1.txt
+    endurancemaxboost2.txt
+    endurancemaxboost3.txt
+    enduranceregenboost1.txt
+    enduranceregenboost2.txt
+    immobilizebolablast.txt
+    immobilizeskunkbomb.txt
+    immobilizeskunkbombextender.txt
+    immobilizesparkstunkz.txt
+    immobilizespiderbola.txt
+    immobilizespiderbolaextendermedium.txt
+    immobilizespiderbolaextendersmall.txt
+    microphone.txt
+    mongoriverpass.txt
+    sendtochipmunk.txt
+    sendtochipmunkextender.txt
+    sendtohowlerpunk.txt
+    sniperdart.txt
+    steefarmorheavy.txt
+    steefarmorlight.txt
+    steefarmormedium.txt
+    steefarmornone.txt
+    strangerarmorbrassknuckles.txt
+    strangerarmorsteelknuckles.txt
+    surgerybid.txt
+    trapfuzzle.txt
+    trapfuzzleloader.txt
+    trapfuzzleloaderextender.txt
+    trapfuzzlerabid.txt
+
+/data/prefs/audiolevelprefs/   (1)
+    default.txt
+
+/data/prefs/bounty/   (13)
+    nullbounty.txt
+    region0_bounty1.txt
+    region1_bounty1.txt
+    region1_bounty2.txt
+    region1_bounty3.txt
+    region2_bounty1.txt
+    region2_bounty2.txt
+    region2_bounty3.txt
+    region2_bounty4.txt
+    region3_bounty1.txt
+    region3_bounty2.txt
+    region3_bounty3.txt
+    region3_bounty4.txt
+
+/data/prefs/bountypost/   (1)
+    default.txt
+
+/data/prefs/characters/   (11)
+    elbowzfreelyprefs.txt
+    giantslegprefs.txt
+    outlawboss_elbowsfreelyprefs.txt
+    outlawcutterprefs.txt
+    outlawshooterprefs.txt
+    sewerslegprefs.txt
+    slegprefs.txt
+    sloghandlerspawnedprefs.txt
+    wolvarkgrenadierprefs.txt
+    wolvarkshooterprefs.txt
+    wolvarksniperprefs.txt
+
+/data/prefs/characters/critters/   (7)
+    armadilloprefs.txt
+    fuzzleprefs.txt
+    skunkprefs.txt
+    spiderprefs.txt
+    squirrelprefs.txt
+    stingbeeprefs.txt
+    sulphurbatprefs.txt
+
+/data/prefs/characters/critters/weapons/   (2)
+    fuzzleattackprefs.txt
+    fuzzlerabidattackprefs.txt
+
+/data/prefs/collectables/   (1)
+    stingbee.txt
+
+/data/prefs/crittercues/   (1)
+    globaldefaults.txt
+
+/data/prefs/critterpaths/   (1)
+    default.txt
+
+/data/prefs/damagers/   (1)
+    default.txt
+
+/data/prefs/decorators/   (1)
+    defaultdecorator.txt
+
+/data/prefs/effects/cardeffectdef/   (1)
+    shock_flash_03.txt
+
+/data/prefs/effects/effectmixdef/   (59)
+    bargesink.txt
+    boatripple.txt
+    button_turn_on_sparks_01.txt
+    col_money_01.txt
+    collectablepoof.txt
+    default_gibs.txt
+    des_basic_dustpuff_01.txt
+    fx_falling_dust_01.txt
+    fx_fire_torch_01.txt
+    npc_chicken_hammer_anim_01.txt
+    npc_fatty_launch_01.txt
+    npc_fatty_launch_hit_01.txt
+    npc_fatty_launch_trail_01.txt
+    npc_fatty_lland_01.txt
+    npc_mortar_charge_01.txt
+    npc_wolvark_sniper_charge_01.txt
+    oarsplash.txt
+    sekto_block_land_01.txt
+    sekto_crash_marble_chunks_01.txt
+    sekto_crash_sparks_01.txt
+    sekto_dust_explosion_01.txt
+    sekto_generator_power_01.txt
+    sekto_hover_jets_01.txt
+    sekto_hover_lightning_01.txt
+    sekto_rock_crack_01.txt
+    sektoelectrictentacles.txt
+    shock_trap_burst.txt
+    sparks_minecarts_01.txt
+    sparks_minecarts_03.txt
+    sparks_minecarts_04.txt
+    sparks_minecarts_05.txt
+    sparks_minecarts_06.txt
+    sparks_minecarts_07.txt
+    sparks_minecarts_08.txt
+    sparks_minecarts_09.txt
+    spiderbolabreakfreemix.txt
+    spiderbolagetwrappedmix.txt
+    swimsplashes.txt
+    swimsplashes_large.txt
+    txt_chicken_crane_drop.txt
+    txt_escalator_spark_dust.txt
+    txt_falling_pipe_01.txt
+    txt_falling_pipe_break_01.txt
+    txt_falling_pipe_dust_hit_01.txt
+    txt_falling_rock_01.txt
+    txt_falling_rock_02.txt
+    txt_falling_roof_01.txt
+    txt_falling_roof_02.txt
+    txt_falling_roof_03.txt
+    txt_giant_gate_gear_dust.txt
+    txt_giant_gate_gear_sparks.txt
+    txt_junk_bridge_drop.txt
+    txt_opple_smash.txt
+    txt_rockslide.txt
+    txt_steam_gate_01.txt
+    txt_tesla_tower_elec_01.txt
+    txt_wlvrk_crane_drop.txt
+    victoryspit.txt
+    wolvark_gibs.txt
+
+/data/prefs/effects/electriceffectdef/   (4)
+    shock_arc_charge.txt
+    shock_arc_fire.txt
+    shock_arc_firetotarget.txt
+    shock_arc_idle.txt
+
+/data/prefs/effects/particlesystemdef/   (2)
+    exaust_plume_01.txt
+    uglydebugpuff.txt
+
+/data/prefs/effects/sparkparticlesystemdef/   (1)
+    electricity_sparks_01.txt
+
+/data/prefs/effects/weathervolumes/   (1)
+    lightsnow.txt
+
+/data/prefs/explosions/   (20)
+    barrel_explosion.txt
+    cart_explosion.txt
+    cin_explosion_effect_rumble.txt
+    cin_explosion_riverbarricade.txt
+    de_barrel_explosive_norender.txt
+    de_explosive_norender_nodamage.txt
+    de_explosive_onlyrumbleandsound.txt
+    de_explosive_visibleeffectonly.txt
+    de_megaknockback.txt
+    nativecatapult_explosion.txt
+    no_render_dukeshove.txt
+    no_render_explosivesmgee_shove.txt
+    no_render_jomommapiledriverknockback.txt
+    no_render_largeknockback.txt
+    no_render_playerpop_shortradi.txt
+    no_render_snipershove.txt
+    no_render_snipershove_lefty.txt
+    no_render_snipershove_minecart.txt
+    no_render_snipershove_sektosprings.txt
+    no_render_snipershove_shortradi.txt
+
+/data/prefs/flowmarkers/   (1)
+    default.txt
+
+/data/prefs/followcam/   (2)
+    boat.txt
+    default.txt
+
+/data/prefs/forcefield/   (1)
+    default.txt
+
+/data/prefs/laserbeam/   (1)
+    sekto.txt
+
+/data/prefs/motionanimconfig/   (36)
+    castaraider.txt
+    giantsleg.txt
+    gloktigi.txt
+    lootenduke.txt
+    mcgrawtiny.txt
+    meagly.txt
+    native.txt
+    nativefemale.txt
+    nativerebelhurt.txt
+    outlawbomber.txt
+    outlawboss_badmortar.txt
+    outlawboss_elboze.txt
+    outlawboss_fattymcboomboom.txt
+    outlawboss_filthyhandsfloyd.txt
+    outlawboss_jomomma.txt
+    outlawboss_movieboss.txt
+    outlawboss_splosivesmcgree.txt
+    outlawcutter.txt
+    outlawmortar.txt
+    outlawnailer.txt
+    outlawpyro.txt
+    outlawshooter.txt
+    outlawsniper.txt
+    sekto.txt
+    sektomachine.txt
+    shocktank.txt
+    slog.txt
+    steef.txt
+    stranger.txt
+    townsfolk.txt
+    townsfolkfemale.txt
+    vykkerdoc.txt
+    wolvarkgrenadier.txt
+    wolvarkshooter.txt
+    wolvarksloghandler.txt
+    wolvarksniper.txt
+
+/data/prefs/motionanimconfig/critters/   (9)
+    armadilloweapon.txt
+    beegunweapon.txt
+    fuzzleattack.txt
+    fuzzleweapon.txt
+    hivequeenweapon.txt
+    skunkweapon.txt
+    spiderweapon.txt
+    squirrelweapon.txt
+    sulphurbatweapon.txt
+
+/data/prefs/motionanimconfig/weapons/   (3)
+    arms.txt
+    scope.txt
+    sendtobow.txt
+
+/data/prefs/playerarmor/   (7)
+    heavy.txt
+    light.txt
+    medium.txt
+    none.txt
+    stranger.txt
+    strangerbrassknuckles.txt
+    strangersteelknuckles.txt
+
+/data/prefs/rumble/   (9)
+    barrel_explosion_01.txt
+    cin_earthquake.txt
+    cin_wolvarkdoor.txt
+    earthquake.txt
+    playerdeath.txt
+    playershakeofffirstperson.txt
+    playershakeoffthirdperson.txt
+    sniperdart.txt
+    thunder.txt
+
+/data/prefs/sky/   (1)
+    default.txt
+
+/data/prefs/spawncollectables/   (1)
+    placemoolah_small.txt
+
+/data/prefs/store/   (1)
+    basicstore.txt
+
+/data/prefs/water/   (1)
+    default.txt
+
+/data/prefs/weapons/   (34)
+    activatehivequeen.txt
+    activatehivequeencharged.txt
+    crossbow.txt
+    crossbowupgrade.txt
+    damagearmadillo.txt
+    damagearmadilloloader.txt
+    damagearmadilloloaderextender.txt
+    damagebeegun.txt
+    damagebeegunextendersmall.txt
+    damageboombatqueen.txt
+    damagedynamite.txt
+    damagedynamiteextender.txt
+    damagedynamiteextenderloader.txt
+    damageriotslug.txt
+    damagestingbee.txt
+    genericnpc.txt
+    immobilizebolablast.txt
+    immobilizeskunkbomb.txt
+    immobilizeskunkbombextender.txt
+    immobilizesparkstunkz.txt
+    immobilizespiderbola.txt
+    immobilizespiderbolaextendermedium.txt
+    immobilizespiderbolaextendersmall.txt
+    punch.txt
+    sendtochipmunk.txt
+    sendtochipmunkextender.txt
+    sendtohowlerpunk.txt
+    sniperdart.txt
+    trapfuzzle.txt
+    trapfuzzlejump.txt
+    trapfuzzleloader.txt
+    trapfuzzleloaderextender.txt
+    trapfuzzlerabid.txt
+    trapfuzzlerabidjump.txt
+
+/data/prefs/weapons/effects/   (1)
+    fallback.txt
+
+/data/prefs/weapons/npc/   (20)
+    boatturret.txt
+    gloktigi.txt
+    mothership_fire.txt
+    nativearrow.txt
+    nativearrow_nocollide.txt
+    nativecatapult.txt
+    nativecatapult_far.txt
+    nativecatapult_insidedam.txt
+    outlawsniper.txt
+    packratrocketlauncher.txt
+    rocketship.txt
+    slogbolt.txt
+    turret_flamer.txt
+    turret_machinegunnest.txt
+    turret_minecart.txt
+    turrettownsfolk.txt
+    wolvarkcannon.txt
+    wolvarkrocketturret.txt
+    wolvarksemiauto.txt
+    wolvarkshooter.txt
+
+/data/prefs/weapons/surfacefx/   (2)
+    objectany.txt
+    weapon_surface.txt
+
+/data/prefs/weapons/test0/   (1)
+    activatehivequeen.txt

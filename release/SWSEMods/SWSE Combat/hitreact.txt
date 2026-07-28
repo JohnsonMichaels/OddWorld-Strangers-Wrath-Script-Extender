@@ -1,0 +1,19 @@
+# SWSE additive hit reactions
+# enabled   0/1  switch on at launch
+# strength       peak rotation in radians at full scale
+# ms             how long a reaction lasts
+# curve     floor perdmg max   damage -> scale
+# ratio     0/1  feed damage as % of max health
+# ease      attack overshoot   envelope shape
+# chain     links falloff      spread along the spine
+# limbmass       min descendants before a bone is used
+# armdamp        how much the arms resist the torso
+enabled 1
+strength 1.2000
+ms 360
+curve 0.2500 0.0400 0.5000
+ratio 1
+ease 0.1800 0.1200
+chain 3 0.6000
+limbmass 14
+armdamp 0.0000

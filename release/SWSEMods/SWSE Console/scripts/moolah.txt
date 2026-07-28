@@ -1,0 +1,4 @@
+# Example custom command. This file's name (moolah) becomes a console
+# command - type "moolah" in-game and every line below runs in order.
+# Lines starting with # are comments and are skipped.
+money 999999

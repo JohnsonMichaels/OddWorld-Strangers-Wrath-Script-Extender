@@ -1,0 +1,6 @@
+{
+  "name": "SWSE Graphics",
+  "author": "Johnson Michaels",
+  "version": "1.1",
+  "description": "The SWSE graphics overhaul. Adds screen-space post-processing rendered by SWSE (the Stranger's Wrath Script Extender): sharpening, soft bloom, filmic ACES tonemapping, colour grading, contact-shadow ambient occlusion, an optional screen-space RTGI pass, and a subtle vignette. Only the 3D scene is affected - menus and HUD are untouched. Press F10 in-game to toggle the effect on/off, and F11 to reload settings.txt live. Edit SWSEMods/SWSE Graphics/settings.txt to tune every effect."
+}

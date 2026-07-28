@@ -1,0 +1,11 @@
+{
+  "values": [
+    {
+      "archive": "global/global_prefs.smb",
+      "anchor": "Blisterz Booty",
+      "slot": 0,
+      "value": 400.0,
+      "_comment": "bounty alive (moolah): vanilla 200 -> 400"
+    }
+  ]
+}

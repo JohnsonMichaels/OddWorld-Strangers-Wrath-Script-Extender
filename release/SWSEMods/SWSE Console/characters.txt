@@ -1,0 +1,34 @@
+# SWSE character tuning - applied automatically on every level load.
+# Edit and run `tuning` in the console to reload without restarting.
+#
+#   <hash>    <health>  <gib>  <hurtReaction>     ("-" = leave stock)
+#
+# hurtReaction: 0 = staggers, 1 = animals, 2 = unflinchable
+#
+# Every character the game shipped unkillable (100000 hp), made mortal.
+
+0E997260    100     1      -    # townsfolk_female
+214F50C8    100     1      -    # nativerebelhurt
+2F4A8582    100     1      -    # unknown
+3670CD9C    100     1      -    # unknown
+36ED7834    100     1      -    # unknown
+3E4F6569    100     1      -    # unknown
+3EE6BB58    100     1      -    # native_female
+44E4794D    100     1      -    # unknown
+5CEE67FD    100     1      -    # townsfolk_clakkerz
+606283C9    100     1      -    # farmerfoster
+6CA190AC    100     1      -    # unknown
+9419779C    100     1      -    # unknown
+AB444625    100     1      -    # townsfolksewerworker
+B6FE5A75    100     1      -    # native_grubb
+BAF35C16    100     1      -    # townsfolkstorekeeper
+C387D977    100     1      -    # vykkerdoc
+C58894A9    100     1      -    # unknown
+C766CCA2    100     1      -    # ugenius
+E2B247BD    100     1      -    # unknown
+E7EBC893    100     1      -    # unknown
+ECF8307A    100     1      -    # unknown
+F98DFA43    100     1      -    # unknown
+
+# Everything else keeps its stock values.
+*           -       -      -

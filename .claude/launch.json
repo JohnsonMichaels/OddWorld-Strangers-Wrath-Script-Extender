@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "little-world",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8321"],
+      "port": 8321
+    },
+    {
+      "name": "vrbov",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8326"],
+      "port": 8326,
+      "autoPort": false
+    }
+  ]
+}

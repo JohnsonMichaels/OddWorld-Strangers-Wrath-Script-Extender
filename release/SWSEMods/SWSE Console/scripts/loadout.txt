@@ -1,0 +1,5 @@
+# Another example: a script can chain several commands together.
+# Type "loadout" in-game to run all of these at once.
+ammo
+heal
+crossbow

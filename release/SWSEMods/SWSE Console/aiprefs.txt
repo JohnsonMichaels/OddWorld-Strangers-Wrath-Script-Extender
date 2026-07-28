@@ -1,0 +1,153 @@
+# SWSE - NPC AI tuning
+#
+# Build your own difficulty. The game's own difficulty menu sends a single
+# integer (EASY/MEDIUM/HARD = new_game 0/1/2) and changes NO AI parameter at
+# all - not sight, not fire rate, not accuracy. Everything that decides how
+# hard a fight actually feels lives in per-character prefs objects that
+# difficulty never reads. This file reaches them.
+#
+# Nothing here is on unless you turn it on.
+
+
+# ===========================================================================
+# ENABLED / DISABLED
+#
+#   active = off         vanilla - this is the default
+#   active = <profile>   apply that profile, e.g. `active = keen`
+#
+# Applied ONCE per level load, never on a timer, and the scan runs on a worker
+# thread so it cannot stall a frame. It re-applies per level because a level
+# load builds fresh prefs objects - without that the tuning silently lapses
+# the moment you change area.
+#
+# `difficulty <name>` in the console applies a profile without editing this
+# file; `difficulty off` restores the shipped values exactly. `aitune` reloads
+# this file live.
+# ===========================================================================
+active = off
+
+
+# ===========================================================================
+# HOW VALUES WORK
+#
+# EVERY VALUE IS A MULTIPLIER on the character's shipped value, never an
+# absolute. Characters differ enormously - one outlaw sees 50 units, another
+# 115, another through a narrow 70x110 cone; fire rates run from 0.1 to 10
+# shots/second - and a flat number would erase all of that hand-authored
+# variety. 1.0 means "leave it alone".
+#
+# Applying is always computed from the shipped baseline, so re-applying does
+# not compound, and turning it off lands back on the exact original numbers.
+#
+# A shipped value of 0 means the field is unused for that character (melee,
+# non-firing). Those are skipped rather than multiplied, because scaling 0
+# writes 0 and looks like it worked.
+#
+# ONLY ENEMIES ARE TUNED. Weapons are reached through their owning character,
+# so anything at 100000 health - townsfolk, Clakkerz, natives, storekeepers -
+# is skipped by construction. The player is never touched.
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+# PERCEPTION      (applies to all four alert states: normal/agitated/combat/panic)
+# ---------------------------------------------------------------------------
+# seedist        how far NPCs see. Measured defaults: 50 at rest, 100 once
+#                agitated, 100 in combat, 75 in panic - sight genuinely
+#                DOUBLES the moment they get suspicious. Other character types
+#                run 115 / 200 / 300 / 115.
+#                HIGHER = spotted from further away.
+#
+# sixthsense     detection with NO line of sight. Ships at 10.
+#                HIGHER = harder to sneak up on.
+#
+# viewcone       horizontal and vertical field of view, in degrees. Ships at
+#                90x90 for most, 70x110 for some. Clamped at 360 - a
+#                wider-than-round cone is not "more alert", it is a broken
+#                value that reads as always-seeing.
+#                HIGHER = harder to flank.
+#
+# instantsight   range inside which you are seen with no reaction delay.
+#                Ships at 10.  HIGHER = no free first shot.
+#
+# hidevolsee     seeing into hiding volumes. Ships 1 normal -> 2 agitated ->
+#                3 combat.  HIGHER = hiding works less well.
+#
+# relax          how long an alerted NPC stays alert. Ships at 200.
+#                HIGHER = longer pursuit, harder to break line of sight.
+#
+# ---------------------------------------------------------------------------
+# WEAPONS
+# ---------------------------------------------------------------------------
+# firerate       m_fireRate is a RATE IN SHOTS PER SECOND, not a delay, so
+#                HIGHER = SHOOTS FASTER. Measured shipped values run from 0.1
+#                (outlaw shooter, 1.3) up to 10.0 (outlaw semiauto); the
+#                sniper is 0.4. Read as a delay the semiauto would fire once
+#                every ten seconds, which is how the direction was confirmed.
+#
+# reload         reload time in seconds, so LOWER = QUICKER. Shipped values
+#                run 1200-5000 ms. Long reloads mean long gaps regardless of
+#                fire rate, so this matters more than it looks.
+#
+# accuracy       scales m_accuracyWidth, which is a SPREAD (shipped 0.05-1.0).
+#                A wider cone is a WORSE shot, so LOWER = MORE ACCURATE.
+#                Do not set 0 - a shipped 0 means "unused" and is skipped, so
+#                0 would silently do nothing. Use 0.05 for near-perfect aim.
+#
+# NOT AVAILABLE
+#   misstime     m_missTime exists but is 10 ms on almost every character -
+#                the engine can make NPCs deliberately miss and essentially
+#                does not. Parsed and ignored.
+#   decisionrate no NPC think-rate field exists anywhere in the 1910 reflected
+#                fields. The field this once pointed at (m_checkEverySeconds)
+#                belongs to a level-scripting trigger, not the NPC brain.
+#                Parsed and ignored.
+#   animation    there is no per-character animation-rate field either.
+# ---------------------------------------------------------------------------
+
+
+# --- EXAMPLES --------------------------------------------------------------
+# Copy one, rename it, and point `active` at it.
+
+# A light touch: noticeably sharper without changing how encounters are built.
+[keen]
+seedist        = 1.12
+sixthsense     = 1.10
+viewcone       = 1.05
+instantsight   = 1.15
+hidevolsee     = 1.10
+relax          = 1.15
+firerate       = 1.15
+reload         = 0.90
+accuracy       = 0.85
+
+
+# Harder, but still inside the space the levels were designed around. Sight is
+# up moderately rather than dramatically - doubling it lets NPCs open fire from
+# outside the distance the levels were built to read at, which feels less like
+# difficulty and more like being sniped by scenery.
+[relentless]
+seedist        = 1.25
+sixthsense     = 1.20
+viewcone       = 1.10
+instantsight   = 1.30
+hidevolsee     = 1.25
+relax          = 1.30
+firerate       = 1.50
+reload         = 0.70
+accuracy       = 0.60
+
+
+# Deliberately absurd - for checking the tuning is reaching NPCs at all.
+# If they do not notice you across the whole level with this on, something is
+# wrong rather than subtle.
+[obvious]
+seedist        = 3.00
+sixthsense     = 4.00
+viewcone       = 1.50
+instantsight   = 3.00
+hidevolsee     = 3.00
+relax          = 2.00
+firerate       = 3.00
+reload         = 0.30
+accuracy       = 0.05
