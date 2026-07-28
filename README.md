@@ -133,5 +133,7 @@ One feature was attempted and removed: blood decals. The engine has no decal
 system, and the findings are preserved in `swse/research/BLOOD_DECALS.md` so
 nobody has to rediscover why.
 
-Requires a legal copy of Oddworld: Stranger's Wrath HD (Steam). **No game assets
-are distributed with this project.**
+Requires a legal copy of Oddworld: Stranger's Wrath HD (Steam). **No original
+game files are distributed with this project.** The optional HD texture pack
+on the Releases page contains AI-upscaled derivatives of the game's own
+textures; it is useless without the game and exists for people who own it.
