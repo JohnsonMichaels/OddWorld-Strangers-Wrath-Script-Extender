@@ -45,6 +45,7 @@
 #include <stdio.h>      // settings file I/O
 #include <string.h>
 #include "granny.h"
+#include "modregistry.h"
 #include "scriptvm.h"   // SWSE_FindNpcs / SWSE_PosGet, for the damage watch
 
 // MEASURED, not taken from Granny's documented granny_transform (0x44 with the
@@ -1933,6 +1934,7 @@ static void HitReactSettingsPath(char* out) {
     GetModuleFileNameA(GetModuleHandleA(NULL), out, MAX_PATH);
     char* sl = strrchr(out, '\\'); if (sl) *sl = 0;    // ...\bin
     sl = strrchr(out, '\\'); if (sl) *sl = 0;          // game root
+    if (SWSE_FindModFile("hitreact.txt", out, MAX_PATH)) return;
     lstrcatA(out, "\\SWSEMods\\SWSE Combat\\hitreact.txt");
 }
 

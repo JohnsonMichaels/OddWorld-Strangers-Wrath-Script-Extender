@@ -9,6 +9,9 @@
 // All replays run under SEH; a fault disables that path instead of crashing.
 
 #include "scriptvm.h"
+#include "positions.h"
+#include "granny.h"
+#include "modregistry.h"
 #include "scriptvm_gen.h"
 #include <windows.h>
 #include <tlhelp32.h>   // Thread32First: watchpoints must arm every thread, not just ours
@@ -295,6 +298,7 @@ static void PointersPath(char* out) {
     char exe[MAX_PATH]; GetModuleFileNameA(GetModuleHandleA(NULL), exe, MAX_PATH);
     char* sl = strrchr(exe, '\\'); if (sl) *sl = 0;      // ...\bin
     sl = strrchr(exe, '\\'); if (sl) *sl = 0;            // game root
+    if (SWSE_FindModFile("pointers.txt", out, MAX_PATH)) return;
     wsprintfA(out, "%s\\SWSEMods\\SWSE Console\\pointers.txt", exe);
 }
 
@@ -2905,15 +2909,17 @@ int SWSE_Resolve(unsigned hash, char* msg, int msgLen) {
 // copy is why player teleports reverted -- the source overwrites it next frame.
 // One heap pass collects motion objects for every NPC we intend to move,
 // instead of a full scan per NPC.
-int SWSE_BringNpcs(int count, unsigned typeHash, char* msg, int msgLen) {
+// Relocate NPCs to an ARBITRARY destination.
+//
+// The engine never creates NPCs at runtime - every one exists from level load
+// (measured across an ambush, a boss fight and tunnel emergences: zero calls to
+// the spawn routine and a strictly falling count). So "spawn an ambush" really
+// means MOVE ones that already exist, and if a level's cast is dead there is
+// nobody left to move. Callers should treat a 0 return as "no bodies
+// available", not as an error.
+int SWSE_BringNpcsTo(float px, float py, float pz,
+                     int count, unsigned typeHash, char* msg, int msgLen) {
     char tmp[220], b[160];
-    float* pp = PlayerPos();
-    if (!pp) { lstrcpynA(msg, "no player position", msgLen); return 0; }
-    if (pp[0] == 0.0f && pp[1] == 0.0f && pp[2] == 0.0f) {
-        lstrcpynA(msg, "player at origin - level still loading", msgLen);
-        return 0;
-    }
-    float px = pp[0], py = pp[1], pz = pp[2];
 
     int n = SWSE_FindNpcs(g_snScan, 1024);
     if (n <= 0) { lstrcpynA(msg, "no live NPCs", msgLen); return 0; }
@@ -2999,6 +3005,122 @@ int SWSE_BringNpcs(int count, unsigned typeHash, char* msg, int msgLen) {
               moved, np, noMotion, (int)px, (int)py, (int)pz);
     lstrcpynA(msg, tmp, msgLen);
     return moved;
+}
+
+
+// How many live NPCs of a type are in the watch cache.
+//
+// Deliberately reads the CACHED actor list (refreshed on its own timer by the
+// hit-reaction watch) rather than running a heap scan. A scan here would be a
+// full memory walk on the render thread, which is exactly the mistake that
+// produced multi-hundred-millisecond stalls twice before in this project.
+// Returns -1 if the cache is empty, so a caller can tell "none alive" apart
+// from "do not know yet".
+int SWSE_CountNpcsOfType(unsigned typeHash) {
+    unsigned act[64];
+    int n = SWSE_WatchActors(act, 64);
+    if (n <= 0) return -1;
+    if (!typeHash) return n;
+    int c = 0;
+    for (int i = 0; i < n; i++) {
+        __try {
+            unsigned pf = PrefsOfNpc(act[i]);
+            if (pf && *(unsigned*)(pf + 0x0C) == typeHash) c++;
+        } __except (EXCEPTION_EXECUTE_HANDLER) {}
+    }
+    return c;
+}
+
+
+// ---- reserve pool ---------------------------------------------------------
+//
+// The engine creates every NPC at level load and never again, so an ambush can
+// only MOVE bodies that already exist. Once a level's cast is dead there is
+// nobody to move, which is precisely why cleared areas stay barren.
+//
+// The way out is to ask the level for MORE cast at load time and park the
+// surplus somewhere the player will not meet it, then teleport from that pool
+// on demand. `npcdupe` re-invokes the game's own spawn routine per tag, which
+// is measured to work (318 -> 953 NPCs at n=2).
+//
+// Parking is straight down. Far below the map is out of sight and out of
+// pathfinding range, and BringNpcsTo skips anyone already near the
+// destination, so parked NPCs are exactly who it picks.
+#define RESERVE_PARK_DZ  -4000.0f
+
+static int   g_reserveParked = 0;
+
+int SWSE_ReserveBuild(int extraPerTag, char* msg, int msgLen) {
+    char tmp[260];
+    if (extraPerTag < 1) extraPerTag = 1;
+    if (extraPerTag > 3) extraPerTag = 3;   // 318 -> ~1300 at 3; beyond that is silly
+    int before = SWSE_FindNpcs(g_snScan, 1024);
+    int tags = SWSE_NpcDupe(extraPerTag);
+    if (tags <= 0) {
+        lstrcpynA(msg, "reserve: the spawn routine is not armed here "
+                       "(run `npcspy`, then reload the level)", msgLen);
+        return 0;
+    }
+    wsprintfA(tmp, "reserve: asked %d tag(s) for %d extra each "
+                   "(was %d NPCs; takes effect on the next level load)",
+              tags, extraPerTag, before);
+    lstrcpynA(msg, tmp, msgLen);
+    return tags;
+}
+
+// Move everyone who is far from the player straight down, out of the way.
+// Called after a level loads so the surplus is banked before the player meets
+// it. Returns how many were parked.
+int SWSE_ReservePark(char* msg, int msgLen) {
+    char tmp[260];
+    float* pp = PlayerPos();
+    if (!pp) { lstrcpynA(msg, "no player position", msgLen); return 0; }
+    float px = pp[0], py = pp[1];
+
+    int n = SWSE_FindNpcs(g_snScan, 1024);
+    if (n <= 0) { lstrcpynA(msg, "no live NPCs to park", msgLen); return 0; }
+
+    int parked = 0;
+    for (int i = 0; i < n; i++) {
+        unsigned a = g_snScan[i];
+        __try {
+            float* q = (float*)(a + NPC_POS);
+            float dx = q[0] - px, dy = q[1] - py;
+            // Only bank the DISTANT ones. Anything near the player is part of
+            // the encounter they are actually in.
+            if (dx*dx + dy*dy < 90000.0f) continue;      // within 300 units
+            if (q[2] < RESERVE_PARK_DZ * 0.5f) continue; // already parked
+            q[2] += RESERVE_PARK_DZ;
+            parked++;
+        } __except (EXCEPTION_EXECUTE_HANDLER) {}
+    }
+    g_reserveParked = parked;
+    wsprintfA(tmp, "reserve: parked %d distant NPC(s) below the map; "
+                   "spawnat will draw from them", parked);
+    lstrcpynA(msg, tmp, msgLen);
+    return parked;
+}
+
+// Teleport the player. Writes the motion object as well as the actor copy,
+// or the position reverts on the next frame.
+int SWSE_PlayerTeleport(float x, float y, float z) {
+    float* pp = PlayerPos();
+    if (!pp) return 0;
+    __try {
+        pp[0] = x; pp[1] = y; pp[2] = z;
+    } __except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
+    return 1;
+}
+
+// The original behaviour: bring them to the player.
+int SWSE_BringNpcs(int count, unsigned typeHash, char* msg, int msgLen) {
+    float* pp = PlayerPos();
+    if (!pp) { lstrcpynA(msg, "no player position", msgLen); return 0; }
+    if (pp[0] == 0.0f && pp[1] == 0.0f && pp[2] == 0.0f) {
+        lstrcpynA(msg, "player at origin - level still loading", msgLen);
+        return 0;
+    }
+    return SWSE_BringNpcsTo(pp[0], pp[1], pp[2], count, typeHash, msg, msgLen);
 }
 
 // Every named object near the player, whatever its class.
@@ -5490,11 +5612,13 @@ void SWSE_ScriptVMInit() {
         slash = exe;
         for (char* c = exe; *c; c++) if (*c == '\\') slash = c;
         *slash = 0;                                   // strip \bin
+    if (SWSE_FindModFile("console.txt", path, MAX_PATH)) return;
         wsprintfA(path, "%s\\SWSEMods\\SWSE Console\\settings.txt", exe);
         if (SWSE_LoadSettings(path, msg, sizeof(msg)) > 0) {
             LogS(msg);
             SWSE_NpcRoutineSpy(1);
         }
+    if (SWSE_FindModFile("characters.txt", path, MAX_PATH)) return;
         wsprintfA(path, "%s\\SWSEMods\\SWSE Console\\characters.txt", exe);
         if (SWSE_LoadTuning(path, msg, sizeof(msg)) > 0) {
             LogS(msg);
@@ -6464,6 +6588,14 @@ int SWSE_GiveWeapon(const char* name, char* msg, int msgLen) {
 #define RVA_LevelTransition  0x160510
 
 int SWSE_LoadLevel(const char* name, bool transition, char* msg, int msgLen) {
+    // Remember where we are, so `writepos` can stamp the level onto a saved
+    // point and `goto` can warn when a label belongs somewhere else.
+    //
+    // PARTIAL: this only sees levels reached through the warp command. A save
+    // load or a normal in-game transition does not pass through here, so the
+    // level reads as unknown and the stamp is blank. The engine has
+    // GPrefs::m_realLevelName; reading that would make this complete.
+    SWSE_NoteLevel(name);
     EnsureCtx();
     if (!g_ctx) { lstrcpynA(msg, "no script context - load a save first", msgLen); return 0; }
 

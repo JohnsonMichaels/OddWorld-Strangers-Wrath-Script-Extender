@@ -13,6 +13,7 @@
 // files (sharpen/bloom/ssao/ssgi) and multi-pass config.
 
 #include "gfx.h"
+#include "modregistry.h"
 #include "glspy.h"
 #include <gl/GL.h>
 #include <string>
@@ -543,12 +544,20 @@ static GLint u_sharpenEnable=-1, u_sharpenStrength=-1;
 static GLint u_gradeEnable=-1, u_exposure=-1, u_tonemap=-1;
 static GLint u_saturation=-1, u_contrast=-1, u_brightness=-1, u_temperature=-1, u_vignette=-1;
 
-// Settings file: <game>\SWSEMods\SWSE Graphics\settings.txt
-// Format: one "key value" per line (e.g. "saturation 1.8"). '#' = comment.
+// Post-process settings. Any mod may provide `graphics.txt`; the last enabled
+// one wins, so a mod can ship a whole look.
+//
+// DO NOT fall back to a bare "settings.txt" here. Both SWSE Graphics and SWSE
+// Console ship a file by that name, and SWSE_FindModFile returns the LAST
+// enabled provider - Console loads after Graphics, so the graphics pipeline
+// silently read the console's settings and RTGI died. A shared namespace needs
+// unambiguous names; that is why `graphics.txt` and `console.txt` exist.
 static void SettingsPath(char* out) {
     char exe[MAX_PATH]; GetModuleFileNameA(GetModuleHandleA(NULL), exe, MAX_PATH);
     char* sl = strrchr(exe, '\\'); if (sl) *sl = 0;      // ...\bin
     sl = strrchr(exe, '\\'); if (sl) *sl = 0;            // ...\Stranger's Wrath
+    if (SWSE_FindModFile("graphics.txt", out, MAX_PATH)) return;
+    // Legacy layout only: the shipped mod's own file, by exact path.
     wsprintfA(out, "%s\\SWSEMods\\SWSE Graphics\\settings.txt", exe);
 }
 

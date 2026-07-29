@@ -1,6 +1,7 @@
 // SWSE AI tuning - see aitune.h.
 
 #include "aitune.h"
+#include "modregistry.h"
 #include "scriptvm.h"
 #include "granny.h"      // SWSE_WatchActors - the level-is-up signal
 #include <windows.h>
@@ -200,6 +201,8 @@ static void TunePath(char* out, int n) {
     GetModuleFileNameA(GetModuleHandleA(NULL), exe, MAX_PATH);
     char* sl = strrchr(exe, '\\'); if (sl) *sl = 0;      // ...\bin
     sl = strrchr(exe, '\\'); if (sl) *sl = 0;            // game root
+    // Profiles may come from any mod folder, not just the shipped one.
+    if (SWSE_FindModFile("aiprefs.txt", out, MAX_PATH)) return;
     wsprintfA(out, "%s\\SWSEMods\\SWSE Console\\aiprefs.txt", exe);
     (void)n;
 }

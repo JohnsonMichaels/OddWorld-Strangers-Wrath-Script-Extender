@@ -679,6 +679,8 @@ void SWSE_InputStatus(char* out, int outLen) {
     (void)outLen;
 }
 
+extern "C" HMODULE SWSE_RealDInput8();   // dllmain.cpp
+
 // ---- the export ----------------------------------------------------------
 // Undecorated name for a __stdcall export on x86.
 #pragma comment(linker, "/export:DirectInput8Create=_DirectInput8Create@20")
@@ -687,17 +689,12 @@ extern "C" HRESULT WINAPI DirectInput8Create(HINSTANCE hinst, DWORD ver, REFIID 
                                              LPVOID* out, LPUNKNOWN outer) {
     static PFN_Create real = 0;
     if (!real) {
-        // dinput8_real.dll is already loaded - the other exports in dllmain.cpp
-        // still forward to it - but resolve by path so we never bind to
-        // ourselves if the loader search order ever changes.
-        HMODULE m = GetModuleHandleA("dinput8_real.dll");
-        if (!m) {
-            char path[MAX_PATH];
-            GetModuleFileNameA(GetModuleHandleA("dinput8.dll"), path, MAX_PATH);
-            char* slash = strrchr(path, '\\');
-            if (slash) { lstrcpyA(slash + 1, "dinput8_real.dll"); m = LoadLibraryA(path); }
-            if (!m) m = LoadLibraryA("dinput8_real.dll");
-        }
+        // Shared resolver (dllmain.cpp): dinput8_real.dll when present,
+        // otherwise the real system dinput8.dll by absolute path. THIS is the
+        // call the game makes during startup, so a missing dinput8_real.dll
+        // used to kill the process right here - no window, no error, only a
+        // swse_log.txt that made it look like SWSE had loaded fine.
+        HMODULE m = SWSE_RealDInput8();
         if (!m) return E_FAIL;
         real = (PFN_Create)GetProcAddress(m, "DirectInput8Create");
         if (!real) return E_FAIL;

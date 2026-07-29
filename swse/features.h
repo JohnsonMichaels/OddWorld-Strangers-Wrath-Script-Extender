@@ -22,6 +22,7 @@ enum SwseFeature {
     FEAT_HITREACT,      // additive hit reactions
     FEAT_FOLIAGE,       // foliage identification + wind
     FEAT_AITUNING,      // aiprefs.txt NPC tuning
+    FEAT_TRIGGERS,      // triggers.txt mod-defined game events
     FEAT_COUNT
 };
 

@@ -18,6 +18,8 @@
 #include "scriptvm.h"
 #include "selftest.h"
 #include "aitune.h"
+#include "triggers.h"
+#include "positions.h"
 #include "features.h"
 #include <gl/GL.h>
 #include <string>
@@ -160,6 +162,10 @@ static BOOL WINAPI HookedSwap(HDC hdc) {
         // Only the PROFILES are read here - nothing is applied, because the
         // prefs objects do not exist until a level is loaded.
         if (SWSE_Feature(FEAT_AITUNING)) { char m[220]; SWSE_AiTuneLoad(m, sizeof(m)); }
+        if (SWSE_Feature(FEAT_TRIGGERS)) {
+            SWSE_PositionsLoad();
+            SWSE_TriggersLoad();
+        }
     }
 
     // Hit reactions come up on their own too. Deferred to the first frame
@@ -181,6 +187,8 @@ static BOOL WINAPI HookedSwap(HDC hdc) {
     }
     if (SWSE_Feature(FEAT_AITUNING))
         SWSE_AiTuneTick();     // applies aiprefs.txt `active` profile on level load
+    if (SWSE_Feature(FEAT_TRIGGERS))
+        SWSE_TriggersTick();   // evaluates mod-defined triggers
     SWSE_SelfTestTick();       // verifies every feature once a level is up
 
     // one-time depth-availability probe (race-free: runs at swap, not at load)

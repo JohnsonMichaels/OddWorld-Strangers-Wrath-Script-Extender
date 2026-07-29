@@ -1,0 +1,7 @@
+# Named positions for this mod.
+#
+# Stand where you want one and run:   writepos <label>
+# It gets appended here (or to whichever mod's positions.txt loads last),
+# together with the level you were in.
+#
+#   label                     x          y          z     level

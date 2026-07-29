@@ -1,0 +1,6 @@
+{
+  "name": "SWSE Ambushes",
+  "author": "Johnson Michaels",
+  "version": "1.0",
+  "description": "Example trigger mod. Adds a chance of encounters in areas you have already cleared, and shows how a mod defines its own game events from a text file. Everything lives in this folder; delete it to remove it. NOTE: runtime data read by the SWSE DLL. Switch triggers on or off in SWSEMods/features.txt."
+}

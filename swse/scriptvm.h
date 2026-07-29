@@ -247,6 +247,24 @@ int   SWSE_SpawnGate(char* msg, int msgLen);
 // Move live NPCs to the player. This engine creates no NPCs at runtime, so
 // relocating existing ones is what "summon" can actually mean here.
 int   SWSE_BringNpcs(int count, unsigned typeHash, char* msg, int msgLen);
+
+// Relocate NPCs to an arbitrary point (triggers use this for ambushes).
+// The engine never creates NPCs at runtime, so this MOVES existing ones; a 0
+// return means the level had nobody left to move.
+int   SWSE_BringNpcsTo(float x, float y, float z,
+                       int count, unsigned typeHash, char* msg, int msgLen);
+
+// Live NPCs of a type, from the cached actor list. -1 = cache not populated.
+int   SWSE_CountNpcsOfType(unsigned typeHash);
+
+// ---- reserve pool: spare NPCs for ambushes --------------------------------
+// The engine only creates NPCs at level load, so a cleared area has nobody
+// left to ambush with. Build asks the level for extra cast (takes effect on
+// the next load); Park banks the distant ones below the map so spawnat can
+// draw on them.
+int   SWSE_ReserveBuild(int extraPerTag, char* msg, int msgLen);
+int   SWSE_ReservePark(char* msg, int msgLen);
+int   SWSE_PlayerTeleport(float x, float y, float z);
 // Send NPCs at the player via the game's own AI (GotoPlayerAggressive). Needs
 // Object arguments, which are handles -- {u16 index, u16 generation} into the
 // table at 0x9D55F0 -- not pointers.

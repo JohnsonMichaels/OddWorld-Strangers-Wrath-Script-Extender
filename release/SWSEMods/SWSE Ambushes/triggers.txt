@@ -1,0 +1,74 @@
+# SWSE Ambushes - example trigger mod
+#
+# This whole folder is the mod. It edits nothing belonging to SWSE, and
+# deleting it removes every trigger below. Copy it, rename it, make your own.
+#
+# THE PROBLEM IT ADDRESSES
+# Cleared areas stay empty. Once you have fought through a canyon there is no
+# reason to be careful there again, and a lot of the map becomes scenery.
+# These triggers put a chance of something happening on the way back.
+#
+# HOW TO USE
+#   1. Stand where you want an ambush and run:   writepos ambush_canyon
+#   2. Point a trigger at that label (below)
+#   3. `triggers reload`, then walk into it
+#
+# `triggers` lists what is loaded and what has fired.
+# `triggers test <name>` fires one immediately, ignoring chance, for testing.
+#
+# ---------------------------------------------------------------------------
+# WHAT CAN FIRE A TRIGGER  (the `when` line)
+#   enter <label> radius <R>     player comes within R units of a saved point
+#   leave <label> radius <R>     player leaves that radius
+#   levelload                    a level has finished loading
+#   every <seconds>              a repeating timer
+#   cleared <typehash>           no live NPCs of that type remain
+#   killed <typehash> count <N>  N of that type have died since level load
+#
+# HOW OFTEN
+#   chance   = 40      percent, rolled once when the condition becomes true
+#   cooldown = 300     seconds before it may fire again
+#   once     = level   at most once per level load ( or `once = ever` )
+#   level    = lm_level_03   restrict to one level
+#
+# WHAT IT DOES
+#   do = <any console command>
+# Anything you can type in the console, a trigger can do. `help` lists them.
+#
+# CHARACTER HASHES (from `npcguns` / research/NPC_TUNING.md)
+#   F4DC66D8  heavy (10000hp)      FFFC00CB  outlaw shooter
+#   072A64D6  outlaw cutter        6A6A4558  outlaw sniper
+#   5629AD35  outlaw bomber        2D8CF05F  outlaw semiauto
+#   7C6717E1  slog                 2F1D4FF5  sewer slog
+# ---------------------------------------------------------------------------
+
+
+# A 40% chance of three heavies waiting when you come back through.
+# Commented out because it needs a position you saved yourself: run
+#     writepos ambush_canyon
+# somewhere, then delete the '#' from the four lines below.
+#
+#[canyon_ambush]
+#when     = enter ambush_canyon radius 18
+#chance   = 40
+#cooldown = 300
+#do       = spawnat ambush_canyon 3 F4DC66D8
+
+
+# Bank the level's spare cast the moment a level comes up, so later ambushes
+# have bodies to draw on. The engine only creates NPCs at load time, so
+# without something like this a cleared area genuinely has nobody left.
+[bank_the_reserve]
+when  = levelload
+once  = level
+do    = reserve park
+
+
+# A patrol that wanders in a while after you have cleared the outlaw shooters.
+# `cleared` means none of that type are alive any more.
+#
+#[the_next_shift]
+#when     = cleared FFFC00CB
+#chance   = 55
+#cooldown = 600
+#do       = spawnat ambush_canyon 2 072A64D6

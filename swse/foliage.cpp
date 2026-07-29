@@ -7,6 +7,7 @@
 // hook in granny.cpp.
 
 #include "foliage.h"
+#include "modregistry.h"
 #include "wind.h"
 #include <windows.h>
 #include <gl/GL.h>
@@ -64,20 +65,14 @@ static unsigned* g_texHash = nullptr;
 static unsigned g_folVP[64];
 static int      g_folVPN = 0;
 
-static void LoadList() {
-    char path[MAX_PATH];
-    GetModuleFileNameA(GetModuleHandleA(NULL), path, MAX_PATH);
-    char* sl = strrchr(path, '\\'); if (sl) *sl = 0;   // ...\bin
-    sl = strrchr(path, '\\'); if (sl) *sl = 0;         // game root
-    lstrcatA(path, "\\SWSEMods\\SWSE Wind\\foliage.txt");
-
+// Read one mod's foliage.txt. Entries ACCUMULATE across mods: a plant pack is
+// a folder with its own foliage.txt, and nobody has to edit the shipped list
+// to add plants. Later mods can override an earlier entry's flags because the
+// lookup takes the last match.
+static void LoadListFile(const char* path, const char* modName, void*) {
     FILE* f = fopen(path, "r");
-    if (!f) {
-        char b[MAX_PATH + 64];
-        wsprintfA(b, "foliage: no list at %s", path);
-        LogF(b);
-        return;
-    }
+    if (!f) return;
+    int before = g_fpN;
     char line[512];
     while (fgets(line, sizeof(line), f) && g_fpN < MAX_FOLIAGE) {
         if (line[0] == '#' || line[0] == '\n' || line[0] == '\r') continue;
@@ -124,8 +119,23 @@ static void LoadList() {
         g_fp[g_fpN++] = v;
     }
     fclose(f);
+    char b[220];
+    wsprintfA(b, "foliage: +%d from [%s]", g_fpN - before, modName);
+    LogF(b);
+}
+
+// Every enabled mod that ships a foliage.txt contributes, in load order.
+static void LoadList() {
+    g_fpN = 0;
+    SWSE_ForEachModFile("foliage.txt", LoadListFile, nullptr);
     char b[160];
-    wsprintfA(b, "foliage: %d fingerprint(s) loaded", g_fpN);
+    if (g_fpN == 0) {
+        wsprintfA(b, "foliage: no foliage.txt in any enabled mod under %s",
+                  SWSE_ModsRoot());
+    } else {
+        wsprintfA(b, "foliage: %d fingerprint(s) from %d mod(s)",
+                  g_fpN, SWSE_CountModFile("foliage.txt"));
+    }
     LogF(b);
 }
 
@@ -170,8 +180,13 @@ static bool IsFoliageHash(unsigned h) {
 }
 
 // As above, but also reports the entry's nopush flag and sway scale.
+//
+// Scans BACKWARD so the LAST matching entry wins. Entries are appended in load
+// order, so a later mod listing the same fingerprint overrides the earlier
+// one's flags - which is what load_order.txt promises. Scanning forward would
+// make the shipped list permanently win over anything a modder adds.
 static bool FoliageLookup(unsigned h, unsigned char* noPush, unsigned char* sway) {
-    for (int i = 0; i < g_fpN; i++) {
+    for (int i = g_fpN - 1; i >= 0; i--) {
         if (g_fp[i] == h) {
             if (noPush) *noPush = g_fpNoPush[i];
             if (sway)   *sway   = g_fpSway[i];

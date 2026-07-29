@@ -4,6 +4,7 @@
 // find the scene depth buffer for true SSAO/RTGI.
 
 #include "features.h"
+#include "modregistry.h"
 #include "glspy.h"
 #include "gfx.h"
 #include "foliage.h"
@@ -229,25 +230,32 @@ static unsigned* g_hdHave = nullptr;
 static int       g_hdHaveN = 0;
 static bool      g_hdScanned = false;
 
-static void HdBuildFolderIndex() {
-    if (g_hdScanned) return;
-    g_hdScanned = true;
-    char path[MAX_PATH]; GetModuleFileNameA(GetModuleHandleA(NULL), path, MAX_PATH);
-    char* sl = strrchr(path, '\\'); if (sl) *sl = 0;   // ...\bin
-    sl = strrchr(path, '\\'); if (sl) *sl = 0;         // game root
+// Fingerprint -> the folder its .oft lives in. Storing the owner is what lets
+// ANY mod ship textures: a texture pack is a folder with a textures\ subfolder
+// and nothing else, and no one has to drop files into the shipped HD mod. On a
+// collision the last enabled mod wins, which is what load order promises.
+static char*     g_hdOwner = nullptr;         // g_hdCap entries of MAX_PATH
+static int       g_hdCap = 0;
+
+static bool HdGrow() {
+    int cap = g_hdCap ? g_hdCap * 2 : 1024;
+    unsigned* h2 = (unsigned*)realloc(g_hdHave, cap * sizeof(unsigned));
+    if (!h2) return false;
+    g_hdHave = h2;
+    char* o2 = (char*)realloc(g_hdOwner, (size_t)cap * MAX_PATH);
+    if (!o2) return false;
+    g_hdOwner = o2;
+    g_hdCap = cap;
+    return true;
+}
+
+static void HdScanOneMod(const char* texDir, const char* modName, void*) {
     char glob[MAX_PATH];
-    wsprintfA(glob, "%s\\SWSEMods\\SWSE HD\\textures\\*.oft", path);
-
-    int cap = 256;
-    g_hdHave = (unsigned*)malloc(cap * sizeof(unsigned));
-    if (!g_hdHave) return;
-
+    wsprintfA(glob, "%s\\*.oft", texDir);
     WIN32_FIND_DATAA fd;
     HANDLE h = FindFirstFileA(glob, &fd);
-    if (h == INVALID_HANDLE_VALUE) {
-        LogS("HD: no textures folder (runtime replacement inactive)");
-        return;
-    }
+    if (h == INVALID_HANDLE_VALUE) return;
+    int added = 0, overrode = 0;
     do {
         // filename is the 8-hex-digit fingerprint
         unsigned v = 0; int n = 0; bool ok = true;
@@ -259,19 +267,46 @@ static void HdBuildFolderIndex() {
             v = v * 16 + (unsigned)d;
         }
         if (!ok || n != 8) continue;
-        if (g_hdHaveN >= cap) {
-            cap *= 2;
-            unsigned* bigger = (unsigned*)realloc(g_hdHave, cap * sizeof(unsigned));
-            if (!bigger) break;
-            g_hdHave = bigger;
+
+        int at = -1;
+        for (int i = 0; i < g_hdHaveN; i++) if (g_hdHave[i] == v) { at = i; break; }
+        if (at < 0) {
+            if (g_hdHaveN >= g_hdCap && !HdGrow()) break;
+            at = g_hdHaveN++;
+            g_hdHave[at] = v;
+            added++;
+        } else {
+            overrode++;                        // a later mod replaces it
         }
-        g_hdHave[g_hdHaveN++] = v;
+        lstrcpynA(g_hdOwner + (size_t)at * MAX_PATH, texDir, MAX_PATH);
     } while (FindNextFileA(h, &fd));
     FindClose(h);
 
-    char b[120];
-    wsprintfA(b, "HD: %d replacement texture(s) available", g_hdHaveN);
+    char b[300];
+    wsprintfA(b, "HD: [%s] +%d texture(s)%s", modName, added,
+              overrode ? " (some override earlier mods)" : "");
     LogS(b);
+}
+
+static void HdBuildFolderIndex() {
+    if (g_hdScanned) return;
+    g_hdScanned = true;
+    SWSE_ForEachModFile("textures", HdScanOneMod, nullptr);
+    char b[160];
+    if (g_hdHaveN == 0)
+        LogS("HD: no mod provides a textures\\ folder (replacement inactive)");
+    else {
+        wsprintfA(b, "HD: %d replacement texture(s) from %d mod(s)",
+                  g_hdHaveN, SWSE_CountModFile("textures"));
+        LogS(b);
+    }
+}
+
+// Where a given fingerprint's .oft lives. Empty if we do not have it.
+static const char* HdOwnerDir(unsigned hash) {
+    for (int i = 0; i < g_hdHaveN; i++)
+        if (g_hdHave[i] == hash) return g_hdOwner + (size_t)i * MAX_PATH;
+    return nullptr;
 }
 
 static bool HdHaveFile(unsigned hash) {
@@ -337,12 +372,12 @@ static HdTex* HdLookup(unsigned hash) {
     if (g_hdN >= (int)(sizeof(g_hd)/sizeof(g_hd[0]))) return nullptr;
     HdTex* t = &g_hd[g_hdN++];
     t->hash = hash; t->state = 0; t->blob = nullptr;
-    // try to load SWSEMods\SWSE HD\textures\<HASH>.oft (game root)
-    char path[MAX_PATH]; GetModuleFileNameA(GetModuleHandleA(NULL), path, MAX_PATH);
-    char* sl = strrchr(path, '\\'); if (sl) *sl = 0;   // ...\bin
-    sl = strrchr(path, '\\'); if (sl) *sl = 0;         // game root
+    // Load from whichever mod folder claimed this fingerprint during the scan,
+    // rather than from a fixed folder.
+    const char* dir = HdOwnerDir(hash);
+    if (!dir) { t->state = 2; return t; }
     char full[MAX_PATH];
-    wsprintfA(full, "%s\\SWSEMods\\SWSE HD\\textures\\%08X.oft", path, hash);
+    wsprintfA(full, "%s\\%08X.oft", dir, hash);
     HANDLE f = CreateFileA(full, GENERIC_READ, FILE_SHARE_READ, NULL,
                            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (f == INVALID_HANDLE_VALUE) { t->state = 2; return t; }

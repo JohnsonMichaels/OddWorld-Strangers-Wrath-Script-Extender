@@ -10,6 +10,9 @@
 // a one-liner.
 
 #include "console.h"
+#include "modregistry.h"
+#include "triggers.h"
+#include "positions.h"
 #include "gfx.h"
 #include "scriptvm.h"
 #include "input.h"
@@ -1921,6 +1924,114 @@ static void Cmd_features(int, char**) {
     SWSE_ConsolePrint("edit features.txt and restart to change these");
 }
 
+
+// ---- named positions, triggers, and the reserve pool ----------------------
+
+static void Cmd_writepos(int argc, char** argv) {
+    if (argc < 2) {
+        SWSE_ConsolePrint("usage: writepos <label>    e.g. writepos enemyambush1");
+        SWSE_ConsolePrint("saves where you are standing, by name, to positions.txt");
+        return;
+    }
+    char msg[300];
+    SWSE_PositionWrite(argv[1], msg, sizeof(msg));
+    SWSE_ConsolePrint(msg);
+}
+
+static void Cmd_positions(int, char**) {
+    int n = SWSE_PositionCount();
+    if (!n) {
+        SWSE_ConsolePrint("no positions - stand somewhere and run: writepos <label>");
+        return;
+    }
+    Printf("%d saved position(s):", n);
+    for (int i = 0; i < n; i++) {
+        float p[3]; const char* lvl = "";
+        SWSE_PositionAt(i, p, &lvl);
+        Printf("  %-22s %6d %6d %6d  %s",
+               SWSE_PositionName(i), (int)p[0], (int)p[1], (int)p[2], lvl);
+    }
+}
+
+static void Cmd_goto(int argc, char** argv) {
+    if (argc < 2) { SWSE_ConsolePrint("usage: goto <label>"); return; }
+    float p[3]; const char* lvl = "";
+    if (!SWSE_PositionGet(argv[1], p, &lvl)) {
+        Printf("no position called '%s' - see `positions`", argv[1]);
+        return;
+    }
+    if (lvl && *lvl && SWSE_CurrentLevel()[0] && lstrcmpiA(lvl, SWSE_CurrentLevel()))
+        Printf("warning: '%s' was saved in %s, you are in %s",
+               argv[1], lvl, SWSE_CurrentLevel());
+    if (SWSE_PlayerTeleport(p[0], p[1], p[2]))
+        Printf("moved to %s (%d %d %d)", argv[1], (int)p[0], (int)p[1], (int)p[2]);
+    else
+        SWSE_ConsolePrint("teleport failed (no player position)");
+}
+
+// spawnat <label|here> [count] [typehash]
+static void Cmd_spawnat(int argc, char** argv) {
+    if (argc < 2) {
+        SWSE_ConsolePrint("usage: spawnat <label> [count] [typehash]");
+        SWSE_ConsolePrint("  moves NPCs to a saved position - this is how an ambush works");
+        return;
+    }
+    float p[3];
+    if (!lstrcmpiA(argv[1], "here")) {
+        if (!SWSE_PosGet(p)) { SWSE_ConsolePrint("no player position"); return; }
+    } else if (!SWSE_PositionGet(argv[1], p, nullptr)) {
+        Printf("no position called '%s' - see `positions`", argv[1]);
+        return;
+    }
+    int count = (argc > 2) ? atoi(argv[2]) : 3;
+    unsigned h = (argc > 3) ? (unsigned)strtoul(argv[3], nullptr, 16) : 0;
+    char msg[300];
+    int moved = SWSE_BringNpcsTo(p[0], p[1], p[2], count, h, msg, sizeof(msg));
+    SWSE_ConsolePrint(msg);
+    if (moved == 0)
+        SWSE_ConsolePrint("(the engine cannot create NPCs - none were spare. try `reserve`)");
+}
+
+// reserve [n] - build a pool of spare NPCs and park them out of the way.
+static void Cmd_reserve(int argc, char** argv) {
+    if (argc > 1 && !lstrcmpiA(argv[1], "park")) {
+        char msg[300];
+        int n = SWSE_ReservePark(msg, sizeof(msg));
+        SWSE_ConsolePrint(msg);
+        (void)n;
+        return;
+    }
+    int extra = (argc > 1) ? atoi(argv[1]) : 1;
+    char msg[300];
+    SWSE_ReserveBuild(extra, msg, sizeof(msg));
+    SWSE_ConsolePrint(msg);
+}
+
+static void Cmd_triggers(int argc, char** argv) {
+    char msg[300];
+    if (argc > 1 && !lstrcmpiA(argv[1], "reload")) {
+        int n = SWSE_TriggersLoad();
+        SWSE_PositionsLoad();
+        Printf("reloaded: %d trigger(s), %d position(s)", n, SWSE_PositionCount());
+        return;
+    }
+    if (argc > 1 && !lstrcmpiA(argv[1], "on"))  { SWSE_TriggersEnable(1); SWSE_ConsolePrint("triggers ON"); return; }
+    if (argc > 1 && !lstrcmpiA(argv[1], "off")) { SWSE_TriggersEnable(0); SWSE_ConsolePrint("triggers OFF"); return; }
+    if (argc > 2 && !lstrcmpiA(argv[1], "test")) {
+        SWSE_TriggerTest(argv[2], msg, sizeof(msg));
+        SWSE_ConsolePrint(msg);
+        return;
+    }
+    int n = SWSE_TriggerCount();
+    Printf("triggers: %s, %d loaded", SWSE_TriggersEnabled() ? "ON" : "OFF", n);
+    for (int i = 0; i < n; i++)
+        Printf("  %-20s %-34s fired %d%s",
+               SWSE_TriggerName(i), SWSE_TriggerWhen(i),
+               SWSE_TriggerFireCount(i), SWSE_TriggerArmed(i) ? "" : "  (spent)");
+    if (!n) SWSE_ConsolePrint("put a triggers.txt in any SWSEMods folder, then `triggers reload`");
+    else    SWSE_ConsolePrint("`triggers test <name>` fires one now, ignoring chance");
+}
+
 static void Cmd_difficulty(int argc, char** argv) {
     char msg[220];
     if (argc < 2) {
@@ -2601,6 +2712,12 @@ static Cmd g_cmds[] = {
     { "npcguns",    "world", "npcguns [ms] - which character carries which gun, with hp/bounty", Cmd_npcguns },
     { "weapons",    "debug", "weapons [ms] - NPC weapon timing: fire rate, accuracy, miss time", Cmd_weapons },
     { "features",   "debug", "features - which SWSE systems are enabled", Cmd_features },
+    { "writepos",   "world", "writepos <label> - save where you stand, by name", Cmd_writepos },
+    { "positions",  "world", "positions - list saved positions", Cmd_positions },
+    { "goto",       "world", "goto <label> - teleport to a saved position", Cmd_goto },
+    { "spawnat",    "world", "spawnat <label> [n] [type] - move NPCs to a position", Cmd_spawnat },
+    { "reserve",    "world", "reserve [n] | reserve park - spare NPCs for ambushes", Cmd_reserve },
+    { "triggers",   "world", "triggers [list|reload|test <name>|on|off]", Cmd_triggers },
     { "difficulty", "world", "difficulty <name|off> - apply an AI profile from aiprefs.txt", Cmd_difficulty },
     { "aitune",     "world", "aitune - reload aiprefs.txt", Cmd_aitune },
     { "spawnradius","world", "spawnradius <tenths> - how far spawns ring out", Cmd_spawnradius },
@@ -2867,6 +2984,7 @@ static void GetScriptsDir(char* out) {
     char exe[MAX_PATH]; GetModuleFileNameA(GetModuleHandleA(NULL), exe, MAX_PATH);
     char* sl = strrchr(exe, '\\'); if (sl) *sl = 0;      // ...\bin
     sl = strrchr(exe, '\\'); if (sl) *sl = 0;            // game root
+    if (SWSE_FindModFile("scripts", out, MAX_PATH)) return;
     wsprintfA(out, "%s\\SWSEMods\\SWSE Console\\scripts", exe);
 }
 
@@ -3064,6 +3182,11 @@ static void Execute(const char* line) {
         else Printf("unknown: %s  (type 'help', or 'list' for game functions)", argv[0]);
     }
 }
+
+void SWSE_ConsoleExec(const char* line) {
+    if (line && *line) Execute(line);
+}
+
 
 // ---- font atlas build (GDI -> GL texture) --------------------------------
 static void BuildFont() {

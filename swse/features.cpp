@@ -10,7 +10,8 @@ static bool g_loaded = false;
 static bool g_fromFile = false;
 
 static const char* kNames[FEAT_COUNT] = {
-    "console", "graphics", "hdtextures", "hitreact", "foliage", "aituning"
+    "console", "graphics", "hdtextures", "hitreact", "foliage", "aituning",
+    "triggers"
 };
 
 const char* SWSE_FeatureName(SwseFeature f) {

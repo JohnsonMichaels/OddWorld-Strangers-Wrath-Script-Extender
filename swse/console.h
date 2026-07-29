@@ -12,3 +12,8 @@ bool SWSE_ConsoleOpen();
 
 // Push a line into the console log from anywhere in SWSE.
 void SWSE_ConsolePrint(const char* text);
+
+// Run a console command line programmatically. This is what makes triggers
+// small: a trigger's actions are console commands, so it inherits the whole
+// command set and every command added later, with no new plumbing.
+void SWSE_ConsoleExec(const char* line);

@@ -14,17 +14,106 @@
 #include <fstream>
 #include "framehook.h"
 
-// Forward every dinput8 export to the real system DLL (copied beside us as
-// dinput8_real.dll). Pragma-based forwarders are the robust way to do this -
-// no .def, no stub functions, no name-decoration issues.
-// DirectInput8Create is NOT forwarded: input.cpp implements it so SWSE can see
-// (and inject into) every device read. Forwarding it here would win over that
-// export and silently disable input injection.
-#pragma comment(linker, "/export:DllCanUnloadNow=dinput8_real.DllCanUnloadNow,PRIVATE")
-#pragma comment(linker, "/export:DllGetClassObject=dinput8_real.DllGetClassObject,PRIVATE")
-#pragma comment(linker, "/export:DllRegisterServer=dinput8_real.DllRegisterServer,PRIVATE")
-#pragma comment(linker, "/export:DllUnregisterServer=dinput8_real.DllUnregisterServer,PRIVATE")
-#pragma comment(linker, "/export:GetdfDIJoystick=dinput8_real.GetdfDIJoystick")
+static void Log(const std::string& line);   // defined below
+
+// ---- forwarding the real dinput8 -----------------------------------------
+//
+// These used to be LINK-TIME forwards to `dinput8_real.dll`. That made a file
+// the user had to create by hand load-bearing, and it failed in the worst
+// possible way: a forward is resolved LAZILY, at the first call, so the DLL
+// loaded fine and wrote its log, and then the process died the instant the
+// game called DirectInput8Create. No window, no error, a log file that proved
+// SWSE "worked". Both of the first two people to install SWSE hit this, from
+// opposite directions - one never created the file, the other created it by
+// copying the system DLL over SWSE's own.
+//
+// Now they are ordinary functions that resolve at runtime and, if
+// dinput8_real.dll is absent, fall back to the real system dinput8.dll by
+// absolute path. dinput8_real.dll becomes optional, and a missed install step
+// is no longer fatal.
+//
+// Resolution order, and why:
+//   1. an already-loaded dinput8_real.dll   (legacy installs keep working)
+//   2. dinput8_real.dll beside our own DLL  (by path, never by bare name)
+//   3. %SystemDirectory%\dinput8.dll        (the real thing; for a 32-bit
+//                                            process GetSystemDirectory
+//                                            returns SysWOW64, which is right)
+// A bare LoadLibraryA("dinput8.dll") is never used: we ARE dinput8.dll, and
+// that would bind us to ourselves.
+extern "C" HMODULE SWSE_RealDInput8() {
+    static HMODULE cached = nullptr;
+    if (cached) return cached;
+
+    cached = GetModuleHandleA("dinput8_real.dll");
+    if (!cached) {
+        char path[MAX_PATH];
+        HMODULE self = GetModuleHandleA("dinput8.dll");
+        if (self && GetModuleFileNameA(self, path, MAX_PATH)) {
+            char* slash = strrchr(path, '\\');
+            if (slash) {
+                lstrcpyA(slash + 1, "dinput8_real.dll");
+                cached = LoadLibraryA(path);
+            }
+        }
+    }
+    if (!cached) {
+        char sys[MAX_PATH];
+        UINT n = GetSystemDirectoryA(sys, MAX_PATH);
+        if (n > 0 && n < MAX_PATH - 16) {
+            lstrcatA(sys, "\\dinput8.dll");
+            cached = LoadLibraryA(sys);
+            if (cached) Log("input: using the system dinput8.dll "
+                            "(dinput8_real.dll not present - that is fine)");
+        }
+    }
+    if (!cached) Log("input: FATAL - could not load any real dinput8.dll");
+    return cached;
+}
+
+// Resolve one export from the real DLL, once.
+static FARPROC RealProc(const char* name) {
+    HMODULE m = SWSE_RealDInput8();
+    return m ? GetProcAddress(m, name) : nullptr;
+}
+
+// The stubs. Undecorated export names are set below with /export aliases,
+// because __stdcall decorates to _Name@N on x86 and COM callers look up the
+// plain name.
+//
+// DirectInput8Create is deliberately NOT here: input.cpp implements it so SWSE
+// can hook device reads. Defining it here as well would win over that export
+// and silently disable input injection.
+extern "C" HRESULT WINAPI DllCanUnloadNow(void) {
+    typedef HRESULT (WINAPI *pfn)(void);
+    static pfn p = (pfn)RealProc("DllCanUnloadNow");
+    return p ? p() : S_FALSE;          // S_FALSE = "do not unload me"
+}
+extern "C" HRESULT WINAPI DllGetClassObject(const GUID& rclsid, const GUID& riid, void** ppv) {
+    typedef HRESULT (WINAPI *pfn)(const GUID&, const GUID&, void**);
+    static pfn p = (pfn)RealProc("DllGetClassObject");
+    return p ? p(rclsid, riid, ppv) : E_FAIL;
+}
+extern "C" HRESULT WINAPI DllRegisterServer(void) {
+    typedef HRESULT (WINAPI *pfn)(void);
+    static pfn p = (pfn)RealProc("DllRegisterServer");
+    return p ? p() : E_FAIL;
+}
+extern "C" HRESULT WINAPI DllUnregisterServer(void) {
+    typedef HRESULT (WINAPI *pfn)(void);
+    static pfn p = (pfn)RealProc("DllUnregisterServer");
+    return p ? p() : E_FAIL;
+}
+extern "C" void* WINAPI GetdfDIJoystick(void) {
+    typedef void* (WINAPI *pfn)(void);
+    static pfn p = (pfn)RealProc("GetdfDIJoystick");
+    return p ? p() : nullptr;
+}
+
+#pragma comment(linker, "/export:DllCanUnloadNow=_DllCanUnloadNow@0,PRIVATE")
+#pragma comment(linker, "/export:DllGetClassObject=_DllGetClassObject@12,PRIVATE")
+#pragma comment(linker, "/export:DllRegisterServer=_DllRegisterServer@0,PRIVATE")
+#pragma comment(linker, "/export:DllUnregisterServer=_DllUnregisterServer@0,PRIVATE")
+#pragma comment(linker, "/export:GetdfDIJoystick=_GetdfDIJoystick@0")
 
 static void Log(const std::string& line) {
     // log sits in the game's bin\ (our DLL's folder)

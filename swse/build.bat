@@ -18,7 +18,7 @@ if not defined VSPATH (
 call "%VSPATH%\VC\Auxiliary\Build\vcvars32.bat" >nul
 
 echo Compiling SWSE proxy (x86)...
-cl /nologo /LD /O2 /EHsc dllmain.cpp framehook.cpp gfx.cpp glspy.cpp console.cpp scriptvm.cpp input.cpp granny.cpp shaderspy.cpp foliage.cpp wind.cpp selftest.cpp uispy.cpp aitune.cpp features.cpp /link /OUT:dinput8.dll
+cl /nologo /LD /O2 /EHsc dllmain.cpp framehook.cpp gfx.cpp glspy.cpp console.cpp scriptvm.cpp input.cpp granny.cpp shaderspy.cpp foliage.cpp wind.cpp selftest.cpp uispy.cpp aitune.cpp features.cpp modregistry.cpp triggers.cpp positions.cpp /link /OUT:dinput8.dll
 if errorlevel 1 (
   echo BUILD FAILED
   exit /b 1
