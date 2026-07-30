@@ -29,6 +29,9 @@
 // Turn wind on/off. Injects (or restores) the foliage vertex programs.
 // Must run with a GL context current, so it is serviced from the frame hook.
 int  SWSE_WindSet(int on, char* msg, int msgLen);
+// Writes the live source of every foliage program to swse_wind_dump.txt, so a
+// patch that compiles but misbehaves can actually be read.
+int  SWSE_WindDump(char* msg, int msgLen);
 
 // Strength = peak bend in local units per unit of height. Speed scales the
 // oscillation rate. Defaults are deliberately gentle.
@@ -65,10 +68,20 @@ void SWSE_WindFrame();
 // foliage.txt, so a tree can be near-still while grass moves normally.
 void SWSE_WindGate(int isFoliage, int noPush, int swayPct);
 
+// Sprint-aware push readout: `norm` is 0..1 (how sprinting he is right now),
+// `seen` is the fastest horizontal speed observed this session, `ref` is the
+// speed treated as a full sprint. Tune `sprintspeed` in wind.txt from `seen`.
+void SWSE_WindSpeedInfo(float* norm, float* seen, float* ref, float* boost,
+                        float* baseRadius);
+
 // injected  = programs successfully rewritten
 // failed    = programs whose expected pattern was not found (left untouched)
 // on        = wind enabled
 void SWSE_WindStats(int* injected, int* failed, int* on, float* curX, float* curZ);
+// How many programs were refused as skinned character programs. Reported by
+// `wind` because a rejection that is never surfaced is indistinguishable from a
+// rejection that never happened.
+int  SWSE_WindRejectedSkinned();
 
 // Stall attribution. Program upload makes the driver compile, and the periodic
 // revert-check reads a program back; either can cost hundreds of ms. Reported

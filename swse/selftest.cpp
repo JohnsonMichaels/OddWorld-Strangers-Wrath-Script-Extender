@@ -125,6 +125,21 @@ int SWSE_SelfTestRun() {
             Check(-1, "wind", "ON, nothing injected yet (no foliage drawn)");
         else
             Check(1, "wind", "ON, %d programs injected, %d failed", inj, fail);
+
+        // Character-mesh guard. Injecting a skinned program is what deformed
+        // characters - some skinned programs draw both bone-rigged plants and
+        // character meshes, so refusing them at injection is the only safe
+        // rule. Its activity has to be visible here, not only in `wind`.
+        //
+        // Zero refusals is only WARN, not FAIL: it is the correct answer in a
+        // level where no character program was ever offered for injection.
+        if (SWSE_Feature(FEAT_FOLIAGE) && on) {
+            int refused = SWSE_WindRejectedSkinned();
+            if (refused > 0)
+                Check(1, "wind guard", "%d character mesh program(s) refused", refused);
+            else if (inj > 0)
+                Check(-1, "wind guard", "0 refused - none offered here, or guard inactive");
+        }
     }
 
     // ---- HD textures ------------------------------------------------------

@@ -78,6 +78,10 @@ static bool Resolve() {
 
 // ---- state ----------------------------------------------------------------
 #define MAX_PROGS 64
+// A vertex program declaring more constant rows than this is a skinned
+// character program, never foliage. Measured: foliage tops out at c[17], skinned
+// characters start at c[175]. See the rejection in Inject().
+#define MAX_CONST_ROWS 64
 #define SRC_MAX   (64 * 1024)
 
 struct SavedProg {
@@ -88,15 +92,21 @@ struct SavedProg {
 static SavedProg g_saved[MAX_PROGS];
 static int  g_savedN = 0;
 static int  g_injected = 0, g_failed = 0;
+// Programs refused for being skinned character programs. Surfaced in `wind`
+// because the whole point of that rejection is invisible otherwise: a working
+// fix and a fix that never ran both look like "no deformation" until the day it
+// deforms again.
+static int  g_rejectedSkinned = 0;
 static bool g_on = false;
 static bool g_testMode = false;
 static int  g_pending = 0;          // 1 = inject, -1 = restore, 0 = idle
 
-// Bend in local units per unit of height: 0.060 moves the tip of a plant by
-// 6% of its own height. 0.010 was measured as working but literally
+// Bend in local units per unit of height: 0.075 moves the tip of a plant by
+// 7.5% of its own height. 0.010 was measured as working but literally
 // invisible; the brief is "gives life to the foliage", which still has to be
-// perceptible.
-static float g_strength = 0.060f;
+// perceptible. Raised from 0.060 after the push axis fix - with the push no
+// longer bleeding along a whole axis, the ambient sway had room to come up.
+static float g_strength = 0.075f;
 static float g_speed    = 1.0f;
 // Stiffness: the greatest plant height that still gains movement. Beyond it a
 // plant bends no further, so tall trees stop whipping. It is a UNIFORM, so it
@@ -108,11 +118,38 @@ static float g_invWeight = 2.0f;
 static float g_curX = 0.0f, g_curZ = 0.0f, g_phase = 0.0f;
 // Player push: foliage bends away from the player, as if they were the wind.
 static float g_push       = 0.35f;   // how far, in local units
-static float g_pushRadius = 3.0f;    // how close before anything happens
+static float g_pushRadius = 4.5f;    // how close before anything happens
 // Plants taller than this are not pushed at all: grass and undergrowth part
 // around the player, trees stay put.
 static float g_pushMax    = 1.0f;
 static float g_px = 0.0f, g_py = 0.0f, g_pz = 0.0f;
+// Sprint-aware push. `g_sprintSpeed` is the horizontal speed treated as a full
+// four-legged sprint; `g_pushSprint` is how much wider the radius gets there.
+// Above SPEED_TELEPORT, movement is a teleport rather than locomotion.
+#define SPEED_TELEPORT 60.0f
+static float g_sprintSpeed = 11.0f;
+// 4.5 walking -> 7.5 sprinting, chosen by feel in play. 5.5 was tried first and
+// read as too subtle to notice at the moment the gait changes.
+static float g_pushSprint  = 1.6667f;
+static float g_speedNorm   = 0.0f;    // 0..1, smoothed
+
+// g_speedSeen exists to tune g_sprintSpeed from what the game actually does
+// instead of from a guess, so it has to be a number worth trusting. A plain
+// running maximum is not: one bad sample poisons it permanently, and there are
+// several ways to get one. A cutscene warp or a `goto` shorter than
+// SPEED_TELEPORT slips past that guard, and a load hitch can pair a real
+// position delta with a small dt. That is how this read 26.70 while the actual
+// sprint is nowhere near it.
+//
+// So require the speed to be SUSTAINED: only the smallest of the last few
+// samples can raise the record. A teleport is a single frame and cannot survive
+// that, while sprinting is continuous by nature and passes untouched. This
+// measures the same thing, just without believing one frame.
+#define SPEED_HIST 4
+static float g_speedSeen   = 0.0f;
+static float g_speedHist[SPEED_HIST];
+static int   g_speedHistN  = 0;
+static DWORD g_lastMoveT   = 0;
 static int   g_havePlayer = 0;
 static bool  g_gateOpen = false;    // is the wind param currently non-zero
 static bool  g_gateNoPush = false;  // current draw is a plant that must not be pushed
@@ -172,6 +209,41 @@ static bool Inject(GLuint id, char* work, int workMax) {
     src[len] = 0;
 
     if (strstr(src, "swsew")) { free(src); return true; }   // already injected
+
+    // REJECT SKINNED CHARACTER PROGRAMS. This is the character-deformation bug,
+    // and it is settled by data rather than argument.
+    //
+    // `wind dump` on a live session showed 21 injected programs. Their declared
+    // constant-array sizes split into two groups with no overlap at all:
+    //
+    //   plants and props   PARAM c[3] .. c[17]
+    //   programs 58/92/94/174   PARAM c[175] .. c[177]
+    //
+    // and those four open their constant block with { 96, 4, 2, 0.5 } - a
+    // 96-bone matrix array. They are skinned character programs, and injecting
+    // displacement into them is what folded the player's skeleton, flickering
+    // with camera angle because draw order decides which programs are hit.
+    //
+    // A tenfold gap makes the threshold safe: no foliage program in the game
+    // comes close to 64 constant rows, and no skinned one comes near it from
+    // below. The foliage texture gate cannot prevent this - by the time a
+    // character draw reuses a captured program the damage is already done - so
+    // the rejection has to happen here, at injection.
+    {
+        const char* pc = strstr(src, "PARAM c[");
+        if (pc) {
+            int rows = atoi(pc + 8);
+            if (rows > MAX_CONST_ROWS) {
+                char b[160];
+                wsprintfA(b, "wind: program %u REJECTED - PARAM c[%d] is a skinned "
+                             "character program, not foliage", id, rows);
+                LogW(b);
+                g_rejectedSkinned++;
+                free(src);
+                return false;
+            }
+        }
+    }
 
     // Find where the local-space position is produced.
     //
@@ -253,35 +325,109 @@ static bool Inject(GLuint id, char* work, int workMax) {
     // applied AFTER the instance transform instead, where both the plant
     // position and the direction are in world space and the maths is exact.
     //
-    // The instance transform is the run of DP4s that read vertex attributes;
-    // the last of them completes the world position. Programs without that run
-    // (static geometry) are already in world space at the first point.
+    // The model transform is the run of DP4s that READ the local-position
+    // register; the last of them completes the world position.
+    //
+    // This used to look for DP4s reading `vertex.attrib[`, on the belief that a
+    // program without that run was static geometry already in world space. That
+    // was wrong: only the 2 attrib-instanced plant programs matched, and every
+    // other injected program fell through to a fallback that pushed the LOCAL
+    // register. Pushing local subtracts a world-space player position from a
+    // local one, so the distance test fires on whatever geometry happens to have
+    // local coordinates near the player's world coordinates, at full strength,
+    // in a direction that is not radially outward. That is the poles that bend
+    // when you approach, indoors included, and why foliage off makes it stop.
+    //
+    // The census across all 137 captured programs is three shapes, not two:
+    //
+    //  2  instanced      DP4 run against vertex.attrib[] rows -> world register
+    //  21 two-stage      same shape with the matrix in c[] constants:
+    //                        MUL R0, vertex.attrib[0], c[10];  dequantise
+    //                        ADD R1, R0, c[13];                R1 = LOCAL
+    //                        DP4 R0.x, R1, c[2]; ...           R0 = world stage
+    //                        DP4 result.position.x, R0, c[6];  clip
+    //  113 single-stage  one composed matrix, local straight to clip:
+    //                        DP4 result.position.x, R0, c[1];
+    //                    NO world register exists in these programs.
+    //
+    // Keying on the local register handles all three: the 2 pick the same
+    // register as before (tuned behaviour unchanged), the 21 get a correct push
+    // (their picked register was taint-checked to feed result.position on every
+    // one), and on the 113 the last consumer of the local position IS
+    // result.position, so wdst lands on "result" and the push is DECLINED. The
+    // old code pushed the local register on all 113 - that is the pole class.
+    // The failure polarity flips from corruption to omission, which is the
+    // right direction for geometry we cannot classify.
     char wdst[24] = {0};
     const char* worldAfter = nullptr;
     {
+        // Scan until the local register is OVERWRITTEN, not for a fixed number of
+        // lines. Both bounds matter. A fixed window can end before the model
+        // transform in a longer program, and scanning past the overwrite is worse
+        // than useless: program 3 does `DP4 R1.x, R0, c[2]` after its world run,
+        // so a later DP4 reading R1 would be reading a different value entirely
+        // and would nominate the wrong register. The live range of the local
+        // position is exactly the region where a consumer of it means what we
+        // think it means.
         const char* scan = insertAfter;
-        for (int guard = 0; scan && *scan && guard < 24; guard++) {
+        for (int guard = 0; scan && *scan && guard < 256; guard++) {
             const char* s = scan;
             while (*s == ' ' || *s == '\t') s++;
             const char* eol = strchr(s, '\n');
             if (!eol) break;
+
+            // Destination of this instruction, whatever the opcode.
+            const char* p = s;
+            while (*p && *p != ' ' && p < eol) p++;      // past the opcode
+            while (*p == ' ') p++;
+            char nd[24] = {0};
+            int di = 0;
+            // p < eol keeps a line with no operands ("END") from parsing into
+            // the next line; nd would be harmless garbage, but not by design.
+            for (; p < eol && *p != ',' && *p != ' ' && *p != '.' && di < 23; p++)
+                nd[di++] = *p;
+
             if (!strncmp(s, "DP4 ", 4)) {
-                char seg[256];
-                int n = (int)(eol - s); if (n > 255) n = 255;
-                memcpy(seg, s, n); seg[n] = 0;
-                if (strstr(seg, "vertex.attrib[")) {
-                    const char* p = s + 4;
-                    while (*p == ' ') p++;
-                    int di = 0; char nd[24] = {0};
-                    for (; *p && *p != ',' && *p != ' ' && *p != '.' && di < 23; p++)
-                        nd[di++] = *p;
-                    if (nd[0]) { lstrcpynA(wdst, nd, 24); worldAfter = eol + 1; }
+                const char* comma = strchr(p, ',');
+                if (nd[0] && comma && comma < eol) {
+                    const char* q = comma + 1;
+                    while (*q == ' ') q++;
+                    char s0[24] = {0};
+                    int si = 0;
+                    for (; *q && *q != ',' && *q != ' ' && *q != '.' && si < 23; q++)
+                        s0[si++] = *q;
+                    // Whole-name compare: a strstr would match R1 inside R10.
+                    //
+                    // This condition used to ALSO require the transform to read
+                    // vertex.attrib[] - an instanced transform - as the way to
+                    // keep the push off character meshes. That was the right
+                    // instinct aimed at the wrong discriminator: it cost the
+                    // push on every c[]-matrix PLANT program too, leaving 2 of
+                    // 57 eligible (measured against the full dump; ~34 are
+                    // legitimate two-stage plant programs).
+                    //
+                    // Character exclusion is now owned by the constant-row
+                    // guard at the top of Inject(): a skinned program declares
+                    // c[111]+ and is refused before any of this code runs, so
+                    // any program reaching this point has already been proven
+                    // non-character. The instanced test is therefore removed,
+                    // restoring the push to every plant whose DP4 run consumes
+                    // the local position - however its matrix is sourced.
+                    if (!lstrcmpA(s0, dst)) {
+                        lstrcpynA(wdst, nd, 24);
+                        worldAfter = eol + 1;
+                    }
                 }
             }
+            // End of the local position's live range.
+            if (nd[0] && !lstrcmpA(nd, dst)) break;
             scan = eol + 1;
         }
     }
-    if (!worldAfter) { lstrcpynA(wdst, dst, 24); worldAfter = insertAfter; }
+    // No DP4 consumes the local position, so there is no world-space register to
+    // push. Guessing one is what caused the bug above, so decline instead - the
+    // same call already made when the transform goes straight into result.*.
+    if (!worldAfter) { lstrcpynA(wdst, "result", 24); worldAfter = insertAfter; }
 
     // The push READS the world position back, and in ARB assembly `result.*`
     // registers are WRITE-ONLY - reading one is GL_INVALID_OPERATION, which is
@@ -293,20 +439,37 @@ static bool Inject(GLuint id, char* work, int workMax) {
 
     // World up is Y for this engine (the `up` command raises axis 1), so the
     // horizontal plane the player pushes through is XZ.
-    char push[768];
+    char push[1536];   // ~719 worst case; wsprintfA does not bounds-check
     push[0] = 0;
     if (!canPush) {
         worldAfter = insertAfter;     // nothing to insert, keep the segments valid
-    } else
+    } else {
+    // "Away from the player" must be measured in the GROUND plane, which is
+    // the two non-up axes. This used to be hardcoded to .x/.z while the up
+    // axis is Z, so it mixed one horizontal axis with the vertical one: the
+    // grass was displaced in a vertical plane instead of radially outward,
+    // and the player's HEIGHT counted towards the distance. Players described
+    // it exactly right - it bent diagonally rather than around you, and
+    // jumping changed the effect because jumping changed the "distance".
+    //
+    // h1/h2 are the same horizontal pair the sway already uses, so both halves
+    // of the effect now agree about which way is up.
+    const char* p1 = h1;                              // "x"
+    const char* p2 = h2;                              // "y" when Z is up
     wsprintfA(push,
-              "SUB swseU.x, %s.x, swsep.x;\n"            // dx from player
-              "SUB swseU.z, %s.z, swsep.z;\n"            // dz from player
+              "SUB swseU.x, %s.%s, swsep.%s;\n"          // d1 from player
+              "SUB swseU.z, %s.%s, swsep.%s;\n"          // d2 from player
               "MUL swseU.y, swseU.x, swseU.x;\n"
-              "MAD swseU.y, swseU.z, swseU.z, swseU.y;\n"   // dist^2
+              "MAD swseU.y, swseU.z, swseU.z, swseU.y;\n"   // dist^2 (ground plane)
               "ADD swseU.y, swseU.y, swsec.w;\n"            // avoid RSQ(0)
               "RSQ swseU.w, swseU.y;\n"                     // 1/dist
               "MAD swseU.y, -swseU.y, swsep.w, swsec.y;\n"  // 1 - d2/r2
               "MAX swseU.y, swseU.y, swsec.x;\n"            // clamp at 0
+              // NOTE: the falloff stays LINEAR on purpose. A squared falloff
+              // eases more prettily at the radius edge, but it also weakens the
+              // whole effect, and adding it alongside the axis fix made a tuned
+              // setup read as "nothing moves at all" - two changes at once,
+              // neither verifiable. Tune strength/radius in wind.txt instead.
               "MUL swseU.y, swseU.y, swseq.x;\n"            // * push strength
               // SIZE GATE: only grass and small plants part around the player;
               // a tree must not shift when walked past. This uses the RAW
@@ -320,9 +483,13 @@ static bool Inject(GLuint id, char* work, int workMax) {
               "MUL swseU.y, swseU.y, swseT.w;\n"            // keep the base planted
               "MUL swseU.x, swseU.x, swseU.w;\n"            // normalise
               "MUL swseU.z, swseU.z, swseU.w;\n"
-              "MAD %s.x, swseU.x, swseU.y, %s.x;\n"
-              "MAD %s.z, swseU.z, swseU.y, %s.z;\n",
-              wdst, wdst, dst, up, wdst, wdst, wdst, wdst);
+              "MAD %s.%s, swseU.x, swseU.y, %s.%s;\n"
+              "MAD %s.%s, swseU.z, swseU.y, %s.%s;\n",
+              wdst, p1, p1, wdst, p2, p2,
+              dst, up,
+              wdst, p1, wdst, p1,
+              wdst, p2, wdst, p2);
+    }
 
     // Declarations go straight after the "!!ARBvp1.0" header rather than after
     // an existing PARAM line - not every program has one, and declaration
@@ -436,14 +603,35 @@ static bool Inject(GLuint id, char* work, int workMax) {
         wsprintfA(rp + lstrlenA(rp), "swse_wind_reject_%u.txt", id);
         FILE* rf = fopen(rp, "w");
         if (rf) { fprintf(rf, "%s", work); fclose(rf); }
-        // put the original back immediately; a half-patched program would
-        // render the plant as garbage rather than simply not moving.
-        if (g_savedN > 0 && g_saved[g_savedN - 1].id == id) {
-            SavedProg* s = &g_saved[--g_savedN];
+        // Put the original back immediately: a half-patched program renders the
+        // plant as garbage rather than simply not moving.
+        //
+        // Search the saved list BY ID rather than assuming this program is the
+        // most recent entry. It usually is, but not when the save table was
+        // full or the allocation failed - and in exactly those cases the old
+        // code silently skipped the restore and left a broken program bound,
+        // which is indistinguishable from the flickering/untextured artifacts
+        // players reported on drivers where injection fails.
+        bool restored = false;
+        for (int k = g_savedN - 1; k >= 0; k--) {
+            if (g_saved[k].id != id || !g_saved[k].orig) continue;
             p_ProgramStringARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB,
-                               s->origLen, s->orig);
-            free(s->orig); s->orig = nullptr;
+                               g_saved[k].origLen, g_saved[k].orig);
             while (glGetError() != GL_NO_ERROR) {}
+            free(g_saved[k].orig);
+            // keep the array dense
+            for (int m = k; m < g_savedN - 1; m++) g_saved[m] = g_saved[m + 1];
+            g_savedN--;
+            restored = true;
+            break;
+        }
+        if (!restored) {
+            // Nothing to restore from: we never got a copy of the original, so
+            // the program may still hold our rejected source. Say so loudly -
+            // this is the state that looks like a texture bug to a player.
+            LogW("wind: NO SAVED ORIGINAL for that program - it may render "
+                 "incorrectly until the level reloads. Set foliage = off in "
+                 "SWSEMods\\features.txt if you see flickering.");
         }
         return false;
     }
@@ -502,6 +690,76 @@ static void InjectAll() {
     }
 }
 
+// Write out what is ACTUALLY loaded in the driver for every foliage program.
+//
+// Until now only REJECTED programs were dumped, which means a patch that
+// compiles cleanly but is semantically wrong is completely invisible - and that
+// is the harder bug of the two. A player reporting corruption that disappears
+// when foliage is switched off gives us a precise localisation and nothing to
+// read, so this closes the gap: it reads the live source back out of GL with
+// glGetProgramStringARB rather than reconstructing what we think we wrote.
+//
+// One file rather than one per program, because the point is for someone to be
+// able to send it.
+int SWSE_WindDump(char* msg, int len) {
+    if (!Resolve()) { lstrcpynA(msg, "wind: ARB entry points unavailable", len); return 0; }
+
+    unsigned progs[MAX_PROGS];
+    int n = SWSE_FoliagePrograms(progs, MAX_PROGS);
+    if (n <= 0) {
+        lstrcpynA(msg, "wind: no foliage programs known yet - walk near some plants", len);
+        return 0;
+    }
+
+    char path[MAX_PATH];
+    GetModuleFileNameA(GetModuleHandleA(NULL), path, MAX_PATH);
+    char* s = strrchr(path, '\\'); if (s) *(s + 1) = 0;
+    lstrcatA(path, "swse_wind_dump.txt");
+    FILE* f = fopen(path, "w");
+    if (!f) { lstrcpynA(msg, "wind: could not write swse_wind_dump.txt", len); return 0; }
+
+    fprintf(f, "SWSE wind program dump\n");
+    fprintf(f, "%d foliage program(s) known; up axis = %s, gate = %s\n",
+            n, g_upAxis == 0 ? "y" : "z", g_useGate ? "on" : "off");
+    fprintf(f, "A program is patched if it contains the marker 'swsew'.\n\n");
+
+    GLint prev = 0;
+    p_GetProgramivARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_BINDING_ARB, &prev);
+    char* buf = (char*)malloc(SRC_MAX);
+    int patched = 0;
+
+    for (int i = 0; i < n && buf; i++) {
+        p_BindProgramARB(GL_VERTEX_PROGRAM_ARB, progs[i]);
+        GLint plen = 0;
+        p_GetProgramivARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_LENGTH_ARB, &plen);
+        if (plen <= 0 || plen >= SRC_MAX) {
+            fprintf(f, "==== program %u: unreadable (length %d) ====\n\n", progs[i], plen);
+            continue;
+        }
+        memset(buf, 0, plen + 1);
+        p_GetProgramStringARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_STRING_ARB, buf);
+        buf[plen] = 0;
+        bool inj = strstr(buf, "swsew") != nullptr;
+        if (inj) patched++;
+        // Whether we still hold this program's original matters: without one we
+        // cannot undo a bad patch, and that is its own failure mode.
+        bool haveOrig = false;
+        for (int k = 0; k < g_savedN; k++)
+            if (g_saved[k].id == progs[i] && g_saved[k].orig) haveOrig = true;
+        fprintf(f, "==== program %u: %s, original %s, %d bytes ====\n%s\n\n",
+                progs[i], inj ? "PATCHED" : "not patched",
+                haveOrig ? "saved" : "NOT SAVED", plen, buf);
+    }
+
+    free(buf);
+    p_BindProgramARB(GL_VERTEX_PROGRAM_ARB, (GLuint)prev);
+    while (glGetError() != GL_NO_ERROR) {}
+    fclose(f);
+
+    wsprintfA(msg, "wrote swse_wind_dump.txt - %d program(s), %d patched", n, patched);
+    return 1;
+}
+
 // Has the engine replaced our patched programs behind our back?
 //
 // Loading a level destroys and recreates the ARB programs. The ids come back
@@ -544,6 +802,7 @@ static void DropSaved() {
     g_triedN = 0;
     g_injected = 0;
     g_failed = 0;
+    g_rejectedSkinned = 0;
 }
 
 static void RestoreAll() {
@@ -623,6 +882,8 @@ void SWSE_WindLoadSettings() {
         else if (!lstrcmpiA(key, "pushmax"))   g_pushMax    = (float)atof(val);
         // set directly, not through SWSE_WindAxis/Seed: those request a
         // REGENERATE, which is meaningless before anything is injected
+        else if (!lstrcmpiA(key, "sprintspeed")) g_sprintSpeed = (float)atof(val);
+        else if (!lstrcmpiA(key, "pushsprint"))  g_pushSprint  = (float)atof(val);
         else if (!lstrcmpiA(key, "axis"))     g_upAxis    = (val[0] == 'z' || val[0] == 'Z') ? 1 : 0;
         else if (!lstrcmpiA(key, "seed"))     g_seedMode  = atoi(val) ? 1 : 0;
         else if (!lstrcmpiA(key, "gate"))     g_useGate   = atoi(val) != 0;
@@ -705,6 +966,19 @@ void SWSE_WindPerf(double* injectMs, double* injectMax,
     if (checkMax)  *checkMax  = g_msCheckMax;
     if (stalls)    *stalls    = g_stalls;
 }
+
+void SWSE_WindSpeedInfo(float* norm, float* seen, float* ref, float* boost,
+                        float* baseRadius) {
+    if (norm)  *norm  = g_speedNorm;
+    if (seen)  *seen  = g_speedSeen;
+    if (ref)   *ref   = g_sprintSpeed;
+    if (boost) *boost = g_pushSprint;
+    if (baseRadius) *baseRadius = g_pushRadius;
+}
+
+// Separate accessor rather than widening SWSE_WindStats, so existing callers
+// (selftest among them) keep compiling unchanged.
+int SWSE_WindRejectedSkinned() { return g_rejectedSkinned; }
 
 void SWSE_WindStats(int* injected, int* failed, int* on, float* curX, float* curZ) {
     if (injected) *injected = g_injected;
@@ -822,12 +1096,74 @@ void SWSE_WindFrame() {
     // movement, and this is one call, not per draw.
     float p[3] = { 0, 0, 0 };
     if (SWSE_PosGet(p) == 1) {
+        // ---- sprint-aware push radius ------------------------------------
+        //
+        // Stranger has a real gait ladder in the engine - walk, trot, canter,
+        // run - with named transition fractions, including one just for him
+        // (m_fracCanterRunTransitionStranger). "Run" is the four-legged
+        // sprint. Rather than hunt for that live gait enum, this measures
+        // SPEED, which is the same signal from the outside and needs no
+        // offsets that a patch could move.
+        //
+        // Speed is also the better input: it is continuous, so the radius
+        // grows as he winds up instead of popping the instant a state flips.
+        //
+        // HORIZONTAL speed only. With Z up, including the vertical would make
+        // jumping read as sprinting - the same mistake that made the push bend
+        // grass diagonally in the first place.
+        DWORD now = GetTickCount();
+        if (g_havePlayer && g_lastMoveT && now > g_lastMoveT) {
+            float dt = (now - g_lastMoveT) / 1000.0f;
+            if (dt > 0.0f && dt < 0.5f) {          // ignore load hitches
+                float dx = p[0] - g_px, dy = p[1] - g_py;
+                float sp = sqrtf(dx * dx + dy * dy) / dt;
+                // A level load, a `goto`, or a cutscene warp moves the player
+                // a long way in one frame, which reads as an enormous speed
+                // and would both max the radius and poison the tuning figure.
+                // Anything past this is a teleport, not running.
+                // Skip ONLY the speed sample on a teleport - returning here
+                // would also skip the oscillator advance and the parameter
+                // upload for that frame.
+                if (sp <= SPEED_TELEPORT) {
+                    // Sustained-speed record: shift the sample in, then let only
+                    // the slowest of the window raise it. See SPEED_HIST above.
+                    for (int i = SPEED_HIST - 1; i > 0; i--)
+                        g_speedHist[i] = g_speedHist[i - 1];
+                    g_speedHist[0] = sp;
+                    if (g_speedHistN < SPEED_HIST) g_speedHistN++;
+                    if (g_speedHistN == SPEED_HIST) {
+                        float lo = g_speedHist[0];
+                        for (int i = 1; i < SPEED_HIST; i++)
+                            if (g_speedHist[i] < lo) lo = g_speedHist[i];
+                        if (lo > g_speedSeen) g_speedSeen = lo;
+                    }
+                    float n = (g_sprintSpeed > 0.01f) ? sp / g_sprintSpeed : 0.0f;
+                    if (n > 1.0f) n = 1.0f;
+                    if (n < 0.0f) n = 0.0f;
+                // Ease towards the target so a single stuttery frame cannot
+                // make the radius jump; ~0.12 settles in a few tenths of a
+                // second, which matches how fast he actually changes gait.
+                    g_speedNorm += (n - g_speedNorm) * 0.12f;
+                } else {
+                    g_speedHistN = 0;   // teleport: the window is not continuous
+                }
+            } else {
+                // A gap in sampling breaks continuity too. Without this, the
+                // sample before a load and the samples after it could form a
+                // window that never actually happened back to back.
+                g_speedHistN = 0;
+            }
+        }
+        g_lastMoveT = now;
+
         g_px = p[0]; g_py = p[1]; g_pz = p[2];
         g_havePlayer = 1;
     }
     if (p_ProgramEnvParameter4fARB) {
-        float invR2 = (g_pushRadius > 0.01f)
-                    ? 1.0f / (g_pushRadius * g_pushRadius) : 1.0f;
+        // Widen the radius as he moves faster: at a standstill this is just
+        // g_pushRadius, at a full sprint it is g_pushRadius * g_pushSprint.
+        float r = g_pushRadius * (1.0f + (g_pushSprint - 1.0f) * g_speedNorm);
+        float invR2 = (r > 0.01f) ? 1.0f / (r * r) : 1.0f;
         p_ProgramEnvParameter4fARB(GL_VERTEX_PROGRAM_ARB, 1, g_px, g_py, g_pz, invR2);
         // Push off entirely until the player position is known, so plants are
         // never shoved away from the world origin.

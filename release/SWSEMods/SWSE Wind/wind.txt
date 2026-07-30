@@ -5,13 +5,17 @@
 # axis     y/z   which local axis is up (measured: z)
 # seed     0/1   per-plant phase, so plants do not sway in step
 # gate     0/1   restrict wind to foliage draws (0 sways tyres too)
+# sprintspeed    horizontal speed treated as a full four-legged sprint
+# pushsprint     how much wider the radius gets there (1.6667 = 4.5 -> 7.5)
 enabled 1
-strength 0.0600
+strength 0.0750
 speed 1.0000
 weight 0.8500
 push 0.4000
-pushradius 3.5000
+pushradius 4.5000
 pushmax 1000.0000
 axis z
 seed 1
 gate 1
+sprintspeed 11.0000
+pushsprint 1.6667

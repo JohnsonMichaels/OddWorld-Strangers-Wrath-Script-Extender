@@ -628,6 +628,12 @@ static void Cmd_wind(int argc, char** argv) {
     char msg[200] = {0};
     if (argc > 1 && !lstrcmpiA(argv[1], "on"))  { SWSE_WindSet(1, msg, sizeof(msg)); Printf("%s", msg); return; }
     if (argc > 1 && !lstrcmpiA(argv[1], "off")) { SWSE_WindSet(0, msg, sizeof(msg)); Printf("%s", msg); return; }
+    if (argc > 1 && !lstrcmpiA(argv[1], "dump")) {
+        SWSE_WindDump(msg, sizeof(msg));
+        Printf("%s", msg);
+        Printf("send that file if plants or nearby geometry look wrong");
+        return;
+    }
     if (argc > 1 && !lstrcmpiA(argv[1], "push")) {
         if (argc > 2) SWSE_WindPush((float)atof(argv[2]),
                                     (argc > 3) ? (float)atof(argv[3]) : -1.0f,
@@ -687,7 +693,13 @@ static void Cmd_wind(int argc, char** argv) {
     SWSE_WindStats(&inj, &fail, &on, &cx, &cz);
     float st = 0, sp = 0; SWSE_WindGetParams(&st, &sp);
     Printf("wind          : %s", on ? "ON" : "OFF");
-    Printf("programs      : %d injected, %d failed", inj, fail);
+    // The refused count is the character-mesh guard's only visible output. An
+    // invisible guard is indistinguishable from an absent one - and the guard
+    // is what keeps wind displacement out of skinned character programs while
+    // the world-space push touches every eligible plant program.
+    int rejSkin = SWSE_WindRejectedSkinned();
+    Printf("programs      : %d injected, %d failed, %d refused (character meshes)",
+           inj, fail, rejSkin);
     Printf("per-draw gate : %s", SWSE_WindGateEnabled() ? "ON (foliage only)" : "OFF");
     Printf("strength/speed: %d.%03d / %d.%03d",
            (int)st, (int)((st - (int)st) * 1000), (int)sp, (int)((sp - (int)sp) * 1000));
@@ -699,6 +711,20 @@ static void Cmd_wind(int argc, char** argv) {
            (int)pa, (int)((pa - (int)pa) * 1000), (int)pr, (int)((pr - (int)pr) * 1000));
     Printf("  pushes only plants under %d.%03d tall (trees stay put)",
            (int)pm, (int)((pm - (int)pm) * 1000));
+    {
+        float sn = 0, ss = 0, sr = 0, sb = 0, br = 0;
+        SWSE_WindSpeedInfo(&sn, &ss, &sr, &sb, &br);
+        float now = br * (1.0f + (sb - 1.0f) * sn);
+        Printf("sprint push   : %d%% toward a full sprint; radius now %d.%02d",
+               (int)(sn * 100.0f), (int)now, (int)(now * 100) % 100);
+        Printf("  walk %d.%02d -> sprint %d.%02d   (pushsprint %d.%02d)",
+               (int)br, (int)(br * 100) % 100,
+               (int)(br * sb), (int)(br * sb * 100) % 100,
+               (int)sb, (int)(sb * 100) % 100);
+        Printf("  fastest sustained speed %d.%02d vs sprintspeed %d.%02d (tune in wind.txt)",
+               (int)ss, (int)(ss * 100) % 100, (int)sr, (int)(sr * 100) % 100);
+        Printf("  sustained = held over 4 frames, so a warp cannot inflate it");
+    }
     Printf("current bend  : x %d.%03d  z %d.%03d",
            (int)cx, (int)fabs((cx - (int)cx) * 1000),
            (int)cz, (int)fabs((cz - (int)cz) * 1000));
