@@ -17,13 +17,15 @@ int  SWSE_AutoPrime();
 
 // Run a named console action. Returns:
 //   1  = executed
-//   0  = no context captured yet (tell the user to grab ammo once)
+//   0  = no context yet (none until a save is loaded; autoprime looks again)
 //  -1  = unknown action
-//  -2  = faulted (SEH) - action auto-disabled
+//  -2  = faulted (SEH) - the context is dropped, the next call finds another
+//  -3  = refused: safe mode, an unknown game build (gamebuild.h)
 int SWSE_ScriptDo(const char* action, int arg);
 
 // Call ANY callable-now script function by name (generic dispatcher).
-//   1 = ok, 0 = no context, -1 = not found, -2 = faulted.
+//   1 = ok, 0 = no context, -1 = not found, -2 = faulted,
+//  -3 = a real function, refused in safe mode (gamebuild.h).
 int SWSE_ScriptCallByName(const char* name, int argc, char** argv);
 
 // List function names containing `filter` (case-insensitive) into out[].
@@ -76,12 +78,23 @@ void SWSE_UnfreezeAll();
 // Returns 1 ok, 0 no context, -2 fault.
 int SWSE_ScriptWatchStart(int durationMs, const char* label);
 
-// Position access (teleport / vertical launch). Returns 1 ok, 0 no
-// context/pos, -2 fault, 3 nothing-saved (restore only), -1 bad axis.
+// Position access. Reads are the engine's own GetFootPosition (where the
+// feet are); moves are the engine's own teleport, PlayerImpl::Teleport - the
+// call its checkpoint respawn makes (research/TELEPORT.md). Returns 1 ok,
+// 0 no player or no body (no position), -1 refused (SWSE_TeleportWhy() says
+// why: unknown game build, level loading, outside every zone, in a boat...),
+// -2 fault, 3 nothing saved (restore only), -3 bad axis (nudge only).
 int SWSE_PosGet(float* out3);     // out3 may be null
-int SWSE_PosSave();
-int SWSE_PosRestore();
-int SWSE_PosNudge(int axis, float delta);
+int SWSE_PosSave();               // position, facing and zone into the quick slot
+int SWSE_PosRestore();            // and back (facing too, when it was saved)
+int SWSE_PosNudge(int axis, float delta);   // axis 2 (up) lands exactly; 0/1 drop to the floor
+const char* SWSE_TeleportWhy();   // why the last teleport was refused ("" if it was not)
+// What the quick slot holds. 0 = nothing saved.
+int SWSE_PosSaved(float* xyz3, float* yawDeg, int* hasYaw);
+
+// The player's facing, degrees about the up (Z) axis. 1 ok, 0 not available.
+int SWSE_PlayerYawGet(float* deg);
+int SWSE_PlayerYawSet(float deg);
 
 // ---- heap diff scanner: locate the artifact inventory in memory ----------
 // Store purchases bypass the script VM, so artifacts must be written
@@ -125,6 +138,7 @@ int SWSE_PlayerStamina(float* cur, float* mx, float* base);
 int SWSE_PlayerSetStamina(float v);
 int SWSE_PlayerGet(int off, float* a, float* b, float* c);
 int SWSE_PlayerSet(int off, float v);
+int SWSE_PlayerSet3(int off, float a, float b, float c);   // each copy separately
 
 int  SWSE_WatchWrite(unsigned addr);   // 1 ok, 0 bad addr, -1 failed
 int  SWSE_WatchInventory();            // resolves player+0x1C and watches it
@@ -168,6 +182,17 @@ int   SWSE_LoadLevel(const char* name, bool transition, char* msg, int msgLen);
 //   set   : non-null to write; cur receives the current value
 // Returns the number of instances touched (0 = none found).
 int   SWSE_MotionField(int field, const float* set, float* cur);
+
+// The player object and one of its motion objects (vtable-checked), for the
+// level watcher. 1 = present, 0 = no player body (menu/loading), -2 = fault.
+int   SWSE_PlayerBody(unsigned* player, unsigned* motion);
+// The player and its two FORM motion objects (Steef, Stranger), which stay
+// put through a Stranger/Steef change - what the level watcher keys on. A
+// slot without a MotionImpl reads 0. 1 = player and at least one form found.
+int   SWSE_PlayerForms(unsigned* player, unsigned* form0, unsigned* form1);
+
+// Drop the cached motion-prefs instance lists (after a level load).
+void  SWSE_MotionRescan();
 
 // Make the level's ActorSpawner objects fire. There is no script verb that
 // spawns an actor, but a spawner's own tick will do it once it is enabled,
@@ -255,7 +280,13 @@ int   SWSE_BringNpcsTo(float x, float y, float z,
                        int count, unsigned typeHash, char* msg, int msgLen);
 
 // Live NPCs of a type, from the cached actor list. -1 = cache not populated.
+// Uses the hit-reaction watcher's list while that runs, otherwise SWSE's own
+// list, which SWSE_NpcCacheTick maintains (call it per frame while needed).
 int   SWSE_CountNpcsOfType(unsigned typeHash);
+void  SWSE_NpcCacheTick();
+void  SWSE_NpcCacheReset();
+// State of SWSE's own NPC list (count -1 = not built), for `npccache`.
+void  SWSE_NpcCacheInfo(int* count, int* scanning, int* passes, int* lastMs, int* watcher);
 
 // ---- reserve pool: spare NPCs for ambushes --------------------------------
 // The engine only creates NPCs at level load, so a cleared area has nobody
@@ -264,6 +295,8 @@ int   SWSE_CountNpcsOfType(unsigned typeHash);
 // draw on them.
 int   SWSE_ReserveBuild(int extraPerTag, char* msg, int msgLen);
 int   SWSE_ReservePark(char* msg, int msgLen);
+// Feet at x y z via the engine's teleport, dropped onto the floor there.
+// 1 moved, 0 no player, -1 refused (SWSE_TeleportWhy()), -2 fault.
 int   SWSE_PlayerTeleport(float x, float y, float z);
 // Send NPCs at the player via the game's own AI (GotoPlayerAggressive). Needs
 // Object arguments, which are handles -- {u16 index, u16 generation} into the
@@ -301,6 +334,10 @@ int   SWSE_NpcNear(char* msg, int msgLen);
 // The game's own path hash (0x24D920), exposed so candidate names can be
 // tested against harvested type hashes.
 unsigned SWSE_HashPath(const char* path);
+// The RTTI class name of a live heap object ("NPCPrefs"), read from its
+// vtable's CompleteObjectLocator. False when obj has none. Never faults. (The
+// plugin API's Game.ClassName.)
+bool SWSE_RttiName(unsigned obj, char* out, int outLen);
 // Resolve a type hash through the game's own resolver, to tell "the hash is
 // rejected" apart from "the type is read from a field we have not found".
 int   SWSE_Resolve(unsigned hash, char* msg, int msgLen);
@@ -325,6 +362,12 @@ struct NpcGunRow {
     float    health, killMoolah, fireRate;
 };
 int SWSE_NpcGuns(NpcGunRow* out, int max, double budgetMs);
+
+// True for a character type the game ships as "protected" (m_health of
+// 100000 or more - townsfolk, Clakkerz, natives) whose health SWSE has since
+// lowered (npctuning, noimmortals, npchealth). AI tuning tells enemies from
+// the protected cast by that health, so it asks here too.
+bool SWSE_NpcWasProtected(unsigned hash);
 
 // Locate NPCWeaponPrefs by shape. READ ONLY - the signature is weaker than
 // the perception one, so callers must not write through these addresses.
@@ -359,6 +402,17 @@ int   SWSE_SetAllTypes(float health, int gib, char* msg, int msgLen);
 // Load characters.txt: per-character health/gib applied automatically as each
 // level spawns them, so a mod is a file rather than commands typed each load.
 int   SWSE_LoadTuning(const char* path, char* msg, int msgLen);
+// append = keep the rules already loaded (a second mod's characters.txt).
+int   SWSE_LoadTuningEx(const char* path, bool append, char* msg, int msgLen);
+// The npctuning feature: console.txt toggles + every enabled mod's
+// characters.txt, then arm the spawn hook the rules are applied from.
+// Returns the rule count, or -1 when that hook cannot go in (an unknown game
+// build refuses it) - the rules are read, but nothing applies them.
+int   SWSE_NpcTuningLoadAll(char* msg, int msgLen);
+// Stop applying rules (already-tuned characters keep them until a reload).
+void  SWSE_NpcTuningDisable();
+// For the self-test: 1 if character rules are loaded; *rules = how many.
+int   SWSE_NpcTuningStats(int* rules);
 // settings.txt: named feature toggles (noimmortals, immortalsgib, ...).
 // Rules rather than hash lists, so they catch characters nobody has named.
 int   SWSE_LoadSettings(const char* path, char* msg, int msgLen);

@@ -10,6 +10,11 @@
 
 #include "scriptvm.h"
 #include "positions.h"
+#include "prefsedit.h"      // SWSE_ResourceLookup / SWSE_ObjIsA
+#include "gamebuild.h"      // refuse unverified code patches on unknown builds
+#include "levelwatch.h"     // SWSE_LevelUp / SWSE_LevelEpoch: teleports only in a live level
+#include "playnpc.h"        // SWSE_PlayNpcHoldNow: keep a played character loaded through a teleport
+#include "hookreg.h"        // every patch reported to the one list (`hooks`)
 #include "granny.h"
 #include "modregistry.h"
 #include "scriptvm_gen.h"
@@ -17,6 +22,8 @@
 #include <tlhelp32.h>   // Thread32First: watchpoints must arm every thread, not just ours
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>       // _snprintf_s: the teleport log lines carry floats
+#include <math.h>
 
 // Every object scan below looks for game objects, and those all live in the
 // game heap -- the scans already discarded hits outside it, but only AFTER
@@ -70,6 +77,7 @@ static bool RttiName(unsigned obj, char* out, int outLen) {
         return i > 0;
     } __except (EXCEPTION_EXECUTE_HANDLER) { out[0] = 0; return false; }
 }
+bool SWSE_RttiName(unsigned obj, char* out, int outLen) { return RttiName(obj, out, outLen); }
 
 // Every live object sharing a vtable. General-purpose companion to whatis:
 // once one object of a class is known, this finds the rest.
@@ -125,7 +133,8 @@ int SWSE_Instances(unsigned addr, char* msg, int msgLen) {
 // Compare two live objects and report only the dwords that differ.
 //
 // Prefs told us what a character IS; they do not say who it FIGHTS -- every
-// character in a town reads affiliation 1, yet outlaws attack and townsfolk
+// character in a town reads m_affGenerally 1 (an ammo rule, not an affiliation:
+// research/AT3_DISCOVERIES.md C1), yet outlaws attack and townsfolk
 // flee. So hostility lives on the live NPC, not in prefs. Diffing an outlaw
 // against a townsfolk is the way to find it: whatever separates "attacks the
 // player" from "runs away" has to show up as a differing field.
@@ -217,6 +226,14 @@ static void*  g_ctx  = nullptr;     // captured live ScriptContext
 static bool   g_inited = false;
 
 static void* Addr(unsigned rva) { return g_base + rva; }
+
+// Safe mode (gamebuild.h): on a game build SWSE's addresses were not measured
+// on, nothing here calls a game function or reads the game through a Steam
+// address. The console refuses the commands first (console.cpp,
+// SafeModeBlocks); the checks on this flag are the floor under that, for every
+// other way in: the Execute fallback to game functions, the plugin API's Game
+// calls, wind's player push, `status` and `query`.
+static bool SafeMode() { return SWSE_GameBuildSafeMode() != 0; }
 
 static void LogS(const char* s) {
     char path[MAX_PATH]; GetModuleFileNameA(GetModuleHandleA(NULL), path, MAX_PATH);
@@ -664,6 +681,7 @@ void SWSE_PlayerSnapshot(unsigned base) {
 
 // Call the getter TakeAllArtifacts uses and dump the object graph it returns.
 int SWSE_DumpInventory() {
+    if (SafeMode()) return 0;           // calls the game's inventory getter
     __try {
         void* o = ((getter_t)Addr(RVA_InvGetter))();
         unsigned a = (unsigned)(uintptr_t)o;
@@ -789,6 +807,12 @@ extern "C" void __cdecl SpyLog(int idx, unsigned* savedRegs) {
 // Build the stub + trampoline for one function.
 static bool SpyInstall(unsigned rva, const char* name, int copyLen) {
     if (g_spyN >= SPY_MAX) return false;
+    // Patches code at a Steam-measured address without checking its bytes.
+    if (!SWSE_GameBuildKnown()) {
+        char m[300]; SWSE_GameBuildRefusal("spy", m, sizeof(m)); LogS(m);
+        SWSE_HookRefused("scriptvm spy", name);
+        return false;
+    }
     BYTE* fn = (BYTE*)Addr(rva);
     int idx = g_spyN;
     BYTE* tramp = (BYTE*)VirtualAlloc(NULL, 64, MEM_COMMIT | MEM_RESERVE,
@@ -820,6 +844,7 @@ static bool SpyInstall(unsigned rva, const char* name, int copyLen) {
     *(DWORD*)(fn + 1) = (DWORD)(stub - (fn + 5));
     for (int i = 5; i < copyLen; i++) fn[i] = 0x90;   // pad sliced bytes
     VirtualProtect(fn, copyLen, old, &old);
+    SWSE_HookNote(fn, copyLen, "scriptvm spy", SWSE_HOOK_TRAMPOLINE, name);
 
     g_spy[idx].rva = rva; g_spy[idx].name = name;
     g_spy[idx].tramp = tramp; g_spy[idx].stub = stub; g_spy[idx].hits = 0;
@@ -1097,6 +1122,7 @@ void SWSE_WatchOff() {
 // Resolve player+0x1C (the inventory head) and watch it - the caller doesn't
 // need to know the address, which changes every session.
 int SWSE_WatchInventory() {
+    if (SafeMode()) return 0;           // calls the game's inventory getter
     __try {
         void* o = ((getter_t)Addr(RVA_InvGetter))();
         if (!o) return 0;
@@ -1126,6 +1152,9 @@ int SWSE_WatchInventory() {
 static void GodTick();        // fwd: refills health/stamina from the player obj
 
 static unsigned PlayerObj() {
+    // A call into the game (the inventory getter at a Steam RVA): every
+    // player read - position, facing, health, the level watcher - starts here.
+    if (SafeMode()) return 0;
     __try {
         void* o = ((getter_t)Addr(RVA_InvGetter))();
         if (!o) return 0;
@@ -1158,6 +1187,18 @@ int SWSE_PlayerSet(int off, float v) {
     __try {
         float* f = (float*)(p + off);
         f[0] = v; f[1] = v; f[2] = v;
+        return 1;
+    } __except (EXCEPTION_EXECUTE_HANDLER) { return -2; }
+}
+
+// Write the three copies individually - for restoring a captured triple
+// exactly, where writing one value to all three would be a full heal.
+int SWSE_PlayerSet3(int off, float a, float b, float c) {
+    unsigned p = PlayerObj();
+    if (!p) return 0;
+    __try {
+        float* f = (float*)(p + off);
+        f[0] = a; f[1] = b; f[2] = c;
         return 1;
     } __except (EXCEPTION_EXECUTE_HANDLER) { return -2; }
 }
@@ -1280,6 +1321,7 @@ static void* RvaPtr(unsigned r) {
 // virtual slot +0x230 (the wallet getter is +0x234 on the same class).
 static void* WalletFrom(void** objOut) {
     if (objOut) *objOut = nullptr;
+    if (SafeMode()) return nullptr;     // two game calls: the getter, then the wallet
     __try {
         TInvGetter get = (TInvGetter)RvaPtr(RVA_INV_GETTER);
         void* g = get();
@@ -1471,6 +1513,11 @@ __declspec(naked) static void HookGrant() {
 }
 
 int SWSE_GrantSpy(int on) {
+    if (on && !g_grantFn && !SWSE_GameBuildKnown()) {
+        char m[300]; SWSE_GameBuildRefusal("grantspy", m, sizeof(m)); LogS(m);
+        SWSE_HookRefused("scriptvm", "item grant (grantspy)");
+        return -1;
+    }
     g_grantSpy = (on != 0);
     if (g_grantFn) return 1;                     // already installed
     if (!on) return 1;
@@ -1488,6 +1535,7 @@ int SWSE_GrantSpy(int on) {
     *(DWORD*)(g_grantFn + 1) = (DWORD)((BYTE*)&HookGrant - (g_grantFn + 5));
     for (int i = 5; i < GRANT_PLEN; i++) g_grantFn[i] = 0x90;
     VirtualProtect(g_grantFn, GRANT_PLEN, old, &old);
+    SWSE_HookNote(g_grantFn, GRANT_PLEN, "scriptvm", SWSE_HOOK_TRAMPOLINE, "item grant (grantspy)");
     LogS("grant spy: hook installed on 0x87C80 - buy something now");
     return 1;
 }
@@ -1643,6 +1691,65 @@ static int PlayerMotionField(int off, const float* set, float* cur) {
     }
     if (cur && gotAny) *cur = best;
     return hits;
+}
+
+// The player's body for the level watcher: the player object and a motion
+// object it owns, vtable-checked. A level load replaces the motion object, so
+// the pair changing is what "a new level is up" means (see levelwatch.h).
+int SWSE_PlayerBody(unsigned* playerOut, unsigned* motionOut) {
+    unsigned p = PlayerObj();
+    if (!p) return 0;
+    unsigned base = (unsigned)(uintptr_t)GetModuleHandleA(NULL);
+    unsigned vtA = base + VT_MOTIONIMPL, vtB = base + VT_MOTIONDUMMY;
+    const int slots[2] = { PF_MOTION_A, PF_MOTION_B };
+    bool faulted = false;
+    for (int i = 0; i < 2; i++) {
+        __try {
+            unsigned mo = *(unsigned*)(p + slots[i]);
+            if (mo < 0x10000) continue;
+            unsigned vt = *(unsigned*)mo;
+            if (vt != vtA && vt != vtB) continue;
+            if (playerOut) *playerOut = p;
+            if (motionOut) *motionOut = mo;
+            return 1;
+        } __except (EXCEPTION_EXECUTE_HANDLER) { faulted = true; }  // try slot B
+    }
+    return faulted ? -2 : 0;
+}
+
+// The player's two FORM motion objects: SteefModeData[2] at +0x188, stride
+// 0x1C, m_motion first - [0] Steef, [1] Stranger (research/PLAYNPC.md). The
+// current motion at +0xB0, which SWSE_PlayerBody reports, flips between these
+// two on every Stranger/Steef change (FinishDisguiseChange, 0x447D80), so a
+// level watcher keyed on it counted every transformation as a new level.
+// These two are stable within a level and rebuilt by a load. Measured live:
+// `steef` then `stranger` moved +0xB0 1488FAD0 -> 1488F720 -> 1488FAD0 while
+// +0x188 / +0x1A4 stayed 1488F720 / 1488FAD0. A slot that does not hold a
+// MotionImpl reads as 0. Returns 1 if the player and at least one form are
+// there, 0 if not, -2 if reading faulted.
+#define PF_FORM_MOTION0 0x188
+#define PF_FORM_MOTION1 0x1A4
+int SWSE_PlayerForms(unsigned* playerOut, unsigned* form0Out, unsigned* form1Out) {
+    unsigned p = PlayerObj();
+    if (!p) return 0;
+    unsigned base = (unsigned)(uintptr_t)GetModuleHandleA(NULL);
+    unsigned vtA = base + VT_MOTIONIMPL, vtB = base + VT_MOTIONDUMMY;
+    const int slots[2] = { PF_FORM_MOTION0, PF_FORM_MOTION1 };
+    unsigned f[2] = { 0, 0 };
+    bool faulted = false;
+    for (int i = 0; i < 2; i++) {
+        __try {
+            unsigned mo = *(unsigned*)(p + slots[i]);
+            if (mo < 0x10000) continue;
+            unsigned vt = *(unsigned*)mo;
+            if (vt == vtA || vt == vtB) f[i] = mo;
+        } __except (EXCEPTION_EXECUTE_HANDLER) { faulted = true; }
+    }
+    if (!f[0] && !f[1]) return faulted ? -2 : 0;
+    if (playerOut) *playerOut = p;
+    if (form0Out)  *form0Out  = f[0];
+    if (form1Out)  *form1Out  = f[1];
+    return 1;
 }
 
 // field: 0=jump 1=run speed 2=gravity 3=air control.
@@ -2046,6 +2153,27 @@ static bool     g_tuneLoaded  = false;
 
 static unsigned ResolvePrefs(unsigned hash);   // defined below
 
+// Types shipped at kImmortalHp or more whose health SWSE has lowered. Filled
+// on the game thread (spawn hook, console) and read by the AI-tuning worker:
+// the entry is stored before the count moves, so a reader sees whole entries.
+static unsigned          g_wasProtected[256];
+static volatile LONG     g_wasProtectedN = 0;
+
+static void NoteProtected(unsigned hash, float shippedHp) {
+    if (!hash || shippedHp < kImmortalHp) return;
+    LONG n = g_wasProtectedN;
+    for (LONG i = 0; i < n; i++) if (g_wasProtected[i] == hash) return;
+    if (n >= 256) return;
+    g_wasProtected[n] = hash;
+    InterlockedExchange(&g_wasProtectedN, n + 1);
+}
+
+bool SWSE_NpcWasProtected(unsigned hash) {
+    LONG n = g_wasProtectedN;
+    for (LONG i = 0; i < n; i++) if (g_wasProtected[i] == hash) return true;
+    return false;
+}
+
 static void ApplyTuningForType(unsigned hash) {
     if (!g_tuneLoaded || !hash || hash == 0x2DFD1072) return;
     float hp = g_tuneAllHp;
@@ -2073,8 +2201,9 @@ static void ApplyTuningForType(unsigned hash) {
     if (hp < 0.0f && gb < 0 && hr < 0) return;
     __try {
         if (hp >= 0.0f) {
+            NoteProtected(hash, *(float*)(prefs + 0x448));
+            // m_health only - +0x44C is m_stamina, not a max (see SetTypeHealth).
             *(float*)(prefs + 0x448) = hp;
-            *(float*)(prefs + 0x44C) = hp;
         }
         if (gb >= 0) {
             *(unsigned char*)(prefs + 0x460) = (unsigned char)(gb ? 1 : 0);
@@ -2312,10 +2441,8 @@ static unsigned ConstructedSpawnFwd(unsigned useHash, float* pos) {
         *(unsigned*)(tag + 0x08)      = useHash ? useHash : rec[2];
         *(unsigned*)(tag + 0x0C)      = 1;
         *(unsigned char*)(tag + 0x22) = 1;
-        if (pos) {
-            float* t = (float*)(tag + 0x30);
-            t[0] = pos[0]; t[1] = pos[1]; t[2] = pos[2];
-        }
+        // (No position in tag+0x30: that is the factory's script token -
+        // RE_SPAWNING.md. The position goes in the IOT's +0x3C below.)
         __asm {
             call ictor
             mov  iot, eax
@@ -2346,7 +2473,23 @@ static unsigned ConstructedSpawnFwd(unsigned useHash, float* pos) {
 // so ecx is the handle's address, not its value.
 #define RVA_RESOLVE_PREFS 0x23880
 
+// A type hash -> its loaded NPCPrefs, READ-ONLY through the game's resource
+// registry (see prefsedit.cpp). 1.0.x called 0x23880 directly, which the
+// reflection work identified as GetPrefs<NPCPrefs>: on a miss - any hash that
+// is not a loaded NPCPrefs, including every weapon and AI hash `ai` handed it -
+// it CONSTRUCTS a default NPCPrefs carrying that hash, registers it, and leaks
+// it. That was the "unrelated record" this resolver was known for. The old call
+// is kept only as the fallback for a registry that cannot be read at all.
+static unsigned ResolvePrefsCreating(unsigned hash);
+
 static unsigned ResolvePrefs(unsigned hash) {
+    unsigned p = SWSE_ResourceLookup(hash);
+    if (p) return SWSE_ObjIsA(p, "NPCPrefs") ? p : 0;
+    if (SWSE_ResourceRegistryOk() == 0) return ResolvePrefsCreating(hash);
+    return 0;                                   // not loaded
+}
+
+static unsigned ResolvePrefsCreating(unsigned hash) {
     unsigned handle = hash;
     unsigned out[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     unsigned fn    = (unsigned)(uintptr_t)RvaPtr(RVA_RESOLVE_PREFS);
@@ -2376,20 +2519,32 @@ static unsigned ResolvePrefs(unsigned hash) {
 //
 // Three objects hang off a character's NPCPrefs:
 //
-//   NPCPrefs +0x118  m_spAIPrefs      -> perception / alert-state object
-//   NPCPrefs +0x498  m_rangedWeapon   -> NPCWeaponPrefs (fire rate, accuracy)
-//   NPCPrefs +0x28   m_aiLowDetail    \ AI level-of-detail, the engine's own
-//   NPCPrefs +0x2C   m_aiHighDetail   / notion of how much thinking to do
+//   NPCPrefs +0x118  m_spAIPrefs      EMBEDDED AIPrefs object (vtable RVA
+//                                     0x377B30) - perception / alert states
+//   NPCPrefs +0x498  m_rangedWeapon   a HASH -> NPCWeaponPrefs (fire rate...)
+//   NPCPrefs +0x530  m_aiLowDetail    \ AI level-of-detail, the engine's own
+//   NPCPrefs +0x52C  m_aiHighDetail   / notion of how much thinking to do
 //
-// The perception object is dumped by the schema under the name `CoverDuration`,
-// which is a misnomer: its fields are sight distances, view-cone angles and a
-// separate block per alert state (normal / agitated / combat / panic).
-#define AIP_6THSENSE      0x000
-#define AIP_SIGHTNORMAL   0x004   // m_seeDistance shares this offset
-#define AIP_HIDEVOLSEE    0x01C
-#define AIP_SIGHTCOMBAT   0x14C
+// Corrected by the reflection extraction (research/PREFS_EDITOR.md). 1.0.x read
+// +0x118 as a HASH and +0x28/+0x2C as the detail levels; `ai <type> <field>
+// <value>` then wrote through the value it found at +0x118 - which is the
+// AIPrefs VTABLE pointer - with VirtualProtect forcing it writable, i.e. into
+// the game's own vtable, and wrote weapon fields through the weapon HASH as if
+// it were an address. The perception object the tuning finds by shape IS this
+// embedded NPCPrefs+0x118 object.
+//
+// AIPrefs layout (relative to the embedded object): four MindStatePrefs sight
+// blocks at +0x04 (normal), +0xA8 (agitated), +0x14C (combat), +0x1F0 (panic),
+// each {6thSense, seeDistance, seeAbove, seeBelow, hAngle, vAngle,
+// instantSight, hideVolSee} floats; m_relaxAgitatedToNormal +0x2A0;
+// m_attackParams +0x2A8.
+#define AIP_6THSENSE      0x004
+#define AIP_SEEDIST       0x008
+#define AIP_HIDEVOLSEE    0x020
+#define AIP_SEEDISTCOMBAT 0x150
 #define AIP_RELAXAGIT     0x2A0
 #define AIP_ATTACKPARAMS  0x2A8
+#define VT_AIPREFS        0x377B30
 
 #define NPCW_FIRERATE     0x17C
 #define NPCW_RELOADTIME   0x184
@@ -2401,8 +2556,8 @@ static unsigned ResolvePrefs(unsigned hash) {
 // unset hash-valued pref, so it must be distinguished from a real reference.
 #define HASH_UNSET        0x2DFD1072
 
-#define NPCP_AILOWDETAIL  0x028
-#define NPCP_AIHIGHDETAIL 0x02C
+#define NPCP_AILOWDETAIL  0x530
+#define NPCP_AIHIGHDETAIL 0x52C
 #define NPCP_SPAIPREFS    0x118
 #define NPCP_RANGEDWEAPON 0x498
 
@@ -2417,15 +2572,27 @@ static bool RdF32(unsigned addr, float* out) {
     __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
 }
 
+// Returns the character's embedded AIPrefs object (0 if the vtable there is not
+// AIPrefs); *weapon receives its loaded NPCWeaponPrefs OBJECT (0 for melee-only
+// or not loaded) and *npcPrefs the NPCPrefs itself.
 unsigned SWSE_AiPrefsOf(unsigned typeHash, unsigned* weapon, unsigned* npcPrefs) {
     unsigned p = ResolvePrefs(typeHash);
     if (npcPrefs) *npcPrefs = p;
+    if (weapon) *weapon = 0;
     if (!p) return 0;
-    unsigned ai = 0, w = 0;
-    RdU32(p + NPCP_SPAIPREFS, &ai);
-    RdU32(p + NPCP_RANGEDWEAPON, &w);
-    if (weapon) *weapon = w;
-    return ai;
+    unsigned wh = 0;
+    if (weapon && RdU32(p + NPCP_RANGEDWEAPON, &wh) && wh && wh != HASH_UNSET) {
+        unsigned w = SWSE_ResourceLookup(wh);
+        if (w && SWSE_ObjIsA(w, "NPCWeaponPrefs")) *weapon = w;
+    }
+    unsigned vt = 0;
+    unsigned want = (unsigned)(uintptr_t)GetModuleHandleA(NULL) + VT_AIPREFS;
+    if (!RdU32(p + NPCP_SPAIPREFS, &vt) || vt != want) return 0;
+    return p + NPCP_SPAIPREFS;
+}
+
+static void FmtMs(char* out, float seconds) {
+    wsprintfA(out, "%d ms", (int)(seconds * 1000.0f + (seconds >= 0 ? 0.5f : -0.5f)));
 }
 
 // Report the whole tuning block for a character type. Emitting via a callback
@@ -2436,12 +2603,14 @@ int SWSE_AiDump(unsigned typeHash, void (*emit)(const char*)) {
     unsigned npcPrefs = 0, weapon = 0;
     unsigned ai = SWSE_AiPrefsOf(typeHash, &weapon, &npcPrefs);
     if (!npcPrefs) {
-        wsprintfA(b, "%08X did not resolve", typeHash);
+        wsprintfA(b, "%08X is not a loaded character type here", typeHash);
         emit(b);
         return 0;
     }
     if (!RttiName(npcPrefs, nm, sizeof(nm))) lstrcpynA(nm, "?", 2);
-    wsprintfA(b, "%08X -> NPCPrefs %08X (%s)", typeHash, npcPrefs, nm);
+    float hp = 0;
+    RdF32(npcPrefs + 0x448, &hp);
+    wsprintfA(b, "%08X -> %s %08X   m_health %d", typeHash, nm, npcPrefs, (int)hp);
     emit(b);
 
     unsigned lo = 0, hi = 0;
@@ -2451,48 +2620,50 @@ int SWSE_AiDump(unsigned typeHash, void (*emit)(const char*)) {
         emit(b);
     }
 
-    // The two linked objects are reported as HASHES with whatever they resolve
-    // to. Decoded field values are deliberately NOT printed yet: the resolver
-    // hands back objects whose RTTI reads `NPCPrefs` for weapon and AI hashes
-    // too, so the per-class offsets cannot be trusted against them. Printing
-    // "fireRate=707ms" from a direction vector would look like data.
-    // See research/AI_SYSTEMS.md - "the unresolved link".
-    unsigned r = 0;
-    if (ai == HASH_UNSET || !ai) {
-        emit("  m_spAIPrefs    unset");
+    if (!ai) {
+        emit("  AIPrefs        (no AIPrefs object at +0x118)");
     } else {
-        r = ResolvePrefs(ai);
-        if (r && RttiName(r, nm, sizeof(nm))) {}
-        else lstrcpynA(nm, "?", 2);
-        wsprintfA(b, "  m_spAIPrefs    hash %08X -> %08X (%s)", ai, r, nm);
+        float s6 = 0, sd = 0, sdc = 0, hv = 0, rx = 0;
+        RdF32(ai + AIP_6THSENSE, &s6);   RdF32(ai + AIP_SEEDIST, &sd);
+        RdF32(ai + AIP_SEEDISTCOMBAT, &sdc); RdF32(ai + AIP_HIDEVOLSEE, &hv);
+        RdF32(ai + AIP_RELAXAGIT, &rx);
+        wsprintfA(b, "  AIPrefs %08X  6thsense %d  seedist %d (combat %d)  hidevolsee %d  relax %d",
+                  ai, (int)s6, (int)sd, (int)sdc, (int)hv, (int)rx);
         emit(b);
     }
 
-    if (weapon == HASH_UNSET || !weapon) {
+    unsigned wh = 0;
+    RdU32(npcPrefs + NPCP_RANGEDWEAPON, &wh);
+    if (!wh || wh == HASH_UNSET) {
         emit("  m_rangedWeapon unset (melee-only character)");
-    } else {
-        r = ResolvePrefs(weapon);
-        if (r && RttiName(r, nm, sizeof(nm))) {}
-        else lstrcpynA(nm, "?", 2);
-        wsprintfA(b, "  m_rangedWeapon hash %08X -> %08X (%s)", weapon, r, nm);
+    } else if (!weapon) {
+        wsprintfA(b, "  m_rangedWeapon %08X - not loaded here", wh);
         emit(b);
-        emit("    (peek it - field offsets not yet confirmed for this class)");
+    } else {
+        float fr = 0, rt = 0, rm = 0, acc = 0, miss = 0;
+        RdF32(weapon + NPCW_FIRERATE, &fr);  RdF32(weapon + NPCW_RELOADTIME, &rt);
+        RdF32(weapon + NPCW_RELOADMAX, &rm); RdF32(weapon + NPCW_ACCURACY, &acc);
+        RdF32(weapon + NPCW_MISSTIME, &miss);
+        char a[24], c[24], d[24];
+        FmtMs(a, rt); FmtMs(c, rm); FmtMs(d, miss);
+        wsprintfA(b, "  weapon %08X (%08X)  firerate %d.%02d/s  reload %s..%s  accuracy %d.%02d  misstime %s",
+                  weapon, wh, (int)fr, (int)(fr * 100) % 100, a, c,
+                  (int)acc, (int)(acc * 100) % 100, d);
+        emit(b);
     }
+    emit("  more fields by name: prefs dump <hash> [filter]");
     return 1;
 }
 
-// Write one float field on an AI or weapon prefs object. `which` selects the
-// object so a caller never has to know the layout.
+// Write one float field on the AI or weapon prefs object. Heap objects - no
+// VirtualProtect: 1.0.x needed it only because it was writing into the exe.
 int SWSE_AiSet(unsigned typeHash, int onWeapon, int offset, float value) {
     unsigned weapon = 0, npcPrefs = 0;
     unsigned ai = SWSE_AiPrefsOf(typeHash, &weapon, &npcPrefs);
     unsigned obj = onWeapon ? weapon : ai;
     if (!obj) return 0;
     __try {
-        DWORD old;
-        VirtualProtect((void*)(obj + offset), 4, PAGE_READWRITE, &old);
         *(float*)(obj + offset) = value;
-        VirtualProtect((void*)(obj + offset), 4, old, &old);
         return 1;
     } __except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
 }
@@ -2803,7 +2974,10 @@ static void CollectNpc(unsigned obj, void* ctx) {
 
 int SWSE_NpcGuns(NpcGunRow* out, int max, double budgetMs) {
     double t0 = AiNowMs();
-    static WepIndex wep;
+    // On the stack (1 KB), not static: the AI-tuning worker and the console's
+    // `npcguns` can both be in here, and a shared index paired one character
+    // with another's weapon.
+    WepIndex wep;
     wep.n = 0;
     WalkByVTable(NpcWeaponVTable(), t0, budgetMs * 0.5, CollectWeapon, &wep);
 
@@ -3016,10 +3190,178 @@ int SWSE_BringNpcsTo(float px, float py, float pz,
 // produced multi-hundred-millisecond stalls twice before in this project.
 // Returns -1 if the cache is empty, so a caller can tell "none alive" apart
 // from "do not know yet".
+// ---- a live-NPC list that does not depend on hit reactions ------------------
+// Triggers' `killed`/`cleared` conditions count live NPCs of a type. 1.0.x
+// counted from the hit-reaction watcher's list, which only exists while hit
+// reactions are on - so with them off (the 1.1 default) those triggers never
+// fired. When the watcher is running its list is used as before; otherwise
+// this keeps one of its own.
+//
+// It is built on a WORKER thread with a scan of its own. The first 1.1 cut
+// crawled the heap in 15 ms slices on the render thread (seconds of stutter
+// after every load), through SWSE_FindNpcsStep - whose cursor it shared with
+// the watcher, and which a level change did not reset - and it never rebuilt
+// within a level, on the belief that the engine creates no NPCs at runtime.
+// It does: gib spawns (m_onGibSpawnNPC - a Shock Tank's wolvark shooter) and
+// spawn-pool refills (research/AT3_DISCOVERIES.md). So the worker rescans
+// every 20 s while the list is wanted, and at once after a level change; the
+// render thread only swaps in each finished list and, between scans, drops
+// entries that have died.
+#define VT_NPC 0x3671B4                 // (also defined, identically, further down)
+#define NC_MAX        1024
+#define NC_REFRESH_MS 20000
+static unsigned g_ncList[NC_MAX];       // render thread only
+static int      g_ncN = -1;             // -1 = not built yet
+static DWORD    g_ncChecked = 0;
+static LONG     g_ncSeenGen = 0;
+
+static CRITICAL_SECTION g_ncCs;         // guards the published list
+static struct NcLocks { NcLocks() { InitializeCriticalSection(&g_ncCs); } } g_ncLocks;
+static unsigned        g_ncPub[NC_MAX];
+static int             g_ncPubN = 0;
+static LONG            g_ncPubGen = 0;      // bumped per published list
+static LONG            g_ncPubFor = 0;      // the reset generation it was scanned in
+static volatile LONG   g_ncResetGen = 0;    // bumped per level change / rebuild
+static volatile LONG   g_ncWantedUntil = 0; // tick count; the worker idles past it
+static volatile LONG   g_ncScanning = 0;
+static volatile LONG   g_ncPasses = 0, g_ncLastMs = 0;
+static volatile LONG   g_ncThread = 0;
+static HANDLE          g_ncWake = nullptr;
+
+static bool WatcherRunning() { return SWSE_HitReactWatching() && SWSE_HitReactEnabled(); }
+
+// One full pass over the heap window. Nothing here is shared with the
+// render-thread scanners. Each 64 KB chunk is read under its own SEH, so a
+// block freed mid-read costs that chunk rather than the rest of the region.
+static int ScanNpcsWorker(unsigned* out, int maxOut) {
+    unsigned vt = (unsigned)(uintptr_t)GetModuleHandleA(NULL) + VT_NPC;
+    MEMORY_BASIC_INFORMATION mbi;
+    BYTE* p  = (BYTE*)(uintptr_t)HEAP_LO;
+    BYTE* hi = (BYTE*)(uintptr_t)HEAP_HI;
+    int n = 0;
+    while (p < hi && n < maxOut) {
+        if (!VirtualQuery(p, &mbi, sizeof(mbi))) break;
+        bool ok = mbi.State == MEM_COMMIT && mbi.Type == MEM_PRIVATE && HeapRegion(mbi)
+               && (mbi.Protect & (PAGE_READWRITE | PAGE_EXECUTE_READWRITE))
+               && !(mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS));
+        if (ok) {
+            unsigned* q = (unsigned*)mbi.BaseAddress;
+            size_t cnt = mbi.RegionSize / 4;
+            for (size_t c0 = 0; c0 < cnt && n < maxOut; c0 += 0x4000) {
+                size_t c1 = c0 + 0x4000;
+                if (c1 > cnt) c1 = cnt;
+                __try {
+                    for (size_t k = c0; k < c1 && n < maxOut; k++) {
+                        if (q[k] != vt) continue;
+                        unsigned a = (unsigned)(uintptr_t)(q + k);
+                        if (a < HEAP_LO || a > HEAP_HI) continue;
+                        if (*(unsigned*)(a + 0x54) != a) continue;
+                        out[n++] = a;
+                    }
+                } __except (EXCEPTION_EXECUTE_HANDLER) {}
+            }
+        }
+        BYTE* next = (BYTE*)mbi.BaseAddress + mbi.RegionSize;
+        if (next <= p) break;
+        p = next;
+    }
+    return n;
+}
+
+static DWORD WINAPI NpcCacheWorker(LPVOID) {
+    unsigned* buf = (unsigned*)malloc(NC_MAX * sizeof(unsigned));
+    if (!buf) { InterlockedExchange(&g_ncThread, 0); return 0; }
+    for (;;) {
+        // Sleeps between passes; a level change or `npccache rebuild` wakes
+        // it early. Idle while nothing has asked for the list lately.
+        WaitForSingleObject(g_ncWake, NC_REFRESH_MS);
+        if ((LONG)(GetTickCount() - (DWORD)g_ncWantedUntil) > 0) continue;
+        LONG gen = g_ncResetGen;
+        InterlockedExchange(&g_ncScanning, 1);
+        DWORD t0 = GetTickCount();
+        int n = ScanNpcsWorker(buf, NC_MAX);
+        InterlockedExchange(&g_ncLastMs, (LONG)(GetTickCount() - t0));
+        InterlockedExchange(&g_ncScanning, 0);
+        if (gen != g_ncResetGen) { SetEvent(g_ncWake); continue; }   // level changed under it
+        EnterCriticalSection(&g_ncCs);
+        memcpy(g_ncPub, buf, (size_t)n * 4);
+        g_ncPubN = n;
+        g_ncPubFor = gen;
+        g_ncPubGen++;
+        LeaveCriticalSection(&g_ncCs);
+        InterlockedIncrement(&g_ncPasses);
+    }
+}
+
+void SWSE_NpcCacheReset() {
+    g_ncN = -1;
+    InterlockedIncrement(&g_ncResetGen);
+    if (g_ncWake) SetEvent(g_ncWake);
+}
+
+void SWSE_NpcCacheInfo(int* count, int* scanning, int* passes, int* lastMs, int* watcher) {
+    if (count)    *count    = g_ncN;
+    if (scanning) *scanning = g_ncScanning ? 1 : 0;
+    if (passes)   *passes   = (int)g_ncPasses;
+    if (lastMs)   *lastMs   = (int)g_ncLastMs;
+    if (watcher)  *watcher  = (SWSE_HitReactWatching() && SWSE_HitReactEnabled()) ? 1 : 0;
+}
+
+void SWSE_NpcCacheTick() {
+    if (WatcherRunning()) return;           // its list is the one to use
+    DWORD now = GetTickCount();
+    InterlockedExchange(&g_ncWantedUntil, (LONG)(now + 3000));
+    if (!g_ncThread && InterlockedCompareExchange(&g_ncThread, 1, 0) == 0) {
+        // Created signalled, so the first pass starts at once.
+        if (!g_ncWake) g_ncWake = CreateEventA(nullptr, FALSE, TRUE, nullptr);
+        HANDLE h = g_ncWake ? CreateThread(nullptr, 0, NpcCacheWorker, nullptr, 0, nullptr)
+                            : nullptr;
+        if (h) CloseHandle(h);
+        else   InterlockedExchange(&g_ncThread, 0);
+    }
+    // A finished pass replaces the list - unless it was scanned before the
+    // latest level change, in which case the worker is already rescanning.
+    bool swapped = false;
+    EnterCriticalSection(&g_ncCs);
+    if (g_ncPubGen != g_ncSeenGen) {
+        g_ncSeenGen = g_ncPubGen;
+        if (g_ncPubFor == g_ncResetGen) {
+            memcpy(g_ncList, g_ncPub, (size_t)g_ncPubN * 4);
+            g_ncN = g_ncPubN;
+            swapped = true;
+        }
+    }
+    LeaveCriticalSection(&g_ncCs);
+    if (swapped) { g_ncChecked = now; return; }
+    if (g_ncN < 0) return;
+    // Between passes, drop the dead. Each entry is checked under its own
+    // SEH, so one freed NPC is dropped instead of failing the whole list.
+    if ((now - g_ncChecked) >= 500) {
+        g_ncChecked = now;
+        unsigned vt = (unsigned)(uintptr_t)GetModuleHandleA(NULL) + VT_NPC;
+        int w = 0;
+        for (int i = 0; i < g_ncN; i++) {
+            unsigned a = g_ncList[i];
+            __try {
+                if (*(unsigned*)a == vt && *(unsigned*)(a + 0x54) == a) g_ncList[w++] = a;
+            } __except (EXCEPTION_EXECUTE_HANDLER) {}
+        }
+        g_ncN = w;
+    }
+}
+
 int SWSE_CountNpcsOfType(unsigned typeHash) {
-    unsigned act[64];
-    int n = SWSE_WatchActors(act, 64);
-    if (n <= 0) return -1;
+    static unsigned act[1024];
+    int n;
+    if (WatcherRunning()) {
+        // 1.0.x read only the first 64, so a big level under-counted.
+        n = SWSE_WatchActors(act, 1024);
+        if (n <= 0) return -1;
+    } else {
+        if (g_ncN < 0) return -1;
+        n = g_ncN;
+        memcpy(act, g_ncList, (size_t)n * 4);
+    }
     if (!typeHash) return n;
     int c = 0;
     for (int i = 0; i < n; i++) {
@@ -3101,15 +3443,13 @@ int SWSE_ReservePark(char* msg, int msgLen) {
     return parked;
 }
 
-// Teleport the player. Writes the motion object as well as the actor copy,
-// or the position reverts on the next frame.
+// Teleport the player with the engine's own teleport (see the position
+// section below and research/TELEPORT.md): feet at x y z, dropped onto the
+// floor there. 1 moved, 0 no player, -1 refused (SWSE_TeleportWhy()),
+// -2 faulted.
+static int EngineTeleport(float x, float y, float z, int zone, const char* zoneHow, int mode);
 int SWSE_PlayerTeleport(float x, float y, float z) {
-    float* pp = PlayerPos();
-    if (!pp) return 0;
-    __try {
-        pp[0] = x; pp[1] = y; pp[2] = z;
-    } __except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
-    return 1;
+    return EngineTeleport(x, y, z, -1, "", 0);
 }
 
 // The original behaviour: bring them to the player.
@@ -3212,8 +3552,11 @@ int SWSE_SetTypeHealth(unsigned hash, float health, char* msg, int msgLen) {
     float was = 0.0f;
     __try {
         was = *(float*)(prefs + NPCP_HEALTH_OFF);
+        NoteProtected(hash, was);
+        // m_health only. 1.0.x also wrote +4 believing it was the max, but the
+        // reflection says +0x44C is m_stamina, so every health change silently
+        // set the character's stamina to the same number.
         *(float*)(prefs + NPCP_HEALTH_OFF)     = health;
-        *(float*)(prefs + NPCP_HEALTH_OFF + 4) = health;   // the max alongside it
     } __except (EXCEPTION_EXECUTE_HANDLER) {
         lstrcpynA(msg, "prefs unwritable", msgLen);
         return -2;
@@ -3325,11 +3668,11 @@ int SWSE_SetTypeHurt(unsigned hash, int value, char* msg, int msgLen) {
     return 1;
 }
 
-// m_affGenerally (+0x4E8) is a character's affiliation. Outlaws and townsfolk
-// both read 1, which is why armed outlaws stand around in a town without
-// anyone minding: same side. Everyone's hostility points at the player instead.
-// Changing it is the obvious lever for making a town raid -- enemies that the
-// townsfolk actually treat as enemies.
+// m_affGenerally (+0x4E8) is NOT an affiliation: with m_affList (+0x4EC) it is
+// the player-ammo rule (1 = hurt by every player ammo except the listed ones,
+// 0 = hurt only by the listed ones; research/AT3_DISCOVERIES.md C1). Everyone
+// reading 1 says nothing about sides - NPC targeting comes from the player
+// singleton (research/FACTIONS.md).
 int SWSE_SetTypeAff(unsigned hash, int value, char* msg, int msgLen) {
     char tmp[200];
     unsigned prefs = ResolvePrefs(hash);
@@ -3338,10 +3681,13 @@ int SWSE_SetTypeAff(unsigned hash, int value, char* msg, int msgLen) {
         lstrcpynA(msg, tmp, msgLen);
         return 0;
     }
+    // m_affGenerally is a BOOL (1 byte) - "player ammo affects this character
+    // in general", with m_affList (+0x4EC) the exceptions - NOT affiliation
+    // (reflection table; AT3 discoveries C1/C2). 1.0.x wrote a dword here.
     unsigned was = 0;
     __try {
-        was = *(unsigned*)(prefs + 0x4E8);
-        *(unsigned*)(prefs + 0x4E8) = (unsigned)value;
+        was = *(unsigned char*)(prefs + 0x4E8);
+        *(unsigned char*)(prefs + 0x4E8) = (unsigned char)(value ? 1 : 0);
     } __except (EXCEPTION_EXECUTE_HANDLER) {
         lstrcpynA(msg, "prefs unwritable", msgLen);
         return -2;
@@ -3356,8 +3702,9 @@ int SWSE_SetTypeAff(unsigned hash, int value, char* msg, int msgLen) {
             if (pf && *(unsigned*)(pf + 0x0C) == hash) live++;
         } __except (EXCEPTION_EXECUTE_HANDLER) {}
     }
-    wsprintfA(tmp, "%08X affiliation %u -> %d  (%d live of this type)",
-              hash, was, value, live);
+    wsprintfA(tmp, "%08X m_affGenerally (player ammo affects it) %u -> %d  (%d live of this type)%s",
+              hash, was, value ? 1 : 0, live,
+              value ? "" : " - now IMMUNE to player ammo not in its list");
     lstrcpynA(msg, tmp, msgLen);
     return 1;
 }
@@ -3475,9 +3822,17 @@ int SWSE_LoadSettings(const char* path, char* msg, int msgLen) {
 }
 
 int SWSE_LoadTuning(const char* path, char* msg, int msgLen) {
+    return SWSE_LoadTuningEx(path, false, msg, msgLen);
+}
+
+// append = keep rules already loaded (another mod's characters.txt). The
+// registry documents characters.txt as ADDITIVE; 1.0.x only ever read one.
+int SWSE_LoadTuningEx(const char* path, bool append, char* msg, int msgLen) {
     char tmp[220];
-    g_tuneCount = 0; g_tuneAllHp = -1.0f; g_tuneAllGib = -1;
-    g_tuneAllHurt = -1; g_tuneLoaded = false;
+    if (!append) {
+        g_tuneCount = 0; g_tuneAllHp = -1.0f; g_tuneAllGib = -1;
+        g_tuneAllHurt = -1; g_tuneLoaded = false;
+    }
 
     HANDLE h = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
                            NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -3535,6 +3890,88 @@ int SWSE_LoadTuning(const char* path, char* msg, int msgLen) {
               g_tuneCount, (int)g_tuneAllHp, g_tuneAllGib);
     lstrcpynA(msg, tmp, msgLen);
     return lines;
+}
+
+// ---- the npctuning feature: every mod's characters.txt + console.txt -------
+static void TuningModDir(char* out) {
+    char exe[MAX_PATH];
+    GetModuleFileNameA(GetModuleHandleA(NULL), exe, MAX_PATH);
+    char* sl = strrchr(exe, '\\'); if (sl) *sl = 0;      // ...\bin
+    sl = strrchr(exe, '\\'); if (sl) *sl = 0;            // game root
+    wsprintfA(out, "%s\\SWSEMods\\SWSE Console", exe);
+}
+
+struct TuneLoadCtx { int files; int rules; };
+static void LoadOneCharacters(const char* path, const char* modName, void* ctx) {
+    TuneLoadCtx* c = (TuneLoadCtx*)ctx;
+    char m[220];
+    int n = SWSE_LoadTuningEx(path, c->files > 0, m, sizeof(m));
+    c->files++;
+    c->rules += n;
+    char b[300];
+    wsprintfA(b, "tuning: [%s] %s", modName, m);
+    LogS(b);
+}
+
+// Reads the named toggles (console.txt - 1.0.x looked for a settings.txt that
+// never shipped, so `noimmortals` was silently never read) and every enabled
+// mod's characters.txt, then arms the spawn hook the rules are applied from.
+int SWSE_NpcTuningLoadAll(char* msg, int msgLen) {
+    char path[MAX_PATH], dir[MAX_PATH], sm[220];
+    TuningModDir(dir);
+    if (!SWSE_FindModFile("console.txt", path, MAX_PATH)) {
+        wsprintfA(path, "%s\\console.txt", dir);
+        if (GetFileAttributesA(path) == INVALID_FILE_ATTRIBUTES)
+            wsprintfA(path, "%s\\settings.txt", dir);    // the 1.0.x name
+    }
+    SWSE_LoadSettings(path, sm, sizeof(sm));
+
+    TuneLoadCtx c = { 0, 0 };
+    SWSE_ForEachModFile("characters.txt", LoadOneCharacters, &c);
+    if (!c.files) {
+        wsprintfA(path, "%s\\characters.txt", dir);
+        char m[220];
+        c.rules = SWSE_LoadTuningEx(path, false, m, sizeof(m));
+        if (GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES) c.files = 1;
+    }
+    // The toggles alone are enough to act on, even with no characters.txt.
+    if (g_noImmortals >= 0 || g_tuneCount || g_tuneAllHp >= 0.0f ||
+        g_tuneAllGib >= 0 || g_tuneAllHurt >= 0)
+        g_tuneLoaded = true;
+    // Tuning is applied from the spawn hook. On a build SWSE's addresses were
+    // not measured on the hook is refused (and logged): the rules are read,
+    // but nothing will apply them, and the message says so.
+    if (SWSE_NpcRoutineSpy(1) < 0) {
+        char why[240];
+        if (!SWSE_GameBuildKnown())
+            SWSE_GameBuildRefusal("the NPC spawn hook that applies them", why, sizeof(why));
+        else
+            lstrcpynA(why, "the NPC spawn hook that applies them could not be installed", sizeof(why));
+        char text[320];                  // why is at most 239 characters
+        wsprintfA(text, "%d character rule(s) read, none will apply: %s", g_tuneCount, why);
+        lstrcpynA(msg, text, msgLen);
+        return -1;
+    }
+
+    char tmp[300];
+    wsprintfA(tmp, "%s; characters.txt: %d file(s), %d rule(s) - applies as the next level spawns",
+              sm, c.files, g_tuneCount);
+    lstrcpynA(msg, tmp, msgLen);
+    return c.rules;
+}
+
+// For the self-test: 1 if rules are loaded, and how many per-character rules.
+int SWSE_NpcTuningStats(int* rules) {
+    if (rules) *rules = g_tuneCount;
+    return g_tuneLoaded ? 1 : 0;
+}
+
+// Stop applying. Characters already tuned keep their values until the level
+// is reloaded - the prefs objects are rebuilt from the archives on every load.
+void SWSE_NpcTuningDisable() {
+    g_tuneLoaded = false;
+    g_noImmortals = -1;
+    g_immortalsGib = -1;
 }
 
 // Read a character type's current health and gib flag.
@@ -3637,10 +4074,17 @@ static void  SetArg(int i, unsigned payload, unsigned type);
 static void  SetArgId(int i, unsigned id);
 static void* CallWithArgs(unsigned rva, void* retBuf);
 
+// What a command says when InstallArgHook fails: the game-build refusal on a
+// build SWSE's addresses were not measured on, otherwise its usual reason.
+static void ArgHookFailMsg(char* msg, int msgLen, const char* usual) {
+    if (!SWSE_GameBuildKnown()) SWSE_GameBuildRefusal("calling script verbs with arguments", msg, msgLen);
+    else lstrcpynA(msg, usual, msgLen);
+}
+
 int SWSE_PostAlarm(unsigned zoneId, int useBell, char* msg, int msgLen) {
     char tmp[200];
     if (!InstallArgHook()) {
-        lstrcpynA(msg, "no script context - could not install the arg hook", msgLen);
+        ArgHookFailMsg(msg, msgLen, "no script context - could not install the arg hook");
         return 0;
     }
     int ok = 1;
@@ -3722,7 +4166,8 @@ int SWSE_TownPanic(int forever, int radius, char* msg, int msgLen) {
 
 // Make NPCs of one type attack NPCs of another, via the game's own AI.
 //
-// This engine has no NPC-vs-NPC hostility: every character reads affiliation 1,
+// This engine has no NPC-vs-NPC hostility: NPCs acquire only the player
+// (research/FACTIONS.md; m_affGenerally is an ammo rule, not an affiliation),
 // and armed outlaws ignore townsfolk entirely. So "outlaws attack chickens"
 // cannot be configured -- it has to be commanded. CombatGoto takes an Object,
 // and a verb acts on ITS CONTEXT'S actor, so the attacker's own VM instance
@@ -4349,10 +4794,10 @@ int SWSE_SpawnNow(int count, int geomIndex, char* msg, int msgLen) {
         wantHash = useHash;   // the outer object gets it too, once it exists
         *(unsigned*)(tag + 0x0C)      = 1;        // count: routine requires exactly 1
         *(unsigned char*)(tag + 0x22) = 1;        // the flag it checks next
-        if (pp) {
-            float* t = (float*)(tag + 0x30);
-            t[0] = pp[0]; t[1] = pp[1]; t[2] = pp[2];
-        }
+        // No position here. This wrote the player's position into tag+0x30,
+        // which DoTagActions passes to the factory as the script token
+        // (RE_SPAWNING.md). The position is the InstancedObjectTag's +0x3C,
+        // set below.
     } __except (EXCEPTION_EXECUTE_HANDLER) {
         lstrcpynA(msg, "could not fill the new tag", msgLen);
         return -2;
@@ -4582,6 +5027,13 @@ __declspec(naked) static void HookNpcRoutine() {
 int SWSE_NpcHits() { return g_nprHits; }
 
 int SWSE_NpcRoutineSpy(int on) {
+    // The spawn hook character tuning rides on: a code patch at a
+    // Steam-measured address, not byte-verified.
+    if (on && !g_nprFn && !SWSE_GameBuildKnown()) {
+        char m[300]; SWSE_GameBuildRefusal("the NPC spawn hook (npctuning, npcspy)", m, sizeof(m)); LogS(m);
+        SWSE_HookRefused("scriptvm", "SpawnNPCFromTag");
+        return -1;
+    }
     g_nprSpy = (on != 0);
     // Fresh window each arming: hit count AND the harvested type list, so both
     // describe the next level rather than the whole session.
@@ -4602,6 +5054,7 @@ int SWSE_NpcRoutineSpy(int on) {
     *(DWORD*)(g_nprFn + 1) = (DWORD)((BYTE*)&HookNpcRoutine - (g_nprFn + 5));
     for (int i = 5; i < NPCR_PLEN; i++) g_nprFn[i] = 0x90;
     VirtualProtect(g_nprFn, NPCR_PLEN, old, &old);
+    SWSE_HookNote(g_nprFn, NPCR_PLEN, "scriptvm", SWSE_HOOK_TRAMPOLINE, "SpawnNPCFromTag");
     LogS("npcspy: hook installed on the whole spawn routine (0x184D90)");
     return 1;
 }
@@ -4877,11 +5330,13 @@ int SWSE_FindNpcsStep(unsigned* out, int maxOut, double budgetMs, int* complete)
 //
 // This is what makes refreshes nearly free. Rediscovering the same ~260
 // objects means walking 768 MB; re-checking known pointers is ~260 reads.
-// Safe because the engine NEVER creates NPCs at runtime - every actor exists
-// from level load, and encounters walk pre-placed ones out of hiding (see
-// ROADMAP.md) - so within a level the set cannot grow behind our back. A level
-// change frees them, the checks below fail, and the caller falls back to a
-// full scan.
+// It only drops the dead; it never finds new NPCs. That was thought safe
+// because "the engine never creates NPCs at runtime" - it does: a gib spawn
+// (m_onGibSpawnNPC) and a spawn-pool refill create them mid-level
+// (research/AT3_DISCOVERIES.md). Those join at the caller's next full walk:
+// the hit-reaction watcher makes one every fourth refresh (~60 s), and the
+// triggers' own list rescans every 20 s. A level change frees the list, the
+// checks below fail, and the caller falls back to a full scan.
 int SWSE_ValidateNpcs(unsigned* list, int n) {
     unsigned vt = (unsigned)(uintptr_t)GetModuleHandleA(NULL) + VT_NPC;
     int w = 0;
@@ -4950,27 +5405,21 @@ int SWSE_NpcTags(unsigned* out, int maxOut) {
     return n;
 }
 
-// ---- build a real NPCTag instead of reanimating a dead one -----------------
-// The captured tag is a corpse: its memory survives the load but the loader
-// releases every resource reference, so spawning from it faults on one null
-// after another. 0x184C20 allocates 0x5C bytes and runs the real constructor,
-// with no arguments, giving a tag whose fields are all valid by construction.
-// Then we only have to set what we actually want: type and position.
-#define RVA_NPCTAG_NEW  0x184C20
-#define TAG_NPCPREF     0x08     // m_npcPref        -> NPCPrefs (the TYPE)
-#define TAG_COUNT       0x0C     // m_countToSpawn
-#define TAG_MAXALIVE    0x10     // m_maxAliveAtATime
-#define TAG_SCATTER     0x1C     // m_spawnScatterRadius
-#define TAG_POS         0x30     // transform translation (WHERE)
+// ---- spawnnpc (retired in 1.1) ---------------------------------------------
+// It built a real NPCTag with the game's constructor (0x184C20) and wrote its
+// type, count and "position" by the reflected layout - but RE_SPAWNING.md
+// shows DoTagActions passing NPCTag+0x30/+0x34/+0x3C to the factory as the
+// script token and two arrays: +0x30 is no position. See SWSE_SpawnNpc.
 
 // m_npcPref is a path HASH, not a pointer: 0x23880 compares it against the
 // sentinel 0x2DFD1072 and otherwise resolves it. Writing a raw NPCPrefs
 // address there is why every attempt produced a null further down. Use the
-// game's own hasher (0x24D920: '/'->'\', tolower, table at 0x7F7478) so the
+// game's own hasher (0x24D920: '/'->'\', toupper, table at 0x7F7478) so the
 // value matches exactly what the loader would have stored.
 #define RVA_PATH_HASH 0x24D920
 
 static unsigned HashPath(const char* path) {
+    if (SafeMode()) return 0;           // the game's own hasher, at a Steam RVA
     unsigned out = 0xFFFFFFFF;
     unsigned fn = (unsigned)(uintptr_t)RvaPtr(RVA_PATH_HASH);
     __try {
@@ -5080,74 +5529,22 @@ int SWSE_SpawnCloned(char* msg, int msgLen) {
     return 1;
 }
 
+// `spawnnpc` refuses (1.1). It predated what NPC_SPAWNING.md and
+// RE_SPAWNING.md established, and was wrong three ways:
+//   - it moved a LIVE GeometryInst - a piece of the level's own world - to
+//     the player, by writing its +0x20, for good;
+//   - it then passed that GeometryInst as SpawnNPCFromTag's arg0, which is an
+//     InstancedObjectTag (the routine reads its zone at +0x14 and position
+//     at +0x3C);
+//   - it wrote the position into NPCTag+0x30, the factory's script token.
+// `npcnow` builds the right pair of objects. A spawn that shows needs a valid
+// zone for its position: RE_SPAWNING.md section 5 (NPC::Create,
+// Zones::ExtrapolateZone, NPC::Respawn), not built yet.
 int SWSE_SpawnNpc(int typeIndex, char* msg, int msgLen) {
-    char tmp[220];
-    if (typeIndex < 0 || typeIndex >= kNpcPathCount) typeIndex = 0;
-
-    unsigned gi[32];
-    int ng = SWSE_FindGeomInst(gi, 32);
-    if (ng <= 0) { lstrcpynA(msg, "no spawn anchor (GeometryInst) found", msgLen); return 0; }
-
-    float* pp = PlayerPos();
-    if (!pp) { lstrcpynA(msg, "no player position", msgLen); return 0; }
-
-    // A fresh, fully-constructed tag.
-    unsigned tag = 0;
-    unsigned mk  = (unsigned)(uintptr_t)RvaPtr(RVA_NPCTAG_NEW);
-    __try {
-        __asm { call mk
-                mov tag, eax }
-    } __except (GrantFilter(GetExceptionInformation(), "npctag-new")) {
-        lstrcpynA(msg, "FAULTED creating the NPCTag", msgLen);
-        return -2;
-    }
-    if (!tag) { lstrcpynA(msg, "NPCTag allocation returned null", msgLen); return -2; }
-
-    // Anchor: a live GeometryInst moved to the player. Skip degenerate ones.
-    unsigned anchor = 0;
-    for (int i = 0; i < ng && !anchor; i++) {
-        __try {
-            float* t = (float*)(gi[i] + GI_POS);
-            if (t[0] == 0.0f && t[1] == 0.0f && t[2] == 0.0f) continue;
-            t[0] = pp[0]; t[1] = pp[1]; t[2] = pp[2];
-            anchor = gi[i];
-        } __except (EXCEPTION_EXECUTE_HANDLER) {}
-    }
-    if (!anchor) { lstrcpynA(msg, "no usable anchor", msgLen); return 0; }
-
-    unsigned prefHash = HashPath(kNpcPaths[typeIndex]);
-    __try {
-        *(unsigned*)(tag + TAG_NPCPREF)  = prefHash;   // a HASH, not a pointer
-        *(int*)     (tag + TAG_COUNT)    = 1;
-        *(int*)     (tag + TAG_MAXALIVE) = 1;
-        *(float*)   (tag + TAG_SCATTER)  = 0.0f;
-        float* tp = (float*)(tag + TAG_POS);
-        tp[0] = pp[0]; tp[1] = pp[1]; tp[2] = pp[2];
-    } __except (EXCEPTION_EXECUTE_HANDLER) {
-        lstrcpynA(msg, "could not populate the tag", msgLen);
-        return -2;
-    }
-
-    wsprintfA(tmp, "npcspawn: tag %08X hash %08X (%s) anchor %08X",
-              tag, prefHash, kNpcPaths[typeIndex], anchor);
-    LogS(tmp);
-
-    unsigned fn = (unsigned)(uintptr_t)RvaPtr(RVA_NPC_SPAWNROUTINE);
-    unsigned ok = 0;
-    __try {
-        __asm {
-            push anchor
-            mov  ecx, tag
-            call fn
-            mov  ok, eax
-        }
-    } __except (GrantFilter(GetExceptionInformation(), "npcspawn")) {
-        lstrcpynA(msg, "FAULTED in the spawn routine - see log", msgLen);
-        return -2;
-    }
-    wsprintfA(tmp, "spawned %s -> %08X", kNpcPaths[typeIndex], ok);
-    lstrcpynA(msg, tmp, msgLen);
-    return 1;
+    (void)typeIndex;
+    lstrcpynA(msg, "spawnnpc is retired: it moved a live piece of the level and wrote the wrong "
+                   "fields (RE_SPAWNING.md) - npcnow builds the right objects", msgLen);
+    return 0;
 }
 
 // Replay the entire routine. tagOverride != 0 uses a patched copy of the tag.
@@ -5276,6 +5673,11 @@ __declspec(naked) static void HookNpcFactory() {
 }
 
 int SWSE_NpcSpy(int on) {
+    if (on && !g_npcFn && !SWSE_GameBuildKnown()) {
+        char m[300]; SWSE_GameBuildRefusal("the NPC factory spy", m, sizeof(m)); LogS(m);
+        SWSE_HookRefused("scriptvm", "NPC factory (npcspy)");
+        return -1;
+    }
     g_npcSpy = (on != 0);
     if (g_npcFn) return 1;
     if (!on) return 1;
@@ -5293,6 +5695,7 @@ int SWSE_NpcSpy(int on) {
     *(DWORD*)(g_npcFn + 1) = (DWORD)((BYTE*)&HookNpcFactory - (g_npcFn + 5));
     for (int i = 5; i < NPCF_PLEN; i++) g_npcFn[i] = 0x90;
     VirtualProtect(g_npcFn, NPCF_PLEN, old, &old);
+    SWSE_HookNote(g_npcFn, NPCF_PLEN, "scriptvm", SWSE_HOOK_TRAMPOLINE, "NPC factory (npcspy)");
     LogS("npcspy: hook installed on the NPC factory (0x25A50)");
     return 1;
 }
@@ -5452,6 +5855,15 @@ __declspec(naked) static void HookGiveAmmo() {
 }
 
 static void InstallCapture() {
+    // A code patch at a Steam-measured address. The two-byte prologue check
+    // below cannot tell another build's function from GiveAmmo, so an unknown
+    // build gets no patch at all (and, in safe mode, no context: nothing that
+    // would use one runs there).
+    if (!SWSE_GameBuildKnown()) {
+        char m[300]; SWSE_GameBuildRefusal("the GiveAmmo capture hook", m, sizeof(m)); LogS(m);
+        SWSE_HookRefused("scriptvm", "GiveAmmo (capture)");
+        return;
+    }
     g_giveAmmo = (BYTE*)Addr(RVA_GiveAmmo);
     // sanity: expect 51 8b 44 24 0c
     if (!(g_giveAmmo[0] == 0x51 && g_giveAmmo[1] == 0x8B)) {
@@ -5469,6 +5881,7 @@ static void InstallCapture() {
     g_giveAmmo[0] = 0xE9;
     *(DWORD*)(g_giveAmmo + 1) = (DWORD)((BYTE*)&HookGiveAmmo - (g_giveAmmo + 5));
     VirtualProtect(g_giveAmmo, 5, old, &old);
+    SWSE_HookNote(g_giveAmmo, 5, "scriptvm", SWSE_HOOK_TRAMPOLINE, "GiveAmmo (capture)");
     LogS("scriptvm: GiveAmmo capture hook installed (pick up ammo to prime)");
 }
 
@@ -5510,6 +5923,7 @@ static void InstallCapture() {
         g_##NAME[0] = 0xE9;                                                 \
         *(DWORD*)(g_##NAME + 1) = (DWORD)((BYTE*)&Hook##NAME - (g_##NAME + 5)); \
         VirtualProtect(g_##NAME, PLEN, old, &old);                          \
+        SWSE_HookNote(g_##NAME, PLEN, "scriptvm", SWSE_HOOK_TRAMPOLINE, #NAME " (capture)"); \
         LogS("scriptvm: " #NAME " capture hook installed");                 \
     }
 
@@ -5543,6 +5957,13 @@ __declspec(naked) static void HookGiveArtifact() {
 }
 
 static void InstallGiveArtifactCapture() {
+    // Same rule as InstallCapture: `55 8B EC` opens most functions in any
+    // build, so only the build SWSE's addresses were measured on is patched.
+    if (!SWSE_GameBuildKnown()) {
+        char m[300]; SWSE_GameBuildRefusal("the GiveArtifact capture hook", m, sizeof(m)); LogS(m);
+        SWSE_HookRefused("scriptvm", "GiveArtifact (capture)");
+        return;
+    }
     g_giveArt = (BYTE*)Addr(RVA_GiveArtifact);
     if (!(g_giveArt[0] == 0x55 && g_giveArt[1] == 0x8B && g_giveArt[2] == 0xEC)) {
         LogS("scriptvm: GiveArtifact prologue mismatch - capture NOT installed");
@@ -5559,6 +5980,7 @@ static void InstallGiveArtifactCapture() {
     *(DWORD*)(g_giveArt + 1) = (DWORD)((BYTE*)&HookGiveArtifact - (g_giveArt + 5));
     g_giveArt[5] = 0x90;                 // pad the sliced instruction
     VirtualProtect(g_giveArt, 6, old, &old);
+    SWSE_HookNote(g_giveArt, 6, "scriptvm", SWSE_HOOK_TRAMPOLINE, "GiveArtifact (capture)");
     LogS("scriptvm: GiveArtifact capture installed (buy/pick up an artifact)");
 }
 
@@ -5599,32 +6021,11 @@ void SWSE_ScriptVMInit() {
     InstallCapture();
     InstallGiveArtifactCapture();
 
-    // Load character tuning at startup, and arm the spawn hook that applies it.
-    // Without this the settings only existed after someone typed `tuning`, which
-    // makes it a console command with extra steps rather than a mod -- the file
-    // was silently ignored on every fresh launch.
-    {
-        char exe[MAX_PATH], path[MAX_PATH], msg[220];
-        GetModuleFileNameA(GetModuleHandleA(NULL), exe, MAX_PATH);
-        char* slash = exe;
-        for (char* c = exe; *c; c++) if (*c == '\\') slash = c;
-        *slash = 0;                                   // strip stranger.exe
-        slash = exe;
-        for (char* c = exe; *c; c++) if (*c == '\\') slash = c;
-        *slash = 0;                                   // strip \bin
-    if (SWSE_FindModFile("console.txt", path, MAX_PATH)) return;
-        wsprintfA(path, "%s\\SWSEMods\\SWSE Console\\settings.txt", exe);
-        if (SWSE_LoadSettings(path, msg, sizeof(msg)) > 0) {
-            LogS(msg);
-            SWSE_NpcRoutineSpy(1);
-        }
-    if (SWSE_FindModFile("characters.txt", path, MAX_PATH)) return;
-        wsprintfA(path, "%s\\SWSEMods\\SWSE Console\\characters.txt", exe);
-        if (SWSE_LoadTuning(path, msg, sizeof(msg)) > 0) {
-            LogS(msg);
-            SWSE_NpcRoutineSpy(1);                    // tuning applies from the hook
-        }
-    }
+    // Character tuning at startup is the `npctuning` feature's job now
+    // (framehook.cpp SWSE_FeatureStart -> SWSE_NpcTuningLoadAll), off by
+    // default. The 1.0.x block that stood here returned from this whole
+    // function as soon as console.txt existed - i.e. in every stock install -
+    // so characters.txt was never actually loaded at launch.
     // GetHealth/GetStamina/GetMoolah hooks install cleanly but NEVER fire -
     // the HUD reads these values directly in C++, not through the script-VM
     // entry points. Disabled; GiveAmmo (an actual ammo pickup) remains the
@@ -5657,6 +6058,9 @@ static bool CtxIsLive() {
 }
 
 int SWSE_AutoPrime() {
+    // Safe mode: a context is recognised by the Steam build's vtable, and all
+    // a context is for is calling game functions. None is looked for.
+    if (SafeMode()) { g_ctx = nullptr; return 0; }
     if (CtxIsLive()) return 1;
     g_ctx = nullptr;          // stale: drop it and go find a live one
     unsigned vt = (unsigned)(uintptr_t)((BYTE*)GetModuleHandleA(NULL) + RVA_CTX_VTABLE);
@@ -5729,7 +6133,7 @@ static const KnownVT kKnownVT[] = {
 };
 
 void SWSE_ScriptCtxInfo() {
-    if (!g_ctx) { LogS("ctxinfo: no context (prime with ammo first)"); return; }
+    if (!g_ctx) { LogS("ctxinfo: no script context - load a save, then run autoprime"); return; }
     __try {
         unsigned vtable = *(unsigned*)g_ctx;
         unsigned rva = vtable - 0x400000;
@@ -5766,7 +6170,7 @@ int SWSE_ScriptVCall(int slot, int argc, int a0, int a1) {
         LogS(b);
         return 1;
     } __except (EXCEPTION_EXECUTE_HANDLER) {
-        LogS("vcall: FAULTED - context invalidated, re-prime with ammo");
+        LogS("vcall: FAULTED - context dropped; autoprime finds a fresh one");
         g_ctx = nullptr;
         return -2;
     }
@@ -5839,7 +6243,7 @@ static int BuildSnapshot(float* snap, char origin[][24]) {
 // immediately, AND is a candidate for a permanent hardcoded SWSE offset
 // (same technique that found teleport's position fields).
 void SWSE_ScriptFind(int value) {
-    if (!g_ctx) { LogS("find: no context (prime with ammo first)"); return; }
+    if (!g_ctx) { LogS("find: no script context - load a save, then run autoprime"); return; }
     __try {
         static float snap[PROBE_N];
         static char  origin[PROBE_N][24];
@@ -5953,7 +6357,7 @@ static void WatchTick() {
 }
 
 void SWSE_ScriptDumpContext() {
-    if (!g_ctx) { LogS("probe: no context (prime with ammo first)"); return; }
+    if (!g_ctx) { LogS("probe: no script context - load a save, then run autoprime"); return; }
     __try {
         // Build a flat snapshot: [0..95] = the object itself; then for each of
         // up to a few pointer members, [k..] = 32 floats from the pointee.
@@ -6053,6 +6457,7 @@ typedef void (__cdecl* hnd1_t)(void* ret, void* ctx, int a);
 static unsigned char g_retBuf[256];
 
 static int CallProtected(unsigned rva, int arg, bool hasArg) {
+    if (SafeMode()) return -3;         // a native handler at a Steam RVA
     EnsureCtx();                       // find a context ourselves if we lack one
     if (!g_ctx) return 0;
     __try {
@@ -6061,13 +6466,10 @@ static int CallProtected(unsigned rva, int arg, bool hasArg) {
         else        ((hnd0_t)Addr(rva))(g_retBuf, g_ctx);
         return 1;
     } __except (EXCEPTION_EXECUTE_HANDLER) {
-        // Self-heal instead of spamming: a fault means the captured context is
-        // dead (freed/reallocated), so clear it. This also stops any per-frame
-        // caller (god mode) from retrying every frame forever - g_ctx==null
-        // short-circuits those checks. Re-prime with ammo to recover.
         // Self-heal instead of spamming: a fault means this context is dead
-        // (freed/reallocated), so drop it. EnsureCtx will scan for a fresh one
-        // on the next call rather than making the player go find ammo.
+        // (freed/reallocated), so drop it. That also stops a per-frame caller
+        // retrying forever (g_ctx==null short-circuits it), and EnsureCtx scans
+        // for a fresh one on the next call - no ammo pickup needed.
         LogS("scriptvm: replay FAULTED - context dropped, will re-scan");
         g_ctx = nullptr;
         return -2;
@@ -6202,6 +6604,18 @@ static bool CtxIsLive();
 int SWSE_AutoPrime();
 
 static bool InstallArgHook() {
+    // It writes a slot of the context's vtable, which lives in the exe: on a
+    // build SWSE's addresses were not measured on, that table is not ours to
+    // patch. Callers say why through ArgHookFailMsg; the log says it once.
+    if (!SWSE_GameBuildKnown()) {
+        static bool s_logged = false;
+        if (!s_logged) {
+            s_logged = true;
+            char m[300]; SWSE_GameBuildRefusal("the script-argument hook", m, sizeof(m)); LogS(m);
+            SWSE_HookRefused("scriptvm", "ScriptContext GetArg (during a call)");
+        }
+        return false;
+    }
     // Re-acquire automatically if the context died with the last level, rather
     // than failing the command and making the user re-prime by hand.
     if (!CtxIsLive()) { g_ctx = nullptr; SWSE_AutoPrime(); }
@@ -6214,6 +6628,7 @@ static bool InstallArgHook() {
         if (!VirtualProtect(&g_vtable[0x74 / 4], 4, PAGE_READWRITE, &old)) return false;
         g_vtable[0x74 / 4] = (unsigned)(uintptr_t)&FakeGetArg;
         VirtualProtect(&g_vtable[0x74 / 4], 4, old, &old);
+        SWSE_HookNote(&g_vtable[0x74 / 4], 4, "scriptvm", SWSE_HOOK_VTABLE, "ScriptContext GetArg (during a call)");
         return true;
     } __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
 }
@@ -6226,6 +6641,7 @@ static void RemoveArgHook() {
             g_vtable[0x74 / 4] = g_origVF74;
             VirtualProtect(&g_vtable[0x74 / 4], 4, old, &old);
         }
+        SWSE_HookForget(&g_vtable[0x74 / 4]);
     } __except (EXCEPTION_EXECUTE_HANDLER) {}
     g_vtable = nullptr; g_origVF74 = 0;
 }
@@ -6384,7 +6800,7 @@ static void DumpVmInstance(unsigned inst, unsigned npc) {
 // direct position writes are ignored for NPCs just as they were for the player.
 int SWSE_SendNpcs(int count, unsigned typeHash, char* msg, int msgLen) {
     char tmp[220], b[160];
-    if (!g_ctx) { lstrcpynA(msg, "no script context - grab ammo once to prime", msgLen); return 0; }
+    if (!g_ctx) { lstrcpynA(msg, "no script context - load a save, then run 'autoprime'", msgLen); return 0; }
     float* pp = PlayerPos();
     if (!pp) { lstrcpynA(msg, "no player position", msgLen); return 0; }
 
@@ -6450,7 +6866,7 @@ static void* CallWithArgs(unsigned rva, void* retBuf) {
 static int GiveArtifactVM(const char* path, char* msg, int msgLen) {
     if (!g_ctx) { lstrcpynA(msg, "no context", msgLen); return 0; }
     int result = -2;
-    if (!InstallArgHook()) { lstrcpynA(msg, "could not hook ctx vtable", msgLen); return -2; }
+    if (!InstallArgHook()) { ArgHookFailMsg(msg, msgLen, "could not hook ctx vtable"); return -2; }
     __try {
         // 1) string -> ArtifactPref
         g_argCount = 0;
@@ -6553,7 +6969,7 @@ int SWSE_GiveWeapon(const char* name, char* msg, int msgLen) {
     s_wpnName.length   = lstrlenA(path) + 1;
     s_wpnName.refcount = 0x10000000;
 
-    if (!InstallArgHook()) { lstrcpynA(msg, "could not hook ctx vtable", msgLen); return -2; }
+    if (!InstallArgHook()) { ArgHookFailMsg(msg, msgLen, "could not hook ctx vtable"); return -2; }
     int result = -2;
 
     // GiveCrossbow takes the STRING, not a WeaponPref - the signature table is
@@ -6607,7 +7023,7 @@ int SWSE_LoadLevel(const char* name, bool transition, char* msg, int msgLen) {
     s_lvlName.length   = lstrlenA(s_lvl) + 1;
     s_lvlName.refcount = 0x10000000;
 
-    if (!InstallArgHook()) { lstrcpynA(msg, "could not hook ctx vtable", msgLen); return -2; }
+    if (!InstallArgHook()) { ArgHookFailMsg(msg, msgLen, "could not hook ctx vtable"); return -2; }
     int result = -2;
     __try {
         g_argCount = 0;
@@ -6628,6 +7044,9 @@ int SWSE_LoadLevel(const char* name, bool transition, char* msg, int msgLen) {
 }
 
 int SWSE_ScriptDo(const char* action, int arg) {
+    // The bridge's door for the console's game verbs (VMcmd): in safe mode it
+    // stays shut, before any context is looked for (-3, gamebuild.h).
+    if (SafeMode()) return -3;
     EnsureCtx();                 // scan for a context rather than demanding ammo
     if (!g_ctx) return 0;
     // ammo / weapons
@@ -6686,10 +7105,15 @@ static unsigned ParseArg(char type, const char* s) {
 }
 
 int SWSE_ScriptCallByName(const char* name, int argc, char** argv) {
-    EnsureCtx();
-    if (!g_ctx) return 0;
     for (int i = 0; i < kVmFnCount; i++) {
         if (lstrcmpiA(name, kVmFns[i].name)) continue;
+        // Only a real function needs the context. Checking it first made
+        // every unknown word typed at the main menu answer "no context"
+        // instead of "unknown" (Execute falls back to this for any name).
+        // Safe mode refuses a real one the same way: -3, after the lookup.
+        if (SafeMode()) return -3;
+        EnsureCtx();
+        if (!g_ctx) return 0;
         const char* fmt = kVmFns[i].args;
         unsigned w[2] = {0, 0};
         for (int a = 0; a < 2 && fmt[a]; a++) {
@@ -6701,7 +7125,7 @@ int SWSE_ScriptCallByName(const char* name, int argc, char** argv) {
             ((fnN_t)Addr(kVmFns[i].rva))(g_retBuf, g_ctx, w[0], w[1]);
             return 1;
         } __except (EXCEPTION_EXECUTE_HANDLER) {
-            LogS("scriptvm: generic call FAULTED - context invalidated, re-prime with ammo");
+            LogS("scriptvm: generic call FAULTED - context dropped; the next call scans for a fresh one");
             g_ctx = nullptr;
             return -2;
         }
@@ -6750,130 +7174,390 @@ const char* SWSE_ScriptArgs(const char* name) {
 
 // ---- position read/write: teleport + vertical launch --------------------
 // From the probe diff: player position vec3 lives at *(ctx+0x94) + 0x5C.
-// ---- the REAL position -----------------------------------------------------
-// player+0x24 is only a per-frame COPY: a watchpoint caught module+0x21E0F2
-// doing `mov [esi+4],edx` from [edi], so writing the copy changes what we read
-// and moves nothing. The authority is a motion object at edi-0x50.
+// ---- the player's position: read and moved the engine's way -----------------
+// (research/TELEPORT.md)
 //
-// Nothing points to that object from the player - searching for its address
-// found only stack slots. It points back at us though: +0x4C holds player+8.
-// So we scan for that back-pointer. Several sibling objects match, so the
-// candidate is confirmed by checking its own position equals the copy.
-#define MO_OWNER 0x4C     // back-pointer to player+8
-#define MO_POS   0x50     // xyz float triple
+// READ. PlayerImpl vtable +0x5C is the engine's own GetFootPosition
+// (0x45F970): the translation of the current body's world frame, body+0x30
+// +0x24. The old source - a copy at the body instance +0x20, found by
+// scanning for the +0x1C back-pointer to player+8 - read 0,0,0.2 for a new
+// body until it moved; the frame is right at once, because SetGeometry copies
+// it. With no body the getter answers from a static identity frame
+// (0x801540), which is "no position", not the origin.
+//
+// WRITE. Every copy of the position is rewritten from physics each frame, so
+// writing one never moved the player: teleporting never worked (owner,
+// 2026-09-28). The engine moves the player with PlayerImpl vtable +0x108,
+// PlayerImpl::Teleport (0x44F340) - the call its own checkpoint respawn makes
+// (PlayerImpl::Respawn 0x446D90: Teleport(&pos, zone, 0, 0), then SetFacing):
+//     void __thiscall Teleport(Vec3* footPos, uint zoneCode, int eTeleport,
+//                              int continuous)
+// eTeleport (Actor::ETeleport, beta PDB): 0 stick to floor - lift a little,
+// drop onto the floor below, or fall if there is none; 1 no collision - put
+// the feet exactly there. It moves the physics (MotionImpl::Teleport, motion
+// vtable +0xF8), runs a scheduler tick, blocks until the destination zone and
+// its neighbours are paged in (0x5F2E30; that loop never presents a frame, so
+// the frame hook cannot re-enter), then updates the body and the zone
+// (Actor::TeleportSub 0x41FBD0). A short move in the same zone skips the
+// paging.
+//
+// ZONE. Teleport needs the destination's zone code, and the engine never
+// derives one from a bare position (zones change only by crossing portals).
+// A position saved by `savepos` keeps the zone it was saved in. Any other
+// point gets: the current zone if its box contains it, else the smallest
+// zone box that contains it, else a refusal. Zone boxes: s_zones {Zone**,
+// cap, count} at 0xA410A0, AxialBox min at Zone+4 and max at +0x10 (the
+// respawn fallback reads the same box). A zone code below the count is a zone
+// index; above it, a portal being crossed (s_portals at 0xA410AC, 0x40 each,
+// its two zones at +0x34/+0x38).
+#define VT_PLAYERIMPL        0x36ACE4
+#define VTS_FOOTPOS          0x05C
+#define RVA_GETFOOTPOS       0x05F970
+#define VTS_TELEPORT         0x108
+#define RVA_PLAYER_TELEPORT  0x04F340
+#define RVA_IDENTITY_FRAME   0x401540     // the no-body frame GetFootPosition falls back to
+#define PF_ZONECODE          0x00C        // the +8 sub-object's +4 (its getter is 0x46D470)
+#define RVA_ZONES            0x6410A0
+#define RVA_PORTALS          0x6410AC
+#define ZONE_MIN             0x04
+#define ZONE_MAX             0x10
+#define PORTAL_STRIDE        0x40
+#define PORTAL_ZONE_A        0x34
+#define PORTAL_ZONE_B        0x38
+#define RVA_LOADPROGRESS     0x5D53CC     // Teleport's own test: >= 10 once a level is up
+#define ZONE_SLACK           1.0f         // units of tolerance on every side of a box
 
-static float*   g_posSrc       = nullptr;
-static unsigned g_posSrcPlayer = 0;
-
-static bool PosMatchesCopy(float* cand, unsigned player) {
+static unsigned PlayerImplObj() {
+    unsigned p = PlayerObj();
+    if (!p) return 0;
     __try {
-        const float* copy = (const float*)(player + PF_POS);
-        for (int i = 0; i < 3; i++) {
-            float d = cand[i] - copy[i];
-            if (d > 1.0f || d < -1.0f) return false;
+        if (*(unsigned*)p != (unsigned)(uintptr_t)RvaPtr(VT_PLAYERIMPL)) return 0;
+    } __except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
+    return p;
+}
+
+// The engine's GetFootPosition for the player: a pointer into the current
+// body's frame, or null with no body. READ ONLY.
+static float* PlayerPos() {
+    unsigned p = PlayerImplObj();
+    if (!p) return nullptr;
+    unsigned fn = (unsigned)(uintptr_t)RvaPtr(RVA_GETFOOTPOS), r = 0;
+    __try {
+        if (*(unsigned*)(*(unsigned*)p + VTS_FOOTPOS) != fn) return nullptr;
+        __asm {
+            mov  ecx, p
+            call fn
+            mov  r, eax
         }
+    } __except (EXCEPTION_EXECUTE_HANDLER) { return nullptr; }
+    unsigned identity = (unsigned)(uintptr_t)RvaPtr(RVA_IDENTITY_FRAME) + 0x24;
+    if (r == identity || r < 0x10000 || (r & 3)) return nullptr;
+    return (float*)(uintptr_t)r;
+}
+
+static bool FiniteXYZ(float x, float y, float z) {
+    return x > -1.0e6f && x < 1.0e6f && y > -1.0e6f && y < 1.0e6f &&
+           z > -1.0e6f && z < 1.0e6f;
+}
+
+static int ZoneCount(unsigned* data) {
+    __try {
+        unsigned d = *(unsigned*)RvaPtr(RVA_ZONES);
+        int n = *(int*)((char*)RvaPtr(RVA_ZONES) + 8);
+        if (d < 0x10000 || n <= 0 || n > 4096) return 0;
+        if (data) *data = d;
+        return n;
+    } __except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
+}
+
+// Does zone `z`'s box hold p? `vol` gets the box volume.
+static bool ZoneHolds(unsigned data, int z, const float* p, float* vol) {
+    __try {
+        unsigned zo = ((unsigned*)(uintptr_t)data)[z];
+        if (zo < 0x10000) return false;
+        const float* mn = (const float*)(uintptr_t)(zo + ZONE_MIN);
+        const float* mx = (const float*)(uintptr_t)(zo + ZONE_MAX);
+        for (int i = 0; i < 3; i++) {
+            if (!(mn[i] <= mx[i])) return false;               // NaN or an empty box
+            if (p[i] < mn[i] - ZONE_SLACK || p[i] > mx[i] + ZONE_SLACK) return false;
+        }
+        if (vol) *vol = (mx[0] - mn[0]) * (mx[1] - mn[1]) * (mx[2] - mn[2]);
         return true;
     } __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
 }
 
-static float* PlayerPos() {
-    unsigned player = PlayerObj();
-    if (!player) return nullptr;
-    // Cache per player object. Deliberately NOT re-validated every call: right
-    // after a teleport the source and the copy legitimately disagree for a
-    // frame, and re-resolving then would reject the correct object.
-    // Cached, but not blindly. The cache must survive a teleport, where the
-    // source and the copy legitimately disagree for a frame -- but it must NOT
-    // survive a level load, where the motion object is replaced and every
-    // distance then gets measured from the player's position in the old level.
-    // A large disagreement means stale, not lag.
-    if (g_posSrc && g_posSrcPlayer == player) {
-        __try {
-            const float* copy = (const float*)(player + PF_POS);
-            float dx = g_posSrc[0] - copy[0];
-            float dy = g_posSrc[1] - copy[1];
-            float dz = g_posSrc[2] - copy[2];
-            if (dx * dx + dy * dy + dz * dz < 2500.0f) return g_posSrc;   // <50 units
-        } __except (EXCEPTION_EXECUTE_HANDLER) {}
-        LogS("possrc: cached motion object looks stale - re-resolving");
-        g_posSrc = nullptr;
-        g_posSrcPlayer = 0;
-    }
-
-    g_posSrc = nullptr;
-    g_posSrcPlayer = 0;
-    unsigned target = player + 8;
-    SYSTEM_INFO si; GetSystemInfo(&si);
-    BYTE* p  = (BYTE*)si.lpMinimumApplicationAddress;
-    BYTE* hi = (BYTE*)si.lpMaximumApplicationAddress;
-    MEMORY_BASIC_INFORMATION mbi;
-    while (p < hi) {
-        if (!VirtualQuery(p, &mbi, sizeof(mbi))) break;
-        bool ok = mbi.State == MEM_COMMIT && mbi.Type == MEM_PRIVATE
-               && HeapRegion(mbi)
-               && (mbi.Protect & (PAGE_READWRITE | PAGE_EXECUTE_READWRITE))
-               && !(mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS));
-        if (ok) {
-            __try {
-                unsigned* q = (unsigned*)mbi.BaseAddress;
-                size_t n = mbi.RegionSize / 4;
-                for (size_t k = 0; k < n; k++) {
-                    if (q[k] != target) continue;
-                    unsigned h = (unsigned)(uintptr_t)(q + k);
-                    if (h < MO_OWNER) continue;
-                    float* cand = (float*)(h - MO_OWNER + MO_POS);
-                    if (!PosMatchesCopy(cand, player)) continue;
-                    char b[110];
-                    wsprintfA(b, "possrc: motion object %08X -> position @ %08X",
-                              h - MO_OWNER, (unsigned)(uintptr_t)cand);
-                    LogS(b);
-                    g_posSrc = cand;
-                    g_posSrcPlayer = player;
-                    return cand;
-                }
-            } __except (EXCEPTION_EXECUTE_HANDLER) {}
+// The zone for a point, and how it was chosen (for the log). -1 = none.
+static int ZoneForPoint(unsigned player, const float* p, const char** how) {
+    unsigned data = 0;
+    int n = ZoneCount(&data);
+    if (!n) { *how = "the level has no zone table"; return -1; }
+    int here[2] = { -1, -1 };
+    __try {
+        unsigned cur = *(unsigned*)(player + PF_ZONECODE);
+        if ((int)cur >= 0 && (int)cur < n) here[0] = (int)cur;
+        else if (cur != 0xFFFFFFFFu && cur - (unsigned)n < 4096u) {
+            // crossing a portal: either of its two zones
+            unsigned po = *(unsigned*)RvaPtr(RVA_PORTALS);
+            if (po >= 0x10000) {
+                unsigned e = po + (cur - (unsigned)n) * PORTAL_STRIDE;
+                here[0] = *(int*)(uintptr_t)(e + PORTAL_ZONE_A);
+                here[1] = *(int*)(uintptr_t)(e + PORTAL_ZONE_B);
+            }
         }
-        p = (BYTE*)mbi.BaseAddress + mbi.RegionSize;
+    } __except (EXCEPTION_EXECUTE_HANDLER) {}
+    for (int k = 0; k < 2; k++) {
+        if (here[k] >= 0 && here[k] < n && ZoneHolds(data, here[k], p, nullptr)) {
+            *how = "your current zone contains it";
+            return here[k];
+        }
     }
-    LogS("possrc: no motion object matched the player's position");
-    return nullptr;
+    int best = -1; float bestVol = 0.0f;
+    for (int z = 0; z < n; z++) {
+        float v = 0.0f;
+        if (ZoneHolds(data, z, p, &v) && (best < 0 || v < bestVol)) { best = z; bestVol = v; }
+    }
+    *how = best >= 0 ? "the smallest zone box that contains it" : "no zone of this level contains it";
+    return best;
+}
+
+static char g_tpWhy[200] = "";
+const char* SWSE_TeleportWhy() { return g_tpWhy; }
+static volatile LONG g_tpBusy = 0;
+
+// Move the player with the engine's own teleport. mode 0 = stick to floor,
+// 1 = exactly there. zone < 0 = choose one for the point. Returns 1 moved,
+// 0 no player, -1 refused (SWSE_TeleportWhy() says why), -2 faulted.
+static int EngineTeleport(float x, float y, float z, int zone, const char* zoneHow, int mode) {
+    g_tpWhy[0] = 0;
+    char b[260];
+    if (!FiniteXYZ(x, y, z)) { lstrcpynA(g_tpWhy, "each coordinate must be a number within +-1000000", sizeof(g_tpWhy)); return -1; }
+    if (!SWSE_GameBuildKnown()) { SWSE_GameBuildRefusal("teleport", g_tpWhy, sizeof(g_tpWhy)); return -1; }
+    unsigned p = PlayerImplObj();
+    if (!p) return 0;
+    unsigned fn = (unsigned)(uintptr_t)RvaPtr(RVA_PLAYER_TELEPORT);
+    __try {
+        if (*(unsigned*)(*(unsigned*)p + VTS_TELEPORT) != fn) {
+            lstrcpynA(g_tpWhy, "the player's teleport is not the function this was built against", sizeof(g_tpWhy));
+            return -1;
+        }
+        if (*(int*)RvaPtr(RVA_LOADPROGRESS) < 10) {
+            lstrcpynA(g_tpWhy, "the level is still loading - try again in a moment", sizeof(g_tpWhy));
+            return -1;
+        }
+        // Teleport returns at once while the motion's physics is 3 (a boat).
+        unsigned mo = *(unsigned*)(p + PF_MOTION_A);
+        if (mo >= 0x10000 && *(unsigned*)mo == (unsigned)(uintptr_t)RvaPtr(VT_MOTIONIMPL) &&
+            *(int*)(mo + 0x34) == 3) {
+            lstrcpynA(g_tpWhy, "not while in a boat - the game ignores a teleport there", sizeof(g_tpWhy));
+            return -1;
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) { return -2; }
+    if (!SWSE_LevelUp()) { lstrcpynA(g_tpWhy, "no level is up", sizeof(g_tpWhy)); return -1; }
+    float to[3] = { x, y, z };
+    unsigned data = 0;
+    int n = ZoneCount(&data);
+    if (zone >= 0 && zone >= n) zone = -1;                    // not a zone of this level
+    if (zone < 0) zone = ZoneForPoint(p, to, &zoneHow);
+    if (zone < 0) {
+        _snprintf_s(g_tpWhy, sizeof(g_tpWhy), _TRUNCATE,
+                    "%d %d %d is outside every zone of this level - not moving", (int)x, (int)y, (int)z);
+        _snprintf_s(b, sizeof(b), _TRUNCATE, "teleport REFUSED to %.2f %.2f %.2f: %s", x, y, z, zoneHow);
+        LogS(b);
+        return -1;
+    }
+    if (InterlockedExchange(&g_tpBusy, 1)) { lstrcpynA(g_tpWhy, "a teleport is already running", sizeof(g_tpWhy)); return -1; }
+    unsigned from = 0;
+    __try { from = *(unsigned*)(p + PF_ZONECODE); } __except (EXCEPTION_EXECUTE_HANDLER) {}
+    _snprintf_s(b, sizeof(b), _TRUNCATE, "teleport to %.2f %.2f %.2f: zone %d (%s), from zone %u, %s",
+                x, y, z, zone, zoneHow, from, mode ? "exact (no collision)" : "stick to floor");
+    LogS(b);
+    // Inside Teleport the scheduler ticks without clearing the npc blocks'
+    // need counts, and the paging wait can run the release queue: a
+    // character played with playnpc must be marked as needed before it.
+    SWSE_PlayNpcHoldNow();
+    unsigned pto = (unsigned)(uintptr_t)&to[0], zc = (unsigned)zone, md = (unsigned)mode;
+    int r = 1;
+    __try {
+        __asm {
+            mov  edi, esp
+            push 0
+            push md
+            push zc
+            push pto
+            mov  ecx, p
+            call fn
+            mov  esp, edi
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) { r = -2; LogS("teleport faulted inside the engine"); }
+    InterlockedExchange(&g_tpBusy, 0);
+    return r;
 }
 
 static float g_savedPos[3];
 static bool  g_haveSaved = false;
+static float g_savedYaw = 0.0f;
+static bool  g_haveSavedYaw = false;
 
-// r: 1 ok, 0 no context/pos, -2 fault. Fills out[3] with current pos if given.
+// ---- player facing (yaw) ---------------------------------------------------
+// The facing is NOT a field of the player or of its motion object. It is the
+// rotation part of the player's geometry world frame (static RE, see
+// research/PLAYER_FACING.md):
+//
+//   G = *(player+0x14)            the geometry instance
+//   G+0x30 .. +0x50               3x3 rotation, rows m0-m2 / m3-m5 / m6-m8
+//   G+0x54                        foot position (synced from motion each frame)
+//   GameObject::GetFacing (RVA 0x5F920) returns -(m1, m4, m7); Z is up and the
+//   model's forward is local -Y.
+//
+// Actor::SetFacing (RVA 0x1FC80, vtable +0x104, __thiscall(this, float dir[3]),
+// ret 4) stores {-dy,-dx,0, dx,-dy,0, 0,0,1} - a pure store, and nothing
+// rewrites the rotation per frame, so a set facing sticks until the player
+// moves.
+//
+// YAW CONVENTION: the rotation angle of that matrix about Z, atan2(m3, m0) in
+// degrees - the angle the game's own level records store for every placed
+// object, and the one Stranger: Armed to the Teeth reads from sites.txt and
+// builds its placement matrices from. A yaw copied from SWSE into a level
+// record therefore faces the same way the player did. In compass terms,
+// 0 = facing -Y, 90 = +X, 180 = +Y, 270 = -X (the heading is yaw - 90, since
+// the model's forward is its local -Y).
+#define PF_GEOMETRY        0x14
+#define GEO_ROT            0x30
+#define RVA_ACTOR_SETFACING 0x1FC80
+#define VTS_SETFACING      0x104
+
+static float* PlayerFrameRot() {
+    unsigned p = PlayerObj();
+    if (!p) return nullptr;
+    __try {
+        unsigned g = *(unsigned*)(p + PF_GEOMETRY);
+        if (g < HEAP_LO || g >= HEAP_HI) return nullptr;
+        float* m = (float*)(g + GEO_ROT);
+        // A rotation about Z: m8 == 1, the rest of the Z row/column zero, and
+        // the heading row a unit vector. Anything else is not the frame.
+        if (m[8] < 0.99f || m[8] > 1.01f) return nullptr;
+        float h = m[1] * m[1] + m[4] * m[4];
+        if (h < 0.9f || h > 1.1f) return nullptr;
+        return m;
+    } __except (EXCEPTION_EXECUTE_HANDLER) { return nullptr; }
+}
+
+int SWSE_PlayerYawGet(float* deg) {
+    float* m = PlayerFrameRot();
+    if (!m) return 0;
+    __try {
+        // The matrix angle, as level records store it (see the note above).
+        float a = (float)(atan2((double)m[3], (double)m[0]) * 57.29577951308232);
+        if (a < 0.0f) a += 360.0f;
+        if (a >= 360.0f) a -= 360.0f;
+        if (deg) *deg = a;
+        return 1;
+    } __except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
+}
+
+// Through the engine's own setter when the vtable slot proves it is the one we
+// analysed; otherwise the identical 9-float store it would have made.
+int SWSE_PlayerYawSet(float deg) {
+    // A non-finite angle would put NaN into the frame (QA Q18/Q19).
+    if (!(deg > -1.0e7f && deg < 1.0e7f)) return 0;
+    deg = (float)fmod((double)deg, 360.0);
+    if (deg < 0.0f) deg += 360.0f;
+    unsigned p = PlayerObj();
+    float* m = PlayerFrameRot();
+    if (!p || !m) return 0;
+    // Matrix angle phi -> the facing direction SetFacing takes: the heading is
+    // phi - 90, so dir = (sin phi, -cos phi). The stored matrix is then the
+    // plain rotation by phi: {cos,-sin,0, sin,cos,0, 0,0,1}.
+    double r = (double)deg / 57.29577951308232;
+    float dir[3] = { (float)sin(r), (float)-cos(r), 0.0f };
+    unsigned fn = (unsigned)(uintptr_t)RvaPtr(RVA_ACTOR_SETFACING);
+    unsigned pd = (unsigned)(uintptr_t)&dir[0];
+    bool viaEngine = false;
+    __try {
+        unsigned vt = *(unsigned*)p;
+        viaEngine = (*(unsigned*)(vt + VTS_SETFACING) == fn);
+    } __except (EXCEPTION_EXECUTE_HANDLER) { viaEngine = false; }
+    __try {
+        if (viaEngine) {
+            __asm {
+                mov  edi, esp
+                mov  ecx, p
+                push pd
+                call fn
+                mov  esp, edi
+            }
+        } else {
+            float dx = dir[0], dy = dir[1];
+            m[0] = -dy; m[1] = -dx; m[2] = 0.0f;
+            m[3] =  dx; m[4] = -dy; m[5] = 0.0f;
+            m[6] = 0.0f; m[7] = 0.0f; m[8] = 1.0f;
+        }
+        return 1;
+    } __except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
+}
+
+// r: 1 ok, 0 no player or no body (no position - callers leave x/y/z out),
+// -2 fault. Fills out[3] with the feet's position if given.
 int SWSE_PosGet(float* out) {
     __try {
         float* p = PlayerPos();
         if (!p) return 0;
+        if (!FiniteXYZ(p[0], p[1], p[2])) return 0;
         if (out) { out[0] = p[0]; out[1] = p[1]; out[2] = p[2]; }
         return 1;
     } __except (EXCEPTION_EXECUTE_HANDLER) { return -2; }
 }
+// The quick slot keeps the facing (1.1) and the zone the spot is in, so `tp`
+// can hand the engine the exact zone instead of looking one up. The zone is
+// only good in the level it was saved in.
+static unsigned g_savedZone = 0xFFFFFFFFu;
+static unsigned g_savedEpoch = 0;
 int SWSE_PosSave() {
     float p[3]; int r = SWSE_PosGet(p);
-    if (r == 1) { memcpy(g_savedPos, p, 12); g_haveSaved = true; }
+    if (r == 1) {
+        memcpy(g_savedPos, p, 12); g_haveSaved = true;
+        g_haveSavedYaw = (SWSE_PlayerYawGet(&g_savedYaw) == 1);
+        g_savedZone = 0xFFFFFFFFu;
+        unsigned pl = PlayerImplObj();
+        if (pl) { __try { g_savedZone = *(unsigned*)(pl + PF_ZONECODE); } __except (EXCEPTION_EXECUTE_HANDLER) {} }
+        g_savedEpoch = SWSE_LevelEpoch();
+    }
     return r;
 }
+// 1 moved, 3 nothing saved, 0 no player, -1 refused (SWSE_TeleportWhy()), -2 fault.
 int SWSE_PosRestore() {
     if (!g_haveSaved) return 3;                 // nothing saved
-    __try {
-        float* p = PlayerPos();
-        if (!p) return 0;
-        p[0] = g_savedPos[0]; p[1] = g_savedPos[1]; p[2] = g_savedPos[2];
-        return 1;
-    } __except (EXCEPTION_EXECUTE_HANDLER) { return -2; }
+    unsigned data = 0;
+    int n = ZoneCount(&data);
+    bool zoneOk = g_savedEpoch == SWSE_LevelEpoch() && g_savedZone < (unsigned)n;
+    int r = EngineTeleport(g_savedPos[0], g_savedPos[1], g_savedPos[2],
+                           zoneOk ? (int)g_savedZone : -1,
+                           zoneOk ? "saved with the position" : "", 0);
+    if (r == 1 && g_haveSavedYaw) SWSE_PlayerYawSet(g_savedYaw);
+    return r;
 }
-// add delta to one axis (0/1/2). For "up"/out-of-bounds launching.
+int SWSE_PosSaved(float* xyz, float* yaw, int* hasYaw) {
+    if (!g_haveSaved) return 0;
+    if (xyz) memcpy(xyz, g_savedPos, 12);
+    if (yaw) *yaw = g_savedYaw;
+    if (hasYaw) *hasYaw = g_haveSavedYaw ? 1 : 0;
+    return 1;
+}
+// Add delta to one axis (0 x, 1 y, 2 z - Z is up). A vertical nudge puts the
+// feet exactly there (the engine's no-collision mode), so `up` lifts you and
+// you fall back down; a sideways one drops you onto the floor at the new spot.
+// No collision means no ceiling check: indoors, a lift can end above the roof.
+// 1 moved, 0 no position, -1 refused (SWSE_TeleportWhy()), -2 fault, -3 bad axis.
 int SWSE_PosNudge(int axis, float delta) {
-    if (axis < 0 || axis > 2) return -1;
-    __try {
-        float* p = PlayerPos();
-        if (!p) return 0;
-        p[axis] += delta;
-        return 1;
-    } __except (EXCEPTION_EXECUTE_HANDLER) { return -2; }
+    if (axis < 0 || axis > 2) {
+        lstrcpynA(g_tpWhy, "the axis must be 0 (x), 1 (y) or 2 (z, up)", sizeof(g_tpWhy));
+        return -3;
+    }
+    float p[3];
+    int r = SWSE_PosGet(p);
+    if (r != 1) return r;
+    p[axis] += delta;
+    return EngineTeleport(p[0], p[1], p[2], -1, "", axis == 2 ? 1 : 0);
 }
 
 // ---- generic poke/freeze: same [+selfOff]+subOff addressing as probe/watch
@@ -7098,7 +7782,7 @@ int SWSE_AnimVerb(const char* which, int intArg, int tag, char* msg, int msgLen)
 
     EnsureCtx();
     if (!g_ctx) { lstrcpynA(msg, "no script context", msgLen); return 0; }
-    if (!InstallArgHook()) { lstrcpynA(msg, "could not hook ctx vtable", msgLen); return -2; }
+    if (!InstallArgHook()) { ArgHookFailMsg(msg, msgLen, "could not hook ctx vtable"); return -2; }
 
     int r = -2;
     __try {

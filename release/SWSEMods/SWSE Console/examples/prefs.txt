@@ -1,0 +1,58 @@
+# SWSE - live prefs edits (prefs.txt)
+#
+# SWSE reads prefs.txt from a mod folder, such as SWSEMods\SWSE Console\ -
+# the copy in examples\ is only a template. Copy it up one folder to use it;
+# `prefs keep` creates the file there too.
+#
+# Every tunable the game has - ammo damage and knockback, NPC health, weapon
+# timing, motion, explosions - is a prefs record (/data/prefs/**.txt) that the
+# game loads into an ordinary object. A line here changes the LOADED object,
+# not the file: nothing in the game's archives is touched, nothing needs a
+# backup, and `prefs restore` or switching the feature off puts the shipped
+# values back.
+#
+# Applied a few seconds into every level (a level load rebuilds the objects),
+# with the prefsedit feature on: SWSEMods\features.txt `prefsedit = on`, or
+# `features prefsedit on` in the console. It ships off. Every enabled mod's
+# prefs.txt is read, so a mod can ship its own.
+#
+# FORMAT - one edit per line:    <target>   <field>   <value>
+#   target  /data/prefs/weapons/damagedynamite.txt   a prefs path (any case,
+#                                                     / or \ both work)
+#           weapons/damagedynamite                   the same, short form
+#           1B2A36F7                                 its 8-digit path hash
+#           @NPCWeaponPrefs                          every live object of an
+#                                                     RTTI class
+#   field   m_maxKnockSpeedPlayer                    a reflected field name
+#           NPCPrefs::m_health                       class-qualified, when a
+#                                                     name is ambiguous
+#           0x144                                    a raw byte offset
+#           Add :i :b :h or :f for int, byte, hash or float (float unless
+#           SWSE's field table says otherwise).
+#   value   a number; a hash may be written as a /data/... path.
+# A `#` starts a comment anywhere on a line. Up to 256 edits in all.
+#
+# In the console, `prefs` does the same by hand: `prefs find`, `prefs get`,
+# `prefs set` (this level only), `prefs keep` (set now AND add the line here),
+# `prefs dump`, `prefs fields`, `prefs restore`, `prefs reload`, `prefs status`.
+# `knockback` on its own lists all 31 player ammo types with their current
+# knockback values.
+#
+# EXAMPLES - remove the leading # to use one.
+#
+# Knockback on the PLAYER. m_maxKnockSpeedPlayer is how hard an ammo type
+# throws YOU. It ships at -1 on every type, which means "the same as
+# m_maxKnockSpeed" (what it does to NPCs); 0 means it never knocks you.
+# Boombats throw you harder than NPCs (vanilla 20 for both):
+#/data/prefs/weapons/damagedynamite.txt          m_maxKnockSpeedPlayer   35
+#/data/prefs/weapons/damagedynamiteextender.txt  m_maxKnockSpeedPlayer   35
+#
+# Boombats never knock you back:
+#/data/prefs/weapons/damagedynamite.txt          m_maxKnockSpeedPlayer   0
+#
+# Boombats throw NPCs and objects harder (vanilla 20). While the player value
+# is still -1 this throws you harder too:
+#/data/prefs/weapons/damagedynamite.txt          m_maxKnockSpeed         40
+#
+# Thud slugs knock harder (vanilla 15):
+#/data/prefs/weapons/damagearmadillo.txt         m_maxKnockSpeed         25

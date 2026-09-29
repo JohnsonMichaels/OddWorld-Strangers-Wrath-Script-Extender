@@ -1,6 +1,10 @@
 # SWSE load order - top loads first; later mods win conflicts.
 # 'ModName' = enabled, '!ModName' = disabled, '#...' = comment.
-# The SWSE DLL's own systems (HD, Wind, Combat...) are switched in
-# features.txt instead - the load order only governs archive patches.
+# Folders not listed here are enabled and load after the listed ones,
+# alphabetically. This also decides which folders the SWSE DLL reads its
+# files from (a '!' folder's files are ignored) and which one wins when two
+# provide the same single-value file. The DLL's own systems (graphics, HD,
+# wind, hit reactions, AI tuning...) are switched on and off in features.txt.
+# Edit it by hand; the modders' Mod Loader (studio.py) rewrites it too.
 SWSE Graphics
 SWSE Console

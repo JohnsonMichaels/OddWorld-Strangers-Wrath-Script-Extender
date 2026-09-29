@@ -48,6 +48,8 @@ void SWSE_TraceFBOFrameMark();
 // truncated or malformed replacement. Those fall back to the vanilla texture,
 // so they are invisible in play; without a counter a bad batch ships silently.
 void SWSE_HdStats(int* available, int* loaded, int* failed);
+// Scan the mods' textures\ folders now (otherwise done at the first upload).
+void SWSE_HdPrepare();
 
 // Fingerprints of the replacements that failed to load, so a bad file can be
 // named and re-packed. Returns how many were written into `out`.
@@ -59,3 +61,26 @@ int SWSE_HdFailures(unsigned* out, int max);
 unsigned SWSE_SceneColorTex();
 int      SWSE_SceneColorW();
 int      SWSE_SceneColorH();
+
+// Put a framebuffer binding back for SWSE's own housekeeping (the plugin
+// OVERLAY snapshot), past the glBindFramebufferEXT hook: a restore to 0 must
+// not look like the game finishing its scene, which is what triggers the early
+// pass. Works whether or not glspy is installed. Render thread.
+void SWSE_GlBindFramebufferQuiet(unsigned fbo);
+
+// ---- glBindTexture: one hook, fanned out (1.1) ------------------------------
+// The core owns the glBindTexture trampoline (it lived in foliage.cpp until
+// plugins arrived) and calls its clients before every real bind: the built-in
+// foliage tap, once foliage or wind has asked for it, then plugins' bind
+// listeners. Installed by the first client to ask; never removed.
+//
+// Install (or find in place) the hook. `who` names the asker in the log line,
+// "<who>: glBindTexture hooked (prologue N bytes)". Returns the prologue
+// length (> 0), or 0 with the reason in msg (an unrecognised prologue is
+// refused and its bytes logged, never guessed at).
+int      SWSE_BindHookInstall(const char* who, char* msg, int msgLen);
+// Route every GL_TEXTURE_2D bind to foliage's tap from now on (foliage.cpp).
+void     SWSE_BindHookEnableBuiltin();
+// The last texture bound to GL_TEXTURE_2D as the hook saw it; 0 before the
+// hook exists.
+unsigned SWSE_BoundTexture2D();

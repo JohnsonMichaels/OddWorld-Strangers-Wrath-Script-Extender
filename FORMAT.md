@@ -3,6 +3,13 @@
 Status: reverse-engineering in progress. Everything below verified empirically against
 all 1,222 `.smb` archives in the Steam HD release (2026-07).
 
+> **STATUS 2026-09-28: written 2026-07-23; corrections are marked where they apply.** The container
+> layout below is implemented in `oddforge/container.py` (parse and byte-identical rebuild,
+> 1,222/1,222; `tools/roundtrip_test.py`). `oddforge/toc.py` decodes the TOC node header and the
+> texture records, and `oddforge/records.py` finds and edits generic records. Later format work:
+> ODDVIEW.md (character bundles, `.geo` records) and swse/research/AT3_DISCOVERIES.md (record
+> framing, prefs records, `.smh`, `.lvl`).
+
 ## Container layout (VALIDATED on 1222/1222 archives)
 
 All values little-endian. Strings are `uint32 length` + exactly that many ASCII bytes
@@ -38,6 +45,13 @@ per entry), unknown ids/hashes (`0xE3C20CDE` repeated), then per entry:
 - ~97 bytes of per-entry record: contains what look like dimensions (128, 128),
   a mip/format field (5), size-like values (0x12F8), float 1.0, and the build
   timestamp again. **Fields are NOT 4-byte aligned** - parse sequentially only.
+
+> **NOTE 2026-09-28:** decoded since, in part. Each TOC node has a 40-byte header (build timestamp
+> `0x4DFAA77E`, node id, data offset into section 1, the id repeated), then the name. A texture
+> record has a `0x29` marker at +12, the format at +21 (12 = DXT1), then width and height at
+> +25 / +29 (`oddforge/toc.py`). Records of every kind, prefs included, can be found and exported
+> (`oddforge/records.py`). A prefs or tag record describes itself, `[0x000B4265][class hash]
+> [params...]`, in the order of the class's ParamIO descriptors (AT3_DISCOVERIES.md §0).
 
 ## TOC region - it's an object-graph serialization, not a flat file table
 
@@ -75,6 +89,14 @@ payloads) rather than a name/record table.
 | `data\audio\*.fsb` | Standard FMOD sound banks - existing tools handle these. |
 | `bin\cg.dll` | NVIDIA Cg shader pipeline (renderer is shader-based → ReShade yes, RTX Remix no). |
 
+> **NOTE 2026-09-28:** two rows above moved on.
+> - `.lvl` is now readable and writable: `tools/lvl_schema.json`, read from the exe's reflection,
+>   parses all 9 shipped level roots, and AT3 decoded the object-record chain (token `0x7A60600D`,
+>   class-hash marker `0x000B4265`, zone, rotation, translation, scale; CHANGELOG.md 1.1).
+> - `.smh`: AT3 found that the blockmap holds the section-1 copy the game actually loads, indexed
+>   by cumulative cursors and ended by `0xCAFED00D` (AT3_DISCOVERIES.md H2). Script extraction
+>   through it is still not built in oddforge.
+
 ## Archive inventory
 
 - `data\global\*.smb` - 72 archives: `global_player.smb`, `global_stranger.smb`,
@@ -82,6 +104,12 @@ payloads) rather than a name/record table.
 - `data\bundles\region_XX\lm_level_XX\` - per level: `npc_N.smb` (one per NPC type,
   models+textures), `zonebundle_N.smb` (world geometry), `cine_N.smb` (cutscenes,
   Granny `.gr2` animation refs), `lm_level_XX_tgl.smb` (large, contains `.foo` refs).
+
+> **CORRECTED 2026-09-28 (swse/research/PLAYNPC.md, "What a character needs"):** `npc_N.smb`
+> blocks are not one per NPC type. A character's body is one npc block, and its animations are in
+> one to three npc blocks that other characters often share (in lm_level_02, one block holds 45
+> townsfolk animations used by every townsfolk variant). A character's prefs and animation config
+> live in `lm_level_XX_tgl.smb`, which also holds the level's character type table (ODDVIEW.md).
 
 ## Next steps
 
@@ -91,3 +119,10 @@ payloads) rather than a name/record table.
 3. Byte-identical rebuild: `bounty cashin` → repack; diff against original. When a
    rebuilt archive is byte-identical, we understand every field.
 4. `.smh` blockmap format (magic 0xBEEF2B16) → script extraction/injection.
+
+> **STATUS 2026-09-28:** 3 is done: `oddforge.container.SmbContainer.parse(...).build()` rebuilds
+> all 1,222 archives byte for byte (`python tools/roundtrip_test.py`), and modified rebuilds load
+> in game. The `bounty catch` / `bounty cashin` commands were never built under those names: texture
+> export is `python -m oddforge.dump <game>\data <out>`, and mods are applied and reverted by
+> `oddforge/modloader.py` (the Mod Loader GUI, or `python tools/mods_cli.py list|apply|revert`).
+> 1 is done in part (see the notes above); 4 is not started in oddforge.

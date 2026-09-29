@@ -1,7 +1,12 @@
-# SWSE settings - named feature toggles.
+# SWSE - named character-tuning rules (console.txt)
 #
-# Read at startup and applied as each level spawns its characters.
-# Run `tuning` in the console to reload without restarting the game.
+# Read at launch by the npctuning feature (SWSEMods\features.txt
+# `npctuning = on`, or `features npctuning on` in the console), which ships
+# off in 1.1, and by the `tuning` console command; applied as each level
+# spawns its characters. SWSE 1.0.x never read this file - it looked for a
+# settings.txt that no longer shipped, so `noimmortals` below was silently
+# ignored. If more than one enabled mod provides a console.txt, the last one
+# in load order wins.
 #
 # These are RULES, not lists: noimmortals works by measuring a character's
 # health rather than naming it, so it catches every protected variant --
@@ -11,11 +16,14 @@
 # Any character the game shipped as unkillable (100000 hp) gets this health
 # instead. "off" leaves them alone. 22 of the game's 66 characters are
 # protected this way: townsfolk, natives, farmers, storekeepers, the Vykker Doc.
-noimmortals  = 100
+# SHIPPED COMMENTED OUT (1.1). Uncomment a line to use it. As live defaults
+# these made every townsperson, native and storekeeper mortal for anyone who
+# switched character tuning on for their own characters.txt.
+# noimmortals  = 100
 
 # Should those newly-mortal characters gib on death?
 # Note: townsfolk are knocked UNCONSCIOUS rather than killed (the game's
 # non-lethal capture path), so this may never fire for them.
-immortalsgib = on
+# immortalsgib = on
 
 # Per-character detail lives in characters.txt, which overrides these.

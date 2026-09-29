@@ -20,6 +20,9 @@ build_patcher/
 # ~18 MB each git would store every rebuild in full. Ship them as Releases.
 oddforge/ModLoader.exe
 release/ModLoader.exe
+# The players' installer, rebuilt from swse_setup.py via SWSESetup.spec into
+# release\ - the one the zip ships (tools/package_swse.ps1).
+release/SWSE Setup.exe
 SWSE.zip
 # HD texture working folders. These hold extracted game art and its upscaled
 # derivatives, so they are large and they are Oddworld's assets - they should
@@ -39,3 +42,6 @@ frame_tex*.txt
 frame*.tga
 
 
+
+# RE tooling caches: regenerated from the beta PDB and the exe on demand.
+tools/re/cache/

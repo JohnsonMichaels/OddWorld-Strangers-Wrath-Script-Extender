@@ -1,13 +1,15 @@
 // SWSE UI callback spy.
 //
-// Every Scaleform menu screen in the game owns a `MyCallback` class whose
-// vtable the SWF calls into when a button is pressed - MainMenu, NewGame,
-// Difficulty, Options, Pause and eleven more. Recovered from RTTI, they all
-// have the same shape, so one hook covers the whole menu system.
+// Every Flash (gameswf) menu screen in the game owns a `MyCallback` class whose
+// handler the movie calls with each fscommand a button sends - MainMenu,
+// NewGame, Difficulty, Options, Pause and eleven more, plus the movie SKIP/PLAY
+// prompt and the in-game Store and bounty post. Recovered from RTTI, they all
+// have the same shape, so one hook covers the whole menu system. Each call is
+// logged as `UISPY: <screen> <- fscommand("<cmd>", "<arg>")`.
 //
 // This exists to answer a specific question - what does choosing a difficulty
 // actually do? - without guessing from static analysis. Hook the callback,
-// press the button, read what ran.
+// press the button (or send the command with `menu fs`), read what ran.
 //
 // Hooking is done by swapping the function pointer INSIDE the vtable rather
 // than patching code. The menu vtables live in .rdata and are only ever read,

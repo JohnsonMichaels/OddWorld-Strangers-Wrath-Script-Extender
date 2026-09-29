@@ -6,7 +6,7 @@
 # hard a fight actually feels lives in per-character prefs objects that
 # difficulty never reads. This file reaches them.
 #
-# Nothing here is on unless you turn it on.
+# Nothing here is on unless you turn it on - see ENABLED / DISABLED.
 
 
 # ===========================================================================
@@ -15,14 +15,22 @@
 #   active = off         vanilla - this is the default
 #   active = <profile>   apply that profile, e.g. `active = keen`
 #
-# Applied ONCE per level load, never on a timer, and the scan runs on a worker
-# thread so it cannot stall a frame. It re-applies per level because a level
-# load builds fresh prefs objects - without that the tuning silently lapses
-# the moment you change area.
+# The aituning switch in features.txt ships as `auto`: naming a profile here
+# is all it takes, and the switch comes on at the next launch (or at once
+# with `features aituning auto` in the console). `aituning = off` in
+# features.txt overrides that. The profile is then applied ONCE per level
+# load, never on a timer, and the scan runs on a worker thread so it cannot
+# stall a frame. It re-applies per level because a level load builds fresh
+# prefs objects - without that the tuning silently lapses the moment you
+# change area.
 #
 # `difficulty <name>` in the console applies a profile without editing this
 # file; `difficulty off` restores the shipped values exactly. `aitune` reloads
-# this file live.
+# this file live. Both work with the feature off (run `aitune` first).
+#
+# SWSE reads up to 32 profiles from the first 64 KB of this file. Stranger:
+# Armed to the Teeth rewrites the `active` line and a [Racketeer] section at
+# the end, and leaves the rest alone.
 # ===========================================================================
 active = off
 
@@ -30,11 +38,12 @@ active = off
 # ===========================================================================
 # HOW VALUES WORK
 #
-# EVERY VALUE IS A MULTIPLIER on the character's shipped value, never an
-# absolute. Characters differ enormously - one outlaw sees 50 units, another
-# 115, another through a narrow 70x110 cone; fire rates run from 0.1 to 10
-# shots/second - and a flat number would erase all of that hand-authored
-# variety. 1.0 means "leave it alone".
+# EVERY VALUE IS APPLIED AS A MULTIPLIER on the character's shipped value,
+# never as an absolute (`misstime` is WRITTEN in milliseconds, but it scales
+# each weapon's own value too - see below). Characters differ
+# enormously - one outlaw sees 50 units, another 115, another through a narrow
+# 70x110 cone; fire rates run from 0.1 to 10 shots/second - and a flat number
+# would erase all of that hand-authored variety. 1.0 means "leave it alone".
 #
 # Applying is always computed from the shipped baseline, so re-applying does
 # not compound, and turning it off lands back on the exact original numbers.
@@ -94,14 +103,21 @@ active = off
 #                Do not set 0 - a shipped 0 means "unused" and is skipped, so
 #                0 would silently do nothing. Use 0.05 for near-perfect aim.
 #
+# misstime       WRITTEN IN STANDARD MILLISECONDS: 10 is vanilla. It is the
+#                window in which a shooter deliberately misses, 10 ms on almost
+#                every NPC weapon. It is applied as a ratio - each weapon's own
+#                shipped window x misstime/10 - so the odd weapon that ships a
+#                longer window keeps its proportion, and one that ships 0
+#                stays 0. Around
+#                1000, enemies can barely land a shot. Firing weapons only;
+#                leave it out (or -1) to keep the shipped values. This is the
+#                number Stranger: Armed to the Teeth writes. 1.0.x ignored it.
+#
 # NOT AVAILABLE
-#   misstime     m_missTime exists but is 10 ms on almost every character -
-#                the engine can make NPCs deliberately miss and essentially
-#                does not. Parsed and ignored.
-#   decisionrate no NPC think-rate field exists anywhere in the 1910 reflected
-#                fields. The field this once pointed at (m_checkEverySeconds)
-#                belongs to a level-scripting trigger, not the NPC brain.
-#                Parsed and ignored.
+#   decisionrate no NPC think-rate field exists in any of the game's 5,697
+#                reflected fields. The field this once pointed at
+#                (m_checkEverySeconds) belongs to a level-scripting trigger,
+#                not the NPC brain. Parsed and ignored.
 #   animation    there is no per-character animation-rate field either.
 # ---------------------------------------------------------------------------
 

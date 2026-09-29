@@ -13,13 +13,18 @@
 // files (sharpen/bloom/ssao/ssgi) and multi-pass config.
 
 #include "gfx.h"
+#include "materials.h"
+#include "raytrace.h"
+#include "features.h"     // FEAT_RAYTRACE gates every call into the tracer
 #include "modregistry.h"
 #include "glspy.h"
+#include "wind.h"
 #include <gl/GL.h>
 #include <string>
 #include <fstream>
 #include <cstdio>
 #include <cstring>
+#include <cstdlib>        // strtod: `set` checks its value is a number
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "user32.lib")
@@ -91,6 +96,7 @@ static PFNGLUNIFORM1I          p_glUniform1i;
 
 static GLuint g_prog = 0, g_tex = 0;
 static int    g_texW = 0, g_texH = 0;   // power-of-two texture dims
+static bool   g_texHasA = false;        // capture texture allocated as RGBA?
 static int    g_frameW = 0, g_frameH = 0; // actual captured frame dims
 static unsigned char* g_cpu = nullptr;  // CPU frame buffer for the read/process/draw path
 static int    g_cpuSize = 0;
@@ -180,6 +186,59 @@ static const char* kProofShader =
     "uniform float uSSGIMaxScreen;\n"  // max gather radius as a fraction of the screen
     "uniform int   uSSGISamples;\n"
     "uniform float uDebugGI;\n"  // 1 = visualize the RTGI pass output
+    "uniform float uDebugNormals;\n" // 1 = normals x-ray (view normals as colour)
+    // GTAO-family horizon AO: replaces the tap-count AO when enabled. Consumes
+    // the reconstructed normals + true camera - the two inputs that did not
+    // exist before this rebuild.
+    "uniform float uGTAOEnable;\n"
+    "uniform float uGTAOIntensity;\n"
+    "uniform float uGTAORadius;\n"     // world-units gather radius
+    "uniform float uGTAODirs;\n"       // directions over the full circle (2..4)
+    "uniform float uGTAOSteps;\n"      // march steps per direction (2..8)
+    "uniform float uDebugAO;\n"        // 1 = grayscale AO x-ray
+    // HBIL: indirect bounce riding the SAME horizon scan. Each march step that
+    // RAISES the horizon just revealed an occluder surface; its colour bounces
+    // onto the receiver, weighted by the solid angle it subtends (the horizon
+    // delta). Directional colour bleed for the ray budget already spent.
+    "uniform float uHBILEnable;\n"
+    "uniform float uHBILIntensity;\n"
+    "uniform float uDebugBounce;\n"    // 1 = bounce-only x-ray
+    "uniform sampler2D uGITex;\n"     // the pre-pass output (unit 2)
+    // SSR - wet-ground screen-space reflections. v1 applies to upward-
+    // facing surfaces (dot(N, uViewUp) gate); material-tagged surfaces
+    // follow once the MaterialDef/fingerprint map is built with the owner.
+    "uniform float uSSREnable;\n"
+    "uniform float uSSRIntensity;\n"
+    "uniform float uSSRSteps;\n"
+    "uniform float uSSRThickness;\n"
+    "uniform float uSSRUpDot;\n"
+    "uniform vec3  uViewUp;\n"
+    "uniform float uDebugSSR;\n"
+    // Material mask: reflective surfaces stamped their coverage into dest
+    // alpha during scene draws; the RGBA capture carries it here in uScene.a.
+    "uniform float uSSRMaskUse;\n"
+    "uniform float uSSRMaskFresnel;\n"
+    "uniform float uDebugSSRMask;\n"
+    // The mask is read from the game's scene FBO color attachment (unit 3),
+    // not the backbuffer capture: the stamps land there, and the engine's
+    // own blit drops alpha before the backbuffer (measured: capture alpha
+    // all-zero with 79 reflective binds/frame). Same V-flip as the depth
+    // texture - both are attachments of the same FBO.
+    "uniform sampler2D uSceneFBO;\n"
+    "uniform float uHasFBOMask;\n"
+    // True-normal G-buffer (unit 5): rgb = packed world normal, a = coverage
+    // (0 where no world draw landed - characters, sky, GLSL-drawn things).
+    "uniform sampler2D uGBufTex;\n"
+    "uniform float uHasGBuf;\n"
+    "uniform float uDebugGNormals;\n"
+    // Stage 1b: the compute tracer's own view of the world (unit 6).
+    "uniform sampler2D uRtTex;\n"
+    "uniform float uDebugRt;\n"
+    // Stage 2: ray-traced AO on unit 8, and its x-ray.
+    "uniform sampler2D uRtaoTex;\n"
+    "uniform float uRtaoUse;\n"
+    "uniform float uRtaoFlipV;\n"
+    "uniform float uDebugRtao;\n"
     "uniform float uFov;\n"      // vertical FOV (deg) for position reconstruction
     "uniform float uAspect;\n"   // width/height
     // sharpen
@@ -206,6 +265,18 @@ static const char* kProofShader =
     "uniform float uDofStrength;\n"   // max blur radius in texels
     "uniform float uDepthInvert;\n"   // 1 = treat the depth buffer as reverse-Z
     "uniform float uDepthFlipV;\n"    // 1 = sample depth vertically mirrored
+    // Material-mask fetch. Defined HERE, after uDepthFlipV's declaration -
+    // defining it up with the SSR uniforms broke the whole composite with
+    // 'undeclared identifier' (GLSL reads top-down; the pass silently died).
+    // The mask's own flip - NOT uDepthFlipV: this engine's passes disagree
+    // about orientation (depth texture mirrored, scene FBO color upright),
+    // so the mask FBO gets an independently-verified switch.
+    "uniform float uMaskFlipV;\n"
+    "float maskAt(vec2 uv){\n"
+    "  if (uHasFBOMask < 0.5) return 0.0;\n"
+    "  vec2 muv = vec2(uv.x, (uMaskFlipV > 0.5) ? (1.0 - uv.y) : uv.y);\n"
+    "  return texture2D(uSceneFBO, muv).r;\n"   // v2: our FBO, white = tagged
+    "}\n"
     // Depth fetch, then linearize to world distance.
     //
     // MEASURED by A/B-ing both switches in game:
@@ -271,6 +342,16 @@ static const char* kProofShader =
     "  bool hasD = uHasDepth > 0.5;\n"
     "  float rd  = hasD ? rawDepth(vUV) : 1.0;\n"
     "  bool sky  = hasD && rd >= 0.9999;\n"
+    // Normals x-ray - the first consumer viewNormal() has ever had. Smooth
+    // surfaces must read as flat colour and edges as crisp colour changes;
+    // per-pixel sparkle means the reconstruction or the camera is wrong.
+    "  if (uDebugNormals > 0.5 && hasD) {\n"
+    "    if (sky) { gl_FragColor = vec4(0.5,0.5,1.0,1.0); return; }\n"
+    "    g_tanHalf = tan(radians(uFov)*0.5);\n"
+    "    vec3 dbgP = viewPos(vUV);\n"
+    "    vec3 dbgN = viewNormal(vUV, dbgP);\n"
+    "    gl_FragColor = vec4(dbgN*0.5+0.5, 1.0); return;\n"
+    "  }\n"
     "  float aspect = uTexel.x/uTexel.y;\n"   // (1/w)/(1/h)=h/w -> circular kernels
     // --- sharpen FIRST, on the raw scene (keeps the high-pass DC-correct) ---
     "  if (uSharpenEnable > 0.5) {\n"
@@ -290,7 +371,27 @@ static const char* kProofShader =
     // effect stopped the critters on the bow and approaching chickens being lit
     // at all, and they visibly popped in and out. It now means "geometry this
     // close may be LIT but may not OCCLUDE" -- see the sample rejections below.
-    "  if (uAOEnable > 0.5 && hasD && !sky) {\n"
+    // ---- GTAO-family horizon occlusion --------------------------------------
+    // Per pixel: reconstruct position P and normal N, then march a few screen
+    // directions. For each direction find the HORIZON - the highest angle
+    // (in cos space, relative to the view vector V) that nearby geometry
+    // subtends - and compare it against the surface's own tangent plane in
+    // that direction. Occlusion is how far the horizon rises above the
+    // tangent: a genuine visibility arc, not a count of nearer taps.
+    // Distance falloff keeps far geometry from occluding as hard as near.
+    // GI terms are FETCHED from the pre-pass texture (multi-pass skeleton).
+    // The computation lives in kGIShader; temporal and denoise stages will
+    // blend that texture before this shader ever reads it.
+    "  if ((uGTAOEnable > 0.5 || uHBILEnable > 0.5) && hasD && !sky) {\n"
+    "    vec4 gi = texture2D(uGITex, vUV);\n"
+    "    if (uDebugAO > 0.5) { gl_FragColor = vec4(gi.a, gi.a, gi.a, 1.0); return; }\n"
+    "    if (uDebugBounce > 0.5) { gl_FragColor = vec4(gi.rgb, 1.0); return; }\n"
+    "    if (uGTAOEnable > 0.5) c *= gi.a;\n"
+    "    if (uHBILEnable > 0.5) c += (orig*0.6+0.4) * gi.rgb;\n"
+    "  }\n"
+    "  else if (uDebugAO > 0.5 && hasD && !sky) { gl_FragColor = vec4(1.0); return; }\n"
+    // old tap-count AO: stands aside when GTAO is on, so the two A/B cleanly
+    "  if (uAOEnable > 0.5 && uGTAOEnable < 0.5 && hasD && !sky) {\n"
     "    float lin0 = linDepth(rd);\n"
     // The per-pixel random rotation below is what shows up as a fine diagonal
     // "grid": ign() is interleaved gradient noise, and with too few samples and
@@ -327,7 +428,8 @@ static const char* kProofShader =
     //     step until they hit real geometry; the hit surface's colour is the
     //     light that bounces back. Long-range colour bleed off walls/rocks -
     //     the actual "light bouncing" look. Depth-only; no normals needed. ---
-    "  if (uSSGIEnable > 0.5 && hasD && !sky) {\n"
+    // old SSGI march: stands aside when HBIL is on - one bounce system at a time
+    "  if (uSSGIEnable > 0.5 && uHBILEnable < 0.5 && hasD && !sky) {\n"
     "    g_tanHalf = tan(radians(uFov)*0.5);\n"
     "    float z0 = depthAt(vUV);\n"                   // linear world depth
     "    float seed = ign(gl_FragCoord.xy);\n"
@@ -388,6 +490,89 @@ static const char* kProofShader =
     "    }\n"
     "    c *= max(aoT, 0.35);\n"                       // occlusion darkening
     "    c += (orig*0.6+0.4) * giL;\n"                 // bounce (visible on dark surfaces too)
+    "  }\n"
+    // --- SSR: wet-ground reflections -----------------------------------
+    // Reflect the eye ray off the reconstructed normal, march the depth
+    // buffer (same thickness rules as SSGI), shade with a grazing-angle
+    // Fresnel so reflections live at shallow angles like real wet ground.
+    // Misses and screen edges fade out; sky never reflects into geometry.
+    // Mask x-ray: destination alpha as grayscale. White = a surface the
+    // owner graded reflective stamped here; solid black = the stamp chain
+    // is broken somewhere between glColorMask and the RGBA capture.
+    "  if (uDebugSSRMask > 0.5) {\n"
+    "    float mv = maskAt(vUV);\n"
+    "    gl_FragColor = vec4(mv, mv, mv, 1.0); return;\n"
+    "  }\n"
+    // G-buffer x-ray: packed normals as color; MAGENTA marks coverage holes
+    // (expected: characters, sky). Black = the buffer never filled at all.
+    // Ray-traced camera view: brightness is proximity, black is a miss. If
+    // this shows the level's silhouette, the BVH, the geometry decode and
+    // the camera all agree - the acceptance test for stage 1b.
+    "  if (uDebugRt > 0.5) {\n"
+    "    gl_FragColor = vec4(texture2D(uRtTex, vUV).rgb, 1.0); return;\n"
+    "  }\n"
+    // Red only: green carries the eye distance used for history rejection,
+    // so showing rgb paints the screen magenta rather than showing occlusion.
+    // The AO is written by a compute shader with imageStore at px (y-UP) and
+    // read here with vUV. If those two conventions disagree the occlusion is
+    // MIRRORED vertically: it lands on the wrong part of the screen and slides
+    // the wrong way when the camera pitches, which reads as a texture-style
+    // glitch rather than as lighting. Switchable so it can be measured.
+    "  vec2 aoUV = (uRtaoFlipV > 0.5) ? vec2(vUV.x, 1.0 - vUV.y) : vUV;\n"
+    "  if (uDebugRtao > 0.5) {\n"
+    "    float a = texture2D(uRtaoTex, aoUV).r;\n"
+    "    gl_FragColor = vec4(a, a, a, 1.0); return;\n"
+    "  }\n"
+    // Real ray-traced occlusion multiplied into the scene. This darkens by
+    // what is actually AROUND a point in the world, including geometry the
+    // screen never shows - the ceiling screen-space AO cannot cross.
+    "  if (uRtaoUse > 0.5) {\n"
+    "    c *= max(texture2D(uRtaoTex, aoUV).r, 0.25);\n"
+    "  }\n"
+    "  if (uDebugGNormals > 0.5) {\n"
+    "    vec4 gn = (uHasGBuf > 0.5) ? texture2D(uGBufTex, vUV) : vec4(0.0);\n"
+    "    if (gn.a > 0.5) { gl_FragColor = vec4(gn.rgb, 1.0); }\n"
+    "    else { gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0); }\n"
+    "    return;\n"
+    "  }\n"
+    "  if (uSSREnable > 0.5 && hasD && !sky) {\n"
+    "    g_tanHalf = tan(radians(uFov)*0.5);\n"
+    "    vec3 sP = viewPos(vUV);\n"
+    "    vec3 sN = viewNormal(vUV, sP);\n"
+    "    float upd = dot(sN, normalize(uViewUp));\n"
+    // Two doors in: the geometric gate (upward faces = wet ground) or the
+    // material mask (owner-graded metal/glass/water at ANY orientation).
+    "    float mval = (uSSRMaskUse > 0.5) ? maskAt(vUV) : 0.0;\n"
+    "    if (upd > uSSRUpDot || mval > 0.25) {\n"
+    "      vec3 vd = normalize(sP);\n"
+    "      vec3 rdir = reflect(vd, sN);\n"
+    "      float fres = pow(1.0 - clamp(dot(-vd, sN), 0.0, 1.0), 2.0);\n"
+    // Metals reflect head-on, not only at grazing angles - give masked
+    // surfaces a reflectivity floor instead of the pure dielectric curve.
+    "      if (mval > 0.25) fres = max(fres, uSSRMaskFresnel);\n"
+    "      vec3 refl = vec3(0.0); float hitW = 0.0;\n"
+    "      float tAcc = 0.0; float stepT = max(sP.z * 0.02, 0.05);\n"
+    "      for (int si=1; si<=32; si++){\n"
+    "        if (si > int(uSSRSteps)) break;\n"
+    "        tAcc += stepT; stepT *= 1.15;\n"
+    "        vec3 sp2 = sP + rdir * tAcc;\n"
+    "        if (sp2.z < uNear) break;\n"
+    "        vec2 suv = viewToUV(sp2);\n"
+    "        if (suv.x<0.002||suv.x>0.998||suv.y<0.002||suv.y>0.998) break;\n"
+    "        float zs = depthAt(suv);\n"
+    "        float dz = sp2.z - zs;\n"
+    "        if (dz > 0.02*max(sp2.z,1.0) && dz < uSSRThickness * max(1.0, sp2.z*0.05)) {\n"
+    "          float edge = min(min(suv.x,1.0-suv.x), min(suv.y,1.0-suv.y));\n"
+    "          hitW = clamp(edge*8.0, 0.0, 1.0) * (1.0 - float(si)/uSSRSteps);\n"
+    "          refl = texture2D(uScene, suv).rgb;\n"
+    "          break;\n"
+    "        }\n"
+    "      }\n"
+    "      float rw = clamp(hitW * fres * uSSRIntensity, 0.0, 0.85);\n"
+    "      if (uDebugSSR > 0.5) { gl_FragColor = vec4(refl * hitW, 1.0); return; }\n"
+    "      c = mix(c, refl, rw);\n"
+    "    }\n"
+    "    else if (uDebugSSR > 0.5) { gl_FragColor = vec4(0.0,0.0,0.0,1.0); return; }\n"
     "  }\n"
     // --- far-field detail softening -----------------------------------------
     // Deliberately NOT a photographic depth of field: there is no focal plane,
@@ -456,11 +641,337 @@ static const char* kProofShader =
     "    c *= 1.0 - smoothstep(0.35, 0.75, dcen) * uVignette;\n"
     "  }\n"
     "  c = mix(orig, c, uIntensity);\n"
-    "  gl_FragColor = vec4(clamp(c,0.0,1.0), 1.0);\n"
+    // Alpha 0, deliberately: this quad covers every pixel every frame, which
+    // makes it the material mask's CLEAR. The game never clears backbuffer
+    // color (sky covers it), untagged draws have alpha writes off, so without
+    // this the mask saturates to 1 everywhere (measured: all-white x-ray).
+    "  gl_FragColor = vec4(clamp(c,0.0,1.0), 0.0);\n"
     "}\n";
 
 // ---- live-tunable parameters (read from settings.txt) --------------------
+
+// ---- GI pre-pass shader (multi-pass skeleton) ------------------------------
+// Computes GTAO occlusion (alpha) + HBIL bounce (rgb) into their own render
+// target, so later stages (temporal blend, bilateral denoise) have a texture
+// to read and refine. Helpers are duplicated from the main shader on purpose:
+// the two programs must stay independently compilable.
+static const char* kGIShader =
+    "#version 120\n"
+    "uniform sampler2D uScene;\n"
+    "uniform sampler2D uDepth;\n"
+    "uniform vec2  uTexel;\n"
+    "uniform float uHasDepth;\n"
+    "uniform float uNear;\n"
+    "uniform float uFar;\n"
+    "uniform float uFov;\n"
+    "uniform float uAspect;\n"
+    "uniform float uNearCutoff;\n"
+    "uniform float uDepthInvert;\n"
+    "uniform float uDepthFlipV;\n"
+    "uniform float uGTAOIntensity;\n"
+    "uniform float uGTAORadius;\n"
+    "uniform float uGTAODirs;\n"
+    "uniform float uGTAOSteps;\n"
+    "uniform float uHBILEnable;\n"
+    "uniform float uHBILIntensity;\n"
+    // temporal accumulation: previous accumulated GI + the matrices to find
+    // where this pixel WAS last frame. uTemporalOK=0 resets history (camera
+    // cut, matrices unavailable).
+    "uniform sampler2D uHist;\n"
+    "uniform float uTemporalEnable;\n"
+    "uniform float uTemporalBlend;\n"
+    "uniform float uTemporalOK;\n"
+    "uniform mat4  uInvVPCur;\n"
+    "uniform mat4  uVPPrev;\n"
+    "uniform float uFrameSeed;\n"
+    "uniform float uLumaSplit;\n" // 0=flat AO, 1=occlusion scaled by (1-luma): baked light protected
+    "varying vec2 vUV;\n"
+    "float rawDepth(vec2 uv){\n"
+    "  vec2 duv = vec2(uv.x, (uDepthFlipV > 0.5) ? (1.0 - uv.y) : uv.y);\n"
+    "  float d = texture2D(uDepth, duv).r;\n"
+    "  return (uDepthInvert > 0.5) ? (1.0 - d) : d;\n"
+    "}\n"
+    "float linDepth(float d){ return uNear*uFar/(uFar-d*(uFar-uNear)); }\n"
+    "float depthAt(vec2 uv){ return linDepth(rawDepth(uv)); }\n"
+    "float ign(vec2 p){ return fract(52.9829189*fract(dot(p, vec2(0.06711056,0.00583715)))); }\n"
+    "float g_tanHalf;\n"
+    "vec3 viewPos(vec2 uv){\n"
+    "  float z = depthAt(uv);\n"
+    "  vec2 ndc = uv*2.0-1.0;\n"
+    "  return vec3(ndc.x*g_tanHalf*uAspect, ndc.y*g_tanHalf, 1.0) * z;\n"
+    "}\n"
+    "vec3 viewNormal(vec2 uv, vec3 P){\n"
+    "  vec2 e = uTexel * 2.0;\n"
+    "  vec3 pL=viewPos(uv-vec2(e.x,0)); vec3 pR=viewPos(uv+vec2(e.x,0));\n"
+    "  vec3 pD=viewPos(uv-vec2(0,e.y)); vec3 pU=viewPos(uv+vec2(0,e.y));\n"
+    "  vec3 dx = (abs(pR.z-P.z) < abs(P.z-pL.z)) ? (pR-P) : (P-pL);\n"
+    "  vec3 dy = (abs(pU.z-P.z) < abs(P.z-pD.z)) ? (pU-P) : (P-pD);\n"
+    "  vec3 n = cross(dx, dy);\n"
+    "  float L = length(n);\n"
+    "  if (L < 1e-6) return vec3(0.0,0.0,-1.0);\n"
+    "  n /= L;\n"
+    "  if (n.z > 0.0) n = -n;\n"
+    "  return n;\n"
+    "}\n"
+    "void main(){\n"
+    "  if (uHasDepth < 0.5) { gl_FragColor = vec4(0.0,0.0,0.0,1.0); return; }\n"
+    "  float rd = rawDepth(vUV);\n"
+    "  if (rd >= 0.9999) { gl_FragColor = vec4(0.0,0.0,0.0,1.0); return; }\n"
+    "  float aspect = uTexel.x/uTexel.y;\n"
+    "  g_tanHalf = tan(radians(uFov)*0.5);\n"
+    "  vec3 P = viewPos(vUV);\n"
+    "  vec3 N = viewNormal(vUV, P);\n"
+    "  vec3 V = -normalize(P);\n"
+    "  vec3 giAcc = vec3(0.0);\n"
+    "  float jit = fract(ign(gl_FragCoord.xy) + uFrameSeed);\n"
+    "  float radUV = clamp(uGTAORadius / max(P.z*g_tanHalf*2.0, 0.001), 0.004, 0.30);\n"
+    "  int DIRS = int(clamp(uGTAODirs, 2.0, 4.0));\n"
+    "  int STEPS = int(clamp(uGTAOSteps, 2.0, 8.0));\n"
+    "  float occ = 0.0;\n"
+    "  for (int s2=0; s2<4; s2++){\n"
+    "    if (s2>=DIRS) break;\n"
+    "    float phi = (float(s2)+jit)*6.2831853/float(DIRS);\n"
+    "    vec2 dir = vec2(cos(phi)*aspect, sin(phi));\n"
+    "    vec3 d3 = normalize(vec3(dir.x/aspect, dir.y, 0.0));\n"
+    "    vec3 t3 = d3 - N*dot(d3, N);\n"
+    "    float tl = length(t3);\n"
+    "    float cosT = tl > 1e-4 ? dot(t3/tl, V) : 0.0;\n"
+    "    float cosH = cosT;\n"
+    "    for (int i2=1; i2<=8; i2++){\n"
+    "      if (i2>STEPS) break;\n"
+    "      float t = (float(i2)-0.5+jit)/float(STEPS);\n"
+    "      vec2 suv = vUV + dir*(t*t*radUV);\n"
+    "      if (suv.x<0.001||suv.x>0.999||suv.y<0.001||suv.y>0.999) break;\n"
+    "      float zs = depthAt(suv);\n"
+    "      if (uNearCutoff > 0.0 && zs < uNearCutoff) continue;\n"
+    "      vec3 S = viewPos(suv);\n"
+    "      vec3 D = S - P;\n"
+    "      float dl = length(D);\n"
+    "      if (dl < 1e-4 || dl > uGTAORadius*3.0) continue;\n"
+    "      float cc = dot(D/dl, V);\n"
+    "      float fall = 1.0 - (dl/(uGTAORadius*3.0));\n"
+    "      float cNew = mix(cosT, cc, fall);\n"
+    "      if (cNew > cosH) {\n"
+    "        if (uHBILEnable > 0.5) {\n"
+    "          float ndl = max(0.0, dot(N, D/dl));\n"
+    "          giAcc += texture2D(uScene, suv).rgb * (cNew - cosH) * ndl;\n"
+    "        }\n"
+    "        cosH = cNew;\n"
+    "      }\n"
+    "    }\n"
+    "    occ += max(0.0, cosH - cosT);\n"
+    "  }\n"
+    "  float gtao = 1.0 - (occ/float(DIRS)) * uGTAOIntensity;\n"
+    // THE AMBIENT/DIRECT SPLIT, baked-lighting edition. This game's lighting
+    // is painted into the frame (measured: no live sun vector exists in the
+    // program constants; c[5] is a baked per-object colour scale). So the
+    // frame itself is the light map: bright pixels ARE lit surfaces, and
+    // occlusion physically belongs to the ambient term, not to direct light.
+    // Scaling the occlusion by (1 - luma) protects sunlit surfaces and lets
+    // shadowed creases go genuinely dark - the contrast baked-AO cannot give.
+    "  if (uLumaSplit > 0.001) {\n"
+    "    float luma = dot(texture2D(uScene, vUV).rgb, vec3(0.299, 0.587, 0.114));\n"
+    "    float occAmt = (1.0 - gtao) * mix(1.0, clamp(1.0 - luma, 0.0, 1.0), uLumaSplit);\n"
+    "    gtao = 1.0 - occAmt;\n"
+    "  }\n"
+    "  gtao = clamp(gtao, 0.35, 1.0);\n"
+    "  vec3 bounce = giAcc / float(DIRS) * uHBILIntensity;\n"
+    "  vec4 cur = vec4(bounce, gtao);\n"
+    // ---- temporal accumulation ------------------------------------------
+    // Where was this pixel last frame? Unproject current uv+depth to WORLD
+    // with the inverse of this frame's view-projection, project with last
+    // frame's - both matrices read from the game's own draws. History is
+    // clamped to the current 4-neighbour range before blending (standard TAA
+    // neighbourhood clamp): a reprojection that lands on different geometry
+    // gets pulled to plausible values instead of ghosting.
+    "  if (uTemporalEnable > 0.5 && uTemporalOK > 0.5) {\n"
+    "    vec3 ndc = vec3(vUV.x*2.0-1.0, -(vUV.y*2.0-1.0), rd*2.0-1.0);\n"
+    "    vec4 wp = uInvVPCur * vec4(ndc, 1.0);\n"
+    "    if (abs(wp.w) > 1e-6) {\n"
+    "      wp /= wp.w;\n"
+    "      vec4 pc = uVPPrev * vec4(wp.xyz, 1.0);\n"
+    "      if (pc.w > 1e-4) {\n"
+    "        vec2 puv = vec2(pc.x/pc.w, -(pc.y/pc.w))*0.5+0.5;\n"
+    "        if (puv.x>0.002 && puv.x<0.998 && puv.y>0.002 && puv.y<0.998) {\n"
+    "          vec4 hist = texture2D(uHist, puv);\n"
+    "          vec4 n1 = cur;\n"
+    "          vec4 c0 = texture2D(uHist, puv);\n"          // placeholder read
+    "          vec4 mn = cur; vec4 mx = cur;\n"
+    "          vec4 s1; \n"
+    "          s1 = vec4(0.0);\n"
+    "          {\n"
+    // 4-neighbour bounds of the CURRENT frame's signal, cheaply approximated
+    // by re-evaluating depth-only AO proxies is too costly - instead sample
+    // the current result's neighbours from the PREVIOUS accumulation target
+    // is wrong too. Pragmatic clamp: widen current by a fixed tolerance.
+    "            vec4 tol = vec4(0.15, 0.15, 0.15, 0.12);\n"
+    "            mn = cur - tol; mx = cur + tol;\n"
+    "          }\n"
+    "          hist = clamp(hist, mn, mx);\n"
+    "          cur = mix(cur, hist, clamp(uTemporalBlend, 0.0, 0.95));\n"
+    "        }\n"
+    "      }\n"
+    "    }\n"
+    "  }\n"
+    "  gl_FragColor = cur;\n"
+    "}\n";
+
+// ---- GI denoise shader ------------------------------------------------------
+// Depth-aware bilateral blur over the accumulated GI texture, run between
+// temporal accumulation and the composite. Kills sampling grain without
+// smearing across depth edges; bounce (rgb) and occlusion (a) both benefit.
+static const char* kDenoiseShader =
+    "#version 120\n"
+    "uniform sampler2D uGI;\n"
+    "uniform sampler2D uDepth;\n"
+    "uniform vec2  uTexel;\n"
+    "uniform float uNear;\n"
+    "uniform float uFar;\n"
+    "uniform float uDepthInvert;\n"
+    "uniform float uDepthFlipV;\n"
+    "uniform float uRadius;\n"
+    "uniform float uDepthSigma;\n"
+    "varying vec2 vUV;\n"
+    "float rawDepth(vec2 uv){\n"
+    "  vec2 duv = vec2(uv.x, (uDepthFlipV > 0.5) ? (1.0 - uv.y) : uv.y);\n"
+    "  float d = texture2D(uDepth, duv).r;\n"
+    "  return (uDepthInvert > 0.5) ? (1.0 - d) : d;\n"
+    "}\n"
+    "float linDepth(float d){ return uNear*uFar/(uFar-d*(uFar-uNear)); }\n"
+    "float depthAt(vec2 uv){ return linDepth(rawDepth(uv)); }\n"
+    "void main(){\n"
+    "  float z0 = depthAt(vUV);\n"
+    "  float sig = max(z0 * uDepthSigma, 0.02);\n"
+    "  vec4 acc = texture2D(uGI, vUV);\n"
+    "  float wsum = 1.0;\n"
+    "  vec2 r = uTexel * uRadius;\n"
+    "  {\n"
+    "    vec2 o = vec2(1.0, 0.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 1.0 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(-1.0, 0.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 1.0 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(0.0, 1.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 1.0 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(0.0, -1.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 1.0 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(1.0, 1.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 0.7 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(-1.0, 1.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 0.7 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(1.0, -1.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 0.7 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(-1.0, -1.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 0.7 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(2.0, 0.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 0.5 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(-2.0, 0.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 0.5 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(0.0, 2.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 0.5 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  {\n"
+    "    vec2 o = vec2(0.0, -2.0) * r;\n"
+    "    float z = depthAt(vUV + o);\n"
+    "    float w = 0.5 * exp(-abs(z - z0) / sig);\n"
+    "    acc += texture2D(uGI, vUV + o) * w; wsum += w;\n"
+    "  }\n"
+    "  gl_FragColor = acc / wsum;\n"
+    "}\n";
+
 struct GfxParams {
+    float camDraw = 0.0f;   // 1 = take near/far/fov from the draws (SWSE_WindClipCamera)
+    float debugNormals = 0.0f; // 1 = normals x-ray view
+    // GTAO-family horizon AO. OFF by default per the rebuild discipline -
+    // nothing ships on until the owner approves it in play.
+    float gtaoEnable    = 0.0f;
+    float gtaoIntensity = 1.0f;
+    float gtaoRadius    = 1.2f;   // match the tuned ao_radius starting point
+    float gtaoDirs      = 4.0f;
+    float gtaoSteps     = 6.0f;
+    float debugAO       = 0.0f;
+    float hbilEnable    = 0.0f;   // bounce off, like every unapproved stage
+    float hbilIntensity = 1.0f;
+    float debugBounce   = 0.0f;
+    float debugSSR      = 0.0f;
+    float debugSSRMask  = 0.0f;
+    float ssrMaskStamp   = 0.0f;  // scene draws stamp dest alpha (needs RGBA capture)
+    float ssrMaskUse     = 0.0f;  // shader honors the mask as an SSR gate
+    float ssrMaskFresnel = 0.35f; // reflectivity floor for masked (metal) pixels
+    float ssrMaskFlip    = 0.0f;  // mask FBO's own V-flip (independent of depth)
+    float ssrMaskDepth   = 1.0f;  // redraw depth test (0 = diagnostic: draw through)
+    float gbufNormals    = 0.0f;  // true-normal G-buffer via the draw hook
+    float debugGNormals  = 0.0f;  // x-ray: G-buffer normals (magenta = no coverage)
+    float debugRt        = 0.0f;  // x-ray: the ray-traced camera view (stage 1b)
+    float rtaoEnable     = 0.0f;  // stage 2: ray-traced ambient occlusion
+    float rtaoRadius     = 4.0f;  // world units an occlusion ray travels
+    float rtaoRays       = 8.0f;  // rays per pixel (denoised afterwards)
+    float rtaoStrength   = 1.0f;
+    float debugRtao      = 0.0f;  // x-ray: the AO term alone
+    float rtaoBlend      = 0.12f; // temporal: weight of the new frame
+    // Spatial denoise. Temporal alone still ghosts on fast camera motion,
+    // because history is correctly REJECTED on those pixels and what is left
+    // is the raw few-ray estimate.
+    float rtaoDn         = 1.0f;  // 0 = raw accumulation
+    float rtaoHistFlip   = 1.0f;  // temporal reprojection V flip; measure it
+    float rtaoFlipV      = 0.0f;  // AO sample V flip in the composite
+    float rtaoRequireHit = 1.0f;  // no BVH surface -> unoccluded, not guessed
+    float rtaoDnRadius   = 4.0f;  // taps per side, per axis (max 8)
+    float rtaoDnDepth    = 0.002f;// 2 units; 0.01 was the RGBA8 floor and blurred
+                                  // across every silhouette on the ground
+    float rtaoDnNormal   = 0.15f; // normal up-component tolerance
+    float temporalEnable = 0.0f;  // OFF until owner-approved, like every stage
+    float temporalBlend  = 0.85f;
+    float lumaSplit      = 0.0f;  // 0 = off; ~0.7 protects lit surfaces
+    float denoiseEnable  = 0.0f;
+    float denoiseRadius  = 2.0f;   // tap spacing in texels
+    float denoiseSigma   = 0.03f;  // relative depth tolerance
+    float ssrEnable      = 0.0f;
+    float ssrIntensity   = 0.6f;
+    float ssrSteps       = 24.0f;
+    float ssrThickness   = 1.5f;
+    float ssrUpDot       = 0.65f;  // -1 = every surface (testing)
     float intensity     = 1.0f;
     // contact-shadow AO
     float aoEnable      = 1.0f;
@@ -538,7 +1049,70 @@ static GLint u_bloomEnable=-1, u_bloomThreshold=-1, u_bloomIntensity=-1, u_bloom
 static GLint u_ssgiEnable=-1, u_ssgiIntensity=-1, u_ssgiRadius=-1, u_ssgiSamples=-1;
 static GLint u_ssgiThickness=-1, u_ssgiMaxScreen=-1;
 static GLint u_dofEnable=-1, u_dofStart=-1, u_dofEnd=-1, u_dofStrength=-1;
-static GLint u_debugGI=-1, u_fov=-1, u_aspect=-1;
+static GLint u_debugGI=-1, u_fov=-1, u_aspect=-1, u_debugNormals=-1;
+static GLint u_gtaoEnable=-1, u_gtaoIntensity=-1, u_gtaoRadius=-1;
+static GLint u_gtaoDirs=-1, u_gtaoSteps=-1, u_debugAO=-1;
+static GLint u_hbilEnable=-1, u_hbilIntensity=-1, u_debugBounce=-1;
+static GLint u_giTex = -1;
+static GLint u_ssrEnable=-1, u_ssrIntensity=-1, u_ssrSteps=-1;
+static GLint u_ssrThickness=-1, u_ssrUpDot=-1, u_viewUp=-1, u_debugSSR=-1;
+static GLint u_ssrMaskUse=-1, u_ssrMaskFresnel=-1, u_debugSSRMask=-1;
+static GLint u_sceneFBO=-1, u_hasFBOMask=-1, u_maskFlipV=-1;
+static bool  g_haveFBOMask = false;   // scene FBO color bound on unit 3 this frame
+static GLint u_gbufTex=-1, u_hasGBuf=-1, u_debugGN=-1;
+static GLint u_rtTex=-1, u_debugRt=-1;
+static GLint u_rtaoTex=-1, u_rtaoUse=-1, u_debugRtao=-1, u_rtaoFlipV=-1;
+static bool  g_haveRtao = false;
+static bool  g_haveGBuf = false;      // normal G-buffer bound on unit 5 this frame
+typedef void (APIENTRY* PFNGLUNIFORM3F)(GLint, GLfloat, GLfloat, GLfloat);
+static PFNGLUNIFORM3F p_glUniform3f = nullptr;
+// GI pre-pass objects + uniform locations
+static GLuint g_giProg = 0, g_giTex = 0, g_giFbo = 0;
+static int    g_giW = 0, g_giH = 0;
+static bool   g_giOk = false;
+static GLint gi_scene=-1, gi_depth=-1, gi_texel=-1, gi_hasDepth=-1;
+static GLint gi_near=-1, gi_far=-1, gi_fov=-1, gi_aspect=-1, gi_nearCutoff=-1;
+static GLint gi_depthInvert=-1, gi_depthFlipV=-1;
+static GLint gi_gtaoI=-1, gi_gtaoR=-1, gi_gtaoD=-1, gi_gtaoS=-1;
+static GLint gi_hbilE=-1, gi_hbilI=-1;
+static GLint gi_hist=-1, gi_tempE=-1, gi_tempB=-1, gi_tempOK=-1;
+static GLint gi_invVP=-1, gi_vpPrev=-1, gi_frameSeed=-1, gi_lumaSplit=-1;
+static GLuint g_dnProg = 0, g_giTexC = 0;
+static GLint dn_gi=-1, dn_depth=-1, dn_texel=-1, dn_near=-1, dn_far=-1;
+static GLint dn_dinv=-1, dn_dflip=-1, dn_radius=-1, dn_sigma=-1;
+static int   g_giFrame = 0;
+static GLuint g_giTexB = 0;          // ping-pong partner of g_giTex
+static int    g_giCur = 0;           // which of the pair was written this frame
+static float  g_vpPrev[16];
+static bool   g_vpPrevValid = false;
+typedef void (APIENTRY* PFNGLUNIFORMMATRIX4FV)(GLint, GLsizei, GLboolean, const GLfloat*);
+static PFNGLUNIFORMMATRIX4FV p_glUniformMatrix4fv = nullptr;
+
+// General 4x4 inverse (row-major), for unprojecting with the draws' VP.
+static bool Invert4x4(const float m[16], float out[16]) {
+    float inv[16];
+    inv[0]  =  m[5]*m[10]*m[15] - m[5]*m[11]*m[14] - m[9]*m[6]*m[15] + m[9]*m[7]*m[14] + m[13]*m[6]*m[11] - m[13]*m[7]*m[10];
+    inv[4]  = -m[4]*m[10]*m[15] + m[4]*m[11]*m[14] + m[8]*m[6]*m[15] - m[8]*m[7]*m[14] - m[12]*m[6]*m[11] + m[12]*m[7]*m[10];
+    inv[8]  =  m[4]*m[9]*m[15] - m[4]*m[11]*m[13] - m[8]*m[5]*m[15] + m[8]*m[7]*m[13] + m[12]*m[5]*m[11] - m[12]*m[7]*m[9];
+    inv[12] = -m[4]*m[9]*m[14] + m[4]*m[10]*m[13] + m[8]*m[5]*m[14] - m[8]*m[6]*m[13] - m[12]*m[5]*m[10] + m[12]*m[6]*m[9];
+    inv[1]  = -m[1]*m[10]*m[15] + m[1]*m[11]*m[14] + m[9]*m[2]*m[15] - m[9]*m[3]*m[14] - m[13]*m[2]*m[11] + m[13]*m[3]*m[10];
+    inv[5]  =  m[0]*m[10]*m[15] - m[0]*m[11]*m[14] - m[8]*m[2]*m[15] + m[8]*m[3]*m[14] + m[12]*m[2]*m[11] - m[12]*m[3]*m[10];
+    inv[9]  = -m[0]*m[9]*m[15] + m[0]*m[11]*m[13] + m[8]*m[1]*m[15] - m[8]*m[3]*m[13] - m[12]*m[1]*m[11] + m[12]*m[3]*m[9];
+    inv[13] =  m[0]*m[9]*m[14] - m[0]*m[10]*m[13] - m[8]*m[1]*m[14] + m[8]*m[2]*m[13] + m[12]*m[1]*m[10] - m[12]*m[2]*m[9];
+    inv[2]  =  m[1]*m[6]*m[15] - m[1]*m[7]*m[14] - m[5]*m[2]*m[15] + m[5]*m[3]*m[14] + m[13]*m[2]*m[7] - m[13]*m[3]*m[6];
+    inv[6]  = -m[0]*m[6]*m[15] + m[0]*m[7]*m[14] + m[4]*m[2]*m[15] - m[4]*m[3]*m[14] - m[12]*m[2]*m[7] + m[12]*m[3]*m[6];
+    inv[10] =  m[0]*m[5]*m[15] - m[0]*m[7]*m[13] - m[4]*m[1]*m[15] + m[4]*m[3]*m[13] + m[12]*m[1]*m[7] - m[12]*m[3]*m[5];
+    inv[14] = -m[0]*m[5]*m[14] + m[0]*m[6]*m[13] + m[4]*m[1]*m[14] - m[4]*m[2]*m[13] - m[12]*m[1]*m[6] + m[12]*m[2]*m[5];
+    inv[3]  = -m[1]*m[6]*m[11] + m[1]*m[7]*m[10] + m[5]*m[2]*m[11] - m[5]*m[3]*m[10] - m[9]*m[2]*m[7] + m[9]*m[3]*m[6];
+    inv[7]  =  m[0]*m[6]*m[11] - m[0]*m[7]*m[10] - m[4]*m[2]*m[11] + m[4]*m[3]*m[10] + m[8]*m[2]*m[7] - m[8]*m[3]*m[6];
+    inv[11] = -m[0]*m[5]*m[11] + m[0]*m[7]*m[9] + m[4]*m[1]*m[11] - m[4]*m[3]*m[9] - m[8]*m[1]*m[7] + m[8]*m[3]*m[5];
+    inv[15] =  m[0]*m[5]*m[10] - m[0]*m[6]*m[9] - m[4]*m[1]*m[10] + m[4]*m[2]*m[9] + m[8]*m[1]*m[6] - m[8]*m[2]*m[5];
+    float det = m[0]*inv[0] + m[1]*inv[4] + m[2]*inv[8] + m[3]*inv[12];
+    if (det > -1e-12f && det < 1e-12f) return false;
+    det = 1.0f / det;
+    for (int i = 0; i < 16; i++) out[i] = inv[i] * det;
+    return true;
+}
 static GLint u_depthInvert=-1, u_depthFlipV=-1;
 static GLint u_sharpenEnable=-1, u_sharpenStrength=-1;
 static GLint u_gradeEnable=-1, u_exposure=-1, u_tonemap=-1;
@@ -561,37 +1135,75 @@ static void SettingsPath(char* out) {
     wsprintfA(out, "%s\\SWSEMods\\SWSE Graphics\\settings.txt", exe);
 }
 
-static void LoadSettings() {
-    char path[MAX_PATH]; SettingsPath(path);
-    HANDLE h = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, NULL,
-                           OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (h == INVALID_HANDLE_VALUE) { LogC("gfx: no settings.txt (using defaults)"); return; }
-    char buf[4096]; DWORD n = 0;
-    ReadFile(h, buf, sizeof(buf) - 1, &n, NULL); CloseHandle(h);
-    buf[n] = 0;
-    char key[64]; float val;
-    char* line = strtok(buf, "\r\n");
-    while (line) {
-        if (line[0] != '#' && sscanf(line, "%63s %f", key, &val) == 2) {
-            if      (!lstrcmpiA(key, "intensity"))       g_params.intensity      = val;
-            else if (!lstrcmpiA(key, "depth_invert"))    g_params.depthInvert    = val;
-    else if (!lstrcmpiA(key, "depth_flipv"))     g_params.depthFlipV     = val;
-    else if (!lstrcmpiA(key, "depth_near"))      g_params.depthNear      = val;
-            else if (!lstrcmpiA(key, "depth_far"))       g_params.depthFar       = val;
-            else if (!lstrcmpiA(key, "ao_enable"))       g_params.aoEnable       = val;
-            else if (!lstrcmpiA(key, "ao_intensity"))    g_params.aoIntensity    = val;
-            else if (!lstrcmpiA(key, "ao_radius"))       g_params.aoRadius       = val;
-    else if (!lstrcmpiA(key, "ao_samples"))      g_params.aoSamples      = val;
-    else if (!lstrcmpiA(key, "near_cutoff"))     g_params.nearCutoff     = val;
-            else if (!lstrcmpiA(key, "bloom_enable"))    g_params.bloomEnable    = val;
-            else if (!lstrcmpiA(key, "bloom_threshold")) g_params.bloomThreshold = val;
-            else if (!lstrcmpiA(key, "bloom_intensity")) g_params.bloomIntensity = val;
-            else if (!lstrcmpiA(key, "bloom_radius"))    g_params.bloomRadius    = val;
-            else if (!lstrcmpiA(key, "ssgi_enable"))     g_params.ssgiEnable     = val;
-            else if (!lstrcmpiA(key, "ssgi_intensity"))  g_params.ssgiIntensity  = val;
-            else if (!lstrcmpiA(key, "ssgi_radius"))     g_params.ssgiRadius     = val;
-    else if (!lstrcmpiA(key, "ssgi_thickness"))  g_params.ssgiThickness  = val;
-    else if (!lstrcmpiA(key, "ssgi_maxscreen"))  g_params.ssgiMaxScreen  = val;
+// One settings key onto a params block. False for a key nothing reads: that
+// is how `set` tells a typo from a setting, where it used to write the typo
+// into graphics.txt and report success (RT_QA_STATE_AUDIT 2.1a: `set rtao 1`
+// and `set debut_rt 1` both sat in the live file doing nothing).
+static bool ApplySetting(GfxParams& p, const char* key, float val) {
+    if      (!lstrcmpiA(key, "intensity"))       p.intensity      = val;
+    else if (!lstrcmpiA(key, "depth_invert"))    p.depthInvert    = val;
+    else if (!lstrcmpiA(key, "depth_flipv"))     p.depthFlipV     = val;
+    else if (!lstrcmpiA(key, "depth_near"))      p.depthNear      = val;
+    else if (!lstrcmpiA(key, "depth_far"))       p.depthFar       = val;
+    else if (!lstrcmpiA(key, "cam_draw"))        p.camDraw        = val;
+    else if (!lstrcmpiA(key, "debug_normals"))   p.debugNormals   = val;
+    else if (!lstrcmpiA(key, "gtao_enable"))     p.gtaoEnable     = val;
+    else if (!lstrcmpiA(key, "gtao_intensity"))  p.gtaoIntensity  = val;
+    else if (!lstrcmpiA(key, "gtao_radius"))     p.gtaoRadius     = val;
+    else if (!lstrcmpiA(key, "gtao_dirs"))       p.gtaoDirs       = val;
+    else if (!lstrcmpiA(key, "gtao_steps"))      p.gtaoSteps      = val;
+    else if (!lstrcmpiA(key, "debug_ao"))        p.debugAO        = val;
+    else if (!lstrcmpiA(key, "hbil_enable"))     p.hbilEnable     = val;
+    else if (!lstrcmpiA(key, "hbil_intensity"))  p.hbilIntensity  = val;
+    else if (!lstrcmpiA(key, "debug_bounce"))    p.debugBounce    = val;
+    else if (!lstrcmpiA(key, "temporal_enable")) p.temporalEnable = val;
+    else if (!lstrcmpiA(key, "temporal_blend"))  p.temporalBlend  = val;
+    else if (!lstrcmpiA(key, "luma_split"))      p.lumaSplit      = val;
+    else if (!lstrcmpiA(key, "denoise_enable"))  p.denoiseEnable  = val;
+    else if (!lstrcmpiA(key, "denoise_radius"))  p.denoiseRadius  = val;
+    else if (!lstrcmpiA(key, "denoise_sigma"))   p.denoiseSigma   = val;
+    else if (!lstrcmpiA(key, "ssr_enable"))      p.ssrEnable      = val;
+    else if (!lstrcmpiA(key, "ssr_intensity"))   p.ssrIntensity   = val;
+    else if (!lstrcmpiA(key, "ssr_steps"))       p.ssrSteps       = val;
+    else if (!lstrcmpiA(key, "ssr_thickness"))   p.ssrThickness   = val;
+    else if (!lstrcmpiA(key, "ssr_updot"))       p.ssrUpDot       = val;
+    else if (!lstrcmpiA(key, "debug_ssr"))       p.debugSSR       = val;
+    else if (!lstrcmpiA(key, "debug_ssrmask"))   p.debugSSRMask   = val;
+    else if (!lstrcmpiA(key, "ssr_mask_stamp"))  p.ssrMaskStamp   = val;
+    else if (!lstrcmpiA(key, "ssr_mask_use"))    p.ssrMaskUse     = val;
+    else if (!lstrcmpiA(key, "ssr_mask_fresnel")) p.ssrMaskFresnel = val;
+    else if (!lstrcmpiA(key, "ssr_mask_flip"))   p.ssrMaskFlip    = val;
+    else if (!lstrcmpiA(key, "ssr_mask_depth"))  p.ssrMaskDepth   = val;
+    else if (!lstrcmpiA(key, "gbuf_normals"))    p.gbufNormals    = val;
+    else if (!lstrcmpiA(key, "debug_gnormals"))  p.debugGNormals  = val;
+    else if (!lstrcmpiA(key, "debug_rt"))        p.debugRt        = val;
+    else if (!lstrcmpiA(key, "rtao_enable"))     p.rtaoEnable     = val;
+    else if (!lstrcmpiA(key, "rtao_radius"))     p.rtaoRadius     = val;
+    else if (!lstrcmpiA(key, "rtao_rays"))       p.rtaoRays       = val;
+    else if (!lstrcmpiA(key, "rtao_strength"))   p.rtaoStrength   = val;
+    else if (!lstrcmpiA(key, "debug_rtao"))      p.debugRtao      = val;
+    else if (!lstrcmpiA(key, "rtao_blend"))      p.rtaoBlend      = val;
+    else if (!lstrcmpiA(key, "rtao_dn"))         p.rtaoDn         = val;
+    else if (!lstrcmpiA(key, "rtao_histflip"))   p.rtaoHistFlip   = val;
+    else if (!lstrcmpiA(key, "rtao_flipv"))      p.rtaoFlipV      = val;
+    else if (!lstrcmpiA(key, "rtao_requirehit")) p.rtaoRequireHit = val;
+    else if (!lstrcmpiA(key, "rtao_dn_radius"))  p.rtaoDnRadius   = val;
+    else if (!lstrcmpiA(key, "rtao_dn_depth"))   p.rtaoDnDepth    = val;
+    else if (!lstrcmpiA(key, "rtao_dn_normal"))  p.rtaoDnNormal   = val;
+    else if (!lstrcmpiA(key, "ao_enable"))       p.aoEnable       = val;
+    else if (!lstrcmpiA(key, "ao_intensity"))    p.aoIntensity    = val;
+    else if (!lstrcmpiA(key, "ao_radius"))       p.aoRadius       = val;
+    else if (!lstrcmpiA(key, "ao_samples"))      p.aoSamples      = val;
+    else if (!lstrcmpiA(key, "near_cutoff"))     p.nearCutoff     = val;
+    else if (!lstrcmpiA(key, "bloom_enable"))    p.bloomEnable    = val;
+    else if (!lstrcmpiA(key, "bloom_threshold")) p.bloomThreshold = val;
+    else if (!lstrcmpiA(key, "bloom_intensity")) p.bloomIntensity = val;
+    else if (!lstrcmpiA(key, "bloom_radius"))    p.bloomRadius    = val;
+    else if (!lstrcmpiA(key, "ssgi_enable"))     p.ssgiEnable     = val;
+    else if (!lstrcmpiA(key, "ssgi_intensity"))  p.ssgiIntensity  = val;
+    else if (!lstrcmpiA(key, "ssgi_radius"))     p.ssgiRadius     = val;
+    else if (!lstrcmpiA(key, "ssgi_thickness"))  p.ssgiThickness  = val;
+    else if (!lstrcmpiA(key, "ssgi_maxscreen"))  p.ssgiMaxScreen  = val;
     // early_pass is DISABLED IN CODE, not merely defaulted off. It crashes the
     // driver and the value persists into settings.txt the moment anyone runs
     // `set early_pass 1`, so a plain default would come back and crash the game
@@ -599,25 +1211,55 @@ static void LoadSettings() {
     // only once the pass is attached to the correct render target (see
     // research/GRAPHICS_RTGI.md: the scene colour is a window-sized texture
     // bound during earlier passes, not at the fbo=0 transition).
-    else if (!lstrcmpiA(key, "early_pass"))      g_params.earlyPass      = val;
-    else if (!lstrcmpiA(key, "dof_enable"))      g_params.dofEnable      = val;
-    else if (!lstrcmpiA(key, "dof_start"))       g_params.dofStart       = val;
-    else if (!lstrcmpiA(key, "dof_end"))         g_params.dofEnd         = val;
-    else if (!lstrcmpiA(key, "dof_strength"))    g_params.dofStrength    = val;
-            else if (!lstrcmpiA(key, "ssgi_samples"))    g_params.ssgiSamples    = (int)val;
-            else if (!lstrcmpiA(key, "debug_gi"))        g_params.debugGI        = val;
-            else if (!lstrcmpiA(key, "fov"))             g_params.fov            = val;
-            else if (!lstrcmpiA(key, "sharpen_enable"))  g_params.sharpenEnable  = val;
-            else if (!lstrcmpiA(key, "sharpen_strength"))g_params.sharpenStrength= val;
-            else if (!lstrcmpiA(key, "grade_enable"))    g_params.gradeEnable    = val;
-            else if (!lstrcmpiA(key, "exposure"))        g_params.exposure       = val;
-            else if (!lstrcmpiA(key, "tonemap"))         g_params.tonemap        = val;
-            else if (!lstrcmpiA(key, "saturation"))      g_params.saturation     = val;
-            else if (!lstrcmpiA(key, "contrast"))        g_params.contrast       = val;
-            else if (!lstrcmpiA(key, "brightness"))      g_params.brightness     = val;
-            else if (!lstrcmpiA(key, "temperature"))     g_params.temperature    = val;
-            else if (!lstrcmpiA(key, "vignette"))        g_params.vignette       = val;
-        }
+    else if (!lstrcmpiA(key, "early_pass"))      p.earlyPass      = val;
+    else if (!lstrcmpiA(key, "dof_enable"))      p.dofEnable      = val;
+    else if (!lstrcmpiA(key, "dof_start"))       p.dofStart       = val;
+    else if (!lstrcmpiA(key, "dof_end"))         p.dofEnd         = val;
+    else if (!lstrcmpiA(key, "dof_strength"))    p.dofStrength    = val;
+    else if (!lstrcmpiA(key, "ssgi_samples"))    p.ssgiSamples    = (int)val;
+    else if (!lstrcmpiA(key, "debug_gi"))        p.debugGI        = val;
+    else if (!lstrcmpiA(key, "fov"))             p.fov            = val;
+    else if (!lstrcmpiA(key, "sharpen_enable"))  p.sharpenEnable  = val;
+    else if (!lstrcmpiA(key, "sharpen_strength"))p.sharpenStrength= val;
+    else if (!lstrcmpiA(key, "grade_enable"))    p.gradeEnable    = val;
+    else if (!lstrcmpiA(key, "exposure"))        p.exposure       = val;
+    else if (!lstrcmpiA(key, "tonemap"))         p.tonemap        = val;
+    else if (!lstrcmpiA(key, "saturation"))      p.saturation     = val;
+    else if (!lstrcmpiA(key, "contrast"))        p.contrast       = val;
+    else if (!lstrcmpiA(key, "brightness"))      p.brightness     = val;
+    else if (!lstrcmpiA(key, "temperature"))     p.temperature    = val;
+    else if (!lstrcmpiA(key, "vignette"))        p.vignette       = val;
+    else return false;
+    return true;
+}
+
+// A key ApplySetting reads - what `set` checks before writing anything.
+int SWSE_GfxKnownKey(const char* key) {
+    GfxParams scratch;
+    return ApplySetting(scratch, key, 0.0f) ? 1 : 0;
+}
+
+static void LoadSettings() {
+    char path[MAX_PATH]; SettingsPath(path);
+    HANDLE h = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, NULL,
+                           OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (h == INVALID_HANDLE_VALUE) { LogC("gfx: no settings.txt (using defaults)"); return; }
+    // 64 K, not 4 K. The WRITER (`set`) appends to this file without bound, and
+    // the RTAO block lives at the END - so a 4 K read silently truncated exactly
+    // the settings being tuned, and the straddling line could sscanf to a wrong
+    // but plausible value with nothing logged. Measured at 4050 of 4095 bytes
+    // with the tuning session still running. Match the writer, and say so when
+    // the buffer fills rather than quietly dropping the tail.
+    static char buf[65536]; DWORD n = 0;
+    ReadFile(h, buf, sizeof(buf) - 1, &n, NULL); CloseHandle(h);
+    buf[n] = 0;
+    if (n >= sizeof(buf) - 1)
+        LogC("gfx: WARNING settings file filled the read buffer - tail may be lost");
+    char key[64]; float val;
+    char* line = strtok(buf, "\r\n");
+    while (line) {
+        if (line[0] != '#' && sscanf(line, "%63s %f", key, &val) == 2)
+            ApplySetting(g_params, key, val);
         line = strtok(NULL, "\r\n");
     }
     char msg[200];
@@ -667,6 +1309,8 @@ bool SWSE_GfxInit() {
     p_glUniform1f          = Resolve<PFNGLUNIFORM1F>("glUniform1f", ok);
     p_glUniform2f          = Resolve<PFNGLUNIFORM2F>("glUniform2f", ok);
     p_glUniform1i          = Resolve<PFNGLUNIFORM1I>("glUniform1i", ok);
+    { bool mok = true; p_glUniformMatrix4fv = Resolve<PFNGLUNIFORMMATRIX4FV>("glUniformMatrix4fv", mok); }
+    { bool uok = true; p_glUniform3f = Resolve<PFNGLUNIFORM3F>("glUniform3f", uok); }
     if (!ok) { Log("gfx: GL2.0 not fully available - post-process disabled"); return false; }
 
     // compile vertex shader
@@ -696,6 +1340,99 @@ bool SWSE_GfxInit() {
     GLint okl = 0; p_glGetProgramiv(g_prog, GL_LINK_STATUS, &okl);
     if (!okl) { Log("gfx: program link FAILED"); return false; }
 
+    // GI pre-pass program. Failure is NON-FATAL by design: g_giProg stays 0,
+    // the pre-pass never runs, and the GTAO/HBIL stages read an unwritten
+    // texture - the auto-fallback contract (frame stays sane, log says why).
+    {
+        GLuint gfs = p_glCreateShader(GL_FRAGMENT_SHADER);
+        p_glShaderSource(gfs, 1, &kGIShader, nullptr);
+        p_glCompileShader(gfs);
+        GLint okg = 0; p_glGetShaderiv(gfs, GL_COMPILE_STATUS, &okg);
+        if (!okg) {
+            char glog[1024]; p_glGetShaderInfoLog(gfs, 1024, nullptr, glog);
+            Log(std::string("gfx: GI shader compile FAILED: ") + glog);
+        } else {
+            g_giProg = p_glCreateProgram();
+            p_glAttachShader(g_giProg, vs);
+            p_glAttachShader(g_giProg, gfs);
+            p_glLinkProgram(g_giProg);
+            GLint okgl = 0; p_glGetProgramiv(g_giProg, GL_LINK_STATUS, &okgl);
+            if (!okgl) { Log("gfx: GI program link FAILED"); g_giProg = 0; }
+        }
+        if (g_giProg) {
+            gi_scene      = p_glGetUniformLocation(g_giProg, "uScene");
+            gi_depth      = p_glGetUniformLocation(g_giProg, "uDepth");
+            gi_texel      = p_glGetUniformLocation(g_giProg, "uTexel");
+            gi_hasDepth   = p_glGetUniformLocation(g_giProg, "uHasDepth");
+            gi_near       = p_glGetUniformLocation(g_giProg, "uNear");
+            gi_far        = p_glGetUniformLocation(g_giProg, "uFar");
+            gi_fov        = p_glGetUniformLocation(g_giProg, "uFov");
+            gi_aspect     = p_glGetUniformLocation(g_giProg, "uAspect");
+            gi_nearCutoff = p_glGetUniformLocation(g_giProg, "uNearCutoff");
+            gi_depthInvert= p_glGetUniformLocation(g_giProg, "uDepthInvert");
+            gi_depthFlipV = p_glGetUniformLocation(g_giProg, "uDepthFlipV");
+            gi_gtaoI      = p_glGetUniformLocation(g_giProg, "uGTAOIntensity");
+            gi_gtaoR      = p_glGetUniformLocation(g_giProg, "uGTAORadius");
+            gi_gtaoD      = p_glGetUniformLocation(g_giProg, "uGTAODirs");
+            gi_gtaoS      = p_glGetUniformLocation(g_giProg, "uGTAOSteps");
+            gi_hbilE      = p_glGetUniformLocation(g_giProg, "uHBILEnable");
+            gi_hbilI      = p_glGetUniformLocation(g_giProg, "uHBILIntensity");
+            gi_hist       = p_glGetUniformLocation(g_giProg, "uHist");
+            gi_tempE      = p_glGetUniformLocation(g_giProg, "uTemporalEnable");
+            gi_tempB      = p_glGetUniformLocation(g_giProg, "uTemporalBlend");
+            gi_tempOK     = p_glGetUniformLocation(g_giProg, "uTemporalOK");
+            gi_invVP      = p_glGetUniformLocation(g_giProg, "uInvVPCur");
+            gi_vpPrev     = p_glGetUniformLocation(g_giProg, "uVPPrev");
+            gi_frameSeed  = p_glGetUniformLocation(g_giProg, "uFrameSeed");
+            gi_lumaSplit  = p_glGetUniformLocation(g_giProg, "uLumaSplit");
+            Log("gfx: GI pre-pass program ready");
+        }
+        // denoise program - same non-fatal contract
+        GLuint dfs = p_glCreateShader(GL_FRAGMENT_SHADER);
+        p_glShaderSource(dfs, 1, &kDenoiseShader, nullptr);
+        p_glCompileShader(dfs);
+        GLint okd = 0; p_glGetShaderiv(dfs, GL_COMPILE_STATUS, &okd);
+        if (!okd) {
+            char dlog[1024]; p_glGetShaderInfoLog(dfs, 1024, nullptr, dlog);
+            Log(std::string("gfx: denoise shader compile FAILED: ") + dlog);
+        } else {
+            g_dnProg = p_glCreateProgram();
+            p_glAttachShader(g_dnProg, vs);
+            p_glAttachShader(g_dnProg, dfs);
+            p_glLinkProgram(g_dnProg);
+            GLint okdl = 0; p_glGetProgramiv(g_dnProg, GL_LINK_STATUS, &okdl);
+            if (!okdl) { Log("gfx: denoise program link FAILED"); g_dnProg = 0; }
+        }
+        if (g_dnProg) {
+            dn_gi     = p_glGetUniformLocation(g_dnProg, "uGI");
+            dn_depth  = p_glGetUniformLocation(g_dnProg, "uDepth");
+            dn_texel  = p_glGetUniformLocation(g_dnProg, "uTexel");
+            dn_near   = p_glGetUniformLocation(g_dnProg, "uNear");
+            dn_far    = p_glGetUniformLocation(g_dnProg, "uFar");
+            dn_dinv   = p_glGetUniformLocation(g_dnProg, "uDepthInvert");
+            dn_dflip  = p_glGetUniformLocation(g_dnProg, "uDepthFlipV");
+            dn_radius = p_glGetUniformLocation(g_dnProg, "uRadius");
+            dn_sigma  = p_glGetUniformLocation(g_dnProg, "uDepthSigma");
+            Log("gfx: denoise program ready");
+        }
+    }
+
+    // Dest-alpha recon for the SSR material mask. The plan is to let tagged
+    // draws stamp reflectivity into the back buffer's alpha channel - which
+    // only works if the pixel format HAS alpha storage. Runs once, with the
+    // window-system framebuffer bound (we are mid-capture). A0 here = pivot
+    // to a mask FBO instead; nothing else in this build changes behaviour.
+    {
+        GLint rb = -1, gb = -1, bb = -1, ab = -1;
+        glGetIntegerv(0x0D52 /*GL_RED_BITS*/,   &rb);
+        glGetIntegerv(0x0D53 /*GL_GREEN_BITS*/, &gb);
+        glGetIntegerv(0x0D54 /*GL_BLUE_BITS*/,  &bb);
+        glGetIntegerv(0x0D55 /*GL_ALPHA_BITS*/, &ab);
+        Log(std::string("gfx: backbuffer bits R") + std::to_string(rb)
+            + " G" + std::to_string(gb) + " B" + std::to_string(bb)
+            + " A" + std::to_string(ab) + " (dest-alpha probe)");
+    }
+
     u_scene = p_glGetUniformLocation(g_prog, "uScene");
     u_texel = p_glGetUniformLocation(g_prog, "uTexel");
     u_intensity      = p_glGetUniformLocation(g_prog, "uIntensity");
@@ -723,6 +1460,39 @@ bool SWSE_GfxInit() {
     u_dofStrength    = p_glGetUniformLocation(g_prog, "uDofStrength");
     u_ssgiSamples    = p_glGetUniformLocation(g_prog, "uSSGISamples");
     u_debugGI        = p_glGetUniformLocation(g_prog, "uDebugGI");
+    u_debugNormals   = p_glGetUniformLocation(g_prog, "uDebugNormals");
+    u_gtaoEnable     = p_glGetUniformLocation(g_prog, "uGTAOEnable");
+    u_gtaoIntensity  = p_glGetUniformLocation(g_prog, "uGTAOIntensity");
+    u_gtaoRadius     = p_glGetUniformLocation(g_prog, "uGTAORadius");
+    u_gtaoDirs       = p_glGetUniformLocation(g_prog, "uGTAODirs");
+    u_gtaoSteps      = p_glGetUniformLocation(g_prog, "uGTAOSteps");
+    u_debugAO        = p_glGetUniformLocation(g_prog, "uDebugAO");
+    u_hbilEnable     = p_glGetUniformLocation(g_prog, "uHBILEnable");
+    u_hbilIntensity  = p_glGetUniformLocation(g_prog, "uHBILIntensity");
+    u_debugBounce    = p_glGetUniformLocation(g_prog, "uDebugBounce");
+    u_giTex          = p_glGetUniformLocation(g_prog, "uGITex");
+    u_ssrEnable      = p_glGetUniformLocation(g_prog, "uSSREnable");
+    u_ssrIntensity   = p_glGetUniformLocation(g_prog, "uSSRIntensity");
+    u_ssrSteps       = p_glGetUniformLocation(g_prog, "uSSRSteps");
+    u_ssrThickness   = p_glGetUniformLocation(g_prog, "uSSRThickness");
+    u_ssrUpDot       = p_glGetUniformLocation(g_prog, "uSSRUpDot");
+    u_viewUp         = p_glGetUniformLocation(g_prog, "uViewUp");
+    u_debugSSR       = p_glGetUniformLocation(g_prog, "uDebugSSR");
+    u_ssrMaskUse     = p_glGetUniformLocation(g_prog, "uSSRMaskUse");
+    u_ssrMaskFresnel = p_glGetUniformLocation(g_prog, "uSSRMaskFresnel");
+    u_debugSSRMask   = p_glGetUniformLocation(g_prog, "uDebugSSRMask");
+    u_sceneFBO       = p_glGetUniformLocation(g_prog, "uSceneFBO");
+    u_hasFBOMask     = p_glGetUniformLocation(g_prog, "uHasFBOMask");
+    u_maskFlipV      = p_glGetUniformLocation(g_prog, "uMaskFlipV");
+    u_gbufTex        = p_glGetUniformLocation(g_prog, "uGBufTex");
+    u_hasGBuf        = p_glGetUniformLocation(g_prog, "uHasGBuf");
+    u_debugGN        = p_glGetUniformLocation(g_prog, "uDebugGNormals");
+    u_rtTex          = p_glGetUniformLocation(g_prog, "uRtTex");
+    u_debugRt        = p_glGetUniformLocation(g_prog, "uDebugRt");
+    u_rtaoTex        = p_glGetUniformLocation(g_prog, "uRtaoTex");
+    u_rtaoUse        = p_glGetUniformLocation(g_prog, "uRtaoUse");
+    u_rtaoFlipV      = p_glGetUniformLocation(g_prog, "uRtaoFlipV");
+    u_debugRtao      = p_glGetUniformLocation(g_prog, "uDebugRtao");
     u_depthInvert    = p_glGetUniformLocation(g_prog, "uDepthInvert");
     u_depthFlipV     = p_glGetUniformLocation(g_prog, "uDepthFlipV");
     u_fov            = p_glGetUniformLocation(g_prog, "uFov");
@@ -795,6 +1565,14 @@ static void RenderRaw(int w, int h) {
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &savedTex2D);
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
+    // Materials mask handshake: our own quads must never lose alpha writes
+    // (the GI texture carries occlusion in .a), so stamping suspends for the
+    // rest of the frame - the swap-time frame mark re-arms it. PopAttrib
+    // restores the game's own colormask on the way out.
+    SWSE_MaterialsSetStamp(g_params.ssrMaskStamp > 0.5f ? 1 : 0);
+    SWSE_MaterialsSetDepthTest(g_params.ssrMaskDepth > 0.5f ? 1 : 0);
+    SWSE_MaterialsPassGuard(1);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glReadBuffer(GL_BACK);
     glDisable(GL_DEPTH_TEST); glDisable(GL_LIGHTING);
     glDisable(GL_BLEND); glDisable(GL_ALPHA_TEST);
@@ -808,7 +1586,11 @@ static void RenderRaw(int w, int h) {
     // mismatch), while glReadPixels returns a perfect frame. So read to CPU with
     // explicit PACK alignment, then upload with explicit UNPACK alignment. The
     // shader pass still runs on the GPU (fast, RTGI-ready) - only capture changed.
-    int nbytes = w * h * 3;
+    // The material mask lives in destination alpha, so with stamping on the
+    // capture widens to RGBA (+33% readback). RGB otherwise - no idle cost.
+    bool maskA = g_params.ssrMaskStamp > 0.5f;
+    GLenum capFmt = maskA ? GL_RGBA : GL_RGB;
+    int nbytes = w * h * (maskA ? 4 : 3);
     if (nbytes != g_cpuSize) {
         free(g_cpu); g_cpu = (unsigned char*)malloc(nbytes); g_cpuSize = nbytes;
     }
@@ -826,16 +1608,19 @@ static void RenderRaw(int w, int h) {
     glPixelStorei(0x0D03 /*GL_PACK_SKIP_ROWS*/,     0);
     glPixelStorei(0x0D04 /*GL_PACK_SKIP_PIXELS*/,   0);
     glPixelStorei(0x0D05 /*GL_PACK_ALIGNMENT*/,     1);
-    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, g_cpu);
-    if (w != g_texW || h != g_texH) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, g_cpu);
+    glReadPixels(0, 0, w, h, capFmt, GL_UNSIGNED_BYTE, g_cpu);
+    // Format changes force a realloc too: glTexSubImage2D RGBA into an RGB
+    // texture "works" - by silently dropping the alpha the mask rides in.
+    if (w != g_texW || h != g_texH || maskA != g_texHasA) {
+        glTexImage2D(GL_TEXTURE_2D, 0, maskA ? 0x8058 /*GL_RGBA8*/ : GL_RGB,
+                     w, h, 0, capFmt, GL_UNSIGNED_BYTE, g_cpu);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        g_texW = w; g_texH = h;
+        g_texW = w; g_texH = h; g_texHasA = maskA;
     } else {
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, g_cpu);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, capFmt, GL_UNSIGNED_BYTE, g_cpu);
     }
     if (trace) LogC("gfx step: frame captured (glReadPixels->glTexImage2D)");
 
@@ -863,6 +1648,243 @@ static void RenderRaw(int w, int h) {
         if (trace) LogC("gfx step: bound game depth texture to unit 1");
     } else if (trace) {
         LogC("gfx step: scene depth texture not detected yet");
+    }
+
+    // Material mask source on unit 3: the scene FBO color attachment. The
+    // stamps land in ITS alpha; the engine's blit drops them before the
+    // backbuffer, so the capture never sees them.
+    g_haveFBOMask = false;
+    {
+        unsigned maskTex = SWSE_MaterialsMaskTex();
+        if (maskTex != 0 && g_params.ssrMaskStamp > 0.5f && p_glActiveTexture) {
+            // Unit 4: unit 3 belongs to the temporal GI history, which is
+            // bound AFTER this spot - it silently replaced the mask and the
+            // composite read accumulated GI as "reflectivity" (measured:
+            // the x-ray showed an AO-looking ghost instead of silhouettes).
+            p_glActiveTexture(GL_TEXTURE0 + 4);
+            glBindTexture(GL_TEXTURE_2D, (GLuint)maskTex);
+            p_glActiveTexture(GL_TEXTURE0);
+            g_haveFBOMask = true;
+        }
+    }
+    // Stage 1b: trace the world into our own texture, bind it on unit 6.
+    // Only while the debug view is up - this is a correctness milestone, not
+    // a shipping cost.
+    if (g_params.debugRt > 0.5f && SWSE_Feature(FEAT_RAYTRACE)) {
+        SWSE_RtTrace(w, h);
+        unsigned rtT = SWSE_RtTex();
+        if (rtT && p_glActiveTexture) {
+            p_glActiveTexture(GL_TEXTURE0 + 6);
+            glBindTexture(GL_TEXTURE_2D, (GLuint)rtT);
+            p_glActiveTexture(GL_TEXTURE0);
+        }
+    }
+
+    // Stage 2: ray-traced AO. Needs the scene depth, which is already found
+    // and bound above; the pass unprojects it to world space itself.
+    g_haveRtao = false;
+    // The `raytrace` feature is the master switch: graphics.txt's rtao_enable
+    // alone no longer turns the tracer on (1.1).
+    if (g_params.rtaoEnable > 0.5f && haveDepth && SWSE_Feature(FEAT_RAYTRACE)) {
+        SWSE_RtAoParams(g_params.rtaoRadius, g_params.rtaoRays, g_params.rtaoStrength);
+        SWSE_RtAutoBuildTick();       // BVH follows the player
+        SWSE_RtAoBlend(g_params.rtaoBlend);
+        SWSE_RtAoDenoise(g_params.rtaoDn, g_params.rtaoDnRadius,
+                         g_params.rtaoDnDepth, g_params.rtaoDnNormal);
+        SWSE_RtAoHistFlip(g_params.rtaoHistFlip);
+        SWSE_RtAoRequireHit(g_params.rtaoRequireHit);
+        SWSE_RtAo(w, h, gameDepth, g_params.depthInvert, g_params.depthFlipV,
+                  g_params.depthNear, g_params.depthFar);
+        unsigned aoT = SWSE_RtAoTex();
+        if (aoT && p_glActiveTexture) {
+            p_glActiveTexture(GL_TEXTURE0 + 8);
+            glBindTexture(GL_TEXTURE_2D, (GLuint)aoT);
+            p_glActiveTexture(GL_TEXTURE0);
+            g_haveRtao = true;
+        }
+    }
+
+    // Normal G-buffer on unit 5 (3 = GI history, 4 = material mask).
+    SWSE_MaterialsGBuf(g_params.gbufNormals > 0.5f ? 1 : 0, w, h);
+    g_haveGBuf = false;
+    {
+        unsigned nrmTex = SWSE_MaterialsGBufTex();
+        if (nrmTex != 0 && p_glActiveTexture) {
+            p_glActiveTexture(GL_TEXTURE0 + 5);
+            glBindTexture(GL_TEXTURE_2D, (GLuint)nrmTex);
+            p_glActiveTexture(GL_TEXTURE0);
+            g_haveGBuf = true;
+        }
+    }
+
+    // ---- GI pre-pass (multi-pass skeleton) --------------------------------
+    // GTAO+HBIL render into their own texture; the main shader fetches the
+    // result. This is the structural prerequisite for temporal accumulation
+    // and denoise - both operate on this texture before the composite reads it.
+    bool wantGI = (g_params.gtaoEnable > 0.5f || g_params.hbilEnable > 0.5f);
+    if (wantGI && g_giProg && p_glBindFramebuffer && p_glFramebufferTexture2D) {
+        if (w != g_giW || h != g_giH) {
+            if (!g_giTex)  glGenTextures(1, &g_giTex);
+            if (!g_giTexB) glGenTextures(1, &g_giTexB);
+            if (!g_giTexC) glGenTextures(1, &g_giTexC);
+            if (p_glActiveTexture) p_glActiveTexture(GL_TEXTURE0 + 2);
+            GLuint pair[3] = { g_giTex, g_giTexB, g_giTexC };
+            for (int ti = 0; ti < 3; ti++) {
+                glBindTexture(GL_TEXTURE_2D, pair[ti]);
+                glTexImage2D(GL_TEXTURE_2D, 0, 0x8058 /*GL_RGBA8*/, w, h, 0,
+                             GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            }
+            if (p_glActiveTexture) p_glActiveTexture(GL_TEXTURE0);
+            if (!g_giFbo && p_glGenFramebuffers) p_glGenFramebuffers(1, &g_giFbo);
+            p_glBindFramebuffer(0x8D40 /*GL_FRAMEBUFFER_EXT*/, g_giFbo);
+            p_glFramebufferTexture2D(0x8D40, 0x8CE0 /*COLOR_ATTACHMENT0*/,
+                                     GL_TEXTURE_2D, g_giTex, 0);
+            unsigned st = p_glCheckFramebufferStatus
+                        ? p_glCheckFramebufferStatus(0x8D40) : 0x8CD5u;
+            g_giOk = (st == 0x8CD5 /*FRAMEBUFFER_COMPLETE*/);
+            p_glBindFramebuffer(0x8D40, 0);
+            g_giW = w; g_giH = h;
+            g_vpPrevValid = false;   // resolution change invalidates history
+            char gib[120];
+            wsprintfA(gib, "gfx: GI pre-pass target %dx%d %s", w, h,
+                      g_giOk ? "READY" : "INCOMPLETE - stages fall back");
+            LogC(gib);
+        }
+        float giNear = g_params.depthNear, giFar = g_params.depthFar;
+        float giFov  = g_params.fov;
+        if (g_giOk) {
+            SWSE_SceneProjection(&giNear, &giFar, &giFov);
+            if (g_params.camDraw > 0.5f) {
+                float dn, df, dv, da; unsigned dp; int dc, dg;
+                if (SWSE_WindClipCamera(&dn, &df, &dv, &da, &dp, &dc, &dg)) {
+                    giNear = dn; giFar = df; giFov = dv;
+                }
+            }
+            // ping-pong: write the target we did NOT write last frame, read
+            // the other as history on unit 3
+            GLuint writeTex = g_giCur ? g_giTex : g_giTexB;
+            GLuint histTex  = g_giCur ? g_giTexB : g_giTex;
+            // Temporal matrices from the draws' camera. DERIVE it - do not
+            // read the cache. SWSE_WindClipVPLast returns whatever the last
+            // SWSE_WindClipCamera call published and derives nothing itself.
+            //
+            // With nothing refreshing it, vpPrev and vpCur come out IDENTICAL,
+            // the reprojection collapses to the identity, and history is
+            // fetched from the same SCREEN pixel every frame - so the shading
+            // sticks to the screen and slides across the world as the camera
+            // turns. That is the artefact the owner has been reporting, and it
+            // is why it survived `rtao_enable 0`: the AO pass was the only
+            // thing still calling the deriver, so switching it off froze this
+            // camera completely.
+            //
+            // FOURTH occurrence of this bug class today (harvest path, the AO's
+            // eye, the AO's matrix, now the GI temporal). In this codebase a
+            // `...Last()` accessor is a CACHE; anything needing current data
+            // must call the deriver itself.
+            { float n_, f_, fv_, a_; unsigned p_; int c_, g_;
+              SWSE_WindClipCamera(&n_, &f_, &fv_, &a_, &p_, &c_, &g_); }
+            float vpCur[16], invCur[16];
+            bool haveVP = SWSE_WindClipVPLast(vpCur) && Invert4x4(vpCur, invCur);
+            bool tempOK = haveVP && g_vpPrevValid
+                          && g_params.temporalEnable > 0.5f;
+            p_glBindFramebuffer(0x8D40, g_giFbo);
+            p_glFramebufferTexture2D(0x8D40, 0x8CE0, GL_TEXTURE_2D, writeTex, 0);
+            if (p_glActiveTexture) {
+                p_glActiveTexture(GL_TEXTURE0 + 3);
+                glBindTexture(GL_TEXTURE_2D, histTex);
+                p_glActiveTexture(GL_TEXTURE0);
+            }
+            p_glUseProgram(g_giProg);
+            if (gi_hist       >= 0) p_glUniform1i(gi_hist, 3);
+            if (gi_tempE      >= 0) p_glUniform1f(gi_tempE, g_params.temporalEnable);
+            if (gi_tempB      >= 0) p_glUniform1f(gi_tempB, g_params.temporalBlend);
+            if (gi_tempOK     >= 0) p_glUniform1f(gi_tempOK, tempOK ? 1.0f : 0.0f);
+            if (haveVP && p_glUniformMatrix4fv) {
+                if (gi_invVP  >= 0) p_glUniformMatrix4fv(gi_invVP, 1, GL_TRUE, invCur);
+                if (gi_vpPrev >= 0) p_glUniformMatrix4fv(gi_vpPrev, 1, GL_TRUE,
+                                        g_vpPrevValid ? g_vpPrev : vpCur);
+            }
+            if (gi_scene      >= 0) p_glUniform1i(gi_scene, 0);
+            if (gi_depth      >= 0) p_glUniform1i(gi_depth, 1);
+            if (gi_texel      >= 0) p_glUniform2f(gi_texel, 1.0f/(float)w, 1.0f/(float)h);
+            if (gi_hasDepth   >= 0) p_glUniform1f(gi_hasDepth, haveDepth ? 1.0f : 0.0f);
+            if (gi_near       >= 0) p_glUniform1f(gi_near, giNear);
+            if (gi_far        >= 0) p_glUniform1f(gi_far,  giFar);
+            if (gi_fov        >= 0) p_glUniform1f(gi_fov,  giFov);
+            if (gi_aspect     >= 0) p_glUniform1f(gi_aspect, (float)w/(float)h);
+            if (gi_nearCutoff >= 0) p_glUniform1f(gi_nearCutoff, g_params.nearCutoff);
+            if (gi_depthInvert>= 0) p_glUniform1f(gi_depthInvert, g_params.depthInvert);
+            if (gi_depthFlipV >= 0) p_glUniform1f(gi_depthFlipV,  g_params.depthFlipV);
+            if (gi_gtaoI      >= 0) p_glUniform1f(gi_gtaoI, g_params.gtaoIntensity);
+            if (gi_gtaoR      >= 0) p_glUniform1f(gi_gtaoR, g_params.gtaoRadius);
+            if (gi_gtaoD      >= 0) p_glUniform1f(gi_gtaoD, g_params.gtaoDirs);
+            if (gi_gtaoS      >= 0) p_glUniform1f(gi_gtaoS, g_params.gtaoSteps);
+            if (gi_hbilE      >= 0) p_glUniform1f(gi_hbilE, g_params.hbilEnable);
+            // 8-frame jitter cycle. Without it every frame drew the SAME sample
+            // pattern, so accumulation had nothing to average (measured:
+            // frame-to-frame diff got 3x WORSE with temporal on).
+            g_giFrame = (g_giFrame + 1) & 7;
+            if (gi_frameSeed  >= 0) p_glUniform1f(gi_frameSeed, (float)g_giFrame * 0.125f);
+            if (gi_lumaSplit  >= 0) p_glUniform1f(gi_lumaSplit, g_params.lumaSplit);
+            if (gi_hbilI      >= 0) p_glUniform1f(gi_hbilI, g_params.hbilIntensity);
+            glColor3f(1, 1, 1);
+            glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex2f(-1.0f, -1.0f);
+                glTexCoord2f(1, 0); glVertex2f( 1.0f, -1.0f);
+                glTexCoord2f(1, 1); glVertex2f( 1.0f,  1.0f);
+                glTexCoord2f(0, 1); glVertex2f(-1.0f,  1.0f);
+            glEnd();
+            p_glBindFramebuffer(0x8D40, 0);
+            // remember this frame's camera for next frame's reprojection
+            if (haveVP) {
+                for (int mi = 0; mi < 16; mi++) g_vpPrev[mi] = vpCur[mi];
+                g_vpPrevValid = true;
+            }
+            g_giCur = !g_giCur;
+            if (trace) LogC("gfx step: GI pre-pass drawn");
+        }
+        // ---- denoise pass: accumulated GI -> g_giTexC ----------------------
+        GLuint accumTex = g_giCur ? g_giTexB : g_giTex;
+        bool giDenoised = false;
+        if (g_giOk && g_dnProg && g_params.denoiseEnable > 0.5f) {
+            p_glBindFramebuffer(0x8D40, g_giFbo);
+            p_glFramebufferTexture2D(0x8D40, 0x8CE0, GL_TEXTURE_2D, g_giTexC, 0);
+            p_glUseProgram(g_dnProg);
+            if (p_glActiveTexture) {
+                p_glActiveTexture(GL_TEXTURE0 + 2);
+                glBindTexture(GL_TEXTURE_2D, accumTex);
+                p_glActiveTexture(GL_TEXTURE0);
+            }
+            if (dn_gi     >= 0) p_glUniform1i(dn_gi, 2);
+            if (dn_depth  >= 0) p_glUniform1i(dn_depth, 1);
+            if (dn_texel  >= 0) p_glUniform2f(dn_texel, 1.0f/(float)w, 1.0f/(float)h);
+            if (dn_near   >= 0) p_glUniform1f(dn_near, giNear);
+            if (dn_far    >= 0) p_glUniform1f(dn_far,  giFar);
+            if (dn_dinv   >= 0) p_glUniform1f(dn_dinv, g_params.depthInvert);
+            if (dn_dflip  >= 0) p_glUniform1f(dn_dflip, g_params.depthFlipV);
+            if (dn_radius >= 0) p_glUniform1f(dn_radius, g_params.denoiseRadius);
+            if (dn_sigma  >= 0) p_glUniform1f(dn_sigma,  g_params.denoiseSigma);
+            glColor3f(1, 1, 1);
+            glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex2f(-1.0f, -1.0f);
+                glTexCoord2f(1, 0); glVertex2f( 1.0f, -1.0f);
+                glTexCoord2f(1, 1); glVertex2f( 1.0f,  1.0f);
+                glTexCoord2f(0, 1); glVertex2f(-1.0f,  1.0f);
+            glEnd();
+            p_glBindFramebuffer(0x8D40, 0);
+            giDenoised = true;
+        }
+        // expose the freshly WRITTEN accumulation to the main pass on unit 2
+        if (p_glActiveTexture) {
+            p_glActiveTexture(GL_TEXTURE0 + 2);
+            glBindTexture(GL_TEXTURE_2D, giDenoised ? g_giTexC : accumTex);
+            p_glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, g_tex);
+        }
     }
 
     // draw fullscreen quad in NDC - gl_Position = gl_Vertex, zero matrices
@@ -909,6 +1931,50 @@ static void SetAllUniforms(int w, int h, bool haveDepth) {
     p_glUseProgram(g_prog);
     if (u_scene >= 0) p_glUniform1i(u_scene, 0);
     if (u_depth >= 0) p_glUniform1i(u_depth, 1);   // depth on texture unit 1
+    if (u_giTex >= 0) p_glUniform1i(u_giTex, 2);   // GI pre-pass on unit 2
+    if (u_ssrEnable    >= 0) p_glUniform1f(u_ssrEnable,    g_params.ssrEnable);
+    if (u_ssrIntensity >= 0) p_glUniform1f(u_ssrIntensity, g_params.ssrIntensity);
+    if (u_ssrSteps     >= 0) p_glUniform1f(u_ssrSteps,     g_params.ssrSteps);
+    if (u_ssrThickness >= 0) p_glUniform1f(u_ssrThickness, g_params.ssrThickness);
+    if (u_ssrUpDot     >= 0) p_glUniform1f(u_ssrUpDot,     g_params.ssrUpDot);
+    if (u_debugSSR     >= 0) p_glUniform1f(u_debugSSR,     g_params.debugSSR);
+    // Both mask consumers are ANDed with the stamp param: without stamping
+    // the capture is RGB and samples alpha as constant 1.0, which would read
+    // as "everything is metal" - accidental chrome world.
+    {
+        float stampOn = (g_params.ssrMaskStamp > 0.5f) ? 1.0f : 0.0f;
+        if (u_ssrMaskUse     >= 0) p_glUniform1f(u_ssrMaskUse,     g_params.ssrMaskUse * stampOn);
+        if (u_ssrMaskFresnel >= 0) p_glUniform1f(u_ssrMaskFresnel, g_params.ssrMaskFresnel);
+        if (u_debugSSRMask   >= 0) p_glUniform1f(u_debugSSRMask,   g_params.debugSSRMask * stampOn);
+        if (u_sceneFBO       >= 0) p_glUniform1i(u_sceneFBO, 4);
+        if (u_hasFBOMask     >= 0) p_glUniform1f(u_hasFBOMask, g_haveFBOMask ? 1.0f : 0.0f);
+        if (u_maskFlipV      >= 0) p_glUniform1f(u_maskFlipV, g_params.ssrMaskFlip);
+        if (u_gbufTex        >= 0) p_glUniform1i(u_gbufTex, 5);
+        if (u_hasGBuf        >= 0) p_glUniform1f(u_hasGBuf, g_haveGBuf ? 1.0f : 0.0f);
+        if (u_debugGN        >= 0) p_glUniform1f(u_debugGN, g_params.debugGNormals);
+        if (u_rtTex          >= 0) p_glUniform1i(u_rtTex, 6);
+        if (u_debugRt        >= 0) p_glUniform1f(u_debugRt, g_params.debugRt);
+        if (u_rtaoTex        >= 0) p_glUniform1i(u_rtaoTex, 8);
+        if (u_rtaoFlipV      >= 0) p_glUniform1f(u_rtaoFlipV, g_params.rtaoFlipV);
+        if (u_rtaoUse        >= 0) p_glUniform1f(u_rtaoUse, g_haveRtao ? 1.0f : 0.0f);
+        if (u_debugRtao      >= 0) p_glUniform1f(u_debugRtao,
+                                                 g_haveRtao ? g_params.debugRtao : 0.0f);
+    }
+    // world-up expressed in view space, from the draws' VP rows: for world
+    // z-up, the view-space up vector is the z column of the view rotation.
+    if (u_viewUp >= 0 && p_glUniform3f) {
+        float vp16[16];
+        float ux = 0.0f, uy = 1.0f, uz = 0.0f;   // fallback: screen up
+        if (SWSE_WindClipVPLast(vp16)) {
+            float l0 = sqrtf(vp16[0]*vp16[0]+vp16[1]*vp16[1]+vp16[2]*vp16[2]);
+            float l1 = sqrtf(vp16[4]*vp16[4]+vp16[5]*vp16[5]+vp16[6]*vp16[6]);
+            float l3 = sqrtf(vp16[12]*vp16[12]+vp16[13]*vp16[13]+vp16[14]*vp16[14]);
+            if (l0 > 1e-4f && l1 > 1e-4f && l3 > 1e-4f) {
+                ux = vp16[2]/l0; uy = vp16[6]/l1; uz = -vp16[14]/l3;
+            }
+        }
+        p_glUniform3f(u_viewUp, ux, uy, uz);
+    }
     if (u_texel >= 0) p_glUniform2f(u_texel, 1.0f/(float)w, 1.0f/(float)h);
     if (u_intensity      >= 0) p_glUniform1f(u_intensity,      g_params.intensity);
     if (u_hasDepth       >= 0) p_glUniform1f(u_hasDepth,       haveDepth ? 1.0f : 0.0f);
@@ -923,6 +1989,24 @@ static void SetAllUniforms(int w, int h, bool haveDepth) {
     float mNear = g_params.depthNear, mFar = g_params.depthFar;
     float mFov  = g_params.fov;
     SWSE_SceneProjection(&mNear, &mFar, &mFov);
+    // Draw-derived camera (work item #0 of the RTGI rebuild). The heap scan
+    // cannot tell which frustum copy is ACTIVE; the view-projection rows the
+    // engine uploaded for this frame's world draws can. Opt-in via cam_draw 1
+    // so the owner's defaults are untouched; falls back silently to the scan
+    // value whenever no known program decomposes to a sane frustum.
+    if (g_params.camDraw > 0.5f) {
+        float dn, df, dv, da; unsigned dp; int dc, dg;
+        if (SWSE_WindClipCamera(&dn, &df, &dv, &da, &dp, &dc, &dg)) {
+            static int logged = 0;
+            if (!logged) {
+                char b[160];
+                wsprintfA(b, "gfx: cam_draw ACTIVE - near/far/fov from program %u "
+                             "(%s convention)", dp, dc ? "D3D" : "GL");
+                LogC(b); logged = 1;
+            }
+            mNear = dn; mFar = df; mFov = dv;
+        }
+    }
     if (u_near           >= 0) p_glUniform1f(u_near,           mNear);
     if (u_far            >= 0) p_glUniform1f(u_far,            mFar);
     if (u_aoEnable       >= 0) p_glUniform1f(u_aoEnable,       g_params.aoEnable);
@@ -945,6 +2029,16 @@ static void SetAllUniforms(int w, int h, bool haveDepth) {
     if (u_dofStrength    >= 0) p_glUniform1f(u_dofStrength,    g_params.dofStrength);
     if (u_ssgiSamples    >= 0) p_glUniform1i(u_ssgiSamples,    g_params.ssgiSamples);
     if (u_debugGI        >= 0) p_glUniform1f(u_debugGI,        g_params.debugGI);
+    if (u_debugNormals   >= 0) p_glUniform1f(u_debugNormals,   g_params.debugNormals);
+    if (u_gtaoEnable     >= 0) p_glUniform1f(u_gtaoEnable,     g_params.gtaoEnable);
+    if (u_gtaoIntensity  >= 0) p_glUniform1f(u_gtaoIntensity,  g_params.gtaoIntensity);
+    if (u_gtaoRadius     >= 0) p_glUniform1f(u_gtaoRadius,     g_params.gtaoRadius);
+    if (u_gtaoDirs       >= 0) p_glUniform1f(u_gtaoDirs,       g_params.gtaoDirs);
+    if (u_gtaoSteps      >= 0) p_glUniform1f(u_gtaoSteps,      g_params.gtaoSteps);
+    if (u_debugAO        >= 0) p_glUniform1f(u_debugAO,        g_params.debugAO);
+    if (u_hbilEnable     >= 0) p_glUniform1f(u_hbilEnable,     g_params.hbilEnable);
+    if (u_hbilIntensity  >= 0) p_glUniform1f(u_hbilIntensity,  g_params.hbilIntensity);
+    if (u_debugBounce    >= 0) p_glUniform1f(u_debugBounce,    g_params.debugBounce);
     if (u_depthInvert    >= 0) p_glUniform1f(u_depthInvert,    g_params.depthInvert);
     if (u_depthFlipV     >= 0) p_glUniform1f(u_depthFlipV,     g_params.depthFlipV);
     // FOV was guessed too (65 deg vs the camera's real 80). It scales the
@@ -1188,11 +2282,35 @@ static void WriteTGA(const char* path, int w, int h, const unsigned char* rgb) {
     CloseHandle(f);
 }
 
+static void LogSnap(const char* s) {
+    char path[MAX_PATH];
+    GetModuleFileNameA(GetModuleHandleA(NULL), path, MAX_PATH);
+    char* sl = strrchr(path, '\\'); if (sl) *sl = 0;
+    char full[MAX_PATH];
+    wsprintfA(full, "%s\\swse_log.txt", path);
+    HANDLE f = CreateFileA(full, FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                           OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (f == INVALID_HANDLE_VALUE) return;
+    DWORD w = 0;
+    WriteFile(f, s, lstrlenA(s), &w, NULL);
+    WriteFile(f, "\r\n", 2, &w, NULL);
+    CloseHandle(f);
+}
+
 static void ServiceSnapshot(HDC hdc) {
     if (!g_snapPending) return;
     HWND hwnd = WindowFromDC(hdc);
     RECT rc;
     if (!hwnd || !GetClientRect(hwnd, &rc)) { InterlockedExchange(&g_snapPending, 0); return; }
+    // A minimized window owns no pixels: say so, rather than silently writing
+    // nothing (background mode minimizes the game - restore it without
+    // activation, behind other windows, to take a picture).
+    if (IsIconic(hwnd)) {
+        LogSnap("snap: the game window is minimized - no pixels to read. Restore it "
+                "behind other windows (no activation) and snap again.");
+        InterlockedExchange(&g_snapPending, 0);
+        return;
+    }
     int w = rc.right - rc.left, h = rc.bottom - rc.top;
     if (w <= 0 || h <= 0) { InterlockedExchange(&g_snapPending, 0); return; }
     unsigned char* buf = (unsigned char*)malloc((size_t)w * h * 3);
@@ -1218,6 +2336,11 @@ static void ServiceSnapshotProtected(HDC hdc) {
     __except (EXCEPTION_EXECUTE_HANDLER) { InterlockedExchange(&g_snapPending, 0); }
 }
 
+// For the frame hook when the pipeline is not running: `snap` is a console
+// tool, and with graphics off (the 1.1 default) SWSE_GfxFrame never ran, so
+// the request sat pending forever and no file appeared.
+void SWSE_GfxServiceSnapshot(HDC hdc) { ServiceSnapshotProtected(hdc); }
+
 void SWSE_GfxFrame(HDC hdc) {
     if (!g_ready) return;
 
@@ -1242,6 +2365,42 @@ void SWSE_GfxFrame(HDC hdc) {
     bool reload = (GetAsyncKeyState(VK_F11) & 0x8000) != 0;
     if (reload && !prevReload) { LoadSettings(); LogC("gfx: settings reloaded (F11)"); }
     prevReload = reload;
+
+    // Numpad 9 toggles GTAO vs the old tap-count AO, for in-play A/B testing.
+    // Runtime-only by design: it does NOT write settings.txt, so the shipped
+    // default stays whatever the owner set, and an F11 reload or `set
+    // gtao_enable` wins over the last keypress.
+    static bool prevGtaoKey = false;
+    bool gtaoKey = (GetAsyncKeyState(VK_NUMPAD9) & 0x8000) != 0;
+    if (gtaoKey && !prevGtaoKey) {
+        g_params.gtaoEnable = (g_params.gtaoEnable > 0.5f) ? 0.0f : 1.0f;
+        LogC(g_params.gtaoEnable > 0.5f ? "gfx: GTAO ON (numpad 9)"
+                                        : "gfx: GTAO OFF - old AO active (numpad 9)");
+    }
+    prevGtaoKey = gtaoKey;
+
+    // Numpad 8 toggles the HBIL bounce, same contract as numpad 9: runtime
+    // only, never writes settings, logged per flip.
+    static bool prevHbilKey = false;
+    bool hbilKey = (GetAsyncKeyState(VK_NUMPAD8) & 0x8000) != 0;
+    if (hbilKey && !prevHbilKey) {
+        g_params.hbilEnable = (g_params.hbilEnable > 0.5f) ? 0.0f : 1.0f;
+        LogC(g_params.hbilEnable > 0.5f ? "gfx: HBIL bounce ON (numpad 8)"
+                                        : "gfx: HBIL bounce OFF (numpad 8)");
+    }
+    prevHbilKey = hbilKey;
+
+    // Numpad 6 toggles SSR - the owner's A/B switch for judging whether the
+    // wet-ground look earns its keep. Same contract: runtime only, never
+    // writes settings, logged per flip.
+    static bool prevSsrKey = false;
+    bool ssrKey = (GetAsyncKeyState(VK_NUMPAD6) & 0x8000) != 0;
+    if (ssrKey && !prevSsrKey) {
+        g_params.ssrEnable = (g_params.ssrEnable > 0.5f) ? 0.0f : 1.0f;
+        LogC(g_params.ssrEnable > 0.5f ? "gfx: SSR ON (numpad 6)"
+                                       : "gfx: SSR OFF (numpad 6)");
+    }
+    prevSsrKey = ssrKey;
 
     if (!g_enabled) return;   // do nothing - game renders as normal
 
@@ -1279,6 +2438,40 @@ void SWSE_GfxSetEnabled(int on) {
     if (g_enabled && SWSE_SceneDepthTex() == 0) g_needDepthPick = true;
 }
 int  SWSE_GfxIsEnabled() { return g_enabled ? 1 : 0; }
+
+// Truth probe for the mask chain: the live param values and the uniform
+// locations, so 'ssrmask' can show exactly which link is dead.
+void SWSE_GfxMaskDebugInfo(int* stampP, int* dbgP, int* locDbg, int* locFbo,
+                           int* locHas, int* haveFbo) {
+    if (stampP)  *stampP  = (int)(g_params.ssrMaskStamp * 100.0f);
+    if (dbgP)    *dbgP    = (int)(g_params.debugSSRMask * 100.0f);
+    if (locDbg)  *locDbg  = (int)u_debugSSRMask;
+    if (locFbo)  *locFbo  = (int)u_sceneFBO;
+    if (locHas)  *locHas  = (int)u_hasFBOMask;
+    if (haveFbo) *haveFbo = g_haveFBOMask ? 1 : 0;
+}
+
+// Alpha histogram of the last RGBA capture - ground truth for the material
+// mask, read from the CPU copy the capture already made. No GL calls, safe
+// from any thread. Returns 0 when the capture is RGB (stamping off).
+int SWSE_GfxMaskAlphaStats(int* mn, int* mx, int* mean, int* pctNonzero) {
+    if (!g_texHasA || !g_cpu || g_texW <= 0 || g_texH <= 0) return 0;
+    unsigned char lo = 255, hi = 0;
+    unsigned long long sum = 0; long long nz = 0;
+    long long n = (long long)g_texW * g_texH;
+    for (long long i = 0; i < n; i++) {
+        unsigned char a = g_cpu[i * 4 + 3];
+        if (a < lo) lo = a;
+        if (a > hi) hi = a;
+        sum += a;
+        if (a) nz++;
+    }
+    if (mn) *mn = lo;
+    if (mx) *mx = hi;
+    if (mean) *mean = (int)(sum / (unsigned long long)n);
+    if (pctNonzero) *pctNonzero = (int)(nz * 100 / n);
+    return 1;
+}
 void SWSE_GfxReloadSettings() { LoadSettings(); }
 
 // Rewrite one "key value" line in settings.txt (replace or append), then
@@ -1297,6 +2490,20 @@ void SWSE_GfxReloadSettings() { LoadSettings(); }
 // buffers are large enough for a real config.
 #define SET_BUF 65536
 int SWSE_GfxSetSetting(const char* key, const char* value) {
+    // Check before touching the file (RT_QA_STATE_AUDIT 2.1a): only a key
+    // ApplySetting reads, and only a number - LoadSettings reads every value
+    // as a float, so `set rtao_enable on` would have sat in the file doing
+    // nothing. A decimal comma is taken as a point, as the prefs editor does.
+    if (!SWSE_GfxKnownKey(key)) return 0;
+    char num[64];
+    if (lstrlenA(value) >= (int)sizeof(num)) return -2;
+    lstrcpynA(num, value, sizeof(num));
+    for (char* c = num; *c; c++) if (*c == ',') *c = '.';
+    char* stop = nullptr;
+    double d = strtod(num, &stop);
+    if (stop == num || *stop || !(d >= -1.0e30 && d <= 1.0e30)) return -2;
+    value = num;
+
     char path[MAX_PATH]; SettingsPath(path);
 
     static char buf[SET_BUF];
@@ -1313,11 +2520,13 @@ int SWSE_GfxSetSetting(const char* key, const char* value) {
 
     // Append with a hard bound; refuse to write a truncated file rather than
     // silently losing the user's settings.
+    // (_snprintf_s, not wsprintfA: a line over 511 characters would have run
+    // past _t. Such a line refuses the write too.)
     #define SET_EMIT(fmt, a, b)                                          \
         do {                                                             \
             char _t[512];                                                \
-            int _k = wsprintfA(_t, fmt, a, b);                           \
-            if (o + _k >= (int)sizeof(out) - 1) return 0;                \
+            int _k = _snprintf_s(_t, sizeof(_t), _TRUNCATE, fmt, a, b);  \
+            if (_k < 0 || o + _k >= (int)sizeof(out) - 1) return -1;     \
             memcpy(out + o, _t, _k); o += _k;                            \
         } while (0)
 
@@ -1350,7 +2559,7 @@ int SWSE_GfxSetSetting(const char* key, const char* value) {
 
     HANDLE hw = CreateFileA(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
                             FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hw == INVALID_HANDLE_VALUE) return 0;
+    if (hw == INVALID_HANDLE_VALUE) return -1;
     DWORD wr; WriteFile(hw, out, o, &wr, NULL); CloseHandle(hw);
     LoadSettings();
     return 1;

@@ -31,8 +31,13 @@ void SWSE_FoliageNoteUpload(unsigned hash, unsigned texid);
 void SWSE_FoliageFrameMark();
 
 // Install/remove the glBindTexture hook that tracks which texture is current.
-// Returns 0 on failure and writes why into msg.
+// Returns 0 on failure and writes why into msg. The hook itself is the core's
+// (glspy.cpp, 1.1); this switches foliage's tap on it.
 int SWSE_FoliageTrack(int on, char* msg, int msgLen);
+
+// The tap: called by the core glBindTexture hook for every GL_TEXTURE_2D bind,
+// before the real one, once foliage tracking is on.
+void SWSE_FoliageOnBind2D(unsigned tex);
 
 // listN            fingerprints loaded from disk
 // knownTexids      texture ids currently flagged as foliage

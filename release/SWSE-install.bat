@@ -39,7 +39,12 @@ if exist "bin\dinput8_real.dll" (
 
 echo.
 echo  Done. Launch the game from Steam.
-echo  In-game: F10 = graphics on/off, ` (tilde) = console.
+echo  In-game: ` (tilde) = console. SWSE 1.1 starts with ONLY the console on.
+echo  Type  features  in the console to see every system, and e.g.
+echo  features graphics on   (then F10 toggles the look)  or  features foliage on
+echo  to switch one on, or  features preset full  for the classic SWSE in one
+echo  word. SWSEMods\features.txt holds the same switches, and SWSE Setup.exe
+echo  (in the download) ticks them for you.
 echo.
 pause
 endlocal

@@ -1,0 +1,34 @@
+# SWSE key binds (binds.txt)
+#
+# SWSE reads this file from SWSEMods\SWSE Console\ - the copy in examples\ is
+# only a template. Copy it up one folder to use it; `bind` creates it there too.
+#
+# A bound key runs a console command line while the console is CLOSED and the
+# game has focus. One bind per line:    <key>   <command line>
+#
+#   keys        F1-F24, A-Z, 0-9, numpad0-numpad9 (or kp0-kp9), insert,
+#               delete, home, end, pgup, pgdn, up, down, left, right, space,
+#               tab, enter, backspace, pause, scrolllock, minus, equals,
+#               lbracket, rbracket, semicolon, quote, comma, period, slash,
+#               backslash, kpmultiply, kpadd, kpsubtract, kpdivide, kpdecimal,
+#               and the mouse buttons mouse3 (middle), mouse4, mouse5
+#   modifiers   ctrl+  alt+  shift+  in front, e.g. ctrl+F5 or alt+shift+K.
+#               A bind fires only with exactly those modifiers held.
+#   not allowed ~ (it opens the console) and Esc.
+#
+# A BOUND KEY STILL REACHES THE GAME TOO - pick keys the game does not use.
+# F10 and F11 belong to SWSE Graphics while it is on.
+#
+# The command line can be anything you can type, including a sequence such
+# as  heal; wait 500; status
+#
+# This file is read once, when the console starts. The `bind` and `unbind`
+# commands rewrite it from what is loaded - every # line is kept, ahead of the
+# binds - so either edit it with the game closed or use the commands, not both
+# at once. `binds` lists what is loaded.
+#
+# EXAMPLES - remove the leading # to use one.
+#F5           savepos
+#F6           tp
+#numpad0      status
+#ctrl+F7      features foliage on temp

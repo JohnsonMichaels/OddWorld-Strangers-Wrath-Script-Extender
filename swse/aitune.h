@@ -28,11 +28,20 @@ int SWSE_AiTuneApply(const char* profile, char* msg, int msgLen);
 // Current profile name ("" when off), and how many objects are tuned.
 const char* SWSE_AiTuneActive();
 int SWSE_AiTuneCount();
+// The level epoch the current profile was applied in (SWSE_LevelEpoch), so a
+// status line can tell "in force here" from "applied in an earlier level".
+unsigned SWSE_AiTuneActiveEpoch();
+// The profile aiprefs.txt's `active =` line asks for ("" when off).
+const char* SWSE_AiTuneWanted();
 
 // Called every frame. If aiprefs.txt names an `active` profile, this applies
 // it automatically whenever a level comes up - the scan runs on a worker so
 // it never stalls a frame.
 void SWSE_AiTuneTick();
+
+// Apply the `active` profile again on the next tick, without waiting for a
+// level load - used when AI tuning is switched on while a level is running.
+void SWSE_AiTuneKick();
 
 // Re-apply the active profile. A level load builds new prefs objects, so the
 // tuning has to be re-established or it silently lapses.

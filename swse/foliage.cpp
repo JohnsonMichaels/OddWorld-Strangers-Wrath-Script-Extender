@@ -1,14 +1,14 @@
 // SWSE foliage identification - see foliage.h.
 //
-// glBindTexture is called thousands of times per frame, so the
-// unhook -> call -> rehook pattern used elsewhere in SWSE is not usable here:
-// it costs two VirtualProtect calls per invocation. This uses a trampoline
-// instead (relocate the prologue once, jump back), the same shape as the bolt
-// hook in granny.cpp.
+// Bind tracking rides the core glBindTexture hook (glspy.cpp, 1.1): this file
+// owned that trampoline until native plugins arrived, and its body is now the
+// hook's built-in tap, SWSE_FoliageOnBind2D, unchanged.
 
 #include "foliage.h"
+#include "materials.h"
 #include "modregistry.h"
 #include "wind.h"
+#include "glspy.h"          // the core bind hook
 #include <windows.h>
 #include <gl/GL.h>
 #include <stdio.h>
@@ -308,78 +308,56 @@ void SWSE_FoliageFrameMark() {
     g_scanActive = collecting;
 }
 
-typedef void (APIENTRY* glBindTexture_t)(GLenum, GLuint);
-static glBindTexture_t g_bindTramp = nullptr;
-static BYTE* g_trampMem = nullptr;
-static void* g_bindTarget = nullptr;
-static BYTE  g_bindOrig[8];
-static int   g_bindPrologue = 0;
 static bool  g_hooked = false;
 
-static void APIENTRY HookedBindTexture(GLenum target, GLuint tex) {
-    if (target == GL_TEXTURE_2D) {
-        g_curTex = tex;
-        // Gating on ANY unit's bind, deliberately. Restricting this to unit 0
-        // looked more correct on paper, but the effect demonstrably reaches
-        // the plants as it stands, and a query-per-bind refinement that could
-        // silently miss foliage bound to another unit is not worth making
-        // against a working system.
-        SWSE_WindGate(tex < MAX_TEXID && g_isFoliage[tex],
-                      tex < MAX_TEXID && g_noPushTex[tex],
-                      (tex < MAX_TEXID && g_isFoliage[tex]) ? g_swayTex[tex] : 100);
-        if (tex < MAX_TEXID && g_isFoliage[tex]) {
-            g_bindsThisFrame++;
-            // Capture the camera matrix mid-scene, and keep RE-capturing.
-            //
-            // Program local parameters hold whatever the LAST draw set. On the
-            // FIRST foliage bind of a frame that is still the previous frame's
-            // value, so decals were reconstructed with a stale camera and
-            // visibly swam as the view moved. Capturing repeatedly means the
-            // value left at the end is from a draw in THIS frame's scene pass.
-            // Capped so the cost stays bounded on foliage-heavy views.
-            // The camera is no longer captured here. It used to be, because
-            // scraping the matrix out of shader parameters required a scene
-            // program to be bound - which meant it only updated when FOLIAGE
-            // was on screen. Looking at bare ground left the matrix stale and
-            // decals appeared to move with the camera. It is built from a
-            // memory struct now, so the frame hook updates it every frame
-            // regardless of what is being drawn.
-            // Discover foliage programs CONTINUOUSLY, not only during a scan.
-            // A single scan frame found 3 programs and missed whichever one
-            // draws the dandelions, so they never moved. Different plant types
-            // use different programs, and a plant only reveals its program
-            // when it is on screen. Querying once per distinct foliage texture
-            // (about 11 per frame here, not per bind) keeps this cheap while
-            // still catching every type the player walks past.
-            if (tex != g_lastFoliageTex) {
-                g_lastFoliageTex = tex;
-                NoteFoliageProgram();
-            }
-        }
-        if (g_scanActive && tex < MAX_TEXID && g_scanSeen && !g_scanSeen[tex]
-            && g_scanN < (int)(sizeof(g_scanList) / sizeof(g_scanList[0]))) {
-            g_scanSeen[tex] = 1;
-            g_scanList[g_scanN++] = tex;
+// The built-in tap of the core glBindTexture hook (glspy.cpp), for every
+// GL_TEXTURE_2D bind, before the real one. Until native plugins (1.1) this
+// was the body of foliage's own hook, and it is the same code.
+void SWSE_FoliageOnBind2D(unsigned tex) {
+    g_curTex = tex;
+    SWSE_MaterialsOnBind(tex);   // SSR mask: alpha writes track the bind
+    // Gating on ANY unit's bind, deliberately. Restricting this to unit 0
+    // looked more correct on paper, but the effect demonstrably reaches
+    // the plants as it stands, and a query-per-bind refinement that could
+    // silently miss foliage bound to another unit is not worth making
+    // against a working system.
+    SWSE_WindGate(tex < MAX_TEXID && g_isFoliage[tex],
+                  tex < MAX_TEXID && g_noPushTex[tex],
+                  (tex < MAX_TEXID && g_isFoliage[tex]) ? g_swayTex[tex] : 100);
+    if (tex < MAX_TEXID && g_isFoliage[tex]) {
+        g_bindsThisFrame++;
+        // Capture the camera matrix mid-scene, and keep RE-capturing.
+        //
+        // Program local parameters hold whatever the LAST draw set. On the
+        // FIRST foliage bind of a frame that is still the previous frame's
+        // value, so decals were reconstructed with a stale camera and
+        // visibly swam as the view moved. Capturing repeatedly means the
+        // value left at the end is from a draw in THIS frame's scene pass.
+        // Capped so the cost stays bounded on foliage-heavy views.
+        // The camera is no longer captured here. It used to be, because
+        // scraping the matrix out of shader parameters required a scene
+        // program to be bound - which meant it only updated when FOLIAGE
+        // was on screen. Looking at bare ground left the matrix stale and
+        // decals appeared to move with the camera. It is built from a
+        // memory struct now, so the frame hook updates it every frame
+        // regardless of what is being drawn.
+        // Discover foliage programs CONTINUOUSLY, not only during a scan.
+        // A single scan frame found 3 programs and missed whichever one
+        // draws the dandelions, so they never moved. Different plant types
+        // use different programs, and a plant only reveals its program
+        // when it is on screen. Querying once per distinct foliage texture
+        // (about 11 per frame here, not per bind) keeps this cheap while
+        // still catching every type the player walks past.
+        if (tex != g_lastFoliageTex) {
+            g_lastFoliageTex = tex;
+            NoteFoliageProgram();
         }
     }
-    g_bindTramp(target, tex);
-}
-
-// Verify before patching. A wrong prologue length splits an instruction and
-// corrupts the driver; refusing and logging the bytes is always better than
-// guessing, and the bytes tell us what to support next.
-static int PrologueLen(const BYTE* t) {
-    // mov edi,edi ; push ebp ; mov ebp,esp   -- the hot-patch prologue
-    if (t[0] == 0x8B && t[1] == 0xFF && t[2] == 0x55 && t[3] == 0x8B && t[4] == 0xEC)
-        return 5;
-    // push ebp ; mov ebp,esp ; sub esp,imm8
-    if (t[0] == 0x55 && t[1] == 0x8B && t[2] == 0xEC && t[3] == 0x83 && t[4] == 0xEC)
-        return 6;
-    // push ebp ; mov ebp,esp ; push esi/edi/ebx
-    if (t[0] == 0x55 && t[1] == 0x8B && t[2] == 0xEC &&
-        (t[3] == 0x56 || t[3] == 0x57 || t[3] == 0x53))
-        return 5;   // 1 + 2 + 1 = 4 whole; take 5 only if byte 4 also starts clean
-    return 0;
+    if (g_scanActive && tex < MAX_TEXID && g_scanSeen && !g_scanSeen[tex]
+        && g_scanN < (int)(sizeof(g_scanList) / sizeof(g_scanList[0]))) {
+        g_scanSeen[tex] = 1;
+        g_scanList[g_scanN++] = tex;
+    }
 }
 
 int SWSE_FoliageTrack(int on, char* msg, int msgLen) {
@@ -392,44 +370,12 @@ int SWSE_FoliageTrack(int on, char* msg, int msgLen) {
     }
     if (g_hooked) { if (msg) lstrcpynA(msg, "foliage tracking already on", msgLen); return 1; }
 
-    HMODULE gl = GetModuleHandleA("opengl32.dll");
-    if (!gl) { if (msg) lstrcpynA(msg, "opengl32.dll not loaded", msgLen); return 0; }
-    BYTE* t = (BYTE*)GetProcAddress(gl, "glBindTexture");
-    if (!t) { if (msg) lstrcpynA(msg, "glBindTexture not found", msgLen); return 0; }
-
-    int len = PrologueLen(t);
-    if (len == 0) {
-        char b[160];
-        wsprintfA(b, "foliage: UNRECOGNISED glBindTexture prologue %02X %02X %02X %02X %02X %02X",
-                  t[0], t[1], t[2], t[3], t[4], t[5]);
-        LogF(b);
-        if (msg) lstrcpynA(msg, b, msgLen);
-        return 0;
-    }
-
-    g_trampMem = (BYTE*)VirtualAlloc(0, 32, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-    if (!g_trampMem) { if (msg) lstrcpynA(msg, "trampoline alloc failed", msgLen); return 0; }
-
-    memcpy(g_bindOrig, t, len);
-    memcpy(g_trampMem, t, len);
-    g_trampMem[len] = 0xE9;                            // JMP back to target+len
-    *(DWORD*)(g_trampMem + len + 1) = (DWORD)((t + len) - (g_trampMem + len + 5));
-    g_bindTramp = (glBindTexture_t)g_trampMem;
-
-    DWORD old;
-    VirtualProtect(t, len, PAGE_EXECUTE_READWRITE, &old);
-    t[0] = 0xE9;
-    *(DWORD*)(t + 1) = (DWORD)((BYTE*)HookedBindTexture - (t + 5));
-    for (int i = 5; i < len; i++) t[i] = 0x90;         // pad the remainder
-    VirtualProtect(t, len, old, &old);
-
-    g_bindTarget = t;
-    g_bindPrologue = len;
+    // The core hook (glspy.cpp) - installed now unless a plugin's listener
+    // already put it in - with foliage's tap switched on. Same verification,
+    // same log line as when foliage owned the trampoline.
+    if (SWSE_BindHookInstall("foliage", msg, msgLen) <= 0) return 0;
+    SWSE_BindHookEnableBuiltin();
     g_hooked = true;
-    char b[120];
-    wsprintfA(b, "foliage: glBindTexture hooked (prologue %d bytes)", len);
-    LogF(b);
-    if (msg) lstrcpynA(msg, b, msgLen);
     return 1;
 }
 

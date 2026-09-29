@@ -9,6 +9,7 @@
 # These triggers put a chance of something happening on the way back.
 #
 # HOW TO USE
+#   0. Switch triggers on - they ship off in SWSE 1.1:   features triggers on
 #   1. Stand where you want an ambush and run:   writepos ambush_canyon
 #   2. Point a trigger at that label (below)
 #   3. `triggers reload`, then walk into it
@@ -56,8 +57,9 @@
 
 
 # Bank the level's spare cast the moment a level comes up, so later ambushes
-# have bodies to draw on. The engine only creates NPCs at load time, so
-# without something like this a cleared area genuinely has nobody left.
+# have bodies to draw on. The engine creates a level's cast when it loads
+# (apart from gib spawns and spawn-pool refills), so without something like
+# this a cleared area genuinely has nobody left.
 [bank_the_reserve]
 when  = levelload
 once  = level

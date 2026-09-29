@@ -79,3 +79,10 @@ near_cutoff 2
 # hardcoded 0.45 - near objects gathered from half the frame and bled into
 # each other. Lower = tighter contact GI. 0.12 is the tuned default.
 ssgi_maxscreen 0.12
+
+# ---- Ray-traced AO (EXPERIMENTAL) -----------------------------------------
+# Needs raytrace = on as well as graphics = on in SWSEMods\features.txt, and
+# traces nothing until rtao_enable is 1 (`set rtao_enable 1` in the console
+# adds that line here). Other keys and their defaults: rtao_radius 4,
+# rtao_rays 8, rtao_strength 1, rtao_blend 0.12.
+#rtao_enable 1

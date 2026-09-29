@@ -40,6 +40,7 @@
 //   extremely distinctive pattern - the same value-signature approach that
 //   located the camera frustum.
 
+#include "gamebuild.h"  // the two game-code hooks below refuse on unknown builds
 #include <windows.h>
 #include <cmath>
 #include <stdio.h>      // settings file I/O
@@ -47,6 +48,7 @@
 #include "granny.h"
 #include "modregistry.h"
 #include "scriptvm.h"   // SWSE_FindNpcs / SWSE_PosGet, for the damage watch
+#include "hookreg.h"    // every patch reported to the one list (`hooks`)
 
 // MEASURED, not taken from Granny's documented granny_transform (0x44 with the
 // quaternion at +0x10). Those constants were wrong for this build, and because
@@ -1799,6 +1801,15 @@ static __declspec(naked) void HookedBoltUpdate() {
 
 int SWSE_BoltHookInstall(char* msg, int msgLen) {
     if (g_boltHooked) { lstrcpynA(msg, "bolt hook already installed", msgLen); return 1; }
+    // A code patch at a Steam-measured address: the prologue check below
+    // (55 8B EC 83) matches many functions in any build, so another build is
+    // refused outright.
+    if (!SWSE_GameBuildKnown()) {
+        SWSE_GameBuildRefusal("the bolt-tracking hook", msg, msgLen);
+        LogG(msg);
+        SWSE_HookRefused("granny", "Bolt::vfunc17");
+        return 0;
+    }
     BYTE* t = (BYTE*)((BYTE*)GetModuleHandleA(NULL) + RVA_BOLT_UPDATE);
     // Same prologue discipline as the pose hook: verify before patching.
     if (!(t[0] == 0x55 && t[1] == 0x8B && t[2] == 0xEC && t[3] == 0x83)) {
@@ -1822,6 +1833,7 @@ int SWSE_BoltHookInstall(char* msg, int msgLen) {
     t[5] = 0x90;
     VirtualProtect(t, PROLOGUE_LEN, old, &old);
     g_boltHooked = true;
+    SWSE_HookNote(t, PROLOGUE_LEN, "granny", SWSE_HOOK_TRAMPOLINE, "Bolt::vfunc17");
     lstrcpynA(msg, "bolt hook installed - tracking projectile positions", msgLen);
     return 1;
 }
@@ -1848,6 +1860,14 @@ static __declspec(naked) void HookedBuildWorldPose() {
 
 int SWSE_HitReactInstall(char* msg, int msgLen) {
     if (g_bwpHooked) { lstrcpynA(msg, "already installed", msgLen); return 1; }
+    // Same rule as the bolt hook: this patches the game's pose code at a
+    // Steam-measured address, and a prologue check alone is not proof.
+    if (!SWSE_GameBuildKnown()) {
+        SWSE_GameBuildRefusal("hit reactions (a hook in the game's pose code)", msg, msgLen);
+        LogG(msg);
+        SWSE_HookRefused("granny", "BuildWorldPose");
+        return 0;
+    }
     g_bwpTarget = (BYTE*)GetModuleHandleA(NULL) + RVA_BUILD_WORLD_POSE;
 
     // Verify the prologue before patching. This check already paid for itself:
@@ -1890,6 +1910,7 @@ int SWSE_HitReactInstall(char* msg, int msgLen) {
     VirtualProtect(t, PROLOGUE_LEN, old, &old);
 
     g_bwpHooked = true;
+    SWSE_HookNote(t, PROLOGUE_LEN, "granny", SWSE_HOOK_TRAMPOLINE, "BuildWorldPose");
     LogG("HITREACT: hook installed on BuildWorldPose");
     lstrcpynA(msg, "hit reactions: hook installed", msgLen);
     return 1;

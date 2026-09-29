@@ -10,6 +10,9 @@
 // a one-liner.
 
 #include "console.h"
+#include "gamebuild.h"
+#include "menu.h"
+#include "mute.h"
 #include "modregistry.h"
 #include "triggers.h"
 #include "positions.h"
@@ -23,9 +26,20 @@
 #include "aitune.h"
 #include "features.h"
 #include "foliage.h"
+#include "materials.h"
+#include "gpucompute.h"
+#include "geocapture.h"
+#include "raytrace.h"
 #include "wind.h"
 #include "framehook.h"
 #include "selftest.h"
+#include "levelwatch.h"
+#include "playertune.h"
+#include "prefsedit.h"
+#include "playnpc.h"
+#include "plugins.h"
+#include "hookreg.h"
+#include "freecam.h"
 #include <gl/GL.h>
 #include <string>
 #include <cstring>
@@ -66,6 +80,21 @@ static int   g_logCount = 0;
 static int   g_scroll = 0;   // lines scrolled up from bottom
 
 bool SWSE_ConsoleOpen() { return g_open; }
+
+// When the console last opened and closed. The game reads keys from its own
+// message queue, which it may drain a frame after the console saw them, so
+// input.cpp uses this window to keep what was typed into the console - the
+// Escape or Enter that closed it included - from reaching the game late.
+static DWORD g_openedAt = 0, g_closedAt = 0;
+static void SetOpen(bool open) {
+    if (open && !g_open) g_openedAt = GetTickCount();
+    if (!open && g_open) g_closedAt = GetTickCount();
+    g_open = open;
+}
+void SWSE_ConsoleOpenWindow(DWORD* openedAt, DWORD* closedAt) {
+    if (openedAt) *openedAt = g_openedAt;
+    if (closedAt) *closedAt = g_closedAt;
+}
 
 // ---- remote channel capture ----------------------------------------------
 // While a remote command runs, every console line is also copied into this
@@ -123,7 +152,10 @@ void SWSE_ConsolePrint(const char* text) {
     }
 }
 static void Printf(const char* fmt, ...) {
-    char b[240]; va_list ap; va_start(ap, fmt);
+    // wvsprintfA writes up to 1024 characters whatever the buffer is; a 240
+    // byte buffer here let a long alias/after/bind line overwrite the stack.
+    // Full size to format, then SWSE_ConsolePrint keeps the first 239.
+    char b[1100]; va_list ap; va_start(ap, fmt);
     wvsprintfA(b, fmt, ap); va_end(ap);
     SWSE_ConsolePrint(b);
 }
@@ -136,9 +168,12 @@ struct Cmd { const char* name; const char* cat; const char* help; CmdFn fn; };
 
 // Display order for the help screen; anything with an unlisted category still
 // prints, under "other".
+// "raytrace" and "input" joined in 1.1: those commands were filed under "gfx"
+// and "input", which were not listed here, so they showed only on help's
+// "other" line and `help input` answered "no such command or category".
 static const char* kCats[] = {
-    "player", "movement", "items", "world", "graphics",
-    "scripting", "debug", "music", "console",
+    "player", "movement", "items", "world", "tuning", "graphics", "raytrace",
+    "input", "scripting", "debug", "music", "console",
 };
 static const int N_CATS = sizeof(kCats) / sizeof(kCats[0]);
 
@@ -153,14 +188,30 @@ static DynCmd g_dynCmds[48];
 static int    g_dynCmdCount = 0;
 static void Cmd_clear(int, char**) { g_logCount = 0; g_scroll = 0; }
 static void Cmd_echo(int argc, char** argv) {
-    char line[160] = {0};
-    for (int i = 1; i < argc; i++) { lstrcatA(line, argv[i]); lstrcatA(line, " "); }
+    // Bounded: 1.0.x strcat'ed every word into 160 bytes, and an alias that
+    // echoes its arguments reaches that easily.
+    char line[240] = {0};
+    int used = 0;
+    for (int i = 1; i < argc; i++) {
+        int len = lstrlenA(argv[i]);
+        if (used + len + 2 > (int)sizeof(line)) len = (int)sizeof(line) - used - 2;
+        if (len <= 0) break;
+        memcpy(line + used, argv[i], len); used += len;
+        line[used++] = ' ';
+        line[used] = 0;
+    }
     SWSE_ConsolePrint(line);
 }
+#include "swse_version.h"      // SWSE_VERSION
 static void Cmd_ver(int, char**) {
-    SWSE_ConsolePrint("SWSE Console v1.0  (SWSE script extender)");
+    SWSE_ConsolePrint("SWSE " SWSE_VERSION " - Stranger's Wrath Script Extender");
+    SWSE_ConsolePrint("console-only by default; `features` lists every system and switches them");
 }
 static void Cmd_gfx(int argc, char** argv) {
+    if (!SWSE_Feature(FEAT_GRAPHICS)) {
+        SWSE_ConsolePrint("graphics is off (the 1.1 default) - `features graphics on` loads it");
+        return;
+    }
     if (argc < 2) { SWSE_ConsolePrint("usage: gfx on|off|toggle|reload"); return; }
     if (!lstrcmpiA(argv[1], "on"))        { SWSE_GfxSetEnabled(1); SWSE_ConsolePrint("post-process ON"); }
     else if (!lstrcmpiA(argv[1], "off"))  { SWSE_GfxSetEnabled(0); SWSE_ConsolePrint("post-process OFF"); }
@@ -170,19 +221,57 @@ static void Cmd_gfx(int argc, char** argv) {
 }
 static bool TrySetPointer(const char* name, const char* val);   // fwd
 static void Cmd_remote(int argc, char** argv);                  // fwd (remote channel)
+// Safe mode (gamebuild.h): the one line for a command, a pointer chain or a
+// game function that would reach the game on this build.
+static void SafeModeRefuse(const char* what) {
+    char m[300];
+    SWSE_GameBuildRefusal(what, m, sizeof(m));
+    SWSE_ConsolePrint(m);
+}
 static void Cmd_set(int argc, char** argv) {
     if (argc < 3) { SWSE_ConsolePrint("usage: set <name> <value>   (pointer chain, or a graphics key)"); return; }
-    // pointer chains first (health, etc.), then fall back to graphics settings
+    // pointer chains first (health, etc.), then fall back to graphics settings.
+    // A chain starts at a Steam address (pointers.txt), so safe mode refuses
+    // one; a graphics key still sets.
+    if (SWSE_GameBuildSafeMode() && SWSE_PtrFind(argv[1]) >= 0) {
+        char w[96];
+        _snprintf_s(w, sizeof(w), _TRUNCATE, "set %s (a pointers.txt chain)", argv[1]);
+        SafeModeRefuse(w);
+        return;
+    }
     if (TrySetPointer(argv[1], argv[2])) return;
-    if (SWSE_GfxSetSetting(argv[1], argv[2])) Printf("set %s = %s", argv[1], argv[2]);
-    else Printf("unknown setting or pointer: %s   (try 'ptr')", argv[1]);
+    // Nothing is written for a key SWSE does not read or a value that is not
+    // a number: a typo used to land in graphics.txt with "set ... =" printed.
+    int r = SWSE_GfxSetSetting(argv[1], argv[2]);
+    if (r == 1)       Printf("set %s = %s", argv[1], argv[2]);
+    else if (r == 0)  Printf("unknown setting or pointer: %s - nothing written ('ptr' lists pointers)", argv[1]);
+    else if (r == -2) Printf("%s: '%s' is not a number - nothing written", argv[1], argv[2]);
+    else              Printf("%s: could not write graphics.txt - not saved", argv[1]);
 }
+// The "no script context" line, saying what is true now. SWSE finds the
+// context itself: autoprime scans the heap for one, which exists once a save
+// is loaded (not at the main menu); an ammo pickup also captures one on the
+// Steam build. Picking up ammo used to be the only way, and these messages
+// still said so. `searches`: the command looks by itself (EnsureCtx, at most
+// every 3 s); the low-level ones (vcall, poke, freeze, watch) do not.
+static void NoContext(const char* what, bool searches) {
+    if (!SWSE_GameBuildKnown())
+        Printf("%s: no script context - SWSE recognises it by the Steam build's vtable, "
+               "and this game build is not one it knows (`status`)", what);
+    else if (searches)
+        Printf("%s: no script context yet - load a save first ('autoprime' searches again now)", what);
+    else
+        Printf("%s: no script context - load a save, then run 'autoprime' (this command does not search)", what);
+}
+
 // game-state commands routed through the script-VM bridge (scriptvm.cpp)
 static void RunVM(const char* action, int arg) {
     int r = SWSE_ScriptDo(action, arg);
     if (r == 1)       Printf("%s: done", action);
-    else if (r == 0)  SWSE_ConsolePrint("no script context found - load a save first, then retry ('autoprime' to force a scan).");
-    else if (r == -2) Printf("%s: faulted - disabled (stale context? re-prime by grabbing ammo)", action);
+    else if (r == 0)  NoContext(action, true);
+    else if (r == -2) Printf("%s: faulted - the script context was stale and has been dropped; "
+                             "the next command finds a fresh one", action);
+    else if (r == -3) SafeModeRefuse(action);
     else              Printf("%s: unknown to bridge", action);
 }
 // each cheat command is a thin wrapper that forwards its name to the bridge.
@@ -195,7 +284,7 @@ static void Cmd_money(int argc, char** argv) {
 }
 static void Cmd_god(int, char**) {
     int r = SWSE_ScriptToggleGod();
-    if (r == 0)      SWSE_ConsolePrint("god: no context yet - grab ammo once to prime.");
+    if (r == 0)      SWSE_ConsolePrint("god: no player yet - load a save first.");
     else             Printf("god mode %s", r == 1 ? "ON" : "OFF");
 }
 static void Cmd_ctxinfo(int, char**) {
@@ -209,7 +298,7 @@ static void Cmd_vcall(int argc, char** argv) {
     int a1 = (argc > 3) ? atoi(argv[3]) : 0;
     int r = SWSE_ScriptVCall(slot, argc - 2, a0, a1);
     if (r == 1)      Printf("vcall %d: done (see log for return value)", slot);
-    else if (r == 0) SWSE_ConsolePrint("no context - grab ammo once to prime.");
+    else if (r == 0) NoContext("vcall", false);
     else             Printf("vcall %d: faulted - probably wrong slot for this object", slot);
 }
 static bool ContainsCI(const char* hay, const char* needle) {
@@ -286,6 +375,23 @@ static void Cmd_levels(int, char**) {
 // any screen-space effect needs to linearise the depth buffer correctly, and
 // it is useful on its own for FOV and culling work.
 static void Cmd_proj(int argc, char** argv) {
+    if (argc > 1 && !lstrcmpiA(argv[1], "consts")) {
+        if (argc > 2) {
+            unsigned pid = (unsigned)strtoul(argv[2], nullptr, 10);
+            int rows = (argc > 3) ? atoi(argv[3]) : 190;
+            SWSE_WindProgConstsOf(pid, rows);
+            SWSE_ConsolePrint("single-program dump written to swse_log.txt");
+            return;
+        }
+        SWSE_WindProgConsts();
+        SWSE_ConsolePrint("constant dump written to swse_log.txt");
+        return;
+    }
+    if (argc > 1 && !lstrcmpiA(argv[1], "why")) {
+        SWSE_WindClipCameraWhy();
+        SWSE_ConsolePrint("clipcam diagnostics written to swse_log.txt");
+        return;
+    }
     // 'proj scan' lists every frustum candidate; plain 'proj' reports the camera.
     if (argc > 1 && !lstrcmpiA(argv[1], "scan")) {
         unsigned a[64]; float n[64], f[64], v[64];
@@ -313,6 +419,23 @@ static void Cmd_proj(int argc, char** argv) {
            (int)f, (int)((f < 0 ? -f : f) * 1000) % 1000,
            (int)fov, (int)(fov * 100) % 100);
     Printf("depth tex id=%u  (0 = none captured)", SWSE_SceneDepthTex());
+    // The camera as the DRAWS used it this frame - the active one by
+    // construction. Printed alongside the scan pick so a mismatch is visible
+    // at a glance; `set cam_draw 1` makes the shader use this instead.
+    {
+        float dn = 0, df = 0, dv = 0, da = 0; unsigned dp = 0; int dc = 0, dg = 0;
+        if (SWSE_WindClipCamera(&dn, &df, &dv, &da, &dp, &dc, &dg))
+            Printf("draw-derived : near=%d.%03d far=%d.%03d fovY=%d.%02d deg "
+                   "aspect=%d.%02d  (program %u, %s, consensus %d)",
+                   (int)dn, (int)(dn * 1000) % 1000,
+                   (int)df, (int)(df * 1000) % 1000,
+                   (int)dv, (int)(dv * 100) % 100,
+                   (int)da, (int)(da * 100) % 100,
+                   dp, dc ? "D3D conv" : "GL conv", dg);
+        else
+            SWSE_ConsolePrint("draw-derived : unavailable (no known world program"
+                              " decomposed - walk near foliage first)");
+    }
 }
 
 // List the game's depth textures and report the NEAREST surface each one
@@ -554,10 +677,19 @@ static void Cmd_vtscan(int argc, char** argv) {
 // In-engine screenshot. Works while the game is unfocused or occluded, which
 // no outside-the-process capture can do - and unfocused is exactly when it is
 // needed, since AgentDebugMode exists so the user can work in another app.
+static void JoinArgs(int argc, char** argv, int from, char* out, int outLen);   // below
 static void Cmd_snap(int argc, char** argv) {
     char path[MAX_PATH];
     if (argc > 1 && argv[1][0]) {
-        lstrcpynA(path, argv[1], MAX_PATH);
+        // The whole rest of the line, not argv[1]: the tokenizer splits on
+        // spaces, so `snap C:\Users\me\New folder\x.tga` saved to "C:\Users\
+        // me\New". Quotes around the path are taken off.
+        JoinArgs(argc, argv, 1, path, MAX_PATH);
+        int n = lstrlenA(path);
+        if (n >= 2 && path[0] == '"' && path[n - 1] == '"') {
+            memmove(path, path + 1, n - 2);
+            path[n - 2] = 0;
+        }
     } else {
         GetModuleFileNameA(GetModuleHandleA(NULL), path, MAX_PATH);
         char* slash = strrchr(path, '\\');
@@ -619,6 +751,8 @@ static void Cmd_perf(int argc, char** argv) {
     SWSE_HitReactTickStats(&sc, &po, &pl, &scM, &poM, &plM);
     Printf("hitreact scan    : last %d ms, worst %d ms", (int)sc, (int)scM);
     Printf("hitreact poll    : last %d ms, worst %d ms", (int)po, (int)poM);
+    // Native plugins (1.1): each one's frame cost, then its own perf lines.
+    SWSE_PluginsPerf(SWSE_ConsolePrint);
     Printf("see swse_log.txt for FRAMESTALL / WINDSTALL lines with timings");
 }
 
@@ -653,9 +787,15 @@ static void Cmd_wind(int argc, char** argv) {
         return;
     }
     if (argc > 1 && !lstrcmpiA(argv[1], "save")) {
-        SWSE_WindSaveSettings();
+        if (!SWSE_WindSaveSettings()) {
+            Printf("could not save wind.txt - the old file is unchanged (see swse_log.txt)");
+            return;
+        }
         Printf("saved -> SWSEMods\\SWSE Wind\\wind.txt");
-        Printf("wind will come back on automatically at launch");
+        int inj = 0, fail = 0, on = 0; float cx = 0, cz = 0;
+        SWSE_WindStats(&inj, &fail, &on, &cx, &cz);
+        Printf(on ? "wind comes back on at launch while the foliage switch is on"
+                  : "saved with wind off - it stays off at launch");
         return;
     }
     if (argc > 1 && !lstrcmpiA(argv[1], "axis")) {
@@ -665,8 +805,14 @@ static void Cmd_wind(int argc, char** argv) {
     }
     if (argc > 1 && !lstrcmpiA(argv[1], "seed")) {
         if (argc > 2) SWSE_WindSeed(!lstrcmpiA(argv[2], "on") || atoi(argv[2]) != 0);
-        Printf("per-vertex phase seed = %s%s", SWSE_WindGetSeed() ? "ON" : "OFF",
-               SWSE_WindGetSeed() ? " - WARNING: makes plants twist" : " (plants move in sync)");
+        // wind.cpp's own finding: the seed is per PLANT (attrib[1] is the
+        // same on every vertex of one), and the twisting once blamed on it
+        // was the wrong up axis. It used to warn "makes plants twist".
+        bool seed = SWSE_WindGetSeed() != 0;
+        Printf("per-plant phase seed = %s - %s", seed ? "ON" : "OFF",
+               !seed ? "every plant sways in step"
+               : SWSE_WindGetAxis() ? "each plant sways on its own phase"
+               : "each plant on its own phase; plants that twist mean the axis is wrong, not the seed (`wind axis z`)");
         return;
     }
     if (argc > 1 && !lstrcmpiA(argv[1], "gate")) {
@@ -1178,7 +1324,7 @@ static void Cmd_hitreact(int argc, char** argv) {
     if (!lstrcmpiA(argv[1], "off")) {
         SWSE_HitReactEnable(0);
         SWSE_HitReactRemove();
-        SWSE_ConsolePrint("hit reactions off, hook removed");
+        SWSE_ConsolePrint("hit reactions off (the hook stays in place, inert - unpatching is not thread safe)");
         return;
     }
     if (!lstrcmpiA(argv[1], "probe")) {
@@ -1360,6 +1506,8 @@ static void Cmd_inputst(int, char**) {
     char s[320];
     SWSE_InputStatus(s, sizeof(s));
     SWSE_ConsolePrint(s);
+    SWSE_InputGuardStatus(s, sizeof(s));
+    SWSE_ConsolePrint(s);
 }
 
 // Main menu order: NEW GAME / CONTINUE / LOAD GAME / OPTIONS / EXTRAS / QUIT.
@@ -1373,9 +1521,30 @@ static void MenuPick(int index, const char* what) {
     Printf("menu: %d x Down then Enter (%s)", index, what);
 }
 
+// menu list | fs <screen> <cmd> [arg] | continue | skip | resume | <n>
+// The words drive the game's Flash menus directly, the way a button press
+// does (menu.h) - no input, so they work with the game behind other windows.
+// A number keeps the old key-press form: n x Down, then Enter.
 static void Cmd_menu(int argc, char** argv) {
-    if (argc < 2) { SWSE_ConsolePrint("usage: menu <n>  - move down n times, then Enter"); return; }
-    MenuPick(atoi(argv[1]), "manual");
+    if (argc < 2) {
+        SWSE_ConsolePrint("usage: menu list                      live menu screens");
+        SWSE_ConsolePrint("       menu continue                  MainMenu CONTINUE (loads the last save)");
+        SWSE_ConsolePrint("       menu skip | resume             a paused movie's SKIP / PLAY");
+        SWSE_ConsolePrint("       menu fs <screen> <cmd> [arg]   any screen's command, e.g. menu fs Pause quick_save");
+        SWSE_ConsolePrint("       menu <n>                       n x Down then Enter (key presses)");
+        return;
+    }
+    const char* sub = argv[1];
+    if (sub[0] >= '0' && sub[0] <= '9') { MenuPick(atoi(sub), "manual"); return; }
+    if (!lstrcmpiA(sub, "list")) { SWSE_MenuList(SWSE_ConsolePrint); return; }
+    char msg[300];
+    if (!lstrcmpiA(sub, "continue")) SWSE_MenuFs("MainMenu", "goto_continue", "", msg, sizeof(msg));
+    else if (!lstrcmpiA(sub, "skip")) SWSE_MenuFs("movie", "skip", "", msg, sizeof(msg));
+    else if (!lstrcmpiA(sub, "resume")) SWSE_MenuFs("movie", "play", "", msg, sizeof(msg));
+    else if (!lstrcmpiA(sub, "fs") && argc >= 4)
+        SWSE_MenuFs(argv[2], argv[3], argc > 4 ? argv[4] : "", msg, sizeof(msg));
+    else { SWSE_ConsolePrint("usage: menu list | continue | skip | resume | fs <screen> <cmd> [arg] | <n>"); return; }
+    SWSE_ConsolePrint(msg);
 }
 
 // Full new-game chain in one command. NEW GAME leads to a difficulty card
@@ -1392,7 +1561,16 @@ static void Cmd_newgame(int argc, char** argv) {
     Printf("newgame: NEW GAME then difficulty %d (%s) queued",
            diff, diff == 1 ? "EASY" : diff == 2 ? "NORMAL" : "HARD");
 }
-static void Cmd_continue(int, char**) { MenuPick(2, "CONTINUE"); }
+// CONTINUE: the main menu's own command when its movie is live (no input
+// needed, so it works in background mode); key presses otherwise.
+static void Cmd_continue(int, char**) {
+    char msg[300];
+    if (SWSE_MenuScreenLive("MainMenu") && SWSE_MenuFs("MainMenu", "goto_continue", "", msg, sizeof(msg)) == 1) {
+        Printf("continue: %s", msg);
+        return;
+    }
+    MenuPick(2, "CONTINUE");
+}
 
 // Cutscene skip. MEASURED: Esc during a movie opens a PAUSE card whose items
 // are SKIP MOVIE / CONTINUE, with nothing highlighted, so it takes one Down to
@@ -1494,10 +1672,21 @@ static void Cmd_whatis(int argc, char** argv) {
 }
 // Clakkerz are townsfolkprefs.txt (5CEE67FD) with m_health = 100000, which is
 // the whole of their "immortality". Default to 45, an outlaw cutter's value.
+static void PrefsGet(const char* target, const char* field);   // fwd (1.1 block)
+
+// m_affGenerally is "player ammo affects this character" (a bool, with
+// m_affList as the exceptions) - 1.0.x called it affiliation, and its default
+// of 2 made the type immune to most ammo. Now it only reports unless a value
+// is given. `npc <type> ammorule` is the same field through the prefs editor.
 static void Cmd_npcaff(int argc, char** argv) {
-    if (argc < 2) { SWSE_ConsolePrint("usage: npcaff <typeHash> [value]   outlaws and townsfolk both ship as 1"); return; }
+    if (argc < 2) {
+        SWSE_ConsolePrint("usage: npcaff <typeHash> [0|1]   1 = player ammo affects it (shipped), 0 = immune");
+        SWSE_ConsolePrint("  (1.0.x documented this as affiliation - it is ammo susceptibility)");
+        return;
+    }
     unsigned h = (unsigned)strtoul(argv[1], nullptr, 16);
-    int v = (argc > 2) ? atoi(argv[2]) : 2;
+    if (argc < 3) { char hs[16]; wsprintfA(hs, "%08X", h); PrefsGet(hs, "m_affGenerally"); return; }
+    int v = atoi(argv[2]);
     char msg[200];
     SWSE_SetTypeAff(h, v, msg, sizeof(msg));
     SWSE_ConsolePrint(msg);
@@ -1706,17 +1895,18 @@ static void Cmd_types(int argc, char** argv) {
     if (f != INVALID_HANDLE_VALUE) CloseHandle(f);
     Printf("%d type(s); %d still have huge health", n, immortal);
 }
+// Reads console.txt (1.0.x looked for a settings.txt that never shipped, so
+// `noimmortals` was silently ignored) and every mod's characters.txt, then arms
+// the spawn hook. The npctuning feature does this at launch; this command is
+// the manual form, and works whether or not the feature is on.
 static void Cmd_tuning(int, char**) {
-    char dir[MAX_PATH], path[MAX_PATH], msg[220];
-    GetModDir(dir);
-    wsprintfA(path, "%s\\settings.txt", dir);
-    SWSE_LoadSettings(path, msg, sizeof(msg));
+    char msg[300];
+    int rules = SWSE_NpcTuningLoadAll(msg, sizeof(msg));
     SWSE_ConsolePrint(msg);
-    wsprintfA(path, "%s\\characters.txt", dir);
-    SWSE_LoadTuning(path, msg, sizeof(msg));
-    SWSE_ConsolePrint(msg);
-    SWSE_NpcRoutineSpy(1);          // tuning is applied from the spawn hook
+    if (rules < 0) return;                  // no spawn hook to apply them; msg says why
     SWSE_ConsolePrint("  spawn hook armed - warp or load a save to apply");
+    if (!SWSE_Feature(FEAT_NPCTUNING))
+        SWSE_ConsolePrint("  (npctuning is off: this lasts until restart - `features npctuning on` keeps it)");
 }
 static void Cmd_allnpcs(int argc, char** argv) {
     if (argc < 2) {
@@ -1832,14 +2022,17 @@ static void Cmd_ai(int argc, char** argv) {
     if (argc < 4) { SWSE_AiDump(h, AiEmit); return; }
 
     // name -> (object, offset). Weapon fields and AI fields live on different
-    // objects, so the table carries which one each belongs to.
+    // objects, so the table carries which one each belongs to. AI offsets are
+    // relative to the AIPrefs object embedded at NPCPrefs+0x118 (reflection-
+    // confirmed); 1.0.x's were 4 bytes short, starting ON the vtable.
+    // isTime: stored in seconds, shown in ms. firerate is shots per second.
     struct { const char* name; int onWeapon; int off; int isTime; } F[] = {
-        { "firerate",    1, 0x17C, 1 }, { "reload",      1, 0x184, 1 },
+        { "firerate",    1, 0x17C, 0 }, { "reload",      1, 0x184, 1 },
         { "reloadmax",   1, 0x188, 1 }, { "accuracy",    1, 0x1A8, 0 },
         { "misstime",    1, 0x1AC, 1 },
-        { "6thsense",    0, 0x000, 0 }, { "seedist",     0, 0x004, 0 },
-        { "hidevolsee",  0, 0x01C, 0 }, { "sightcombat",0, 0x14C, 0 },
-        { "relax",       0, 0x2A0, 1 },
+        { "6thsense",    0, 0x004, 0 }, { "seedist",     0, 0x008, 0 },
+        { "hidevolsee",  0, 0x020, 0 }, { "sightcombat",0, 0x150, 0 },
+        { "relax",       0, 0x2A0, 0 },
     };
     for (int i = 0; i < (int)(sizeof(F) / sizeof(F[0])); i++) {
         if (lstrcmpiA(argv[2], F[i].name)) continue;
@@ -1849,9 +2042,10 @@ static void Cmd_ai(int argc, char** argv) {
                    h, F[i].onWeapon ? "ranged weapon" : "AI");
             return;
         }
-        Printf("%08X %s = %d %s", h, F[i].name,
-               F[i].isTime ? (int)(v * 1000.0f) : (int)v,
-               F[i].isTime ? "ms" : "");
+        char vs[32];
+        if (F[i].isTime) sprintf_s(vs, sizeof(vs), "%d ms", (int)(v * 1000.0f));
+        else             sprintf_s(vs, sizeof(vs), "%.3g", v);
+        Printf("%08X %s = %s", h, F[i].name, vs);
         SWSE_ConsolePrint("(affects the whole species; live NPCs use it next decision)");
         return;
     }
@@ -1903,13 +2097,16 @@ static void Cmd_npcguns(int argc, char** argv) {
     int n = SWSE_NpcGuns(rows, 64, (argc > 1) ? atof(argv[1]) : 4000.0);
     if (!n) { SWSE_ConsolePrint("no armed characters found (load a level)"); return; }
     Printf("%d armed character type(s):", n);
-    SWSE_ConsolePrint("  hash      hp   bounty  fire   name");
+    SWSE_ConsolePrint("  hash      hp   bounty  shots/s  name");
     for (int i = 0; i < n; i++) {
-        Printf("  %08X %5d %6d %5d   %s", rows[i].npcHash,
-               (int)rows[i].health, (int)rows[i].killMoolah,
-               (int)(rows[i].fireRate * 1000.0f), NpcName(rows[i].npcHash));
+        // m_fireRate is shots per SECOND (aitune.cpp) - 1.0.x printed x1000
+        // as "ms between shots", so the 10-shot semiauto read as 10000 ms.
+        char fr[16];
+        sprintf_s(fr, sizeof(fr), "%.2f", rows[i].fireRate);
+        Printf("  %08X %5d %6d %7s  %s", rows[i].npcHash,
+               (int)rows[i].health, (int)rows[i].killMoolah, fr, NpcName(rows[i].npcHash));
     }
-    SWSE_ConsolePrint("fire in ms (delay between shots); '?' = name not yet recovered");
+    SWSE_ConsolePrint("'?' = name not yet recovered");
 }
 
 static void Cmd_weapons(int argc, char** argv) {
@@ -1937,17 +2134,233 @@ static void Cmd_weapons(int argc, char** argv) {
 }
 
 
-// `features` - which SWSE systems are switched on. Read-only: changing them
-// means editing SWSEMods\features.txt, because a disabled feature installs no
-// hooks at all and that decision is made once, at startup.
-static void Cmd_features(int, char**) {
-    Printf("SWSE features (%s):",
-           SWSE_FeaturesFromFile() ? "SWSEMods\\features.txt"
-                                   : "no features.txt - defaults");
-    for (int i = 0; i < FEAT_COUNT; i++)
-        Printf("  %-11s %s", SWSE_FeatureName((SwseFeature)i),
-               SWSE_Feature((SwseFeature)i) ? "on" : "OFF");
-    SWSE_ConsolePrint("edit features.txt and restart to change these");
+// One switch to on or off, the way `features <name> on|off [temp]` does it,
+// with its line printed. True when something changed - live, or the value
+// features.txt should hold - so the caller saves (or says "this session
+// only"). `named`: the user named this switch, so "already on" is said too;
+// `all` and the presets stay quiet about switches already right.
+static bool SwitchOne(int i, bool on, bool temp, bool named) {
+    SwseFeature f = (SwseFeature)i;
+    if (SWSE_Feature(f) == on) {
+        // Live already matches - but the FILE may not: `features console
+        // off` saves off while the console stays up, and `features foliage
+        // on temp` leaves the file at off. Answering "already on" without
+        // saving made the first undoable only by hand-editing
+        // features.txt, and the second impossible to make permanent.
+        if (!temp && (SWSE_FeatureSaved(f) != on || SWSE_FeatureIsAuto(f))) {
+            SWSE_FeatureSetSaved(f, on);
+            Printf("%s is already %s - saved that to features.txt",
+                   SWSE_FeatureName(f), on ? "on" : "off");
+            return true;
+        }
+        if (named) Printf("%s is already %s", SWSE_FeatureName(f), on ? "on" : "off");
+        return false;
+    }
+    // On: flag first, because systems consult it while starting (HD looks
+    // itself up per upload). Off: stop first, then drop the flag.
+    char msg[300] = { 0 };
+    bool ok;
+    if (on) {
+        SWSE_FeatureSetFlag(f, true);
+        ok = SWSE_FeatureStart(f, msg, sizeof(msg));
+        if (!ok) SWSE_FeatureSetFlag(f, false);
+    } else {
+        ok = SWSE_FeatureStop(f, msg, sizeof(msg));
+        if (ok) SWSE_FeatureSetFlag(f, false);
+    }
+    // A refused start (safe mode, raytrace without graphics) says so: it
+    // printed "ON" ahead of the reason, with the switch left off.
+    Printf("%s %s: %s", SWSE_FeatureName(f), on ? (ok ? "ON" : "refused") : "off", msg);
+    if (!ok) return false;
+    if (!temp) SWSE_FeatureSetSaved(f, on);       // only non-temp reaches the file
+    // Plugins that are on hear every live switch change (the FEATURE event).
+    SWSE_PluginsNotifyFeature(i, on);
+    return true;
+}
+
+// Save after a batch of switches, or say that it was for this session only.
+static void SaveOrSay(int changed, bool temp) {
+    if (changed && !temp) {
+        char sm[200];
+        SWSE_FeaturesSave(sm, sizeof(sm));
+        SWSE_ConsolePrint(sm);
+    } else if (changed) {
+        SWSE_ConsolePrint("(this session only - features.txt unchanged)");
+    }
+}
+
+// `features preset full|default|list [temp]` (1.1): several switches in one
+// word, saved like `features` (or for the session with `temp`).
+//   full    - the classic SWSE, the 1.0.x look: console, graphics,
+//             hdtextures, hitreact, foliage and aituning on; every other
+//             switch as it is.
+//   default - the 1.1 default: console on, aituning and playertune auto,
+//             everything else off - plugins too, which are off unless named.
+// In safe mode the switches it refuses are left alone and named in one line.
+// SWSE Setup offers the same two as buttons (oddforge/swsefeatures.py).
+#define PRESET_KEEP -1
+#define PRESET_OFF   0
+#define PRESET_ON    1
+#define PRESET_AUTO  2
+static void PresetTargets(bool full, int* want) {
+    for (int i = 0; i < FEAT_COUNT; i++) want[i] = full ? PRESET_KEEP : PRESET_OFF;
+    want[FEAT_CONSOLE] = PRESET_ON;
+    if (full) {
+        want[FEAT_GRAPHICS] = want[FEAT_HDTEXTURES] = want[FEAT_HITREACT] =
+            want[FEAT_FOLIAGE] = want[FEAT_AITUNING] = PRESET_ON;
+    } else {
+        want[FEAT_AITUNING] = want[FEAT_PLAYERTUNE] = PRESET_AUTO;
+    }
+}
+
+static void Cmd_featuresPreset(int argc, char** argv) {
+    const char* which = (argc > 2) ? argv[2] : "list";
+    bool temp = (argc > 3 && !lstrcmpiA(argv[3], "temp"));
+    bool full = !lstrcmpiA(which, "full") || !lstrcmpiA(which, "classic");
+    bool def  = !lstrcmpiA(which, "default");
+    if (!full && !def) {
+        SWSE_ConsolePrint("features preset full      the classic SWSE (the 1.0.x look): console, graphics,");
+        SWSE_ConsolePrint("                          hdtextures, hitreact, foliage and aituning on; the rest as they are");
+        SWSE_ConsolePrint("features preset default   the 1.1 default: console on, aituning and playertune auto,");
+        SWSE_ConsolePrint("                          everything else off (plugins too)");
+        SWSE_ConsolePrint("add `temp` to try one for this session only; without it, features.txt is saved");
+        return;
+    }
+    int want[FEAT_COUNT];
+    PresetTargets(full, want);
+    int changed = 0;
+    char skipped[200] = "", later[200] = "";
+    for (int i = 0; i < FEAT_COUNT; i++) {
+        if (want[i] == PRESET_KEEP) continue;
+        SwseFeature f = (SwseFeature)i;
+        // Safe mode: a switch it refuses is left as it is, and named once
+        // below rather than refused line by line.
+        if (want[i] != PRESET_OFF && SWSE_GameBuildSafeMode() && SWSE_FeatureSafeModeRefusal(f)) {
+            if (skipped[0]) lstrcatA(skipped, ", ");
+            lstrcatA(skipped, SWSE_FeatureName(f));
+            continue;
+        }
+        if (want[i] == PRESET_AUTO) {
+            // As `features <name> auto`: follow its own file from now on.
+            if (SWSE_FeatureIsAuto(f)) continue;
+            if (!temp) SWSE_FeatureSetSavedAuto(f);
+            char msg[400];
+            bool was = SWSE_Feature(f);
+            SWSE_FeatureAutoEvaluate(f, msg, sizeof(msg));
+            SWSE_ConsolePrint(msg);
+            if (SWSE_Feature(f) != was) SWSE_PluginsNotifyFeature(i, !was);
+            changed++;
+            continue;
+        }
+        bool on = (want[i] == PRESET_ON), was = SWSE_Feature(f);
+        if (SwitchOne(i, on, temp, false)) changed++;
+        // Plants and textures are recognised as a level uploads them, and hit
+        // reactions first find the level's characters (features.txt says so).
+        if (on && !was && SWSE_Feature(f) &&
+            (f == FEAT_HDTEXTURES || f == FEAT_HITREACT || f == FEAT_FOLIAGE)) {
+            if (later[0]) lstrcatA(later, ", ");
+            lstrcatA(later, SWSE_FeatureName(f));
+        }
+    }
+    // default: plugins off as well - a plugin runs only when named.
+    if (def)
+        for (int i = FEAT_COUNT; i < SWSE_FeatureTotal(); i++)
+            if (SwitchOne(i, false, temp, false)) changed++;
+    if (!changed) Printf("preset %s: every switch is already so", full ? "full" : "default");
+    SaveOrSay(changed, temp);
+    if (later[0])
+        Printf("%s: full effect from the next level load (warp, or load a save)", later);
+    if (skipped[0])
+        Printf("left as they are - not on this game build (safe mode): %s", skipped);
+}
+
+// `features` - which SWSE systems are switched on, and switching them.
+//   features                      list, with what each one does
+//   features <name> on|off        switch now AND remember it in features.txt
+//   features <name> on|off temp   switch now, this session only
+//   features all off              everything but the console (plugins too)
+//   features all on               every built-in but the console - never a
+//                                 plugin, which loads only when named (1.1)
+//   features preset full|default  several at once (Cmd_featuresPreset, 1.1)
+// A feature that was off at launch has no hooks installed; switching it on
+// here installs them at this point. Switching one off stops its effect (and
+// restores shipped values where the system keeps them); hooks it already
+// installed stay, inert, until the next launch.
+static void Cmd_features(int argc, char** argv) {
+    // Presets (1.1): several switches in one word.
+    if (argc > 1 && !lstrcmpiA(argv[1], "preset")) { Cmd_featuresPreset(argc, argv); return; }
+    if (argc < 3) {
+        Printf("SWSE %s features (%s):", SWSE_VERSION,
+               SWSE_FeaturesFromFile() ? "SWSEMods\\features.txt"
+                                       : "no features.txt - console only");
+        // Built-ins, then one switch per native plugin (1.1), in load order.
+        for (int i = 0; i < SWSE_FeatureTotal(); i++) {
+            SwseFeature f = (SwseFeature)i;
+            const char* st = SWSE_FeatureIsAuto(f) ? (SWSE_Feature(f) ? "auto:on" : "auto:off")
+                                                   : (SWSE_Feature(f) ? "on" : "off");
+            char pd[300];
+            if (SWSE_FeatureIsPlugin(i)) SWSE_PluginDescribeFeature(i, pd, sizeof(pd));
+            // Safe mode: the switches that act on the game cannot come on.
+            bool refused = !SWSE_FeatureIsPlugin(i) && SWSE_GameBuildSafeMode() &&
+                           SWSE_FeatureSafeModeRefusal(f);
+            Printf("  %-11s %-8s  %s%s", SWSE_FeatureName(f), refused ? "refused" : st,
+                   SWSE_FeatureIsPlugin(i) ? pd : SWSE_FeatureDescribe(f),
+                   refused ? " (not on this game build: safe mode)" : "");
+        }
+        SWSE_ConsolePrint("usage: features <name> on|off|auto [temp]   e.g. `features foliage on`");
+        SWSE_ConsolePrint("presets: `features preset full` (the classic SWSE), `features preset default`, `features preset list`");
+        SWSE_ConsolePrint("auto (aituning, playertune): runs only while aiprefs.txt / playerprefs.txt asks for something");
+        if (SWSE_FeatureTotal() > FEAT_COUNT)
+            SWSE_ConsolePrint("plugins load only when named: `features all on` skips them, `features all off` includes them");
+        return;
+    }
+    bool temp = (argc > 3 && !lstrcmpiA(argv[3], "temp"));
+    // `auto` (features.h): aituning and playertune follow their own file.
+    if (!lstrcmpiA(argv[2], "auto")) {
+        int f = SWSE_FeatureFind(argv[1]);
+        if (f < 0 || !SWSE_FeatureAutoCapable((SwseFeature)f)) {
+            SWSE_ConsolePrint("only aituning and playertune have an auto setting");
+            return;
+        }
+        if (!temp) SWSE_FeatureSetSavedAuto((SwseFeature)f);
+        char msg[400];
+        bool was = SWSE_Feature((SwseFeature)f);
+        SWSE_FeatureAutoEvaluate((SwseFeature)f, msg, sizeof(msg));
+        SWSE_ConsolePrint(msg);
+        if (SWSE_Feature((SwseFeature)f) != was) SWSE_PluginsNotifyFeature(f, !was);
+        if (!temp) { char sm[200]; SWSE_FeaturesSave(sm, sizeof(sm)); SWSE_ConsolePrint(sm); }
+        return;
+    }
+    bool on;
+    if (!lstrcmpiA(argv[2], "on") || !lstrcmpiA(argv[2], "1"))       on = true;
+    else if (!lstrcmpiA(argv[2], "off") || !lstrcmpiA(argv[2], "0")) on = false;
+    else { SWSE_ConsolePrint("usage: features <name> on|off|auto [temp]"); return; }
+
+    int first = 0, last = SWSE_FeatureTotal() - 1;
+    if (lstrcmpiA(argv[1], "all")) {
+        int f = SWSE_FeatureFind(argv[1]);
+        if (f < 0) { Printf("no feature called '%s' - `features` lists them", argv[1]); return; }
+        first = last = f;
+    }
+    int changed = 0;
+    for (int i = first; i <= last; i++) {
+        SwseFeature f = (SwseFeature)i;
+        if (f == FEAT_CONSOLE && first != last) continue;     // `all` never touches it
+        // `all on` never loads a plugin: a DLL runs only when the user names
+        // it. `all off` does include them - it is the kill switch.
+        if (on && first != last && SWSE_FeatureIsPlugin(i)) continue;
+        if (f == FEAT_CONSOLE && !on) {
+            // Only the file can do this - a live console cannot remove itself.
+            if (temp) { SWSE_ConsolePrint("the console cannot be switched off for a session"); return; }
+            SWSE_FeatureSetSaved(f, false);
+            char sm[200]; SWSE_FeaturesSave(sm, sizeof(sm));
+            SWSE_ConsolePrint("console = off saved to features.txt - takes effect next launch");
+            SWSE_ConsolePrint("(with it off there is no console or remote mailbox to switch it back)");
+            return;
+        }
+        if (SwitchOne(i, on, temp, first == last)) changed++;
+    }
+    SaveOrSay(changed, temp);
 }
 
 
@@ -1964,6 +2377,27 @@ static void Cmd_writepos(int argc, char** argv) {
     SWSE_ConsolePrint(msg);
 }
 
+// Floats for display. The console mostly prints integers; positions and
+// facings want a decimal or two.
+static void Ff(char* out, float v, int decimals) {
+    // Truncating: `%.1f` of 1e30 is 40 characters, and sprintf_s answers an
+    // overflow by ending the process (QA Q18: `yaw 1e30`).
+    if (v != v) { lstrcpyA(out, "nan"); return; }
+    float a = v < 0.0f ? -v : v;
+    if (a >= 1.0e9f) _snprintf_s(out, 32, _TRUNCATE, "%.4g", v);
+    else             _snprintf_s(out, 32, _TRUNCATE, "%.*f", decimals, v);
+}
+
+// A number typed at the console that the engine can safely take: finite and
+// within +-1e6 (coordinates, facings). NaN, inf and 1e30 are refused.
+static bool SaneFloat(const char* s, float* out) {
+    char* e = nullptr;
+    double d = strtod(s, &e);
+    if (e == s || d != d || d > 1.0e6 || d < -1.0e6) return false;
+    *out = (float)d;
+    return true;
+}
+
 static void Cmd_positions(int, char**) {
     int n = SWSE_PositionCount();
     if (!n) {
@@ -1974,9 +2408,56 @@ static void Cmd_positions(int, char**) {
     for (int i = 0; i < n; i++) {
         float p[3]; const char* lvl = "";
         SWSE_PositionAt(i, p, &lvl);
-        Printf("  %-22s %6d %6d %6d  %s",
-               SWSE_PositionName(i), (int)p[0], (int)p[1], (int)p[2], lvl);
+        float yaw = 0; char ys[32] = "   -";
+        if (SWSE_PositionYawAt(i, &yaw)) Ff(ys, yaw, 1);
+        Printf("  %-22s %6d %6d %6d  yaw %6s  %s",
+               SWSE_PositionName(i), (int)p[0], (int)p[1], (int)p[2], ys, lvl);
     }
+}
+
+// ---- did the teleport stick? (QA Q33) --------------------------------------------
+// For a moment after a level load or CONTINUE the engine puts the player back
+// where it had them, so "moved to" could be untrue. Each teleport is checked
+// half a second later. If the player is nearer the spot they left than the
+// spot they were sent to, the console says so. A level change in between
+// cancels the check.
+static struct { bool armed; DWORD due; unsigned epoch; float from[3], to[3]; } g_tpCheck;
+
+static void TpCheckArm(const float* from, float x, float y, float z) {
+    g_tpCheck.armed = (from != nullptr);
+    if (!from) return;
+    memcpy(g_tpCheck.from, from, sizeof(g_tpCheck.from));
+    g_tpCheck.to[0] = x; g_tpCheck.to[1] = y; g_tpCheck.to[2] = z;
+    g_tpCheck.due = GetTickCount() + 500;
+    g_tpCheck.epoch = SWSE_LevelEpoch();
+}
+
+static float Dist2(const float* a, const float* b) {
+    float dx = a[0] - b[0], dy = a[1] - b[1], dz = a[2] - b[2];
+    return dx * dx + dy * dy + dz * dz;
+}
+
+static void TpCheckTick() {
+    if (!g_tpCheck.armed || (int)(GetTickCount() - g_tpCheck.due) < 0) return;
+    g_tpCheck.armed = false;
+    if (SWSE_LevelEpoch() != g_tpCheck.epoch) return;
+    float p[3];
+    if (SWSE_PosGet(p) != 1) return;
+    float dTo = Dist2(p, g_tpCheck.to), dFrom = Dist2(p, g_tpCheck.from);
+    if (dTo <= 0.25f || dFrom >= dTo) return;                  // it stuck
+    // Since 1.1 the move is the engine's own teleport, so this should stay
+    // silent; it is kept as the independent check (research/TELEPORT.md).
+    Printf("the teleport did not stick - you are back at %d %d %d (swse_log.txt has the "
+           "teleport line); please report it", (int)p[0], (int)p[1], (int)p[2]);
+}
+
+// A refused or failed teleport, in words.
+static void PrintTeleportFailure(int r) {
+    const char* why = SWSE_TeleportWhy();
+    if (r == 0)                      SWSE_ConsolePrint("teleport: no player (load a level first)");
+    else if (r == -2)                SWSE_ConsolePrint("teleport faulted inside the game (see swse_log.txt)");
+    else if (why && why[0])          Printf("teleport refused: %s", why);
+    else                             SWSE_ConsolePrint("teleport refused");
 }
 
 static void Cmd_goto(int argc, char** argv) {
@@ -1989,10 +2470,52 @@ static void Cmd_goto(int argc, char** argv) {
     if (lvl && *lvl && SWSE_CurrentLevel()[0] && lstrcmpiA(lvl, SWSE_CurrentLevel()))
         Printf("warning: '%s' was saved in %s, you are in %s",
                argv[1], lvl, SWSE_CurrentLevel());
-    if (SWSE_PlayerTeleport(p[0], p[1], p[2]))
+    float from[3]; bool haveFrom = (SWSE_PosGet(from) == 1);
+    int tr = SWSE_PlayerTeleport(p[0], p[1], p[2]);
+    if (tr != 1) { PrintTeleportFailure(tr); return; }
+    TpCheckArm(haveFrom ? from : nullptr, p[0], p[1], p[2]);
+    float yaw = 0;
+    if (SWSE_PositionYaw(argv[1], &yaw) && SWSE_PlayerYawSet(yaw) == 1) {
+        char ys[32]; Ff(ys, yaw, 1);
+        Printf("moved to %s (%d %d %d), facing %s deg", argv[1],
+               (int)p[0], (int)p[1], (int)p[2], ys);
+    } else {
         Printf("moved to %s (%d %d %d)", argv[1], (int)p[0], (int)p[1], (int)p[2]);
-    else
-        SWSE_ConsolePrint("teleport failed (no player position)");
+    }
+}
+
+// tpxyz <x> <y> <z> [yaw] - teleport to explicit coordinates.
+static void Cmd_tpxyz(int argc, char** argv) {
+    if (argc < 4) { SWSE_ConsolePrint("usage: tpxyz <x> <y> <z> [yawDeg]   (see `pos`)"); return; }
+    float x, y, z, yw = 0;
+    if (!SaneFloat(argv[1], &x) || !SaneFloat(argv[2], &y) || !SaneFloat(argv[3], &z) ||
+        (argc > 4 && !SaneFloat(argv[4], &yw))) {
+        SWSE_ConsolePrint("tpxyz: each value must be a number within +-1000000");
+        return;
+    }
+    float from[3]; bool haveFrom = (SWSE_PosGet(from) == 1);
+    int tr = SWSE_PlayerTeleport(x, y, z);
+    if (tr != 1) { PrintTeleportFailure(tr); return; }
+    TpCheckArm(haveFrom ? from : nullptr, x, y, z);
+    if (argc > 4) {
+        if (SWSE_PlayerYawSet(yw) != 1)
+            SWSE_ConsolePrint("(facing could not be set)");
+    }
+    Printf("moved to %d %d %d", (int)x, (int)y, (int)z);
+}
+
+// yaw [deg] - read or set the direction the player faces.
+static void Cmd_yaw(int argc, char** argv) {
+    if (argc > 1) {
+        float d;
+        if (!SaneFloat(argv[1], &d)) { SWSE_ConsolePrint("yaw: give a number of degrees"); return; }
+        if (SWSE_PlayerYawSet(d) == 1) { char s[32]; Ff(s, d, 1); Printf("facing %s deg", s); }
+        else SWSE_ConsolePrint("facing could not be set (no player yet?)");
+        return;
+    }
+    float d = 0;
+    if (SWSE_PlayerYawGet(&d) == 1) { char s[32]; Ff(s, d, 1); Printf("facing %s deg", s); }
+    else SWSE_ConsolePrint("facing not readable (no player yet?)");
 }
 
 // spawnat <label|here> [count] [typehash]
@@ -2062,7 +2585,11 @@ static void Cmd_difficulty(int argc, char** argv) {
     char msg[220];
     if (argc < 2) {
         const char* a = SWSE_AiTuneActive();
-        if (a && *a) Printf("AI profile: %s  (%d object(s) tuned)", a, SWSE_AiTuneCount());
+        if (a && *a && SWSE_AiTuneActiveEpoch() != SWSE_LevelEpoch())
+            // A level change built fresh prefs objects; the profile is only in
+            // force here if the automatic apply (`active =`) ran again.
+            Printf("AI profile: %s was applied in an earlier level - `difficulty %s` applies it here", a, a);
+        else if (a && *a) Printf("AI profile: %s  (%d object(s) tuned)", a, SWSE_AiTuneCount());
         else SWSE_ConsolePrint("AI profile: off (shipped values)");
         SWSE_ConsolePrint("usage: difficulty <name|off>   e.g. `difficulty keen`");
         SWSE_ConsolePrint("profiles: keen, relentless, obvious - edit or add your own in");
@@ -2235,6 +2762,336 @@ static void Cmd_npccount(int argc, char** argv) {
 // having to alt-tab and close it by hand -- that round trip dominated the
 // development loop. ExitProcess rather than a clean shutdown: we want it gone
 // promptly, and nothing here is worth saving.
+// The SSR material-mask instrument. "ssrmask" prints the whole chain's
+// state; "ssrmask reload" re-reads materials.txt so the owner can grade
+// more textures without a restart.
+static void Cmd_ssrmask(int argc, char** argv) {
+    if (argc > 1 && !lstrcmpiA(argv[1], "reload")) {
+        int n = SWSE_MaterialsReload();
+        Printf("reloaded materials.txt: %d fingerprint(s)", n);
+        return;
+    }
+    if (argc > 1 && !lstrcmpiA(argv[1], "alpha")) {
+        int mn = 0, mx = 0, mean = 0, pct = 0;
+        if (SWSE_GfxMaskAlphaStats(&mn, &mx, &mean, &pct))
+            Printf("capture alpha: min=%d max=%d mean=%d nonzero=%d%%", mn, mx, mean, pct);
+        else
+            SWSE_ConsolePrint("no RGBA capture yet (need ssr_mask_stamp 1 + F10 on)");
+        return;
+    }
+    Printf("fingerprints loaded : %d", SWSE_MaterialsListN());
+    Printf("texids flagged live : %d", SWSE_MaterialsKnownTexids());
+    Printf("refl binds last frame: %d", SWSE_MaterialsBindsLastFrame());
+    Printf("stamping active     : %s", SWSE_MaterialsStampState() ? "yes" : "no (set ssr_mask_stamp 1)");
+    Printf("frame marks / suspended now: %d / %s", SWSE_MaterialsMarks(),
+           SWSE_MaterialsSuspended() ? "yes" : "no");
+    Printf("draw hook: %s, draws/frame %d, mask redraws/frame %d, glsl skips %d",
+           SWSE_MaterialsDrawHooked() ? "installed" : "NOT installed",
+           SWSE_MaterialsDrawsSeenLastFrame(), SWSE_MaterialsRedrawsLastFrame(),
+           SWSE_MaterialsGlslSkipsLastFrame());
+    {
+        int sp = 0, dp = 0, ld = 0, lf = 0, lh = 0, hf = 0;
+        SWSE_GfxMaskDebugInfo(&sp, &dp, &ld, &lf, &lh, &hf);
+        Printf("gfx params x100: stamp=%d debug=%d | locs: dbg=%d fbo=%d has=%d | fboBound=%d",
+               sp, dp, ld, lf, lh, hf);
+    }
+    Printf("gbuf: draws/frame %d, skinned skips %d",
+           SWSE_MaterialsGBufDrawsLastFrame(), SWSE_MaterialsSkinSkipsLastFrame());
+    SWSE_ConsolePrint("chain: stamp -> RGBA capture -> uScene.a -> gate (debug_ssrmask x-rays it)");
+}
+
+// Can this 2005 context run modern compute - and how much ray math does the
+// GPU deliver through it? Runs at swap time, where a GL context is current.
+// One frame hitches (the probe calls glFinish to time honestly).
+static void GpuEmit(const char* line) { SWSE_ConsolePrint(line); }
+
+static void Cmd_gpu(int, char**) {
+    SWSE_ConsolePrint("probing GPU compute (this frame will hitch)...");
+    SWSE_GpuProbe(GpuEmit);
+}
+
+// Can a ray tracer read the geometry the engine draws, and is it world space?
+// Arms a one-frame capture; results are read back with 'geo show' because the
+// draws happen after this command's response has already been sent.
+// The ray-tracing tools need the tracer switched on: with it off the draw
+// hook they read from is not installed, and an armed capture waits forever.
+static bool RtGate() {
+    if (SWSE_Feature(FEAT_RAYTRACE)) return true;
+    SWSE_ConsolePrint("ray tracing is off (the default) - `features graphics on`, then `features raytrace on`");
+    return false;
+}
+
+static void Cmd_geo(int argc, char** argv) {
+    if (!RtGate()) return;
+    if (argc > 1 && !lstrcmpiA(argv[1], "show")) { SWSE_GeoReport(GpuEmit); return; }
+    SWSE_GeoArm(4);
+    SWSE_ConsolePrint("armed: capturing the next frame's world draws - run 'geo show'");
+}
+
+// Stage 1b: BVH over the harvested world, and the camera trace that proves it.
+static void Cmd_rt(int argc, char** argv) {
+    if (!RtGate()) return;
+    if (argc > 1 && !lstrcmpiA(argv[1], "build")) { SWSE_RtBuild(GpuEmit); return; }
+    if (argc > 2 && !lstrcmpiA(argv[1], "nearz")) {
+        SWSE_RtSetNearZ((float)atof(argv[2]));
+        Printf("rt: near-plane NDC z = %s", argv[2]);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "mode")) {
+        SWSE_RtSetMode((float)atof(argv[2]));
+        Printf("rt: view mode %s (0 depth, 1 ray direction, 2 ray origin)", argv[2]);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "flipy")) {
+        SWSE_RtSetFlipY((float)atof(argv[2]));
+        Printf("rt: flip y = %s", argv[2]);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "cardsize")) {
+        SWSE_RtCardSize((float)atof(argv[2]));
+        Printf("rt: leaf-card area threshold = %s (now run 'rt build')", argv[2]);
+        return;
+    }
+    // One switch for the whole live pipeline: keep harvesting as the player
+    // moves, and rebuild the BVH when enough new geometry has arrived.
+    if (argc > 1 && !lstrcmpiA(argv[1], "live")) {
+        int on = (argc > 2) ? atoi(argv[2]) : 1;
+        int th = (argc > 3) ? atoi(argv[3]) : 150;
+        SWSE_GeoHarvestContinuous(on);
+        SWSE_RtAutoBuild(on, th);
+        Printf("rt: LIVE harvest %s, auto-rebuild every %d new meshes",
+               on ? "ON" : "off", th);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "fovscale")) {
+        SWSE_RtFovScale((float)atof(argv[2]));
+        Printf("rt: FOV scale = %s (1 = the derived matrix's own FOV)", argv[2]);
+        return;
+    }
+    if (argc > 1 && !lstrcmpiA(argv[1], "aoclamp")) {
+        if (argc > 2) SWSE_RtAoClamp((float)atof(argv[2]));
+        Printf("rt: history clamp = %d/1000 of the current estimate%s",
+               (int)(SWSE_RtAoGetClamp() * 1000.0f),
+               SWSE_RtAoGetClamp() > 0.0f ? "" : "  (OFF - history is unbounded)");
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "pairprev")) {
+        SWSE_RtPairPrev(atoi(argv[2]));
+        Printf("rt: pair depth with previous frame's camera = %s", argv[2]);
+        return;
+    }
+    if (argc > 1 && !lstrcmpiA(argv[1], "fovsweep")) {
+        SWSE_RtFovSweep();
+        SWSE_ConsolePrint("rt: sweeping FOV scale, minimising |Pdepth-hp| -> swse_log.txt");
+        return;
+    }
+    if (argc > 1 && !lstrcmpiA(argv[1], "camerr")) {
+        SWSE_RtErrProbe();
+        SWSE_ConsolePrint("rt: camera error probe armed - needs 'set rtao_strength -6'; result in swse_log.txt");
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "clipyneg")) {
+        SWSE_RtClipYNeg(atoi(argv[2]));
+        Printf("rt: clip-y negation = %s", argv[2]);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "cardcell")) {
+        SWSE_RtCardCell((float)atof(argv[2]));
+        Printf("rt: leaf-card hash cells/unit = %s (immediate)", argv[2]);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "cardopacity")) {
+        SWSE_RtCardOpacity((float)atof(argv[2]));
+        Printf("rt: leaf-card opacity = %s (takes effect immediately)", argv[2]);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "cardany")) {
+        SWSE_RtCardAny(atoi(argv[2]));
+        Printf("rt: drop big triangles from ANY program = %s (now 'rt build')", argv[2]);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "foliage")) {
+        SWSE_GeoExcludeFoliage(atoi(argv[2]));
+        Printf("rt: exclude foliage-program draws = %s (re-harvest, then 'rt build')", argv[2]);
+        return;
+    }
+    if (argc > 1 && !lstrcmpiA(argv[1], "tiltlog")) {
+        int n = (argc > 2) ? atoi(argv[2]) : 30;
+        SWSE_WindTiltLog(n);
+        Printf("rt: reporting tilt-test survivors for %d frames -> swse_log.txt", n);
+        return;
+    }
+    if (argc > 1 && !lstrcmpiA(argv[1], "camlog")) {
+        int n = (argc > 2) ? atoi(argv[2]) : 60;
+        SWSE_RtCamLog(n);
+        Printf("rt: logging the derived camera for %d frames -> swse_log.txt", n);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "all")) {
+        SWSE_RtSetUseAll(atoi(argv[2]));
+        Printf("rt: keep float-attribute draws = %s (run 'rt build' again)", argv[2]);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "dist")) {
+        SWSE_RtSetMaxDist((float)atof(argv[2]));
+        Printf("rt: trace range = %s", argv[2]);
+        return;
+    }
+    SWSE_RtStatus(GpuEmit);
+}
+
+static void Cmd_progsrc(int argc, char** argv) {
+    if (argc < 2) { SWSE_ConsolePrint("usage: progsrc <program id>"); return; }
+    SWSE_GeoDumpProgram((unsigned)strtoul(argv[1], nullptr, 10), GpuEmit);
+}
+
+// skin, meshdump, hidepart, nohat, noponcho and nodreads all work through the
+// graphics pipeline's glDrawElements hook (materials.cpp), which goes in when
+// the graphics feature starts. Without it they armed a census or a hide that
+// nothing ever ran - meshdump wrote an empty file - so they say so instead.
+// What only undoes or reports (show, list, clear, off, stop) needs no hook.
+static bool DrawHookGate(const char* cmd) {
+    if (!SWSE_Feature(FEAT_GRAPHICS)) {
+        Printf("%s needs graphics on (it works through the pipeline's draw hook) - `features graphics on`", cmd);
+        return false;
+    }
+    if (!SWSE_MaterialsDrawHooked()) {
+        Printf("%s: the pipeline's draw hook is not installed (see swse_log.txt) - nothing to work through", cmd);
+        return false;
+    }
+    return true;
+}
+
+// Stage 1: harvest the whole visible world as a world-space triangle soup.
+// Skinned-draw census for the Oddview model-format work: 'skin' arms it,
+// 'skin show' reports. Characters are excluded from the geometry probe, so
+// this is the only way to see their vertex counts.
+// 'meshdump' captures a few frames of character geometry for Oddview, then
+// 'meshdump stop' closes the file.
+static void Cmd_meshdump(int argc, char** argv) {
+    if (argc > 1 && !lstrcmpiA(argv[1], "stop")) {
+        int n = SWSE_MeshDumpFinish();
+        Printf("meshdump: wrote %d meshes to bin\\swse_meshes.odv", n);
+        return;
+    }
+    if (!DrawHookGate("meshdump")) return;
+    char path[260] = { 0 };
+    if (SWSE_MeshDumpStart(path, sizeof(path)))
+        Printf("meshdump: capturing character geometry -> %s   ('meshdump stop' to close)", path);
+    else
+        SWSE_ConsolePrint("meshdump: could not open the output file");
+}
+// Hide a character part by its index count - the value 'skin show' prints.
+//   hidepart <n>      hide the piece drawn with n indices
+//   hidepart show <n> put it back
+//   hidepart list     what is hidden
+//   hidepart clear    show everything again
+static void Cmd_hidepart(int argc, char** argv) {
+    if (argc > 1 && !lstrcmpiA(argv[1], "clear")) {
+        SWSE_MaterialsHideClear();
+        SWSE_ConsolePrint("hidepart: all parts visible again");
+        return;
+    }
+    if (argc > 1 && !lstrcmpiA(argv[1], "list")) {
+        unsigned h[16];
+        int n = SWSE_MaterialsHideList(h, 16);
+        if (!n) { SWSE_ConsolePrint("hidepart: nothing hidden"); return; }
+        for (int i = 0; i < n; i++) Printf("  hidden: %u indices", h[i]);
+        return;
+    }
+    if (argc > 2 && !lstrcmpiA(argv[1], "show")) {
+        SWSE_MaterialsHidePart((unsigned)atoi(argv[2]), 0);
+        Printf("hidepart: %s visible again", argv[2]);
+        return;
+    }
+    if (argc < 2) {
+        SWSE_ConsolePrint("usage: hidepart <indexCount> | show <n> | list | clear");
+        SWSE_ConsolePrint("run 'skin' then 'skin show' to see the index counts");
+        return;
+    }
+    if (!DrawHookGate("hidepart")) return;
+    int n = SWSE_MaterialsHidePart((unsigned)atoi(argv[1]), 1);
+    Printf("hidepart: hiding the %s-index part (%d hidden)", argv[1], n);
+}
+
+// Stranger's poncho and hat are separate skinned draws. These are named
+// wrappers over hidepart, using the index counts measured in play.
+// Measured in play by hiding each index count from the 'skin show' table and
+// looking at the result.
+//   272 / 1567  poncho (and the hat rides the same draw)
+//   1173        dreadlocks
+//   5688        eyeballs  (also the source of the stray eye-fan triangles the
+//                          world harvest kept picking up)
+//   22145       body
+//
+// A name holds a LIST, not one number, because the same garment is drawn with
+// DIFFERENT index counts in different places - the poncho is 272 inside the
+// bounty office and 1567 out in the street. One fixed count silently stops
+// working when you walk through a door, which is exactly what happened on the
+// first attempt. Teaching a count ADDS to the list rather than replacing it.
+#define NAMED_MAX 8
+struct NamedPart { unsigned c[NAMED_MAX]; int n; };
+static NamedPart g_poncho = { { 272, 1567 }, 2 };
+static NamedPart g_hat    = { { 272, 1567 }, 2 };
+static NamedPart g_dreads = { { 1173 }, 1 };
+
+static void ToggleNamed(const char* what, NamedPart* p, int argc, char** argv) {
+    if (argc > 1 && (!lstrcmpiA(argv[1], "off") || !lstrcmpiA(argv[1], "show"))) {
+        for (int i = 0; i < p->n; i++) SWSE_MaterialsHidePart(p->c[i], 0);
+        Printf("%s: back on", what);
+        return;
+    }
+    if (!DrawHookGate(what)) return;
+    if (argc > 1 && atoi(argv[1]) > 0) {
+        unsigned v = (unsigned)atoi(argv[1]);
+        int have = 0;
+        for (int i = 0; i < p->n; i++) if (p->c[i] == v) have = 1;
+        if (!have && p->n < NAMED_MAX) p->c[p->n++] = v;
+    }
+    if (!p->n) {
+        Printf("%s: which draw is it? run 'skin' then 'skin show', then", what);
+        Printf("  %s <indexCount>   - it is remembered after that", argv[0]);
+        return;
+    }
+    for (int i = 0; i < p->n; i++) SWSE_MaterialsHidePart(p->c[i], 1);
+    char b[160]; int o = 0;
+    for (int i = 0; i < p->n && o < 120; i++)
+        o += wsprintfA(b + o, i ? ", %u" : "%u", p->c[i]);
+    Printf("%s: hidden (%s indices)", what, b);
+}
+static void Cmd_noponcho(int argc, char** argv) { ToggleNamed("noponcho", &g_poncho, argc, argv); }
+static void Cmd_nohat(int argc, char** argv)    { ToggleNamed("nohat",    &g_hat,    argc, argv); }
+static void Cmd_nodreads(int argc, char** argv) { ToggleNamed("nodreads", &g_dreads, argc, argv); }
+
+static void Cmd_skin(int argc, char** argv) {
+    if (argc > 1 && !lstrcmpiA(argv[1], "show")) { SWSE_SkinCensusReport(GpuEmit); return; }
+    if (!DrawHookGate("skin")) return;
+    SWSE_SkinCensusArm();
+    SWSE_ConsolePrint("skin: capturing this frame's CHARACTER draws - run 'skin show'");
+}
+static void Cmd_harvest(int argc, char** argv) {
+    if (!RtGate()) return;
+    if (argc > 1 && !lstrcmpiA(argv[1], "show")) { SWSE_GeoHarvestReport(GpuEmit); return; }
+    if (argc > 1 && !lstrcmpiA(argv[1], "dump")) {
+        char path[MAX_PATH] = { 0 };
+        int n = SWSE_GeoHarvestDumpObj(path, MAX_PATH, (argc > 2) ? atoi(argv[2]) : 0);
+        if (n) Printf("wrote %d triangles -> %s", n, path);
+        else   SWSE_ConsolePrint("nothing harvested yet");
+        return;
+    }
+    SWSE_GeoHarvestArm();
+    SWSE_GeoHarvestArmRetries(20);   // wait for the camera after a level load
+    // Default 1: multi-frame accumulation dedups by buffer identity, which
+    // MERGES INSTANCES - the engine draws one mesh many times at different
+    // places (884 draws/frame collapse to 339 keys), so anything above 1
+    // currently loses most of the world. Kept for when instance identity
+    // (quantised world position) is added to the key.
+    int frames = (argc > 1) ? atoi(argv[1]) : 1;
+    if (frames < 1) frames = 1;
+    SWSE_GeoHarvestFrames(frames);
+    Printf("harvesting %d frames (brief hitch) - then 'harvest show'", frames);
+}
+
 static void Cmd_exit(int, char**) {
     SWSE_ConsolePrint("exiting...");
     ExitProcess(0);
@@ -2579,7 +3436,8 @@ static void Cmd_poke(int argc, char** argv) {
     int val = atoi(argv[3]);
     int r = SWSE_Poke(selfOff, subOff, val);
     if (r == 1)      Printf("poked [+0x%X]+0x%X = %d", selfOff, subOff, val);
-    else if (r == 0) SWSE_ConsolePrint("no context/field - grab ammo once, check the offsets.");
+    else if (r == 0) SWSE_ConsolePrint("poke: no script context, or no field at those offsets - "
+                                       "load a save and run 'autoprime', then check the offsets.");
     else             SWSE_ConsolePrint("poke faulted.");
 }
 static void Cmd_freeze(int argc, char** argv) {
@@ -2588,7 +3446,7 @@ static void Cmd_freeze(int argc, char** argv) {
     int val = atoi(argv[3]);
     int r = SWSE_Freeze(selfOff, subOff, val);
     if (r == 1)       Printf("frozen [+0x%X]+0x%X = %d  (unfreeze to release)", selfOff, subOff, val);
-    else if (r == 0)  SWSE_ConsolePrint("no context - grab ammo once to prime.");
+    else if (r == 0)  NoContext("freeze", false);
     else if (r == -1) SWSE_ConsolePrint("freeze list full (16 max) - unfreeze one first.");
 }
 static void Cmd_unfreeze(int argc, char** argv) {
@@ -2623,35 +3481,76 @@ static void Cmd_watch(int argc, char** argv) {
         if (label[0]) SWSE_ConsolePrint("(label attached so it's easy to find in the log later.)");
         SWSE_ConsolePrint("results land in bin\\swse_log.txt when the timer's up.");
     } else if (r == 0) {
-        SWSE_ConsolePrint("no context - grab ammo once to prime.");
+        NoContext("watch", false);
     } else {
         SWSE_ConsolePrint("watch failed to start.");
     }
 }
 static void PrintPosResult(int r, const char* ok) {
-    if (r == 1)      SWSE_ConsolePrint(ok);
-    else if (r == 0) SWSE_ConsolePrint("no position - grab ammo once to prime.");
-    else if (r == 3) SWSE_ConsolePrint("nothing saved yet - use 'savepos' first.");
-    else             SWSE_ConsolePrint("position access faulted.");
+    const char* why = SWSE_TeleportWhy();
+    if (r == 1)       { if (ok && ok[0]) SWSE_ConsolePrint(ok); }
+    else if (r == 0)  SWSE_ConsolePrint("no position - no level is up, or the player has no body yet.");
+    else if (r == 3)  SWSE_ConsolePrint("nothing saved yet - use 'savepos' first.");
+    else if (r == -1) Printf("teleport refused: %s", why && why[0] ? why : "see swse_log.txt");
+    else if (r == -3) Printf("move: %s", why && why[0] ? why : "bad axis");
+    else              SWSE_ConsolePrint("position access faulted (see swse_log.txt).");
 }
 static void Cmd_pos(int, char**) {
     float p[3]; int r = SWSE_PosGet(p);
-    if (r == 1) Printf("pos: x=%d.%03d  y=%d.%03d  z=%d.%03d",
-                       (int)p[0], (int)((p[0]<0?-p[0]:p[0])*1000)%1000,
-                       (int)p[1], (int)((p[1]<0?-p[1]:p[1])*1000)%1000,
-                       (int)p[2], (int)((p[2]<0?-p[2]:p[2])*1000)%1000);
-    else PrintPosResult(r, "");
+    if (r != 1) { PrintPosResult(r, ""); return; }
+    char xs[32], ys[32], zs[32];
+    Ff(xs, p[0], 3); Ff(ys, p[1], 3); Ff(zs, p[2], 3);
+    float yaw = 0;
+    if (SWSE_PlayerYawGet(&yaw) == 1) {
+        char ws[32]; Ff(ws, yaw, 1);
+        Printf("pos: x=%s  y=%s  z=%s  yaw=%s", xs, ys, zs, ws);
+    } else {
+        Printf("pos: x=%s  y=%s  z=%s", xs, ys, zs);
+    }
 }
-static void Cmd_savepos(int, char**) { PrintPosResult(SWSE_PosSave(), "position saved."); }
-static void Cmd_tp(int, char**)      { PrintPosResult(SWSE_PosRestore(), "teleported to saved spot."); }
+static void Cmd_writepos(int argc, char** argv);   // named form, above
+// savepos           - quick slot: position AND facing (1.1)
+// savepos <label>   - the same as writepos <label>: saved to file, with facing
+static void Cmd_savepos(int argc, char** argv) {
+    if (argc > 1) { Cmd_writepos(argc, argv); return; }
+    int r = SWSE_PosSave();
+    if (r != 1) { PrintPosResult(r, ""); return; }
+    float p[3], yaw = 0; int hy = 0;
+    SWSE_PosSaved(p, &yaw, &hy);
+    if (hy) {
+        char ws[32]; Ff(ws, yaw, 1);
+        Printf("position saved: %d %d %d, facing %s deg  (`tp` returns here)",
+               (int)p[0], (int)p[1], (int)p[2], ws);
+    } else {
+        Printf("position saved: %d %d %d (facing unknown)  (`tp` returns here)",
+               (int)p[0], (int)p[1], (int)p[2]);
+    }
+}
+// tp          - back to the quick slot, facing restored
+// tp <label>  - the same as goto <label>
+static void Cmd_tp(int argc, char** argv) {
+    if (argc > 1) { Cmd_goto(argc, argv); return; }
+    float from[3]; bool haveFrom = (SWSE_PosGet(from) == 1);
+    int r = SWSE_PosRestore();
+    PrintPosResult(r, "teleported to saved spot.");
+    float to[3], yaw = 0; int hy = 0;
+    if (r == 1 && haveFrom) { SWSE_PosSaved(to, &yaw, &hy); TpCheckArm(from, to[0], to[1], to[2]); }
+}
 static void Cmd_up(int argc, char** argv) {
-    float d = (argc > 1) ? (float)atof(argv[1]) : 100.0f;
-    // try each axis label; default vertical guess is axis 1
-    PrintPosResult(SWSE_PosNudge(1, d), "launched up.");
+    // Z is up in this engine (hit reactions lift p[2]; the foliage up axis
+    // measured z). 1.0.x nudged axis 1, which moved the player sideways.
+    // Since the move is a real teleport now, a lift is a real drop: the
+    // default is a modest 10 units (it was 100 when nothing moved), and there
+    // is no ceiling check - indoors, a lift can end above the roof.
+    float d = 10.0f;
+    if (argc > 1 && !SaneFloat(argv[1], &d)) { SWSE_ConsolePrint("usage: up [dist]"); return; }
+    PrintPosResult(SWSE_PosNudge(2, d), "launched up.");
 }
 static void Cmd_move(int argc, char** argv) {
     if (argc < 3) { SWSE_ConsolePrint("usage: move <axis 0|1|2> <delta>"); return; }
-    PrintPosResult(SWSE_PosNudge(atoi(argv[1]), (float)atof(argv[2])), "moved.");
+    float d = 0.0f;
+    if (!SaneFloat(argv[2], &d)) { SWSE_ConsolePrint("usage: move <axis 0|1|2> <delta>"); return; }
+    PrintPosResult(SWSE_PosNudge(atoi(argv[1]), d), "moved.");
 }
 // `list [filter]` - search the 181 auto-exposed game functions.
 static void Cmd_list(int argc, char** argv) {
@@ -2659,6 +3558,8 @@ static void Cmd_list(int argc, char** argv) {
     int n = SWSE_ScriptList(argc > 1 ? argv[1] : "", names, 256);
     Printf("%d game functions%s (call <name> [args]):", n,
            argc > 1 ? " matching" : "");
+    if (SWSE_GameBuildSafeMode())
+        SWSE_ConsolePrint("(safe mode: none of them can be called on this game build - 'status')");
     char row[160]; int col = 0; row[0] = 0;
     for (int i = 0; i < n; i++) {
         char cell[40]; wsprintfA(cell, "%-22s", names[i]);
@@ -2672,9 +3573,1065 @@ static void Cmd_call(int argc, char** argv) {
     if (argc < 2) { SWSE_ConsolePrint("usage: call <function> [args]  (see 'list')"); return; }
     int r = SWSE_ScriptCallByName(argv[1], argc - 1, argv + 1);
     if (r == 1)       Printf("%s: called", argv[1]);
-    else if (r == 0)  SWSE_ConsolePrint("no context - grab ammo once to prime.");
+    else if (r == 0)  NoContext(argv[1], true);
     else if (r == -1) Printf("no such function: %s  (try 'list %s')", argv[1], argv[1]);
     else              Printf("%s: faulted - args wrong? try different values", argv[1]);
+}
+
+// ==========================================================================
+//  1.1 ADDITIONS
+// ==========================================================================
+static void Execute(const char* line);          // fwd - defined with the registry
+static void RunLines(char lines[][240], int n); // fwd - sequences with `wait`
+// How deep scripts, aliases, `exec` and `repeat` are nested right now; each
+// refuses past 8, so a file or alias that invokes itself stops instead of
+// running the stack out.
+static int  g_execDepth = 0;
+static bool IsBuiltinCmd(const char* name);     // fwd - needs the command table
+static void LoadDynCmds();                      // fwd - scripts\*.txt commands
+
+// ---- player tuning (playerprefs.txt) ---------------------------------------
+static void Cmd_playertune(int argc, char** argv) {
+    char msg[300];
+    if (argc > 1 && !lstrcmpiA(argv[1], "reload")) {
+        SWSE_PlayerTuneLoad(msg, sizeof(msg)); SWSE_ConsolePrint(msg);
+        if (SWSE_LevelUp()) { SWSE_PlayerTuneApply(msg, sizeof(msg)); SWSE_ConsolePrint(msg); }
+        return;
+    }
+    if (argc > 1 && !lstrcmpiA(argv[1], "apply"))   { SWSE_PlayerTuneApply(msg, sizeof(msg));   SWSE_ConsolePrint(msg); return; }
+    if (argc > 1 && !lstrcmpiA(argv[1], "restore")) { SWSE_PlayerTuneRestore(msg, sizeof(msg)); SWSE_ConsolePrint(msg); return; }
+    Printf("playertune is %s%s", SWSE_Feature(FEAT_PLAYERTUNE) ? "ON" : "off",
+           SWSE_Feature(FEAT_PLAYERTUNE) ? " - applied once per level" : " - `features playertune on` to apply every level");
+    SWSE_PlayerTuneStatus(AiEmit);
+    SWSE_ConsolePrint("usage: playertune [reload|apply|restore]");
+}
+
+// ---- the live prefs editor ---------------------------------------------------
+static void Cmd_prefs(int argc, char** argv) { SWSE_PrefsCommand(argc, argv, AiEmit); }
+
+// ---- ammo knockback -------------------------------------------------------------
+// Every player ammo type is a prefs record at /data/prefs/weapons/<name>.txt
+// (BoltDamagePrefs and relatives, all deriving from BoltPrefs) with
+// m_maxKnockSpeed (+0x140, how hard it throws what it hits) and
+// m_maxKnockSpeedPlayer (+0x144, what to use when it hits YOU). The engine
+// (0x4A1490) uses the player value when it is >= 0 and m_maxKnockSpeed
+// otherwise, and only knocks when the result is > 0 - so -1 (every shipped
+// type) means "the same as for NPCs" and 0 means "never knocks you". The same
+// two fields Stranger: Armed to the Teeth patches in the bundles - here, live.
+static const struct { const char* name; const char* nick; } kAmmo[] = {
+    { "damagearmadillo", "thudslug" },          { "damagearmadilloloader", "thudslug1" },
+    { "damagearmadilloloaderextender", "thudslug2" },
+    { "damageriotslug", "riotslug" },           { "damagebeegun", "stingbee" },
+    { "damagebeegunextendersmall", "stingbee1" }, { "damagestingbee", "superstingbee" },
+    { "trapfuzzle", "fuzzle" },                 { "trapfuzzleloader", "fuzzle1" },
+    { "trapfuzzleloaderextender", "fuzzle2" },  { "trapfuzzlerabid", "rabidfuzzle" },
+    { "trapfuzzlejump", "fuzzlepounce" },       { "trapfuzzlerabidjump", "rabidpounce" },
+    { "immobilizespiderbola", "bolamite" },     { "immobilizespiderbolaextendersmall", "bolamite1" },
+    { "immobilizespiderbolaextendermedium", "bolamite2" },
+    { "immobilizebolablast", "bolablast" },     { "sniperdart", "sniperwasp" },
+    { "immobilizeskunkbomb", "stunkz" },        { "immobilizeskunkbombextender", "stunkz1" },
+    { "immobilizesparkstunkz", "sparkstunkz" }, { "damagedynamite", "boombat" },
+    { "damagedynamiteextender", "boombat1" },   { "damagedynamiteextenderloader", "boombat2" },
+    { "damageboombatqueen", "boombatseekers" }, { "sendtochipmunk", "chippunk" },
+    { "sendtochipmunkextender", "chippunk1" },  { "sendtohowlerpunk", "howlerpunk" },
+    { "activatehivequeen", "hivequeen" },       { "activatehivequeencharged", "hivequeen2" },
+    { "punch", "punch" },
+};
+static const int N_AMMO = (int)(sizeof(kAmmo) / sizeof(kAmmo[0]));
+
+static void Cmd_knockback(int argc, char** argv) {
+    static char paths[64][96];
+    static const char* ptr[64];
+    if (argc < 3) {
+        for (int i = 0; i < N_AMMO; i++) {
+            wsprintfA(paths[i], "/data/prefs/weapons/%s.txt", kAmmo[i].name);
+            ptr[i] = paths[i];
+        }
+        static float kn[64], kp[64]; static int f1[64], f2[64];
+        int a = SWSE_PrefsGetMany(ptr, N_AMMO, "m_maxKnockSpeed", kn, f1);
+        SWSE_PrefsGetMany(ptr, N_AMMO, "m_maxKnockSpeedPlayer", kp, f2);
+        if (!a) SWSE_ConsolePrint("no ammo prefs loaded yet (load a save first)");
+        SWSE_ConsolePrint("  ammo              npc knock   player knock   (-1 = same as npc, 0 = never)");
+        for (int i = 0; i < N_AMMO; i++) {
+            if (!f1[i]) continue;
+            char s1[32], s2[32]; Ff(s1, kn[i], 2); Ff(s2, kp[i], 2);
+            Printf("  %-17s %9s %12s   %s", kAmmo[i].nick, s1, s2, kAmmo[i].name);
+        }
+        SWSE_ConsolePrint("usage: knockback <ammo|all> <npcSpeed|-> [playerSpeed|-] [keep]");
+        SWSE_ConsolePrint("  e.g. knockback boombat 40 25   - boombats throw NPCs harder, and you at 25");
+        SWSE_ConsolePrint("       knockback all - 0         - nothing you fire can knock YOU back");
+        return;
+    }
+    bool keep = !lstrcmpiA(argv[argc - 1], "keep");
+    int nargs = keep ? argc - 1 : argc;          // the arguments before `keep`
+    if (nargs < 3) {
+        SWSE_ConsolePrint("usage: knockback <ammo|all> <npcSpeed|-> [playerSpeed|-] [keep]");
+        return;
+    }
+    int n = 0;
+    for (int i = 0; i < N_AMMO; i++) {
+        if (lstrcmpiA(argv[1], "all") && lstrcmpiA(argv[1], kAmmo[i].name) &&
+            lstrcmpiA(argv[1], kAmmo[i].nick)) continue;
+        wsprintfA(paths[n], "/data/prefs/weapons/%s.txt", kAmmo[i].name);
+        ptr[n] = paths[n];
+        n++;
+    }
+    if (!n) { Printf("no ammo called '%s' - `knockback` lists them", argv[1]); return; }
+    const char* npc = argv[2];
+    const char* ply = (nargs > 3) ? argv[3] : "-";
+    // Numbers or "-" only, checked before anything is set or kept:
+    // `knockback thudslug keep` used to save the word `keep` into prefs.txt.
+    const char* vals[2] = { npc, ply };
+    for (int k = 0; k < 2; k++) {
+        if (!lstrcmpA(vals[k], "-")) continue;
+        char* e = nullptr;
+        strtod(vals[k], &e);
+        if (e == vals[k] || *e) {
+            Printf("'%s' is not a speed - give a number, or - to leave it as it is", vals[k]);
+            return;
+        }
+    }
+    if (!lstrcmpA(npc, "-") && !lstrcmpA(ply, "-")) {
+        SWSE_ConsolePrint("nothing to change - both speeds are '-'");
+        return;
+    }
+    char msg[300] = "";
+    if (lstrcmpA(npc, "-")) {
+        int r = SWSE_PrefsSetMany(ptr, n, "m_maxKnockSpeed", npc, AiEmit);
+        if (keep && r >= 0)
+            for (int i = 0; i < n; i++) SWSE_PrefsKeep(ptr[i], "m_maxKnockSpeed", npc, msg, sizeof(msg));
+    }
+    if (lstrcmpA(ply, "-")) {
+        int r = SWSE_PrefsSetMany(ptr, n, "m_maxKnockSpeedPlayer", ply, AiEmit);
+        if (keep && r >= 0)
+            for (int i = 0; i < n; i++) SWSE_PrefsKeep(ptr[i], "m_maxKnockSpeedPlayer", ply, msg, sizeof(msg));
+    }
+    if (keep) { if (msg[0]) SWSE_ConsolePrint(msg); }
+    else SWSE_ConsolePrint("this level only - add `keep` to re-apply every level (prefsedit feature)");
+}
+
+// ---- npc / wpn: every reflected character and weapon field, by name ---------
+// Thin fronts on the live prefs editor, so every change is recorded and
+// `prefs restore` puts the shipped value back, and `keep` writes it into
+// prefs.txt to re-apply every level. Field names come from the game's own
+// reflection (swse/research/REFLECT_FIELDS.tsv); the aliases are shorthand.
+// Mapped from the proposals in swse/research/AT3_DISCOVERIES.md (P1-P10).
+// NOTE: fields an NPC copies when it is CREATED (motion, attachments, some
+// AI) only reach NPCs spawned afterwards - `keep` + a level load settles it.
+
+static void PrefsGet(const char* target, const char* field) {
+    char a0[] = "prefs", a1[] = "get";
+    char t[160], f[120];
+    lstrcpynA(t, target, sizeof(t)); lstrcpynA(f, field, sizeof(f));
+    char* av[4] = { a0, a1, t, f };
+    SWSE_PrefsCommand(4, av, AiEmit);
+}
+
+// Is a prefs target (path or 8-digit hash) loaded in this level? Only a
+// definite "no" counts: when the registry cannot be read, the caller goes on
+// and lets the editor's heap scan decide.
+static bool TargetNotLoaded(const char* target) {
+    unsigned h = (strchr(target, '/') || strchr(target, '\\'))
+                 ? SWSE_HashPath(target) : (unsigned)strtoul(target, nullptr, 16);
+    if (!h) return false;
+    return SWSE_ResourceLookup(h) == 0 && SWSE_ResourceRegistryOk() == 1;
+}
+
+// on/off/none -> what the editor parses. none = the engine's unset token.
+static const char* NormValue(const char* v) {
+    if (!lstrcmpiA(v, "on") || !lstrcmpiA(v, "yes") || !lstrcmpiA(v, "true"))   return "1";
+    if (!lstrcmpiA(v, "off") || !lstrcmpiA(v, "no") || !lstrcmpiA(v, "false"))  return "0";
+    if (!lstrcmpiA(v, "none")) return "2DFD1072";
+    return v;
+}
+
+static const struct { const char* alias; const char* field; } kNpcAlias[] = {
+    { "health", "m_health" },              { "stamina", "m_stamina" },
+    { "healthregen", "m_healthRecoverTime" }, { "staminaregen", "m_staminaRecoverTime" },
+    { "exhaust", "m_exhaustTime" },        { "species", "m_spActorPrefs.m_species" },
+    { "gibfx", "m_spActorPrefs.m_gibEffectName" }, { "gibsound", "m_spActorPrefs.m_gibSoundName" },
+    { "gib", "m_onDeathGib" },             { "gibspawn", "m_onGibSpawnNPC" },
+    { "hurt", "m_hurtReaction" },          { "moolah", "m_killMoolah" },
+    { "capturemoolah", "m_captureMoolah" }, { "bountyable", "m_canBeBountied" },
+    { "melee", "m_meleeWeapon" },          { "ranged", "m_rangedWeapon" },
+    { "ammorule", "m_affGenerally" },      { "lootlimit", "m_collectableSpawnLimit" },
+    { "loot.damage", "m_onDamageCollectableSpawner" },
+    { "loot.exhaust", "m_onExhaustCollectableSpawner" },
+    { "loot.death", "m_onDeathCollectableSpawner" },
+    { "loot.steefram", "m_onSteefRamAliveCollectableSpawner" },
+    { "loot.ram", "m_onStrangerRamAliveCollectableSpawner" },
+    { "loot.steeframdead", "m_onSteefRamDeadCollectableSpawner" },
+    { "loot.ramdead", "m_onStrangerRamDeadCollectableSpawner" },
+    { "mass", "m_spMotionPrefs.m_mass" },  { "turn", "m_spMotionPrefs.m_bipedTurnSpeedDegrees" },
+    { "walk", "m_spMotionPrefs.m_overVel_Walk" }, { "trot", "m_spMotionPrefs.m_overVel_Trot" },
+    { "canter", "m_spMotionPrefs.m_overVel_Canter" }, { "run", "m_spMotionPrefs.m_overVel_Run" },
+    { "jump", "m_spMotionPrefs.m_jumpHeightMax" }, { "pushable", "m_spMotionPrefs.m_canBePushed" },
+    { "knockable", "m_spMotionPrefs.m_canBeKnocked" }, { "fade", "m_fadeOutOnDeath" },
+    { "aimradius", "m_autoAimRadius" },    { "relax", "m_spAIPrefs.m_relaxAgitatedToNormal" },
+    { "allowpanic", "m_spAIPrefs.m_allowPanic" },
+};
+static const char* kNpcSummary[] = {
+    "health", "stamina", "species", "gib", "gibfx", "gibspawn", "hurt", "moolah",
+    "loot.death", "mass", "run", "jump", "sight.normal.see", "sight.combat.see", "relax",
+};
+
+// sight.<normal|agit|combat|panic>.<6th|see|above|below|hangle|vangle|instant|hidevol>
+// and attack.<param> expand to the dotted AIPrefs members.
+static bool NpcFieldName(const char* in, char* out, int outLen) {
+    for (int i = 0; i < (int)(sizeof(kNpcAlias) / sizeof(kNpcAlias[0])); i++)
+        if (!lstrcmpiA(in, kNpcAlias[i].alias)) { lstrcpynA(out, kNpcAlias[i].field, outLen); return true; }
+    if (!_strnicmp(in, "sight.", 6)) {
+        char st[16] = { 0 }; const char* dot = strchr(in + 6, '.');
+        if (!dot || dot - (in + 6) >= (int)sizeof(st)) return false;
+        memcpy(st, in + 6, dot - (in + 6));
+        static const char* S[][2] = { { "normal", "Normal" }, { "agit", "Agit" }, { "combat", "Combat" }, { "panic", "Panic" } };
+        static const char* F[][2] = { { "6th", "6thSenseDistance" }, { "see", "seeDistance" },
+            { "above", "seeAbove" }, { "below", "seeBelow" }, { "hangle", "horizontalAngleDeg" },
+            { "vangle", "verticalAngleDeg" }, { "instant", "instantSightDistance" },
+            { "hidevol", "hideVolSeeDistance" } };
+        const char* s = nullptr; const char* f = nullptr;
+        for (int i = 0; i < 4; i++) if (!lstrcmpiA(st, S[i][0])) s = S[i][1];
+        for (int i = 0; i < 8; i++) if (!lstrcmpiA(dot + 1, F[i][0])) f = F[i][1];
+        if (!s || !f) return false;
+        _snprintf_s(out, outLen, _TRUNCATE, "m_spAIPrefs.m_sight%s.m_%s", s, f);
+        return true;
+    }
+    if (!_strnicmp(in, "attack.", 7)) {
+        _snprintf_s(out, outLen, _TRUNCATE, "m_spAIPrefs.m_attackParams.%s", in + 7);
+        return true;
+    }
+    lstrcpynA(out, in, outLen);                  // a raw reflected name or offset
+    return true;
+}
+
+static const char* NpcName(unsigned h);          // fwd - the known-names table
+
+// A character name ("outlawcutter", "heavy") or an 8-digit type hash.
+static bool NpcTypeArg(const char* s, char* hashOut) {
+    int n = 0;
+    for (const char* p = s; *p; p++) {
+        char c = *p;
+        if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) { n = -1; break; }
+        n++;
+    }
+    if (n == 8) { lstrcpynA(hashOut, s, 9); return true; }
+    char want[48] = { 0 }; int w = 0;
+    for (const char* p = s; *p && w < 47; p++) if (*p != ' ' && *p != '\'' && *p != '_') want[w++] = (char)(*p | 0x20);
+    for (int i = 0; i < (int)(sizeof(kNpcNames) / sizeof(kNpcNames[0])); i++) {
+        char nm[48] = { 0 }; int k = 0;
+        for (const char* p = kNpcNames[i].name; *p && k < 47; p++)
+            if (*p != ' ' && *p != '\'' && *p != '(' && *p != ')') nm[k++] = (char)(*p | 0x20);
+        if (!lstrcmpA(nm, want)) { wsprintfA(hashOut, "%08X", kNpcNames[i].hash); return true; }
+    }
+    return false;
+}
+
+static void Cmd_npc(int argc, char** argv) {
+    if (argc < 2) {
+        SWSE_ConsolePrint("usage: npc <type> [field [value]] [keep]   (type = 8-digit hash or a name)");
+        SWSE_ConsolePrint("  npc <type>                 the main fields of that character");
+        SWSE_ConsolePrint("  npc <type> dump [filter]   every reflected field with its value");
+        SWSE_ConsolePrint("  fields: health stamina species gib gibfx gibspawn hurt moolah melee ranged");
+        SWSE_ConsolePrint("          loot.<damage|exhaust|death|steefram|ram|...> lootlimit ammorule mass");
+        SWSE_ConsolePrint("          turn walk trot canter run jump pushable knockable fade relax allowpanic");
+        SWSE_ConsolePrint("          sight.<normal|agit|combat|panic>.<6th|see|above|below|hangle|vangle|instant|hidevol>");
+        SWSE_ConsolePrint("          attack.<param> (see `npc <type> dump attack`) or any m_ name / 0x offset");
+        SWSE_ConsolePrint("  values: numbers; hashes as 8 hex digits or a /data/... path; on/off; none");
+        SWSE_ConsolePrint("  `npcguns` / `types` list the characters here; `prefs restore` undoes");
+        return;
+    }
+    char hash[16];
+    if (!NpcTypeArg(argv[1], hash)) { Printf("no character called '%s' - give its 8-digit hash (`npcguns`)", argv[1]); return; }
+    if (argc == 2) {
+        unsigned h = (unsigned)strtoul(hash, nullptr, 16);
+        if (TargetNotLoaded(hash)) {
+            Printf("%s (%s) is not loaded in this level - `npcguns` lists the characters here", hash, NpcName(h));
+            return;
+        }
+        Printf("%s  %s", hash, NpcName(h));
+        for (int i = 0; i < (int)(sizeof(kNpcSummary) / sizeof(kNpcSummary[0])); i++) {
+            char f[120]; NpcFieldName(kNpcSummary[i], f, sizeof(f));
+            PrefsGet(hash, f);
+        }
+        return;
+    }
+    if (!lstrcmpiA(argv[2], "dump")) {
+        char a0[] = "prefs", a1[] = "dump";
+        char* av[4] = { a0, a1, hash, (argc > 3) ? argv[3] : nullptr };
+        SWSE_PrefsCommand(argc > 3 ? 4 : 3, av, AiEmit);
+        return;
+    }
+    char field[120];
+    if (!NpcFieldName(argv[2], field, sizeof(field))) { Printf("unknown field '%s' - `npc` lists them", argv[2]); return; }
+    if (argc == 3) { PrefsGet(hash, field); return; }
+    bool keep = (argc > 4 && !lstrcmpiA(argv[4], "keep"));
+    const char* v = NormValue(argv[3]);
+    int r = SWSE_PrefsSet(hash, field, v, AiEmit);
+    if (keep && r < 0) SWSE_ConsolePrint("not kept - fix the field or value first");
+    else if (keep) { char m[240]; SWSE_PrefsKeep(hash, field, v, m, sizeof(m)); SWSE_ConsolePrint(m); }
+}
+
+// Weapons: player ammo (/data/prefs/weapons/<ammo>.txt) and NPC weapons
+// (/data/prefs/weapons/npc/<name>.txt) share BoltPrefs, so one set of names
+// serves both. `firerate`/`reload` pick the right member for each.
+static const struct { const char* alias; const char* npcField; const char* ammoField; } kWpnAlias[] = {
+    { "damage", "m_damage", "m_damage" },           { "dmgobj", "m_damageDestructable", "m_damageDestructable" },
+    { "stamina", "m_stamina", "m_stamina" },        { "clip", "m_clipCapacity", "m_clipCapacity" },
+    { "clipmin", "m_clipCapacityMin", "m_clipCapacityMin" }, { "total", "m_totalCapacity", "m_totalCapacity" },
+    { "aoe", "m_areaOfEffect", "m_areaOfEffect" },  { "aoeedge", "m_damageAtAreaEdgeMultiplier", "m_damageAtAreaEdgeMultiplier" },
+    { "blast", "m_explosionSpeed", "m_explosionSpeed" }, { "range", "m_range", "m_range" },
+    { "speed", "m_speed", "m_speed" },              { "gravity", "m_gravity", "m_gravity" },
+    { "homing", "m_magnetismOverride", "m_magnetismOverride" }, { "bounce", "m_bounceParameter", "m_bounceParameter" },
+    { "knock", "m_maxKnockSpeed", "m_maxKnockSpeed" }, { "knockplayer", "m_maxKnockSpeedPlayer", "m_maxKnockSpeedPlayer" },
+    { "gibkill", "m_gibOnKill", "m_gibOnKill" },    { "duration", "m_duration", "m_duration" },
+    { "immobilize", "m_immobilizeDuration", "m_immobilizeDuration" },
+    { "firerate", "m_fireRate", "m_fireRateNormal" }, { "reload", "m_reloadTime", "m_reloadTimeNormal" },
+    { "reloadmax", "m_reloadTimeMax", "m_reloadTimeNormal" }, { "accuracy", "m_accuracyWidth", "m_accuracyWidth" },
+    { "misstime", "m_missTime", "m_missTime" },     { "kick", "m_kick", "m_kick" },
+};
+static const char* kWpnSummary[] = {
+    "damage", "dmgobj", "clip", "total", "aoe", "range", "speed", "gravity", "homing", "bounce",
+    "knock", "knockplayer", "firerate", "reload",
+};
+
+// Resolve a weapon argument to a prefs target: ammo name/nickname, "npc/<name>"
+// or a bare NPC weapon name, an 8-digit hash (a weapon, or a character whose
+// ranged weapon is meant). *isAmmo says which member names apply.
+static bool WpnTarget(const char* s, char* out, int outLen, bool* isAmmo) {
+    *isAmmo = false;
+    for (int i = 0; i < N_AMMO; i++)
+        if (!lstrcmpiA(s, kAmmo[i].name) || !lstrcmpiA(s, kAmmo[i].nick)) {
+            _snprintf_s(out, outLen, _TRUNCATE, "/data/prefs/weapons/%s.txt", kAmmo[i].name);
+            *isAmmo = true;
+            return true;
+        }
+    int n = 0; bool hex = true;
+    for (const char* p = s; *p; p++, n++) {
+        char c = *p;
+        if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) hex = false;
+    }
+    if (hex && n == 8) {
+        unsigned h = (unsigned)strtoul(s, nullptr, 16);
+        unsigned obj = SWSE_ResourceLookup(h);
+        if (obj && SWSE_ObjIsA(obj, "NPCPrefs")) {
+            unsigned w = 0;
+            __try { w = *(unsigned*)(obj + 0x498); } __except (EXCEPTION_EXECUTE_HANDLER) { w = 0; }
+            if (!w || w == 0x2DFD1072) return false;           // melee-only character
+            _snprintf_s(out, outLen, _TRUNCATE, "%08X", w);
+            return true;
+        }
+        if (obj) *isAmmo = !SWSE_ObjIsA(obj, "NPCWeaponPrefs");
+        lstrcpynA(out, s, outLen);
+        return true;
+    }
+    const char* nm = (!_strnicmp(s, "npc/", 4)) ? s + 4 : s;
+    _snprintf_s(out, outLen, _TRUNCATE, "/data/prefs/weapons/npc/%s.txt", nm);
+    return true;
+}
+
+static void Cmd_wpn(int argc, char** argv) {
+    if (argc < 2) {
+        SWSE_ConsolePrint("usage: wpn <ammo|npcweapon|hash|all> [field [value]] [keep]");
+        SWSE_ConsolePrint("  ammo: thudslug boombat stingbee bolamite... (see `knockback`)");
+        SWSE_ConsolePrint("  npc weapons: outlawshooter wolvarkshooter slogbolt... or a character's hash");
+        SWSE_ConsolePrint("  fields: damage dmgobj stamina clip clipmin total aoe aoeedge blast range speed");
+        SWSE_ConsolePrint("          gravity homing bounce knock knockplayer gibkill duration immobilize");
+        SWSE_ConsolePrint("          firerate reload reloadmax accuracy misstime kick, or any m_ name");
+        SWSE_ConsolePrint("  e.g. wpn thudslug homing 360   wpn FFFC00CB damage 5   wpn all clip 20 keep");
+        return;
+    }
+    const char* aliasIn = (argc > 2) ? argv[2] : nullptr;
+    int ai = -1;
+    if (aliasIn)
+        for (int i = 0; i < (int)(sizeof(kWpnAlias) / sizeof(kWpnAlias[0])); i++)
+            if (!lstrcmpiA(aliasIn, kWpnAlias[i].alias)) { ai = i; break; }
+    bool keep = (argc > 4 && !lstrcmpiA(argv[4], "keep"));
+
+    if (!lstrcmpiA(argv[1], "all")) {
+        if (argc < 4) { SWSE_ConsolePrint("usage: wpn all <field> <value> [keep]  (every player ammo type)"); return; }
+        static char paths[64][96]; static const char* ptr[64];
+        for (int i = 0; i < N_AMMO; i++) {
+            wsprintfA(paths[i], "/data/prefs/weapons/%s.txt", kAmmo[i].name); ptr[i] = paths[i];
+        }
+        const char* field = (ai >= 0) ? kWpnAlias[ai].ammoField : argv[2];
+        const char* v = NormValue(argv[3]);
+        int r = SWSE_PrefsSetMany(ptr, N_AMMO, field, v, AiEmit);
+        if (keep && r < 0) SWSE_ConsolePrint("not kept - fix the field or value first");
+        else if (keep) {
+            char m[240] = "";
+            for (int i = 0; i < N_AMMO; i++) SWSE_PrefsKeep(ptr[i], field, v, m, sizeof(m));
+            SWSE_ConsolePrint(m);
+        }
+        return;
+    }
+    char target[160]; bool isAmmo = false;
+    if (!WpnTarget(argv[1], target, sizeof(target), &isAmmo)) {
+        Printf("%s has no ranged weapon (melee-only character)", argv[1]);
+        return;
+    }
+    if (argc == 2) {
+        // One answer for an unknown or unloaded weapon, not one per field.
+        if (TargetNotLoaded(target)) {
+            Printf("no weapon '%s' is loaded in this level - `knockback` lists player ammo, "
+                   "`npcguns` the armed characters", argv[1]);
+            return;
+        }
+        for (int i = 0; i < (int)(sizeof(kWpnSummary) / sizeof(kWpnSummary[0])); i++)
+            for (int k = 0; k < (int)(sizeof(kWpnAlias) / sizeof(kWpnAlias[0])); k++)
+                if (!lstrcmpiA(kWpnSummary[i], kWpnAlias[k].alias)) {
+                    PrefsGet(target, isAmmo ? kWpnAlias[k].ammoField : kWpnAlias[k].npcField);
+                    break;
+                }
+        return;
+    }
+    const char* field = (ai >= 0) ? (isAmmo ? kWpnAlias[ai].ammoField : kWpnAlias[ai].npcField) : argv[2];
+    if (argc == 3) { PrefsGet(target, field); return; }
+    const char* v = NormValue(argv[3]);
+    int r = SWSE_PrefsSet(target, field, v, AiEmit);
+    if (keep && r < 0) SWSE_ConsolePrint("not kept - fix the field or value first");
+    else if (keep) { char m[240]; SWSE_PrefsKeep(target, field, v, m, sizeof(m)); SWSE_ConsolePrint(m); }
+}
+
+// ---- key binds ----------------------------------------------------------------
+// bind F5 savepos  - a key (optionally ctrl+/alt+/shift+) runs a console line.
+// Saved to SWSE Console\binds.txt. Binds fire only while the console is closed
+// and the game really has focus, so typing elsewhere never triggers them.
+struct KeyBind { int vk; int mods; char cmd[200]; };
+static KeyBind g_binds[64];
+static int     g_bindN = 0;
+enum { MOD_C = 1, MOD_A = 2, MOD_S = 4 };
+
+static const struct { const char* name; int vk; } kVkNames[] = {
+    { "space", VK_SPACE }, { "tab", VK_TAB }, { "enter", VK_RETURN }, { "backspace", VK_BACK },
+    { "insert", VK_INSERT }, { "ins", VK_INSERT }, { "delete", VK_DELETE }, { "del", VK_DELETE },
+    { "home", VK_HOME }, { "end", VK_END }, { "pgup", VK_PRIOR }, { "pageup", VK_PRIOR },
+    { "pgdn", VK_NEXT }, { "pagedown", VK_NEXT }, { "up", VK_UP }, { "down", VK_DOWN },
+    { "left", VK_LEFT }, { "right", VK_RIGHT }, { "pause", VK_PAUSE }, { "scrolllock", VK_SCROLL },
+    { "minus", VK_OEM_MINUS }, { "equals", VK_OEM_PLUS }, { "lbracket", VK_OEM_4 },
+    { "rbracket", VK_OEM_6 }, { "semicolon", VK_OEM_1 }, { "quote", VK_OEM_7 },
+    { "comma", VK_OEM_COMMA }, { "period", VK_OEM_PERIOD }, { "slash", VK_OEM_2 },
+    { "backslash", VK_OEM_5 }, { "kpmultiply", VK_MULTIPLY }, { "kpadd", VK_ADD },
+    { "kpsubtract", VK_SUBTRACT }, { "kpdivide", VK_DIVIDE }, { "kpdecimal", VK_DECIMAL },
+    { "mouse3", VK_MBUTTON }, { "mouse4", VK_XBUTTON1 }, { "mouse5", VK_XBUTTON2 },
+};
+
+static int VkFromName(const char* s) {
+    if (!s || !*s) return 0;
+    if ((s[0] == 'f' || s[0] == 'F') && s[1] >= '1' && s[1] <= '9') {
+        // Digits only: "f1x" used to be read as F1.
+        bool digits = true;
+        for (const char* d = s + 1; *d; d++) if (*d < '0' || *d > '9') { digits = false; break; }
+        int n = digits ? atoi(s + 1) : 0;
+        if (n >= 1 && n <= 24) return VK_F1 + n - 1;
+    }
+    if (!s[1]) {
+        char c = s[0];
+        if (c >= 'a' && c <= 'z') return c - 'a' + 'A';
+        if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) return c;
+    }
+    if (!_strnicmp(s, "numpad", 6) && s[6] >= '0' && s[6] <= '9' && !s[7]) return VK_NUMPAD0 + (s[6] - '0');
+    if (!_strnicmp(s, "kp", 2) && s[2] >= '0' && s[2] <= '9' && !s[3]) return VK_NUMPAD0 + (s[2] - '0');
+    for (int i = 0; i < (int)(sizeof(kVkNames) / sizeof(kVkNames[0])); i++)
+        if (!lstrcmpiA(s, kVkNames[i].name)) return kVkNames[i].vk;
+    return 0;
+}
+
+static void VkToName(int vk, int mods, char* out) {
+    char key[24] = "?";
+    if (vk >= VK_F1 && vk <= VK_F24) wsprintfA(key, "F%d", vk - VK_F1 + 1);
+    else if ((vk >= 'A' && vk <= 'Z') || (vk >= '0' && vk <= '9')) wsprintfA(key, "%c", vk);
+    else if (vk >= VK_NUMPAD0 && vk <= VK_NUMPAD9) wsprintfA(key, "numpad%d", vk - VK_NUMPAD0);
+    else for (int i = 0; i < (int)(sizeof(kVkNames) / sizeof(kVkNames[0])); i++)
+        if (kVkNames[i].vk == vk) { lstrcpynA(key, kVkNames[i].name, sizeof(key)); break; }
+    wsprintfA(out, "%s%s%s%s", (mods & MOD_C) ? "ctrl+" : "", (mods & MOD_A) ? "alt+" : "",
+              (mods & MOD_S) ? "shift+" : "", key);
+}
+
+// "ctrl+alt+F5" -> vk + modifier mask
+static bool ParseKey(const char* spec, int* vk, int* mods) {
+    char s[48]; lstrcpynA(s, spec, sizeof(s));
+    *mods = 0;
+    char* p = s;
+    for (;;) {
+        char* plus = strchr(p, '+');
+        if (!plus || !plus[1]) break;
+        *plus = 0;
+        if (!lstrcmpiA(p, "ctrl"))       *mods |= MOD_C;
+        else if (!lstrcmpiA(p, "alt"))   *mods |= MOD_A;
+        else if (!lstrcmpiA(p, "shift")) *mods |= MOD_S;
+        else return false;
+        p = plus + 1;
+    }
+    *vk = VkFromName(p);
+    // ~ opens the console and Esc closes it; neither can be a bind.
+    return *vk != 0 && *vk != VK_OEM_3 && *vk != VK_ESCAPE;
+}
+
+static void BindsPath(char* out) { char d[MAX_PATH]; GetModDir(d); wsprintfA(out, "%s\\binds.txt", d); }
+
+// binds.txt and aliases.txt are rewritten from memory - atomically (written
+// beside, then swapped in) and keeping the author's comments: every '#' line
+// already in the file is carried over, in order, ahead of the entries. 1.0.x
+// opened the file "w" and wrote from memory, so hand comments were lost and a
+// crash mid-write left the file empty.
+static FILE* BeginListRewrite(const char* path, char* tmp, int tmpLen,
+                              const char* hdr1, const char* hdr2) {
+    _snprintf_s(tmp, tmpLen, _TRUNCATE, "%s.tmp", path);
+    FILE* out = fopen(tmp, "w");
+    if (!out) return nullptr;
+    bool any = false;
+    FILE* in = fopen(path, "r");
+    if (in) {
+        char line[400];
+        while (fgets(line, sizeof(line), in)) {
+            const char* p = line;
+            while (*p == ' ' || *p == '\t') p++;
+            if (*p != '#') continue;
+            fputs(line, out);
+            int n = lstrlenA(line);
+            if (n && line[n - 1] != '\n') fputc('\n', out);
+            any = true;
+        }
+        fclose(in);
+    }
+    if (!any) { fputs(hdr1, out); fputs(hdr2, out); }
+    return out;
+}
+
+static void EndListRewrite(FILE* out, const char* tmp, const char* path) {
+    bool ok = !ferror(out);
+    if (fclose(out) != 0) ok = false;
+    if (!ok || !MoveFileExA(tmp, path, MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+        DeleteFileA(tmp);
+}
+
+static void SaveBinds() {
+    char path[MAX_PATH], tmp[MAX_PATH + 8]; BindsPath(path);
+    FILE* f = BeginListRewrite(path, tmp, sizeof(tmp),
+        "# SWSE key binds - `bind <key> <command>` writes this file.\n",
+        "# <key> <console command line>   (ctrl+/alt+/shift+ prefixes allowed)\n");
+    if (!f) return;
+    for (int i = 0; i < g_bindN; i++) {
+        char k[48]; VkToName(g_binds[i].vk, g_binds[i].mods, k);
+        fprintf(f, "%-12s %s\n", k, g_binds[i].cmd);
+    }
+    EndListRewrite(f, tmp, path);
+}
+
+static void SetBind(int vk, int mods, const char* cmd) {
+    for (int i = 0; i < g_bindN; i++) {
+        if (g_binds[i].vk != vk || g_binds[i].mods != mods) continue;
+        if (!cmd) { g_binds[i] = g_binds[--g_bindN]; return; }
+        lstrcpynA(g_binds[i].cmd, cmd, sizeof(g_binds[i].cmd));
+        return;
+    }
+    if (!cmd || g_bindN >= 64) return;
+    g_binds[g_bindN].vk = vk; g_binds[g_bindN].mods = mods;
+    lstrcpynA(g_binds[g_bindN].cmd, cmd, sizeof(g_binds[g_bindN].cmd));
+    g_bindN++;
+}
+
+static void LoadBinds() {
+    g_bindN = 0;
+    char path[MAX_PATH]; BindsPath(path);
+    FILE* f = fopen(path, "r");
+    if (!f) return;
+    char line[260];
+    while (fgets(line, sizeof(line), f)) {
+        char* s = line;
+        while (*s == ' ' || *s == '\t') s++;
+        if (!*s || *s == '#' || *s == '\r' || *s == '\n') continue;
+        char* e = s; while (*e && *e != ' ' && *e != '\t') e++;
+        if (!*e) continue;
+        *e++ = 0;
+        while (*e == ' ' || *e == '\t') e++;
+        char* nl = e + lstrlenA(e);
+        while (nl > e && (nl[-1] == '\r' || nl[-1] == '\n' || nl[-1] == ' ')) *--nl = 0;
+        int vk, mods;
+        if (*e && ParseKey(s, &vk, &mods)) SetBind(vk, mods, e);
+    }
+    fclose(f);
+}
+
+// Joins argv[from..] back into one line.
+static void JoinArgs(int argc, char** argv, int from, char* out, int outLen) {
+    out[0] = 0;
+    for (int i = from; i < argc; i++) {
+        if (i > from && lstrlenA(out) + 1 < outLen) lstrcatA(out, " ");
+        if (lstrlenA(out) + lstrlenA(argv[i]) < outLen) lstrcatA(out, argv[i]);
+    }
+}
+
+static void Cmd_bind(int argc, char** argv) {
+    if (argc < 3) {
+        SWSE_ConsolePrint("usage: bind <key> <command...>   e.g. bind F5 savepos");
+        SWSE_ConsolePrint("  keys: F1-F24 A-Z 0-9 numpad0-9 insert delete home end pgup pgdn");
+        SWSE_ConsolePrint("        mouse3-5, with ctrl+/alt+/shift+ prefixes. `binds` lists them.");
+        SWSE_ConsolePrint("  a bound key still reaches the game too - pick ones it does not use");
+        return;
+    }
+    int vk, mods;
+    if (!ParseKey(argv[1], &vk, &mods)) { Printf("unknown key '%s'", argv[1]); return; }
+    char cmd[200]; JoinArgs(argc, argv, 2, cmd, sizeof(cmd));
+    SetBind(vk, mods, cmd);
+    SaveBinds();
+    char k[48]; VkToName(vk, mods, k);
+    Printf("%s -> %s  (saved to binds.txt)", k, cmd);
+}
+static void Cmd_unbind(int argc, char** argv) {
+    if (argc < 2) { SWSE_ConsolePrint("usage: unbind <key> | unbind all"); return; }
+    if (!lstrcmpiA(argv[1], "all")) { g_bindN = 0; SaveBinds(); SWSE_ConsolePrint("all binds removed"); return; }
+    int vk, mods;
+    if (!ParseKey(argv[1], &vk, &mods)) { Printf("unknown key '%s'", argv[1]); return; }
+    SetBind(vk, mods, nullptr);
+    SaveBinds();
+    Printf("unbound %s", argv[1]);
+}
+static void Cmd_binds(int, char**) {
+    if (!g_bindN) { SWSE_ConsolePrint("no binds - `bind F5 savepos` makes one"); return; }
+    for (int i = 0; i < g_bindN; i++) {
+        char k[48]; VkToName(g_binds[i].vk, g_binds[i].mods, k);
+        Printf("  %-14s %s", k, g_binds[i].cmd);
+    }
+}
+
+// Called from HandleInput on a key's down edge while the console is closed.
+static void RunBind(int vk) {
+    if (!g_bindN || !SWSE_InputReallyFocused()) return;
+    int mods = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) ? MOD_C : 0) |
+               ((GetAsyncKeyState(VK_MENU)    & 0x8000) ? MOD_A : 0) |
+               ((GetAsyncKeyState(VK_SHIFT)   & 0x8000) ? MOD_S : 0);
+    for (int i = 0; i < g_bindN; i++)
+        if (g_binds[i].vk == vk && g_binds[i].mods == mods) { Execute(g_binds[i].cmd); return; }
+    // Shift alone falls back to the plain bind: a key bound as F5 used to do
+    // nothing while Shift was held (running, say) unless shift+F5 was bound
+    // too. Ctrl and Alt combinations still need a bind of their own - those
+    // are the system's and the game's shortcuts.
+    if (mods == MOD_S)
+        for (int i = 0; i < g_bindN; i++)
+            if (g_binds[i].vk == vk && g_binds[i].mods == 0) { Execute(g_binds[i].cmd); return; }
+}
+
+// ---- aliases ------------------------------------------------------------------------
+// alias heal2 hp %1; stam %1   - a new command made of others. %1..%9 are its
+// arguments, %* all of them. Saved to SWSE Console\aliases.txt.
+struct Alias { char name[32]; char body[220]; };
+static Alias g_alias[64];
+static int   g_aliasN = 0;
+
+static void AliasPath(char* out) { char d[MAX_PATH]; GetModDir(d); wsprintfA(out, "%s\\aliases.txt", d); }
+
+static void SaveAliases() {
+    char path[MAX_PATH], tmp[MAX_PATH + 8]; AliasPath(path);
+    FILE* f = BeginListRewrite(path, tmp, sizeof(tmp),
+        "# SWSE aliases - `alias <name> <commands>` writes this file.\n",
+        "# <name> <command line; more; wait 500; more>   %1..%9 = arguments\n");
+    if (!f) return;
+    for (int i = 0; i < g_aliasN; i++) fprintf(f, "%-16s %s\n", g_alias[i].name, g_alias[i].body);
+    EndListRewrite(f, tmp, path);
+}
+
+static void SetAlias(const char* name, const char* body) {
+    for (int i = 0; i < g_aliasN; i++) {
+        if (lstrcmpiA(g_alias[i].name, name)) continue;
+        if (!body) { g_alias[i] = g_alias[--g_aliasN]; return; }
+        lstrcpynA(g_alias[i].body, body, sizeof(g_alias[i].body));
+        return;
+    }
+    if (!body || g_aliasN >= 64) return;
+    lstrcpynA(g_alias[g_aliasN].name, name, sizeof(g_alias[g_aliasN].name));
+    lstrcpynA(g_alias[g_aliasN].body, body, sizeof(g_alias[g_aliasN].body));
+    g_aliasN++;
+}
+
+static void LoadAliases() {
+    g_aliasN = 0;
+    char path[MAX_PATH]; AliasPath(path);
+    FILE* f = fopen(path, "r");
+    if (!f) return;
+    char line[300];
+    while (fgets(line, sizeof(line), f)) {
+        char* s = line;
+        while (*s == ' ' || *s == '\t') s++;
+        if (!*s || *s == '#' || *s == '\r' || *s == '\n') continue;
+        char* e = s; while (*e && *e != ' ' && *e != '\t') e++;
+        if (!*e) continue;
+        *e++ = 0;
+        while (*e == ' ' || *e == '\t') e++;
+        char* nl = e + lstrlenA(e);
+        while (nl > e && (nl[-1] == '\r' || nl[-1] == '\n' || nl[-1] == ' ')) *--nl = 0;
+        if (*e && lstrlenA(s) < 32) SetAlias(s, e);
+    }
+    fclose(f);
+}
+
+static const Alias* FindAlias(const char* name) {
+    for (int i = 0; i < g_aliasN; i++)
+        if (!lstrcmpiA(g_alias[i].name, name)) return &g_alias[i];
+    return nullptr;
+}
+
+// Expand %1..%9 and %* in an alias body.
+static void ExpandArgs(const char* body, int argc, char** argv, char* out, int outLen) {
+    int o = 0;
+    for (const char* p = body; *p && o < outLen - 1; p++) {
+        if (p[0] == '%' && p[1] >= '1' && p[1] <= '9') {
+            int k = p[1] - '0';
+            const char* a = (k < argc) ? argv[k] : "";
+            while (*a && o < outLen - 1) out[o++] = *a++;
+            p++;
+        } else if (p[0] == '%' && p[1] == '*') {
+            for (int k = 1; k < argc; k++) {
+                const char* a = argv[k];
+                if (k > 1 && o < outLen - 1) out[o++] = ' ';
+                while (*a && o < outLen - 1) out[o++] = *a++;
+            }
+            p++;
+        } else {
+            out[o++] = *p;
+        }
+    }
+    out[o] = 0;
+}
+
+static void Cmd_alias(int argc, char** argv) {
+    if (argc < 3) {
+        SWSE_ConsolePrint("usage: alias <name> <commands>   e.g. alias fullheal hp 1000; stam 500");
+        SWSE_ConsolePrint("  ';' separates commands, `wait <ms>` pauses, %1..%9 are arguments");
+        return;
+    }
+    if (IsBuiltinCmd(argv[1])) {
+        Printf("'%s' is a built-in command - an alias of that name would never run", argv[1]);
+        return;
+    }
+    // Plugin commands resolve before aliases too (1.1).
+    if (SWSE_PluginCmdExists(argv[1])) {
+        Printf("'%s' is a plugin's command - an alias of that name would never run", argv[1]);
+        return;
+    }
+    // Names are stored in 32 bytes. A longer one used to be cut on the way
+    // in, so the full name never matched again - not to run, not to unalias.
+    if (lstrlenA(argv[1]) > 31) { SWSE_ConsolePrint("alias names are up to 31 characters"); return; }
+    char body[220]; JoinArgs(argc, argv, 2, body, sizeof(body));
+    SetAlias(argv[1], body);
+    SaveAliases();
+    Printf("alias %s = %s  (saved to aliases.txt)", argv[1], body);
+}
+static void Cmd_unalias(int argc, char** argv) {
+    if (argc < 2) { SWSE_ConsolePrint("usage: unalias <name>"); return; }
+    SetAlias(argv[1], nullptr);
+    SaveAliases();
+    Printf("removed alias %s", argv[1]);
+}
+static void Cmd_aliases(int, char**) {
+    if (!g_aliasN) { SWSE_ConsolePrint("no aliases - `alias <name> <commands>` makes one"); return; }
+    for (int i = 0; i < g_aliasN; i++) Printf("  %-16s %s", g_alias[i].name, g_alias[i].body);
+}
+
+// ---- timing: after / wait / repeat ------------------------------------------------
+// A small scheduler, ticked every frame. `wait <ms>` inside a ';' chain, an
+// alias, a script or a remote batch delays everything after it.
+struct Sched { DWORD due; char line[240]; };
+static Sched g_sched[64];
+static int   g_schedN = 0;
+
+static void Schedule(const char* line, DWORD delayMs) {
+    if (g_schedN >= 64) { SWSE_ConsolePrint("scheduler full (64) - dropped a delayed command"); return; }
+    g_sched[g_schedN].due = GetTickCount() + delayMs;
+    lstrcpynA(g_sched[g_schedN].line, line, sizeof(g_sched[g_schedN].line));
+    g_schedN++;
+}
+
+static void SchedTick() {
+    DWORD now = GetTickCount();
+    for (int i = 0; i < g_schedN; ) {
+        if ((int)(now - g_sched[i].due) < 0) { i++; continue; }
+        char line[240];
+        lstrcpynA(line, g_sched[i].line, sizeof(line));
+        g_sched[i] = g_sched[--g_schedN];      // remove before running: it may reschedule
+        Execute(line);
+    }
+}
+
+// `wait` on its own does nothing - it only means something inside a sequence,
+// where RunLines consumes it.
+static void Cmd_wait(int, char**) {
+    SWSE_ConsolePrint("wait <ms> works inside a sequence: `cmd1; wait 500; cmd2`, aliases, scripts");
+}
+
+static void Cmd_after(int argc, char** argv) {
+    if (argc < 3) { SWSE_ConsolePrint("usage: after <seconds> <command...>   e.g. after 5 heal"); return; }
+    double s = atof(argv[1]);
+    if (s < 0) s = 0;
+    char cmd[240]; JoinArgs(argc, argv, 2, cmd, sizeof(cmd));
+    Schedule(cmd, (DWORD)(s * 1000.0));
+    Printf("in %s s: %s", argv[1], cmd);
+}
+
+static void Cmd_repeat(int argc, char** argv) {
+    if (argc < 3) { SWSE_ConsolePrint("usage: repeat <n> <command...>   (n up to 50)"); return; }
+    int n = atoi(argv[1]);
+    if (n < 1) n = 1;
+    if (n > 50) n = 50;
+    char cmd[240]; JoinArgs(argc, argv, 2, cmd, sizeof(cmd));
+    // Counted as nesting: `repeat 50 repeat 50 repeat 50 repeat 50 x` was
+    // 6.25 million commands on the render thread. Execute's per-line budget
+    // stops a runaway; the depth stops the pyramid being built at all.
+    if (g_execDepth >= 8) { SWSE_ConsolePrint("command nesting too deep - aborting."); return; }
+    g_execDepth++;
+    for (int i = 0; i < n; i++) Execute(cmd);
+    g_execDepth--;
+}
+
+// exec <file> - run a text file of commands (path relative to SWSE Console).
+static void Cmd_exec(int argc, char** argv) {
+    if (argc < 2) { SWSE_ConsolePrint("usage: exec <file.txt>   (relative to SWSEMods\\SWSE Console)"); return; }
+    // A file that execs itself used to recurse until the stack ran out, and
+    // a nested exec overwrote the outer file's lines (one static buffer).
+    if (g_execDepth >= 8) { SWSE_ConsolePrint("exec nesting too deep - aborting."); return; }
+    char path[MAX_PATH];
+    if (strchr(argv[1], ':') || argv[1][0] == '\\') lstrcpynA(path, argv[1], MAX_PATH);
+    else { char d[MAX_PATH]; GetModDir(d); _snprintf_s(path, MAX_PATH, _TRUNCATE, "%s\\%s", d, argv[1]); }
+    FILE* f = fopen(path, "r");
+    if (!f) { Printf("could not open %s", path); return; }
+    char (*lines)[240] = (char (*)[240])malloc(64 * 240);
+    if (!lines) { fclose(f); return; }
+    int n = 0;
+    char buf[260];
+    while (fgets(buf, sizeof(buf), f) && n < 64) {
+        char* s = buf;
+        while (*s == ' ' || *s == '\t') s++;
+        char* e = s + lstrlenA(s);
+        while (e > s && (e[-1] == '\r' || e[-1] == '\n' || e[-1] == ' ')) *--e = 0;
+        if (!*s || *s == '#') continue;
+        lstrcpynA(lines[n++], s, 240);
+    }
+    fclose(f);
+    g_execDepth++;
+    RunLines(lines, n);
+    g_execDepth--;
+    free(lines);
+}
+
+// ---- status for people, query for tools ----------------------------------------------
+static void Cmd_status(int, char**) {
+    Printf("SWSE %s   level %s  (epoch %u, up %u s)", SWSE_VERSION,
+           SWSE_LevelUp() ? "up" : "not loaded", SWSE_LevelEpoch(), SWSE_LevelAgeMs() / 1000);
+    if (!SWSE_GameBuildKnown() || lstrcmpA(SWSE_GameBuildName(), "Steam HD")) {
+        char gb[240]; SWSE_GameBuildDescribe(gb, sizeof(gb)); SWSE_ConsolePrint(gb);
+    }
+    // Safe mode: no position, health or moolah lines - every read of the
+    // player calls the game, and scriptvm.cpp answers "no player" there.
+    if (SWSE_GameBuildSafeMode())
+        SWSE_ConsolePrint("  safe mode: the console, mailbox, graphics, HD textures, foliage and ray "
+                          "tracing work; nothing that patches, calls or reads the game runs - `help` "
+                          "marks the commands this refuses");
+    float p[3];
+    if (SWSE_PosGet(p) == 1) {
+        char xs[32], ys[32], zs[32], ws[32] = "?";
+        Ff(xs, p[0], 1); Ff(ys, p[1], 1); Ff(zs, p[2], 1);
+        float yaw; if (SWSE_PlayerYawGet(&yaw) == 1) Ff(ws, yaw, 1);
+        Printf("  at %s %s %s facing %s%s%s", xs, ys, zs, ws,
+               SWSE_CurrentLevel()[0] ? " in " : "", SWSE_CurrentLevel());
+    }
+    float c = 0, m = 0, b = 0;
+    if (SWSE_PlayerHealth(&c, &m, &b) == 1) {
+        float sc = 0, sm = 0, sb = 0; SWSE_PlayerStamina(&sc, &sm, &sb);
+        float mo = 0;
+        if (SWSE_Moolah(&mo) == 1)
+            Printf("  health %d/%d  stamina %d/%d  moolah %d",
+                   (int)c, (int)m, (int)sc, (int)sm, (int)mo);
+        else
+            Printf("  health %d/%d  stamina %d/%d", (int)c, (int)m, (int)sc, (int)sm);
+    }
+    // Bounded: with plugin switches (1.1) the list has no fixed length.
+    char on[230] = "";
+    int ou = 0;
+    for (int i = 0; i < SWSE_FeatureTotal(); i++) {
+        if (!SWSE_Feature((SwseFeature)i)) continue;
+        int k = _snprintf_s(on + ou, sizeof(on) - ou, _TRUNCATE, "%s%s", ou ? ", " : "",
+                            SWSE_FeatureName((SwseFeature)i));
+        if (k < 0) break;
+        ou += k;
+    }
+    Printf("  features on: %s", on);
+    SWSE_PluginsStatus(SWSE_ConsolePrint);    // plugins found/on, and their status lines
+}
+
+// query <player|features|position|version> - one line of key=value pairs, for
+// tools on the remote mailbox (no prose to parse).
+static void Cmd_query(int argc, char** argv) {
+    const char* what = (argc > 1) ? argv[1] : "player";
+    char out[480]; int u = 0;
+    if (!lstrcmpiA(what, "features")) {
+        // Every switch, plugins' too (1.1) - bounded, since that list grows.
+        // The console shows 239 characters; the mailbox reply gets it all.
+        static char all[4096];
+        int au = 0;
+        all[0] = 0;
+        for (int i = 0; i < SWSE_FeatureTotal(); i++) {
+            int k = _snprintf_s(all + au, sizeof(all) - au, _TRUNCATE, "%s%s=%s", i ? " " : "",
+                                SWSE_FeatureName((SwseFeature)i), SWSE_Feature((SwseFeature)i) ? "on" : "off");
+            if (k < 0) break;
+            au += k;
+        }
+        SWSE_ConsolePrint(all);
+        return;
+    }
+    if (!lstrcmpiA(what, "plugins")) {
+        // <plugin>=on|off|faulted|refused for every plugin found (1.1).
+        static char pl[4096];
+        SWSE_PluginsQuery(pl, sizeof(pl));
+        SWSE_ConsolePrint(pl);
+        return;
+    }
+    if (!lstrcmpiA(what, "contract")) {
+        // The tool contract's version (TOOL_CONTRACT.md): bumped only by a
+        // change that breaks what that page promises.
+        SWSE_ConsolePrint("contract=1 swse=" SWSE_VERSION);
+        return;
+    }
+    if (!lstrcmpiA(what, "version")) {
+        // build= names the game exe SWSE recognised ("Steam HD"), or unknown.
+        char b[120];
+        char name[40]; lstrcpynA(name, SWSE_GameBuildName(), sizeof(name));
+        for (char* c = name; *c; c++) if (*c == ' ') *c = '_';
+        _snprintf_s(b, sizeof(b), _TRUNCATE, "swse=%s build=%s", SWSE_VERSION, name);
+        SWSE_ConsolePrint(b);
+        return;
+    }
+    // player / position
+    u += wsprintfA(out + u, "levelup=%d epoch=%u level=%s", SWSE_LevelUp() ? 1 : 0,
+                   SWSE_LevelEpoch(), SWSE_CurrentLevel()[0] ? SWSE_CurrentLevel() : "-");
+    // Safe mode (gamebuild.h): the level watcher does not run, so levelup
+    // stays 0, and every other key would be a read of the game. safemode=1
+    // tells a tool it is not "no level yet" but "never on this build".
+    if (SWSE_GameBuildSafeMode()) {
+        wsprintfA(out + u, " safemode=1");
+        SWSE_ConsolePrint(out);
+        return;
+    }
+    float p[3];
+    if (SWSE_PosGet(p) == 1) {
+        char xs[32], ys[32], zs[32];
+        Ff(xs, p[0], 3); Ff(ys, p[1], 3); Ff(zs, p[2], 3);
+        u += wsprintfA(out + u, " x=%s y=%s z=%s", xs, ys, zs);
+    }
+    float yaw;
+    if (SWSE_PlayerYawGet(&yaw) == 1) { char ws[32]; Ff(ws, yaw, 2); u += wsprintfA(out + u, " yaw=%s", ws); }
+    if (lstrcmpiA(what, "position")) {
+        float c = 0, m = 0, b = 0;
+        if (SWSE_PlayerHealth(&c, &m, &b) == 1) {
+            char a1[32], a2[32]; Ff(a1, c, 1); Ff(a2, m, 1);
+            u += wsprintfA(out + u, " health=%s healthmax=%s", a1, a2);
+        }
+        if (SWSE_PlayerStamina(&c, &m, &b) == 1) {
+            char a1[32], a2[32]; Ff(a1, c, 1); Ff(a2, m, 1);
+            u += wsprintfA(out + u, " stamina=%s staminamax=%s", a1, a2);
+        }
+        float mo = 0;
+        if (SWSE_Moolah(&mo) == 1) u += wsprintfA(out + u, " moolah=%d", (int)mo);
+    }
+    SWSE_ConsolePrint(out);
+}
+
+// mods [reload] - the enabled mod folders in load order, and which conventional
+// files each provides. `reload` rescans SWSEMods (a folder added while the game
+// runs) and re-reads every per-mod file the running systems use.
+static void Cmd_mods(int argc, char** argv) {
+    if (argc > 1 && !lstrcmpiA(argv[1], "reload")) {
+        int n = SWSE_ModsReload();
+        int pos = SWSE_PositionsLoad();
+        char msg[300];
+        Printf("rescanned: %d enabled mod(s), %d position(s)", n, pos);
+        if (SWSE_Feature(FEAT_AITUNING))   { SWSE_AiTuneLoad(msg, sizeof(msg)); SWSE_ConsolePrint(msg); }
+        if (SWSE_Feature(FEAT_TRIGGERS))   Printf("triggers: %d", SWSE_TriggersLoad());
+        if (SWSE_Feature(FEAT_PLAYERTUNE)) { SWSE_PlayerTuneLoad(msg, sizeof(msg)); SWSE_ConsolePrint(msg); }
+        if (SWSE_Feature(FEAT_PREFSEDIT))  { SWSE_PrefsEditLoad(msg, sizeof(msg)); SWSE_ConsolePrint(msg); }
+        if (SWSE_Feature(FEAT_NPCTUNING))  { SWSE_NpcTuningLoadAll(msg, sizeof(msg)); SWSE_ConsolePrint(msg); }
+        LoadDynCmds();
+        // Plugins (1.1): new DLLs become switches (off); plugins that are on
+        // hear MODS_RELOADED and re-read their own files.
+        SWSE_PluginsRescan();
+        SWSE_PluginsModsReloaded();
+        return;
+    }
+    static const char* kFiles[] = {
+        "features.txt", "aiprefs.txt", "playerprefs.txt", "prefs.txt", "characters.txt",
+        "console.txt", "triggers.txt", "positions.txt", "sites.txt", "foliage.txt",
+        "wind.txt", "hitreact.txt", "graphics.txt", "pointers.txt", "textures", "scripts",
+        "plugins",
+    };
+    int n = SWSE_ModCount();
+    Printf("%d enabled mod(s) in load order (later wins for single-value files):", n);
+    for (int i = 0; i < n; i++) {
+        char have[200] = "";
+        for (int k = 0; k < (int)(sizeof(kFiles) / sizeof(kFiles[0])); k++) {
+            char path[MAX_PATH];
+            wsprintfA(path, "%s\\%s", SWSE_ModPath(i), kFiles[k]);
+            if (GetFileAttributesA(path) == INVALID_FILE_ATTRIBUTES) continue;
+            if (lstrlenA(have) + lstrlenA(kFiles[k]) + 2 >= (int)sizeof(have)) break;
+            if (have[0]) lstrcatA(have, " ");
+            lstrcatA(have, kFiles[k]);
+        }
+        Printf("  %2d %-22s %s", i + 1, SWSE_ModName(i), have[0] ? have : "(no SWSE files)");
+    }
+    SWSE_ConsolePrint("`mods reload` after adding a folder or editing load_order.txt");
+}
+
+// npccache [rebuild] - SWSE's own live-NPC list (what triggers' killed/cleared
+// count). A worker thread rescans the heap every 20 s while a trigger needs
+// it, and at once after a level change; with hit reactions on, their
+// watcher's list is used instead.
+static void Cmd_npccache(int argc, char** argv) {
+    if (argc > 1 && !lstrcmpiA(argv[1], "rebuild")) {
+        SWSE_NpcCacheReset();
+        SWSE_ConsolePrint("npc list dropped - rescanned in the background (while a trigger needs it)");
+        return;
+    }
+    int n = 0, sc = 0, passes = 0, lastMs = 0, w = 0;
+    SWSE_NpcCacheInfo(&n, &sc, &passes, &lastMs, &w);
+    if (w) SWSE_ConsolePrint("hit reactions are watching - their actor list is used");
+    Printf("own list: %s%d NPC(s), %s, %d pass(es), the last took %d ms (worker thread)",
+           n < 0 ? "not built, " : "", n < 0 ? 0 : n, sc ? "scanning" : "idle", passes, lastMs);
+    Printf("counted now (all types): %d", SWSE_CountNpcsOfType(0));
+}
+
+// mute [on|off] - the game's own audio session (Volume Mixer's per-app mute),
+// so the setting is the player's, not a change to the game's sound options.
+static void Cmd_mute(int argc, char** argv) {
+    int on = 1;
+    if (argc > 1) on = !(!lstrcmpiA(argv[1], "off") || !lstrcmpiA(argv[1], "0"));
+    else if (SWSE_GameMuted()) on = 0;            // bare `mute` toggles
+    int n = SWSE_SetGameMute(on, 2000);
+    if (n > 0)       Printf("game audio %s (%d device(s))", on ? "MUTED" : "on", n);
+    else if (n == 0) SWSE_ConsolePrint("no playback device took the change - is any audio device active?");
+    else             SWSE_ConsolePrint("could not reach Windows audio (Core Audio unavailable)");
+}
+
+// hooks - the hook registry (1.1): every patch SWSE has made to code or a
+// pointer table, and which system owns it. Two patches on one function break
+// each other silently, so the list is the first thing to check when something
+// else in the process hooks too.
+static void Cmd_hooks(int, char**) {
+    SWSE_HooksList(SWSE_ConsolePrint);
+    SWSE_ConsolePrint("(what is patched depends on the switches on; a plugin's Memory.Write refuses these ranges)");
+}
+
+// hide / show - close or open the console overlay (for tools on the mailbox,
+// which can type commands but cannot press the ~ key).
+static void Cmd_hide(int, char**) { SetOpen(false); }
+static void Cmd_show(int, char**) { SetOpen(true); }
+
+// log <text> - write a line to swse_log.txt (for scripts and tools).
+static void Cmd_log(int argc, char** argv) {
+    char line[240]; JoinArgs(argc, argv, 1, line, sizeof(line));
+    char path[MAX_PATH];
+    GetModuleFileNameA(GetModuleHandleA(NULL), path, MAX_PATH);
+    char* sl = strrchr(path, '\\'); if (sl) *sl = 0;
+    lstrcatA(path, "\\swse_log.txt");
+    FILE* f = fopen(path, "a");
+    if (f) { fprintf(f, "LOG: %s\n", line); fclose(f); }
 }
 
 static Cmd g_cmds[] = {
@@ -2690,11 +4647,13 @@ static Cmd g_cmds[] = {
     { "pfield",     "player", "pfield <hexOff> [v] - any player field", Cmd_pfield },
 
     // ---- movement ---------------------------------------------------------
-    { "pos",        "movement", "print your X Y Z",                     Cmd_pos },
-    { "savepos",    "movement", "save your current spot",               Cmd_savepos },
-    { "tp",         "movement", "teleport to saved spot (see notes)",   Cmd_tp },
-    { "up",         "movement", "up [dist] - raise Y (see notes)",      Cmd_up },
-    { "move",       "movement", "move <axis 0|1|2> <delta>",            Cmd_move },
+    { "pos",        "movement", "print your X Y Z and facing",          Cmd_pos },
+    { "savepos",    "movement", "savepos [label] - save spot AND facing (label = to file)", Cmd_savepos },
+    { "tp",         "movement", "tp [label] - back to the saved spot, facing restored", Cmd_tp },
+    { "tpxyz",      "movement", "tpxyz <x> <y> <z> [yaw] - teleport to coordinates", Cmd_tpxyz },
+    { "yaw",        "movement", "yaw [deg] - read or set the way you face", Cmd_yaw },
+    { "up",         "movement", "up [dist] - lift you dist units (default 10) and let you fall", Cmd_up },
+    { "move",       "movement", "move <axis 0|1|2> <delta> - step along x/y (onto the floor) or z", Cmd_move },
     { "gravity",    "movement", "gravity [value] - 27 default, 7 floats", Cmd_gravity },
     { "aircontrol", "movement", "aircontrol [value] - midair steering", Cmd_aircontrol },
     { "jump",       "movement", "jump [height] - player motion obj",    Cmd_jump },
@@ -2733,15 +4692,22 @@ static Cmd g_cmds[] = {
     { "sendnpc",    "world", "sendnpc [n] [type] - send NPCs at you (their AI)", Cmd_sendnpc },
     { "resolve",    "debug", "resolve <hash> - resolve a type hash to its prefs", Cmd_resolve },
     { "ai",         "world", "ai <hash> [field value] - AI perception + weapon timing", Cmd_ai },
-    { "uispy",      "debug", "uispy [on|off|reset] - watch menu button callbacks", Cmd_uispy },
+    { "uispy",      "debug", "uispy [on|off|reset] - log every menu command (fscommand) by screen", Cmd_uispy },
     { "findai",     "debug", "findai [ms] - locate NPC perception prefs by memory shape", Cmd_findai },
     { "npcguns",    "world", "npcguns [ms] - which character carries which gun, with hp/bounty", Cmd_npcguns },
     { "weapons",    "debug", "weapons [ms] - NPC weapon timing: fire rate, accuracy, miss time", Cmd_weapons },
-    { "features",   "debug", "features - which SWSE systems are enabled", Cmd_features },
-    { "writepos",   "world", "writepos <label> - save where you stand, by name", Cmd_writepos },
+    { "features",   "tuning", "features [name on|off] | preset full|default - list/switch SWSE systems live", Cmd_features },
+    { "playertune", "tuning", "playertune [reload|apply|restore] - playerprefs.txt", Cmd_playertune },
+    { "prefs",      "tuning", "prefs find|get|set|keep|dump|fields - live prefs editor", Cmd_prefs },
+    { "knockback",  "tuning", "knockback [ammo|all] [npc] [player] [keep] - ammo knockback", Cmd_knockback },
+    { "npc",        "tuning", "npc <type> [field [value]] [keep] - any character field by name", Cmd_npc },
+    { "wpn",        "tuning", "wpn <ammo|npcweapon|hash|all> [field [value]] [keep] - weapon fields", Cmd_wpn },
+    { "writepos",   "world", "writepos <label> - save where you stand + facing, by name", Cmd_writepos },
     { "positions",  "world", "positions - list saved positions", Cmd_positions },
-    { "goto",       "world", "goto <label> - teleport to a saved position", Cmd_goto },
+    { "goto",       "world", "goto <label> - teleport to a saved position (and facing)", Cmd_goto },
     { "spawnat",    "world", "spawnat <label> [n] [type] - move NPCs to a position", Cmd_spawnat },
+    { "playnpc",    "world", "playnpc [name|off|status] - play as a character from this level (loads it first if needed)", SWSE_PlayNpcCmd },
+    { "freecam",    "world", "freecam [on|off|toggle] | pos <x> <y> <z> | look <yaw> [pitch] | speed [n] | sens [n] - fly the view with the game's own dev camera", SWSE_FreecamCmd },
     { "reserve",    "world", "reserve [n] | reserve park - spare NPCs for ambushes", Cmd_reserve },
     { "triggers",   "world", "triggers [list|reload|test <name>|on|off]", Cmd_triggers },
     { "difficulty", "world", "difficulty <name|off> - apply an AI profile from aiprefs.txt", Cmd_difficulty },
@@ -2767,13 +4733,13 @@ static Cmd g_cmds[] = {
     { "decoy",      "world", "decoy <shooter> <victim> - make shots land on the victim", Cmd_decoy },
     { "feud",       "world", "feud <typeA> <typeB> - inject mutual damage (untested)", Cmd_feud },
     { "npchurt",    "world", "npchurt <type> [0|2] - 2 = cannot be staggered",  Cmd_npchurt },
-    { "npcaff",     "world", "npcaff <type> [n] - affiliation (who it fights)", Cmd_npcaff },
+    { "npcaff",     "world", "npcaff <type> [0|1] - player ammo affects it (0 = immune; NOT affiliation)", Cmd_npcaff },
     { "allnpcs",    "world", "allnpcs <hp|-> [gib] - apply to every character here", Cmd_allnpcs },
     { "tuning",     "world", "tuning - reload characters.txt (hp/gib per character)", Cmd_tuning },
     { "types",      "world", "types [dump] - characters here + hp/gib, or to a file", Cmd_types },
     { "npclast",    "world", "npclast - replay the captured NPC creation", Cmd_npclast },
     { "npchere",    "world", "npchere - spawn the captured NPC at you",  Cmd_npchere },
-    { "spawnnpc",   "world", "spawnnpc [type] - spawn an NPC at you",    Cmd_spawnnpc },
+    { "spawnnpc",   "world", "spawnnpc - retired: it moved a live piece of the level (npcnow instead)", Cmd_spawnnpc },
     { "spawnclone", "world", "spawnclone - clone a captured NPC at you", Cmd_spawnclone },
     { "npcspawn",   "world", "npcspawn - replay a captured spawn",       Cmd_npcspawn },
     { "npctags",    "debug", "npctags - find live NPC spawn tags",       Cmd_npctags },
@@ -2784,6 +4750,7 @@ static Cmd g_cmds[] = {
     { "granny",     "debug", "granny [minBones] | granny dump <addr> - find bone poses", Cmd_granny },
     { "peek",       "debug", "peek <hexaddr> [dwords] - hex/float/ascii memory view", Cmd_peek },
     { "agentdebug", "debug", "agentdebug [on|off] - run unfocused, desktop stays usable", Cmd_agentdebug },
+    { "mute",       "debug", "mute [on|off] - mute the game's sound (Windows per-app mute)", Cmd_mute },
     { "snap",       "debug", "snap [file.tga] - screenshot from inside the engine", Cmd_snap },
     { "shaderdump", "graphics", "shaderdump [file|stats] - dump the game's shader programs", Cmd_shaderdump },
     { "hd",         "graphics", "hd - HD texture replacement stats, and which .oft files failed", Cmd_hd },
@@ -2801,7 +4768,7 @@ static Cmd g_cmds[] = {
     { "perf",       "graphics", "perf - where a stutter came from (SWSE or the game)", Cmd_perf },
     { "selftest",   "debug", "selftest - check every SWSE feature is operational", Cmd_selftest },
     { "key",        "input", "key <name...> - tap keys into the game",   Cmd_key },
-    { "menu",       "input", "menu <n> - pick the nth main-menu item",   Cmd_menu },
+    { "menu",       "input", "menu list|continue|skip|fs ... - drive the menus without keys", Cmd_menu },
     { "newgame",    "input", "newgame [1-3] - new game (1 easy/2 normal/3 hard)", Cmd_newgame },
     { "continue",   "input", "continue - CONTINUE from the menu",        Cmd_continue },
     { "skipcut",    "input", "skipcut - try to skip the current cutscene", Cmd_skipcut },
@@ -2831,6 +4798,17 @@ static Cmd g_cmds[] = {
     { "call",          "scripting", "call <function> [args]",           Cmd_call },
     { "scripts",       "scripting", "your custom .txt commands",        Cmd_scripts },
     { "reloadscripts", "scripting", "reload scripts\\ after editing",   Cmd_reloadscripts },
+    { "bind",          "scripting", "bind <key> <command> - run a command from a key", Cmd_bind },
+    { "unbind",        "scripting", "unbind <key>|all",                  Cmd_unbind },
+    { "binds",         "scripting", "list key binds",                    Cmd_binds },
+    { "alias",         "scripting", "alias <name> <cmd; cmd> - make a command", Cmd_alias },
+    { "unalias",       "scripting", "unalias <name>",                    Cmd_unalias },
+    { "aliases",       "scripting", "list aliases",                      Cmd_aliases },
+    { "after",         "scripting", "after <sec> <command> - run it later", Cmd_after },
+    { "wait",          "scripting", "wait <ms> - pause inside a ; sequence/script", Cmd_wait },
+    { "repeat",        "scripting", "repeat <n> <command>",              Cmd_repeat },
+    { "exec",          "scripting", "exec <file> - run a file of commands", Cmd_exec },
+    { "log",           "scripting", "log <text> - write a line to swse_log.txt", Cmd_log },
     { "ptr",           "scripting", "list pointer chains + values",     Cmd_ptr },
     { "get",           "scripting", "get <name> - read a chain",        Cmd_get },
     { "hold",          "scripting", "hold <name> <value> - freeze",     Cmd_hold },
@@ -2872,62 +4850,205 @@ static Cmd g_cmds[] = {
 
     // ---- console ----------------------------------------------------------
     { "help",  "console", "help [category|command]",                    Cmd_help },
+    { "status", "console", "status - where you are, health, what is on", Cmd_status },
+    { "query",  "console", "query [player|position|features|plugins|version] - key=value for tools", Cmd_query },
+    { "mods",   "console", "mods [reload] - enabled mod folders and their files", Cmd_mods },
+    { "plugins", "console", "plugins [name|rescan] - native plugins: state, cost, faults", SWSE_PluginsCommand },
+    { "hooks",  "debug", "hooks - every live code/table patch and the system that owns it", Cmd_hooks },
+    { "npccache", "debug", "npccache [rebuild] - SWSE's live-NPC list (triggers)", Cmd_npccache },
+    { "hide",   "console", "hide - close the console overlay",       Cmd_hide },
+    { "show",   "console", "show - open the console overlay",        Cmd_show },
     { "clear", "console", "clear the console",                          Cmd_clear },
     { "echo",  "console", "echo text",                                  Cmd_echo },
     { "ver",   "console", "show version",                               Cmd_ver },
+    { "ssrmask", "graphics", "ssrmask [reload] - SSR material mask status",  Cmd_ssrmask },
+    { "gpu",     "raytrace", "gpu - compute + ray-math capability probe",    Cmd_gpu },
+    { "geo",     "raytrace", "geo [show] - capture draw geometry, prove space", Cmd_geo },
+    { "harvest", "raytrace", "harvest [show|dump N] - world triangle soup",  Cmd_harvest },
+    { "skin",    "debug", "skin [show] - census this frame's CHARACTER draws", Cmd_skin },
+    { "meshdump","debug", "meshdump [stop] - capture character meshes for Oddview", Cmd_meshdump },
+    { "hidepart","debug", "hidepart <n>|show <n>|list|clear - drop a character part", Cmd_hidepart },
+    { "noponcho","debug", "noponcho [off|<indexCount>] - hide Stranger's poncho", Cmd_noponcho },
+    { "nohat",   "debug", "nohat [off|<indexCount>] - hide Stranger's hat", Cmd_nohat },
+    { "nodreads","debug", "nodreads [off|<indexCount>] - hide Stranger's dreadlocks", Cmd_nodreads },
+    { "rt",      "raytrace", "rt [build] - BVH + camera trace status",       Cmd_rt },
+    { "progsrc", "raytrace", "progsrc <id> - a program's position math",     Cmd_progsrc },
     { "exit",  "console", "quit the game (lets the DLL be reinstalled)", Cmd_exit },
 };
 static const int N_CMDS = sizeof(g_cmds) / sizeof(g_cmds[0]);
+
+// ---- safe mode: the commands the console refuses on an unknown game build --
+// gamebuild.h: on a build SWSE's addresses were not measured on, nothing may
+// patch, call or read the game through a Steam address. Decided here, once,
+// by category, then by name where a category is mixed; Execute refuses with
+// SWSE_GameBuildRefusal's text and `help` marks the same commands. What each
+// category does (the review behind the lists):
+//   player, movement, items, music - the player object, its motion, the wallet
+//     and the game's script verbs: every command calls or reads the game.
+//     Refused.
+//   world - NPCs, spawners, AI, zones, warp and teleports, hit reactions,
+//     playnpc, freecam, triggers; `levels` and `positions` only list names for
+//     warp and goto. Refused.
+//   tuning - the prefs registry and the player's fields. Refused, except
+//     `features`, SWSE's own switchboard.
+//   debug - mostly game structures: NPC lists, the script context, the spies,
+//     Steam vtables. Refused, except SWSE's own (hooks, selftest, snap, mute,
+//     agentdebug/background, remote), the OpenGL draw hook's (skin, meshdump,
+//     hidepart, noponcho, nohat, nodreads), and the plain memory readers that
+//     read only an address you type, never a Steam one (peek, dumpaddr, whatis,
+//     diff, instances, vtscan, findval, narrow) - what porting SWSE to another
+//     build needs.
+//   graphics, raytrace - OpenGL: the pipeline, texture uploads, shader
+//     programs, the draw hook, a camera from shader constants. Run. (`set`
+//     refuses a pointer chain itself; wind's player push reads nothing here.)
+//   input - DirectInput key presses; `menu` refuses its keyless half itself
+//     (menu.cpp). Run.
+//   scripting - binds, aliases, exec, after, repeat, wait, scripts: SWSE's
+//     own, and every command they run meets this gate itself. Run, except
+//     `call` (a game function) and the pointers.txt chains (ptr, get, hold,
+//     unhold, ptrreload), each of which starts at a Steam address.
+//   console - SWSE's own: help, status, query, mods, ver, plugins... Run.
+// Plugins' commands are the plugins' own code and run; what they reach of the
+// game goes through the plugin API, which safe mode gates (plugins.cpp).
+static const char* kSafeModeCats[] = {
+    "player", "movement", "items", "world", "tuning", "debug", "music",
+};
+static const char* kSafeModeAllowed[] = {       // in a refused category, but SWSE's own
+    "features",
+    "hooks", "selftest", "snap", "mute", "agentdebug", "background", "remote",
+    "skin", "meshdump", "hidepart", "noponcho", "nohat", "nodreads",
+    "peek", "dumpaddr", "whatis", "diff", "instances", "vtscan", "findval", "narrow",
+};
+static const char* kSafeModeRefused[] = {       // in a category that runs, but into the game
+    "call", "ptr", "get", "hold", "unhold", "ptrreload",
+};
+static bool NameIn(const char* name, const char* const* list, int n) {
+    for (int i = 0; i < n; i++) if (!lstrcmpiA(name, list[i])) return true;
+    return false;
+}
+#define NAMES_IN(name, list) NameIn(name, list, (int)(sizeof(list) / sizeof(list[0])))
+// True when safe mode refuses this built-in (never on a known build).
+static bool SafeModeBlocks(const Cmd& c) {
+    if (!SWSE_GameBuildSafeMode()) return false;
+    if (NAMES_IN(c.name, kSafeModeRefused)) return true;
+    if (NAMES_IN(c.name, kSafeModeAllowed)) return false;
+    return NAMES_IN(c.cat, kSafeModeCats);
+}
 
 // One wrapping line per category: "player  : hp  stam  sethealth ...".
 // A 4-column grid pushed help past 35 lines, so the top scrolled off the panel
 // and whole categories (items, and therefore grant) looked missing.
 static const int HELP_WRAP = 228;      // stay inside the 240-char line buffer
 
-static void HelpCategory(const char* cat) {
+// One word onto a wrapping help row.
+static void HelpRowAdd(char* row, int* len, const char* word) {
+    int need = lstrlenA(word) + 2;
+    if (*len + need >= HELP_WRAP) {
+        SWSE_ConsolePrint(row);
+        wsprintfA(row, "%-10s ", "");         // continuation, aligned
+        *len = lstrlenA(row);
+    }
+    lstrcatA(row, " ");
+    lstrcatA(row, word);
+    *len += need - 1;
+}
+
+static bool IsHelpCat(const char* cat) {
+    for (int c = 0; c < N_CATS; c++) if (!lstrcmpiA(cat, kCats[c])) return true;
+    return false;
+}
+
+// A category's row. Plugin commands (1.1) join the row of the category they
+// name - their plugin's name unless they gave one - while their plugin is on.
+static void HelpCategory(const char* cat, bool builtins) {
     char row[240];
-    wsprintfA(row, "%-10s:", cat);
+    _snprintf_s(row, sizeof(row), _TRUNCATE, "%-10.31s:", cat);
     int len = lstrlenA(row);
     int n = 0;
-    for (int i = 0; i < N_CMDS; i++) {
+    for (int i = 0; builtins && i < N_CMDS; i++) {
         if (lstrcmpiA(g_cmds[i].cat, cat)) continue;
-        int need = lstrlenA(g_cmds[i].name) + 2;
-        if (len + need >= HELP_WRAP) {
-            SWSE_ConsolePrint(row);
-            wsprintfA(row, "%-10s ", "");     // continuation, aligned
-            len = lstrlenA(row);
+        if (SafeModeBlocks(g_cmds[i])) {                  // safe mode: marked, see the legend
+            char w[40];
+            _snprintf_s(w, sizeof(w), _TRUNCATE, "%s*", g_cmds[i].name);
+            HelpRowAdd(row, &len, w);
+        } else {
+            HelpRowAdd(row, &len, g_cmds[i].name);
         }
-        lstrcatA(row, " ");
-        lstrcatA(row, g_cmds[i].name);
-        len += need - 1;
+        n++;
+    }
+    const char *pn, *pc; int on;
+    for (int i = 0; SWSE_PluginCmdAt(i, &pn, &pc, nullptr, nullptr, &on); i++) {
+        if (!on || lstrcmpiA(pc, cat)) continue;
+        // Two plugins offering one name: listed once (one of them runs it).
+        bool dup = false;
+        const char *qn, *qc; int qon;
+        for (int j = 0; j < i && SWSE_PluginCmdAt(j, &qn, &qc, nullptr, nullptr, &qon); j++)
+            if (qon && !lstrcmpiA(qn, pn) && !lstrcmpiA(qc, cat)) { dup = true; break; }
+        if (dup) continue;
+        HelpRowAdd(row, &len, pn);
         n++;
     }
     if (n) SWSE_ConsolePrint(row);
 }
 
+static int PluginCmdsOn() {
+    int n = 0, on;
+    for (int i = 0; SWSE_PluginCmdAt(i, nullptr, nullptr, nullptr, nullptr, &on); i++) if (on) n++;
+    return n;
+}
+
 static void Cmd_help(int argc, char** argv) {
     if (argc > 1) {
-        // help <command> -> one-line detail
+        // help <command> -> one-line detail. A name can be both a command and
+        // a category (`tuning`), so both are shown: returning after the
+        // command made the category unreachable.
+        bool shown = false;
         for (int i = 0; i < N_CMDS; i++)
             if (!lstrcmpiA(argv[1], g_cmds[i].name)) {
-                Printf("%s  [%s]  %s", g_cmds[i].name, g_cmds[i].cat, g_cmds[i].help);
-                return;
+                Printf("%s  [%s]  %s%s", g_cmds[i].name, g_cmds[i].cat, g_cmds[i].help,
+                       SafeModeBlocks(g_cmds[i]) ? "  - unavailable on this game build (safe mode)" : "");
+                shown = true;
+                break;
             }
+        // A plugin command (1.1): every plugin that offers it, and which runs.
+        const char *pn, *pc, *ph, *pp; int on;
+        for (int i = 0; SWSE_PluginCmdAt(i, &pn, &pc, &ph, &pp, &on); i++) {
+            if (lstrcmpiA(argv[1], pn)) continue;
+            Printf("%s  [plugin %s, %s]  %s", pn, pp, on ? "on" : "off - `features <name> on`",
+                   ph[0] ? ph : "(no help given)");
+            shown = true;
+        }
         // help <category> -> that section, with descriptions
         for (int c = 0; c < N_CATS; c++) {
             if (lstrcmpiA(argv[1], kCats[c])) continue;
             Printf("--- %s ---", kCats[c]);
             for (int i = 0; i < N_CMDS; i++)
                 if (!lstrcmpiA(g_cmds[i].cat, kCats[c]))
-                    Printf("  %-15s %s", g_cmds[i].name, g_cmds[i].help);
+                    Printf("  %-15s %s%s", g_cmds[i].name, g_cmds[i].help,
+                           SafeModeBlocks(g_cmds[i]) ? "  (not on this game build)" : "");
+            for (int i = 0; SWSE_PluginCmdAt(i, &pn, &pc, &ph, &pp, &on); i++)
+                if (on && !lstrcmpiA(pc, kCats[c]))
+                    Printf("  %-15s %s  (plugin %s)", pn, ph, pp);
             return;
         }
-        Printf("no such command or category: %s", argv[1]);
+        // help <plugin> or a plugin's own category -> its commands, described.
+        bool header = false;
+        for (int i = 0; SWSE_PluginCmdAt(i, &pn, &pc, &ph, &pp, &on); i++) {
+            if (lstrcmpiA(argv[1], pp) && lstrcmpiA(argv[1], pc)) continue;
+            if (!header) { Printf("--- %s ---", argv[1]); header = true; }
+            Printf("  %-15s %s%s", pn, ph, on ? "" : "  (off)");
+        }
+        if (header) return;
+        if (!shown && SWSE_PluginIsName(argv[1])) {
+            Printf("%s is a plugin with no commands registered - `plugins %s` for more", argv[1], argv[1]);
+            return;
+        }
+        if (!shown) Printf("no such command or category: %s", argv[1]);
         return;
     }
 
-    Printf("SWSE Console - %d commands.  'help <category>' for descriptions.", N_CMDS);
-    for (int c = 0; c < N_CATS; c++) HelpCategory(kCats[c]);
+    Printf("SWSE Console - %d commands.  'help <category>' for descriptions.", N_CMDS + PluginCmdsOn());
+    for (int c = 0; c < N_CATS; c++) HelpCategory(kCats[c], true);
 
     // Anything with a category not in kCats still has to be reachable.
     char row[240]; wsprintfA(row, "%-10s:", "other");
@@ -2944,7 +5065,22 @@ static void Cmd_help(int argc, char** argv) {
         lstrcatA(row, " "); lstrcatA(row, g_cmds[i].name); len += need - 1; n++;
     }
     if (n) SWSE_ConsolePrint(row);
+    // Plugins (1.1): a row per category no built-in uses - normally one per
+    // plugin that is on, under its own name.
+    const char* seen[64]; int ns = 0;
+    const char *pn, *pc; int on;
+    for (int i = 0; SWSE_PluginCmdAt(i, &pn, &pc, nullptr, nullptr, &on) && ns < 64; i++) {
+        if (!on || IsHelpCat(pc)) continue;
+        bool dup = false;
+        for (int k = 0; k < ns; k++) if (!lstrcmpiA(seen[k], pc)) dup = true;
+        if (dup) continue;
+        seen[ns++] = pc;
+        HelpCategory(pc, false);
+    }
     SWSE_ConsolePrint("also: 'list' = 181 game functions, 'scripts' = your own .txt commands");
+    if (SWSE_GameBuildSafeMode())
+        SWSE_ConsolePrint("* = unavailable on this game build: SWSE runs in safe mode here ('status')");
+    if (SWSE_PluginsFound()) SWSE_ConsolePrint("plugins: 'plugins' lists them, 'help <plugin>' shows one's commands");
 }
 
 static bool StartsWithCI(const char* s, const char* pre) {
@@ -2970,6 +5106,7 @@ static void Complete() {
         if (StartsWithCI(g_cmds[i].name, g_input)) m[n++] = g_cmds[i].name;
     for (int i = 0; i < g_dynCmdCount && n < 300; i++)
         if (StartsWithCI(g_dynCmds[i].name, g_input)) m[n++] = g_dynCmds[i].name;
+    n += SWSE_PluginCmdComplete(g_input, m + n, 300 - n);   // plugins' commands (1.1)
     n += SWSE_ScriptComplete(g_input, m + n, 300 - n);
     if (n == 0) return;
     if (n == 1) {                              // unique -> complete + space
@@ -3004,7 +5141,8 @@ static void Complete() {
 // can chain built-ins, any of the 181 exposed game functions, freeze/poke,
 // anything. This is the actual "write my own functions" extension point -
 // no C++, no rebuild, just a text file.
-static int    g_execDepth = 0;       // guards against a script invoking itself
+// (g_execDepth, the recursion guard, is declared with the 1.1 forward
+// declarations so `exec` and `repeat` can count into it too.)
 
 static void GetScriptsDir(char* out) {
     char exe[MAX_PATH]; GetModuleFileNameA(GetModuleHandleA(NULL), exe, MAX_PATH);
@@ -3049,12 +5187,18 @@ static void LoadDynCmds() {
 
 static void Execute(const char* line);   // fwd decl (scripts call back into Execute)
 
+static void RunLines(char lines[][240], int n);   // fwd - honours `wait`
+
 static bool RunDynCmd(const char* name) {
     for (int i = 0; i < g_dynCmdCount; i++) {
         if (lstrcmpiA(name, g_dynCmds[i].name)) continue;
         if (g_execDepth >= 8) { SWSE_ConsolePrint("script recursion too deep - aborting."); return true; }
+        // Copied out so a `wait` line can defer the rest (1.1).
+        char lines[24][240];
+        int n = g_dynCmds[i].lineCount;
+        for (int j = 0; j < n; j++) lstrcpynA(lines[j], g_dynCmds[i].lines[j], 240);
         g_execDepth++;
-        for (int j = 0; j < g_dynCmds[i].lineCount; j++) Execute(g_dynCmds[i].lines[j]);
+        RunLines(lines, n);
         g_execDepth--;
         return true;
     }
@@ -3134,37 +5278,73 @@ static void RemotePoll() {
         g_remotePrimed = true;
         return;
     }
-    char buf[8192]; DWORD got = 0;
+    // The write time as well as the sequence number: a tool that starts its
+    // numbering at 1 every session (Stranger: Armed to the Teeth does) would
+    // otherwise have its first command dropped whenever a stale file from the
+    // last session happened to carry the same number.
+    FILETIME wt = { 0, 0 };
+    GetFileTime(h, nullptr, nullptr, &wt);
+    static char buf[65536]; DWORD got = 0;
     ReadFile(h, buf, sizeof(buf) - 1, &got, nullptr);
     CloseHandle(h);
     if (!got) return;
     buf[got] = 0;
 
     int seq = atoi(buf);
+    ULONGLONG t = ((ULONGLONG)wt.dwHighDateTime << 32) | wt.dwLowDateTime;
+    static ULONGLONG s_lastTime = 0;
     // Priming must consume whatever was already on disk at launch - otherwise
     // a leftover file replays itself every time the game starts. Doing it here
     // (rather than on the first *new* seq) means it costs a poll, not a command.
-    if (!g_remotePrimed) { g_remotePrimed = true; g_remoteSeq = seq; return; }
-    if (seq == g_remoteSeq) return;              // nothing new
+    if (!g_remotePrimed) { g_remotePrimed = true; g_remoteSeq = seq; s_lastTime = t; return; }
+    if (seq == g_remoteSeq && t == s_lastTime) return;   // nothing new
+    // A batch caught mid-write would run in part now and, once the write time
+    // settled, again in full - doubling anything not idempotent. Both known
+    // writers (swsecmd.ps1, Stranger: Armed to the Teeth) end the file with a
+    // newline, so a file without one is taken as still being written - unless
+    // it sits unchanged for a poll, for a writer that leaves the last one off.
+    static ULONGLONG s_pendTime = 0;
+    static DWORD     s_pendSize = 0;
+    if (buf[got - 1] != '\n' && (t != s_pendTime || got != s_pendSize)) {
+        s_pendTime = t;
+        s_pendSize = got;
+        return;
+    }
+    s_pendTime = 0;
+    s_pendSize = 0;
     g_remoteSeq = seq;
+    s_lastTime = t;
 
     const char* p = strchr(buf, '\n');
     if (!p) { RemoteWriteOut(seq, "(no command lines)\r\n"); return; }
     p++;
 
-    g_capLen = 0; g_capBuf[0] = 0; g_capOn = true;
-    char line[256]; int li = 0;
+    // Collected first and run as a sequence, so a `wait <ms>` line delays the
+    // lines after it (their output then goes to the console, not this reply).
+    // 256 lines of up to 239 characters (what a command line holds); anything
+    // beyond is reported in the reply rather than dropped silently.
+    static char lines[256][240];
+    int n = 0, over = 0, cut = 0;
+    char line[256]; int li = 0; bool longLine = false;
     for (;; p++) {
         if (*p == '\r') continue;
         if (*p == '\n' || *p == 0) {
             line[li] = 0;
-            if (li && line[0] != '#') Execute(line);
-            li = 0;
+            if (li && line[0] != '#') {
+                if (n < 256) { lstrcpynA(lines[n++], line, 240); if (longLine || li > 239) cut++; }
+                else over++;
+            }
+            li = 0; longLine = false;
             if (*p == 0) break;
             continue;
         }
         if (li < (int)sizeof(line) - 1) line[li++] = *p;
+        else longLine = true;
     }
+    g_capLen = 0; g_capBuf[0] = 0; g_capOn = true;
+    if (over) Printf("(mailbox: %d line(s) past the first 256 were not run)", over);
+    if (cut)  Printf("(mailbox: %d line(s) were cut to 239 characters)", cut);
+    RunLines(lines, n);
     g_capOn = false;
     RemoteWriteOut(seq, g_capLen ? g_capBuf : "(no output)\r\n");
 }
@@ -3177,20 +5357,115 @@ static void Cmd_remote(int argc, char** argv) {
     Printf("mailbox: %s\\remote_in.txt", dir);
 }
 
+static bool IsBuiltinCmd(const char* name) {
+    for (int i = 0; i < N_CMDS; i++)
+        if (!lstrcmpiA(name, g_cmds[i].name)) return true;
+    return false;
+}
+
+// Run a list of command lines in order. `wait <ms>` delays everything after it
+// by handing the rest to the scheduler, so a sequence never blocks a frame.
+static void RunLines(char lines[][240], int n) {
+    DWORD delay = 0;
+    for (int i = 0; i < n; i++) {
+        const char* l = lines[i];
+        while (*l == ' ' || *l == '\t') l++;
+        if (!*l) continue;
+        if (!_strnicmp(l, "wait", 4) && (l[4] == ' ' || l[4] == '\t' || !l[4])) {
+            int ms = atoi(l + 4);
+            if (ms > 0) delay += (DWORD)ms;
+            continue;
+        }
+        if (delay) Schedule(l, delay);
+        else Execute(l);
+    }
+}
+
+// "a; b; wait 300; c" -> a sequence. A ';' inside the line splits it; there is
+// no quoting, which no built-in command needs.
+static bool RunChain(const char* line) {
+    if (!strchr(line, ';')) return false;
+    // Commands that take a command keep the whole rest of the line, ';'s and
+    // all: `alias x a; b` defines x as "a; b", `after 5 a; b` delays both.
+    // The stored line is split when it finally runs.
+    {
+        const char* w = line;
+        while (*w == ' ' || *w == '\t') w++;
+        static const char* kTakesCommand[] = { "alias", "bind", "after", "repeat" };
+        for (int i = 0; i < 4; i++) {
+            int n = lstrlenA(kTakesCommand[i]);
+            if (!_strnicmp(w, kTakesCommand[i], n) && (w[n] == ' ' || w[n] == '\t'))
+                return false;
+        }
+    }
+    // A local copy per call: a part may itself run a chain (an alias).
+    char local[32][240];
+    int n = 0;
+    const char* p = line;
+    while (*p && n < 32) {
+        const char* e = strchr(p, ';');
+        int len = e ? (int)(e - p) : lstrlenA(p);
+        if (len > 239) len = 239;
+        memcpy(local[n], p, len); local[n][len] = 0;
+        n++;
+        if (!e) break;
+        p = e + 1;
+    }
+    RunLines(local, n);
+    return true;
+}
+
+// Commands one typed (or mailed, bound, scheduled) line may run in total,
+// counting everything its repeats, aliases and scripts expand into. The depth
+// limit alone still allowed 50^7 from a self-repeating alias.
+#define LINE_BUDGET 2000
+static int  g_lineBudget = LINE_BUDGET;
+static bool g_budgetWarned = false;
+
 static void Execute(const char* line) {
+    if (g_execDepth >= 8) { SWSE_ConsolePrint("command nesting too deep - aborting."); return; }
+    if (g_execDepth == 0) { g_lineBudget = LINE_BUDGET; g_budgetWarned = false; }
+    if (--g_lineBudget < 0) {
+        if (!g_budgetWarned) {
+            g_budgetWarned = true;
+            Printf("one line expanded past %d commands - the rest were skipped", LINE_BUDGET);
+        }
+        return;
+    }
+    if (RunChain(line)) return;
     g_cmdsRun++;                    // retires the big welcome title
     Printf("> %s", line);
     char buf[256]; lstrcpynA(buf, line, 256);
-    char* argv[16]; int argc = 0;
+    // 32 tokens: alias/bind/after bodies are whole command lines.
+    char* argv[32]; int argc = 0;
     char* tok = strtok(buf, " \t");
-    while (tok && argc < 16) { argv[argc++] = tok; tok = strtok(nullptr, " \t"); }
+    while (tok && argc < 32) { argv[argc++] = tok; tok = strtok(nullptr, " \t"); }
     if (argc == 0) return;
     for (int i = 0; i < N_CMDS; i++) {
-        if (!lstrcmpiA(argv[0], g_cmds[i].name)) { g_cmds[i].fn(argc, argv); return; }
+        if (!lstrcmpiA(argv[0], g_cmds[i].name)) {
+            // Safe mode's one gate for every way a command arrives: typed,
+            // mailed, bound, aliased, scheduled, from a script or a plugin.
+            if (SafeModeBlocks(g_cmds[i])) { SafeModeRefuse(g_cmds[i].name); return; }
+            g_cmds[i].fn(argc, argv);
+            return;
+        }
     }
+    // A native plugin's command (1.1): after the built-ins, before scripts,
+    // aliases and the game's functions. Guarded and timed in plugins.cpp.
+    if (SWSE_PluginCmdRun(argc, argv)) return;
     if (RunDynCmd(argv[0])) return;      // user-defined .txt script command
+    if (const Alias* a = FindAlias(argv[0])) {
+        char expanded[480];
+        ExpandArgs(a->body, argc, argv, expanded, sizeof(expanded));
+        g_execDepth++;
+        Execute(expanded);
+        g_execDepth--;
+        return;
+    }
     // not a built-in - try the 181 auto-exposed game functions by real name
     const char* fmt = SWSE_ScriptArgs(argv[0]);
+    // Each one is a game function: none is called in safe mode.
+    if (fmt && SWSE_GameBuildSafeMode()) { SafeModeRefuse(argv[0]); return; }
     if (fmt && *fmt && argc == 1) {           // needs args but none given -> show usage
         char hint[64]; ArgHint(fmt, hint);
         Printf("%s needs args:  %s %s", argv[0], argv[0], hint);
@@ -3198,8 +5473,9 @@ static void Execute(const char* line) {
     }
     int r = SWSE_ScriptCallByName(argv[0], argc, argv);
     if (r == 1)       Printf("%s: called", argv[0]);
-    else if (r == 0)  SWSE_ConsolePrint("no context - grab ammo once to prime.");
+    else if (r == 0)  NoContext(argv[0], true);
     else if (r == -2) Printf("%s: faulted - try different args", argv[0]);
+    else if (r == -3) SafeModeRefuse(argv[0]);
     else {
         // near-miss suggestions via prefix
         const char* m[8]; int n = SWSE_ScriptComplete(argv[0], m, 8);
@@ -3211,6 +5487,26 @@ static void Execute(const char* line) {
 
 void SWSE_ConsoleExec(const char* line) {
     if (line && *line) Execute(line);
+}
+
+// ---- for the plugin API (plugins.cpp) -------------------------------------------
+bool SWSE_ConsoleIsBuiltin(const char* name) { return name && IsBuiltinCmd(name); }
+
+// Execute counts nesting only for scripts, aliases, `exec` and `repeat`; a
+// command that runs a command was not counted, so a plugin command running
+// itself would have recursed until the stack died (PLUGIN_SYSTEM.md C5). The
+// plugin API's Execute comes through here and adds its level. A line run from
+// a plugin's frame callback starts a fresh line budget, as a typed line does.
+int SWSE_ConsoleExecNested(const char* line) {
+    if (!line || !*line) return 0;
+    // Execute refuses at depth 8 on its own, silently to its caller; refuse the
+    // level that would reach it here, so the plugin gets SWSE_E_NESTING back.
+    if (g_execDepth >= 7) { SWSE_ConsolePrint("command nesting too deep - aborting."); return -11; }
+    if (g_execDepth == 0) { g_lineBudget = LINE_BUDGET; g_budgetWarned = false; }
+    g_execDepth++;
+    Execute(line);
+    g_execDepth--;
+    return 0;
 }
 
 
@@ -3294,24 +5590,38 @@ static void DrawText(float x, float y, float scale, const char* s) {
 
 // ---- input ---------------------------------------------------------------
 static void HandleInput() {
+    // Only the game's own keyboard. GetAsyncKeyState is the GLOBAL key state,
+    // so without this, while the console was open, whatever the user typed in
+    // ANY app went into the console line and Enter ran it - and the ~ toggle
+    // fired from other apps too (plugin QA, 2026-09-28). While the game is not
+    // the foreground window every key counts as already held, so a key held
+    // across the switch back produces no press.
+    if (!SWSE_InputReallyFocused()) {
+        memset(g_prevKey, 1, sizeof(g_prevKey));
+        return;
+    }
     BYTE ks[256] = {0};
     if (GetAsyncKeyState(VK_SHIFT)   & 0x8000) ks[VK_SHIFT]   = 0x80;
     if (GetKeyState(VK_CAPITAL)      & 0x0001) ks[VK_CAPITAL] = 0x01;
 
-    for (int vk = 8; vk < 256; vk++) {
+    // From 4 (middle mouse, then X1/X2) so those can be bound; they translate
+    // to no character, so typing is unaffected. 1 and 2 (left/right click)
+    // are deliberately never scanned.
+    for (int vk = 4; vk < 256; vk++) {
+        if (vk == 7) continue;                 // unassigned
         bool down = (GetAsyncKeyState(vk) & 0x8000) != 0;
         bool edge = down && !g_prevKey[vk];
         g_prevKey[vk] = down;
         if (!edge) continue;
 
         if (vk == VK_OEM_3) {                 // ` / ~  toggles the console
-            g_open = !g_open;
+            SetOpen(!g_open);
             g_inputLen = 0; g_input[0] = 0;
             continue;
         }
-        if (!g_open) continue;
+        if (!g_open) { RunBind(vk); continue; }   // key binds (1.1)
 
-        if (vk == VK_ESCAPE) { g_open = false; continue; }
+        if (vk == VK_ESCAPE) { SetOpen(false); continue; }
         if (vk == VK_RETURN) {
             if (g_inputLen) { Execute(g_input); g_inputLen = 0; g_input[0] = 0; g_scroll = 0; }
             continue;
@@ -3406,14 +5716,19 @@ static void FrameProtectedBody(HDC hdc) {
         BuildFont();
         SWSE_ScriptVMInit();
         LoadDynCmds();
+        LoadBinds();
+        LoadAliases();
         SWSE_PtrLoad();
         // Deliberately plain. The font atlas is ASCII only, so decorative
         // separators drew as '?', and four dense lines buried the one thing a
         // new user needs to know.
-        SWSE_ConsolePrint("SWSE Console");
-        SWSE_ConsolePrint("type 'help' for commands");
+        SWSE_ConsolePrint("SWSE Console " SWSE_VERSION);
+        SWSE_ConsolePrint("type 'help' for commands, 'features' for what is switched on");
+        if (SWSE_GameBuildSafeMode())
+            SWSE_ConsolePrint("safe mode: this game build is not the one SWSE was measured on - 'status'");
     }
     SWSE_ScriptTick();        // apply god mode each frame (no-op unless enabled)
+    SchedTick();              // `after` / `wait` commands that have come due
     HandleInput();
     if (!g_open) return;
     HWND hwnd = WindowFromDC(hdc);
@@ -3441,7 +5756,9 @@ void SWSE_ConsoleFrame(HDC hdc) {
     // Additive hit reactions: notices NPC health drops and queues a flinch.
     // Inert unless 'hitreact watch on'.
     __try { SWSE_HitReactTick(); } __except (EXCEPTION_EXECUTE_HANDLER) {}
+    __try { TpCheckTick(); } __except (EXCEPTION_EXECUTE_HANDLER) {}
     SWSE_CountFrame();
     __try { FrameProtectedBody(hdc); }
-    __except (EXCEPTION_EXECUTE_HANDLER) { g_open = false; }
+    __except (EXCEPTION_EXECUTE_HANDLER) { SetOpen(false); }
 }
+

@@ -57,4 +57,7 @@ int SWSE_TriggerTest(const char* name, char* msg, int msgLen);
 
 // Enable/disable the whole system at runtime.
 void SWSE_TriggersEnable(int on);
+// Called when triggers are switched on live: the level already up counts as
+// loaded, so its `levelload` triggers do not all fire at the switch.
+void SWSE_TriggersArm();
 int  SWSE_TriggersEnabled();

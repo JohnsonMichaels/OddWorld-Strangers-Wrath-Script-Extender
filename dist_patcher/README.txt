@@ -24,7 +24,10 @@ WHY YOU MIGHT NEED IT
     The stock game runs fine within 2 GB.
 
 USAGE
-    Double-click                 patch the auto-detected Steam install
+    Double-click                 patch the game it finds: the usual Steam
+                                 folders on C:, D: and E:, or the game it
+                                 sits in (in the game folder, in bin, or in
+                                 a folder beside bin)
     SWSE_4GB_Patcher --check     report status only, change nothing
     SWSE_4GB_Patcher --restore   put the original exe back
     SWSE_4GB_Patcher --exe "<path to stranger.exe>"
@@ -52,12 +55,12 @@ KNOWN RISK
     unstable after patching, run --restore and you are back exactly where you
     started.
 
-NOTE FOR SWSE / SWSE USERS
-    SWSE scans memory to find game objects. Those scans were bounded to the
-    2 GB address space. The bounds have been widened (HEAP_HI, and the frustum
-    scan bound) so that NPC scanning, tuning, spawning and the camera scan keep
-    working when the heap can extend past 2 GB. Use an SWSE build from
-    2026-07-26 or later alongside this patch.
+NOTE FOR SWSE USERS
+    SWSE finds game objects by scanning the game's heap. For this patch the
+    scanned range was raised (HEAP_HI, from 0x20000000 to 0x40000000), so NPC
+    scanning, tuning, spawning and the camera scan keep finding objects when
+    the patched game's heap grows past its old ceiling. Every SWSE release,
+    1.0 and later, has this.
 
     Verify after patching by opening the console and running:  npcs
     If it still reports a sensible NPC count, the tooling survived.

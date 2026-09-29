@@ -15,17 +15,31 @@
 //     folder and your plants sway. The shipped mods are ordinary folders that
 //     follow the same rule and get no special treatment.
 //
-// CONVENTIONAL FILES  (any mod may provide any of these)
+// CONVENTIONAL FILES  (any mod may provide any of these; each policy below is
+// what the code does - checked against every SWSE_FindModFile /
+// SWSE_ForEachModFile call in 1.1)
 //     foliage.txt        plants the wind moves          ADDITIVE
-//     wind.txt           wind strength/behaviour        LAST WINS
-//     aiprefs.txt        NPC AI tuning profiles         ADDITIVE
+//     aiprefs.txt        AI difficulty profiles         LAST WINS (the whole file)
 //     characters.txt     per-character health/gib       ADDITIVE
 //     hitreact.txt       additive hit reactions         LAST WINS
-//     pointers.txt       pointer chains for the console ADDITIVE
+//     pointers.txt       pointer chains for the console LAST WINS
 //     graphics.txt       post-process settings          LAST WINS
 //     console.txt        console/tuning toggles         LAST WINS
+//     playerprefs.txt    player health/stamina/motion   LAST WINS
+//     prefs.txt          live prefs-record edits        ADDITIVE
+//     triggers.txt       mod-defined events             ADDITIVE
+//     positions.txt      named points (+ yaw)           ADDITIVE, later label wins
+//     sites.txt          named points, AT3 order        ADDITIVE, later label wins
 //     textures\*.oft     HD texture replacements        ADDITIVE, later wins
-//     scripts\*.txt      new console commands           ADDITIVE
+//     scripts\*.txt      new console commands           LAST WINS (the folder)
+//
+// NOT MOD FILES - fixed places, never searched:
+//     SWSEMods\features.txt, SWSEMods\load_order.txt
+//     SWSE Console\binds.txt, aliases.txt, remote_in.txt, remote_out.txt
+//     SWSE Wind\wind.txt (wind.cpp reads and `wind save` writes that one
+//         file, whichever mods are enabled; this table used to list it as
+//         a LAST WINS mod file)
+//     (writepos also always writes SWSE Console\positions.txt and sites.txt)
 //
 // MERGE POLICY
 //     ADDITIVE  - every enabled mod contributes; use SWSE_ForEachModFile.

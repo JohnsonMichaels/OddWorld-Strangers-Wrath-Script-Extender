@@ -5,7 +5,7 @@
 #include "modregistry.h"
 #include "console.h"
 #include "scriptvm.h"
-#include "granny.h"
+#include "levelwatch.h"
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,6 +60,32 @@ static void LogT(const char* s) {
 }
 
 void SWSE_TriggersEnable(int on) { g_on = (on != 0); }
+
+// The level epoch the triggers last treated as "just loaded".
+static unsigned g_trgEpoch = 0;
+
+// What a level load resets: per-level counts and edge state, the NPC cache.
+static void ResetLevelState() {
+    g_levelStamp = GetTickCount();
+    SWSE_NpcCacheReset();                 // the old level's NPCs are gone
+    for (int i = 0; i < g_trgN; i++) {
+        g_trg[i].firedThisLevel = 0;
+        g_trg[i].peakAlive = 0;
+        g_trg[i].inside = false;
+        g_trg[i].primed = false;
+    }
+}
+
+// Switched on in the middle of a level: that level has already loaded as far
+// as `levelload` is concerned. Without this the first tick saw an epoch it
+// had not handled and ran every levelload trigger at once - with the stock
+// SWSE Ambushes that parks the distant cast below the map. A level that came
+// up less than the settle delay ago still gets its levelload.
+void SWSE_TriggersArm() {
+    if (!SWSE_LevelUp() || SWSE_LevelAgeMs() < 4000) return;
+    g_trgEpoch = SWSE_LevelEpoch();
+    ResetLevelState();
+}
 int  SWSE_TriggersEnabled()      { return g_on ? 1 : 0; }
 
 // ---- parsing ---------------------------------------------------------------
@@ -224,23 +250,19 @@ void SWSE_TriggersTick() {
     static bool seeded = false;
     if (!seeded) { seeded = true; srand(GetTickCount()); }
 
-    // Level-change detection, using the same actor-presence edge the self-test
-    // and AI tuning use. Cheap and already computed each frame.
-    static int lastHadActors = 0;
-    unsigned act[4];
-    int have = SWSE_WatchActors(act, 4) > 0 ? 1 : 0;
-    bool levelJustLoaded = (have && !lastHadActors);
-    if (levelJustLoaded) {
-        g_levelStamp = GetTickCount();
-        for (int i = 0; i < g_trgN; i++) {
-            g_trg[i].firedThisLevel = 0;
-            g_trg[i].peakAlive = 0;
-            g_trg[i].inside = false;
-            g_trg[i].primed = false;
-        }
-    }
-    if (!have) { lastHadActors = 0; return; }   // no level up: nothing to do
-    lastHadActors = have;
+    // Level-change detection from the level watcher, a settle delay after a
+    // new player body appears (so `levelload` actions find the cast built).
+    // 1.0.x used the hit-reaction actor list, which never fills with hit
+    // reactions off - so with 1.1's defaults no trigger would ever have run.
+    bool levelJustLoaded = SWSE_LevelDue(&g_trgEpoch, 4000);
+    if (levelJustLoaded) ResetLevelState();
+    if (!SWSE_LevelUp() || g_trgEpoch != SWSE_LevelEpoch()) return;   // not up yet
+
+    // Only pay for an NPC list when a trigger counts NPCs.
+    bool needCount = false;
+    for (int i = 0; i < g_trgN && !needCount; i++)
+        if (g_trg[i].kind == W_KILLED || g_trg[i].kind == W_CLEARED) needCount = true;
+    if (needCount) SWSE_NpcCacheTick();
 
     float pp[3];
     bool havePos = SWSE_PosGet(pp) && !(pp[0] == 0 && pp[1] == 0 && pp[2] == 0);

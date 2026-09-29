@@ -59,6 +59,10 @@ void SWSE_WindGetPush(float* amount, float* radius, float* maxHeight);
 // advances the wind oscillation.
 void SWSE_WindFrame();
 
+// Restore every injected program now, rather than on a frame that may never
+// come (the frame hook skips wind while foliage is off). Render thread only.
+void SWSE_WindRestoreNow();
+
 // Called by the foliage bind tracker as the bound texture changes between
 // foliage and non-foliage. Only acts on a CHANGE, so this costs nothing per
 // draw even though binds are frequent.
@@ -113,5 +117,33 @@ int  SWSE_WindGetSeed();
 // startup and can enable the effect (installing the foliage tracker it needs);
 // save writes whatever is currently tuned. Every value was arrived at by
 // looking at the result in game, so they must not be lost on restart.
+// Save writes beside wind.txt and swaps it in, keeping its '#' lines; it
+// returns 0 (and leaves the old file) if that fails.
 void SWSE_WindLoadSettings();
-void SWSE_WindSaveSettings();
+int  SWSE_WindSaveSettings();
+
+// The ACTIVE camera, read back from the view-projection rows the engine
+// uploaded to a world-drawing vertex program - ground truth, not a heap-scan
+// guess. Returns 1 and fills the frustum when a known program's clip rows
+// decompose to a sane perspective. conv: 0 = GL depth convention, 1 = D3D.
+int SWSE_WindClipCamera(float* nearOut, float* farOut, float* fovOut,
+                        float* aspectOut, unsigned* progOut, int* convOut,
+                        int* groupOut);
+// Log WHY each candidate failed (rows/row3-length/frustum sanity), for `proj why`.
+void SWSE_WindClipCameraWhy();
+// Report, for N frames, how many camera candidates pass the TILT test - that
+// their forward agrees with the direction from their eye to the player.
+// "0 of N" means the true scene camera is not among the programs we scan.
+void SWSE_WindTiltLog(int n);
+
+// Raw view-projection rows of the last consensus camera (row-major,
+// clip = M * world). For temporal reprojection. 0 until a camera has decoded.
+int SWSE_WindClipVPLast(float out16[16]);
+
+// Dump c[0..19] of the clip-camera candidate programs to the log - lights
+// reconnaissance. Rows identical across programs are per-frame globals.
+void SWSE_WindProgConsts();
+
+// Dump one program's local constants (nonzero rows) up to maxRow. For the
+// skinned-program light hunt: their lighting consts sit above the bone range.
+void SWSE_WindProgConstsOf(unsigned progId, int maxRow);

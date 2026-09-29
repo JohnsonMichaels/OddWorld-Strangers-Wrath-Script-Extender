@@ -9,6 +9,7 @@
 // frame hook + shader passes land in M2+.
 
 #include <windows.h>
+#include "swse_version.h"
 #include <string>
 #include <vector>
 #include <fstream>
@@ -162,8 +163,42 @@ static std::vector<std::string> FindGraphicsMods() {
     return found;
 }
 
+// The log grew by every session - it passed 1.6 MB, and old sessions buried
+// the new one. At load, a log over 4 MB becomes swse_log.old.txt (replacing
+// the previous one) and a fresh log starts.
+static void RotateLog() {
+    char dir[MAX_PATH];
+    GetModuleFileNameA(GetModuleHandleA(NULL), dir, MAX_PATH);
+    char* sl = strrchr(dir, '\\');
+    if (sl) *sl = 0;
+    char log[MAX_PATH], old[MAX_PATH];
+    _snprintf_s(log, MAX_PATH, _TRUNCATE, "%s\\swse_log.txt", dir);
+    _snprintf_s(old, MAX_PATH, _TRUNCATE, "%s\\swse_log.old.txt", dir);
+    WIN32_FILE_ATTRIBUTE_DATA a;
+    if (GetFileAttributesExA(log, GetFileExInfoStandard, &a) &&
+        (a.nFileSizeHigh || a.nFileSizeLow > 4u * 1024 * 1024))
+        MoveFileExA(log, old, MOVEFILE_REPLACE_EXISTING);
+}
+
+extern "C" IMAGE_DOS_HEADER __ImageBase;     // this DLL's own module base
+
 static void InitSWSE() {
-    Log("==== SWSE injected ====");
+    RotateLog();
+    // The banner says what ran and when, so a pasted log identifies itself:
+    // the version, the local time, and this DLL's link stamp. (The game exe's
+    // fingerprint follows at the first frame.) Tools search for
+    // "SWSE injected", so it stays at the front.
+    {
+        SYSTEMTIME st; GetLocalTime(&st);
+        const IMAGE_NT_HEADERS* nt =
+            (const IMAGE_NT_HEADERS*)((const BYTE*)&__ImageBase + __ImageBase.e_lfanew);
+        char b[200];
+        _snprintf_s(b, sizeof(b), _TRUNCATE,
+                    "==== SWSE injected ==== version %s, %04d-%02d-%02d %02d:%02d:%02d, dll link stamp %08X",
+                    SWSE_VERSION, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond,
+                    (unsigned)nt->FileHeader.TimeDateStamp);
+        Log(b);
+    }
     Log("Stranger's Wrath Script Extender loaded into stranger.exe");
     auto mods = FindGraphicsMods();
     if (mods.empty()) {

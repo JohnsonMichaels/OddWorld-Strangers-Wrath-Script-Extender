@@ -3,6 +3,21 @@
 #include "wind.h"
 #include "foliage.h"
 #include "scriptvm.h"       // SWSE_PosGet - the player's world position
+#include "geocapture.h"     // SWSE_GeoInvert4x4 - per-candidate matrix inverse
+
+// Unproject an NDC point through an inverse view-projection. Used to derive a
+// candidate camera's eye and forward so its TILT can be checked, which the
+// frustum decomposition alone cannot tell us.
+static int g_tiltLog = 0;    // frames of tilt-test reporting still to emit
+void SWSE_WindTiltLog(int n) { g_tiltLog = n; }
+
+static void ClipUnproj(const float* m, float x, float y, float z, float* out) {
+    float w = m[12]*x + m[13]*y + m[14]*z + m[15];
+    if (w > -1e-9f && w < 1e-9f) w = 1e-9f;
+    out[0] = (m[0]*x + m[1]*y + m[2]*z  + m[3])  / w;
+    out[1] = (m[4]*x + m[5]*y + m[6]*z  + m[7])  / w;
+    out[2] = (m[8]*x + m[9]*y + m[10]*z + m[11]) / w;
+}
 #include <windows.h>
 #include <gl/GL.h>
 #include <stdio.h>
@@ -28,6 +43,8 @@ static PFN_BINDPROGRAMARB       p_BindProgramARB;
 static PFN_PROGRAMSTRINGARB     p_ProgramStringARB;
 static PFN_GETPROGRAMIVARB      p_GetProgramivARB;
 static PFN_GETPROGRAMSTRINGARB  p_GetProgramStringARB;
+typedef void (__stdcall *PFN_GETPROGRAMLOCALPARAMFV)(unsigned, unsigned, float*);
+static PFN_GETPROGRAMLOCALPARAMFV p_GetProgramLocalParameterfvARB;
 static PFN_PROGRAMENVPARAM4FARB p_ProgramEnvParameter4fARB;
 static bool g_resolved = false;
 
@@ -71,6 +88,8 @@ static bool Resolve() {
     p_ProgramStringARB         = (PFN_PROGRAMSTRINGARB)gpa("glProgramStringARB");
     p_GetProgramivARB          = (PFN_GETPROGRAMIVARB)gpa("glGetProgramivARB");
     p_GetProgramStringARB      = (PFN_GETPROGRAMSTRINGARB)gpa("glGetProgramStringARB");
+    p_GetProgramLocalParameterfvARB =
+        (PFN_GETPROGRAMLOCALPARAMFV)gpa("glGetProgramLocalParameterfvARB");
     p_ProgramEnvParameter4fARB = (PFN_PROGRAMENVPARAM4FARB)gpa("glProgramEnvParameter4fARB");
     return p_ProgramStringARB && p_GetProgramStringARB && p_BindProgramARB
         && p_GetProgramivARB && p_ProgramEnvParameter4fARB;
@@ -101,6 +120,10 @@ static bool g_on = false;
 static bool g_testMode = false;
 static int  g_pending = 0;          // 1 = inject, -1 = restore, 0 = idle
 
+// The settings below start at the values the shipped SWSE Wind\wind.txt
+// holds, so the effect looks the same when that file is missing. Keep the two
+// in step.
+//
 // Bend in local units per unit of height: 0.075 moves the tip of a plant by
 // 7.5% of its own height. 0.010 was measured as working but literally
 // invisible; the brief is "gives life to the foliage", which still has to be
@@ -111,17 +134,19 @@ static float g_speed    = 1.0f;
 // Stiffness: the greatest plant height that still gains movement. Beyond it a
 // plant bends no further, so tall trees stop whipping. It is a UNIFORM, so it
 // tunes live with no re-injection.
-static float g_weight   = 0.5f;
+static float g_weight   = 0.85f;
 // The shader needs 1/cap: ARB has RCP but no divide, and doing it once here
 // beats doing it per vertex.
-static float g_invWeight = 2.0f;
+static float g_invWeight = 1.0f / 0.85f;
 static float g_curX = 0.0f, g_curZ = 0.0f, g_phase = 0.0f;
 // Player push: foliage bends away from the player, as if they were the wind.
-static float g_push       = 0.35f;   // how far, in local units
+static float g_push       = 0.4f;    // how far, in local units
 static float g_pushRadius = 4.5f;    // how close before anything happens
-// Plants taller than this are not pushed at all: grass and undergrowth part
-// around the player, trees stay put.
-static float g_pushMax    = 1.0f;
+// Plants taller than this are not pushed at all. 1000 means no cut: a height
+// cannot tell grass from trees (`pushmax 1.0` stopped the push on grass while
+// trees still moved - FOLIAGE_WIND.md), so trees are kept still by name
+// instead, through `nopush` in foliage.txt.
+static float g_pushMax    = 1000.0f;
 static float g_px = 0.0f, g_py = 0.0f, g_pz = 0.0f;
 // Sprint-aware push. `g_sprintSpeed` is the horizontal speed treated as a full
 // four-legged sprint; `g_pushSprint` is how much wider the radius gets there.
@@ -166,7 +191,7 @@ static bool  g_useGate = true;
 // programs only show the projection convention - so it was settled by trying
 // both and looking.
 static int   g_upAxis  = 1;         // 0 = Y is up, 1 = Z is up
-// Per-plant phase seeding, DEFAULT OFF.
+// Per-plant phase seeding, DEFAULT ON (it shipped off first - see the end).
 //
 // The first attempt seeded phase from vertex.attrib[1].w, on the reading that
 // attrib[1] was an instance-matrix row. It is not: the program header declares
@@ -437,8 +462,9 @@ static bool Inject(GLuint id, char* work, int workMax) {
     // injected. Losing the push on a few programs beats losing both.
     bool canPush = strncmp(wdst, "result", 6) != 0;
 
-    // World up is Y for this engine (the `up` command raises axis 1), so the
-    // horizontal plane the player pushes through is XZ.
+    // World up is Z for this engine (research/PLAYER_FACING.md; `up` moves
+    // along Z since 1.1), so the plane the player pushes through is the two
+    // non-up axes - see the h1/h2 note below.
     char push[1536];   // ~719 worst case; wsprintfA does not bounds-check
     push[0] = 0;
     if (!canPush) {
@@ -834,18 +860,56 @@ static void SettingsPath(char* out) {
     lstrcatA(out, "\\SWSEMods\\SWSE Wind\\wind.txt");
 }
 
-void SWSE_WindSaveSettings() {
+// `wind save`. It used to open wind.txt "w" and write a short header and ten
+// values: `sprintspeed` and `pushsprint` were never written, so a saved file
+// lost any custom sprint push (and the shipped notes about them), and a crash
+// mid-write left the file empty. Now, like features.txt, it is written beside
+// the file and swapped in; every '#' line already there is kept, ahead of the
+// values (the shipped notes, or the user's own); and all twelve are written.
+int SWSE_WindSaveSettings() {
     char path[MAX_PATH];
     SettingsPath(path);
-    FILE* f = fopen(path, "w");
-    if (!f) { LogW("wind: could not write wind.txt"); return; }
-    fprintf(f, "# SWSE foliage wind settings\n");
-    fprintf(f, "# enabled  0/1   turn the effect on at launch\n");
-    fprintf(f, "# strength       bend per unit of plant height (0.06 = 6%%)\n");
-    fprintf(f, "# speed          oscillation rate multiplier\n");
-    fprintf(f, "# axis     y/z   which local axis is up (measured: z)\n");
-    fprintf(f, "# seed     0/1   per-plant phase, so plants do not sway in step\n");
-    fprintf(f, "# gate     0/1   restrict wind to foliage draws (0 sways tyres too)\n");
+    char tmp[MAX_PATH + 8];
+    wsprintfA(tmp, "%s.tmp", path);
+    FILE* f = fopen(tmp, "w");
+    if (!f) { LogW("wind: could not write wind.txt.tmp - wind.txt is unchanged"); return 0; }
+
+    bool anyNote = false;
+    FILE* in = fopen(path, "r");
+    if (in) {
+        char line[400];
+        while (fgets(line, sizeof(line), in)) {
+            const char* s = line;
+            while (*s == ' ' || *s == '\t') s++;
+            if (*s != '#') continue;
+            fputs(line, f);
+            int n = lstrlenA(line);
+            if (n && line[n - 1] != '\n') fputc('\n', f);
+            anyNote = true;
+        }
+        fclose(in);
+    }
+    if (!anyNote) {                        // the shipped file's notes
+        static const char* kNotes[] = {
+            "# SWSE foliage wind settings",
+            "# enabled  0/1   turn the effect on at launch",
+            "# strength       bend per unit of plant height (0.06 = 6%)",
+            "# speed          oscillation rate multiplier",
+            "# weight         stiffness: the height above which bending stops growing",
+            "# push           how far the player shoves foliage aside (0 = off)",
+            "# pushradius     how close the player must be before foliage parts",
+            "# pushmax        only plants shorter than this are pushed",
+            "# axis     y/z   which local axis is up (measured: z)",
+            "# seed     0/1   per-plant phase, so plants do not sway in step",
+            "# gate     0/1   restrict wind to foliage draws (0 sways tyres too)",
+            "# sprintspeed    horizontal speed treated as a full four-legged sprint",
+            "# pushsprint     how much wider the radius gets there (1.6667 = 4.5 -> 7.5)",
+        };
+        for (int i = 0; i < (int)(sizeof(kNotes) / sizeof(kNotes[0])); i++) {
+            fputs(kNotes[i], f);
+            fputc('\n', f);
+        }
+    }
     fprintf(f, "enabled %d\n", g_on ? 1 : 0);
     fprintf(f, "strength %.4f\n", g_strength);
     fprintf(f, "speed %.4f\n", g_speed);
@@ -856,10 +920,19 @@ void SWSE_WindSaveSettings() {
     fprintf(f, "axis %s\n", g_upAxis ? "z" : "y");
     fprintf(f, "seed %d\n", g_seedMode);
     fprintf(f, "gate %d\n", g_useGate ? 1 : 0);
-    fclose(f);
+    fprintf(f, "sprintspeed %.4f\n", g_sprintSpeed);
+    fprintf(f, "pushsprint %.4f\n", g_pushSprint);
+    bool ok = !ferror(f);
+    if (fclose(f) != 0) ok = false;
+    if (!ok || !MoveFileExA(tmp, path, MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
+        DeleteFileA(tmp);
+        LogW("wind: could not replace wind.txt - the old file is unchanged");
+        return 0;
+    }
     char b[MAX_PATH + 32];
     wsprintfA(b, "wind: settings saved to %s", path);
     LogW(b);
+    return 1;
 }
 
 void SWSE_WindLoadSettings() {
@@ -903,6 +976,7 @@ void SWSE_WindLoadSettings() {
 // ---- public ---------------------------------------------------------------
 int SWSE_WindSet(int on, char* msg, int msgLen) {
     if (!!on == g_on) {
+        g_pending = 0;       // cancels an opposite request not yet serviced
         if (msg) lstrcpynA(msg, on ? "wind already on" : "wind already off", msgLen);
         return 1;
     }
@@ -1014,6 +1088,18 @@ void SWSE_WindGate(int isFoliage, int noPush, int swayPct) {
     if (want) p_ProgramEnvParameter4fARB(GL_VERTEX_PROGRAM_ARB, 0,
                                          g_curX * sway, g_invWeight, g_curZ * sway, g_phase);
     else      p_ProgramEnvParameter4fARB(GL_VERTEX_PROGRAM_ARB, 0, 0.0f, g_invWeight, 0.0f, g_phase);
+}
+
+// `features foliage off`: the frame hook stops calling SWSE_WindFrame the
+// moment the switch is off, so a restore merely queued there never ran and
+// the injected programs stayed for the session. The console runs on the render
+// thread with the context current, so the restore is done on the spot.
+void SWSE_WindRestoreNow() {
+    if (!g_on && g_pending != -1) { g_pending = 0; return; }
+    RestoreAll();
+    g_on = false;
+    g_pending = 0;
+    LogW("wind: OFF (programs restored)");
 }
 
 void SWSE_WindFrame() {
@@ -1188,4 +1274,522 @@ void SWSE_WindFrame() {
         p_ProgramEnvParameter4fARB(GL_VERTEX_PROGRAM_ARB, 0,
                                    g_curX * sway, g_invWeight, g_curZ * sway, g_phase);
     }
+}
+
+// ---- active camera, read from the draws themselves -------------------------
+//
+// The frustum-struct heap scan finds A camera but cannot tell WHICH is active
+// (GRAPHICS_RTGI.md, "Open: identifying the ACTIVE camera"). This sidesteps the
+// question: the engine uploads the view-projection matrix it actually renders
+// with into every vertex program's local constants. Read those four rows back
+// from a program that drew the world this frame and the ACTIVE camera falls out
+// of the matrix - ground truth, no heuristics.
+//
+// Decomposition: for clip = P*V with rigid V and standard perspective P,
+//   row3 = -[R2 | t2]         so |row3.xyz| must be ~1  (the validity test)
+//   row1 = sy*[R1 | t1]       so sy = |row1.xyz|, fovY = 2*atan(1/sy)
+//   row0 = sx*[R0 | t0]       so aspect = sy/sx
+//   row2 = A*[R2 | t2] + [0|B] so A = dot(row2.xyz, -row3.xyz), B = row2.w + A*row3.w
+// GL clip convention:  near = B/(A-1), far = B/(A+1).
+// D3D-style (Cg can emit either): near = B/A, far = B/(1+A). Both are tried;
+// whichever yields a sane frustum wins, and the caller is told which.
+// Cg does NOT emit four DP4s straight into result.position. Measured against
+// all 21 dumped programs: x and z are direct (`DP4 result.position.x, R0, c[1]`)
+// but y and w route through a temp and a MOV - and y is NEGATED, which is the
+// engine's vertical flip showing up in the vertex path:
+//
+//     DP4 R1.x, R0, c[2];
+//     MOV result.position.y, -R1.x;
+//
+// So a MOV has to be traced back to the DP4 that wrote that register component.
+// With the trace in place, 17 of 21 real programs resolve, and every one to the
+// same rows: the view-projection lives in c[1]..c[4]. The negation is recorded
+// per row so the caller can restore the true matrix sign after readback.
+static int ClipRowsFromSource(const char* src, int rows[4], float sign[4]) {
+    const char* comps = "xyzw";
+    for (int ci = 0; ci < 4; ci++) { rows[ci] = -1; sign[ci] = 1.0f; }
+    const char* p = src;
+    while ((p = strstr(p, "result.position.")) != 0) {
+        char comp = p[16];
+        int ci = -1;
+        for (int k = 0; k < 4; k++) if (comp == comps[k]) ci = k;
+        if (ci < 0 || rows[ci] >= 0) { p += 16; continue; }
+        const char* eol = strchr(p, ';');
+        if (!eol) break;
+        const char* cb = strstr(p, "c[");
+        if (cb && cb < eol) {
+            rows[ci] = atoi(cb + 2);                 // direct DP4 ... c[N]
+        } else {
+            // MOV result.position.C, [-]Rn.s - find the operand
+            const char* comma = strchr(p, ',');
+            if (comma && comma < eol) {
+                const char* q = comma + 1;
+                while (*q == ' ') q++;
+                float sg = 1.0f;
+                if (*q == '-') { sg = -1.0f; q++; }
+                if (*q == 'R') {
+                    char reg[8] = {0}; int ri = 0;
+                    while (q[ri] && q[ri] != '.' && ri < 6) { reg[ri] = q[ri]; ri++; }
+                    char swz = q[ri] == '.' ? q[ri + 1] : 0;
+                    if (swz) {
+                        // last "DP4 Rn.s" before this MOV
+                        char needle[16];
+                        wsprintfA(needle, "DP4 %s.%c", reg, swz);
+                        const char* best = 0;
+                        const char* scan = src;
+                        while ((scan = strstr(scan, needle)) != 0 && scan < p) {
+                            best = scan; scan += 4;
+                        }
+                        if (best) {
+                            const char* beol = strchr(best, ';');
+                            const char* bcb  = strstr(best, "c[");
+                            if (beol && bcb && bcb < beol) {
+                                rows[ci] = atoi(bcb + 2);
+                                sign[ci] = sg;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        p += 16;
+    }
+    return rows[0] >= 0 && rows[1] >= 0 && rows[2] >= 0 && rows[3] >= 0;
+}
+
+static int DecodeClip(const float M[4][4], float* nOut, float* fOut,
+                      float* fovOut, float* aspOut, int* conv) {
+    float l3 = (float)sqrt(M[3][0]*M[3][0] + M[3][1]*M[3][1] + M[3][2]*M[3][2]);
+    if (l3 < 0.90f || l3 > 1.10f) return 0;          // not a rigid P*V product
+    float sy = (float)sqrt(M[1][0]*M[1][0] + M[1][1]*M[1][1] + M[1][2]*M[1][2]);
+    float sx = (float)sqrt(M[0][0]*M[0][0] + M[0][1]*M[0][1] + M[0][2]*M[0][2]);
+    if (sy < 0.2f || sy > 8.0f || sx < 0.05f) return 0;
+    float A = -(M[2][0]*M[3][0] + M[2][1]*M[3][1] + M[2][2]*M[3][2]) / (l3*l3);
+    float B = M[2][3] + A * M[3][3];
+    float n, f;
+    n = B / (A - 1.0f); f = B / (A + 1.0f);          // GL convention
+    if (n > 0.01f && n < 20.0f && f > n*5.0f && f < 50000.0f) { *conv = 0; }
+    else {
+        if (A > -1e-6f && A < 1e-6f) return 0;
+        n = B / A; f = B / (1.0f + A);               // D3D-style
+        if (!(n > 0.01f && n < 20.0f && f > n*5.0f && f < 50000.0f)) return 0;
+        *conv = 1;
+    }
+    *nOut = n; *fOut = f;
+    *fovOut = 2.0f * (float)atan(1.0 / sy) * 57.2957795f;
+    *aspOut = sy / sx;
+    if (*fovOut < 20.0f || *fovOut > 140.0f) return 0;
+    return 1;
+}
+
+// Diagnostic twin: reports why each candidate was rejected, into the log.
+// The failure "no known world program decomposed" is useless without knowing
+// WHICH test failed - rows not found, row3 not unit-length, or frustum insane.
+void SWSE_WindClipCameraWhy() {
+    if (!p_GetProgramLocalParameterfvARB) { LogW("clipcam: no readback entry point"); return; }
+    unsigned cand[48]; int nc = 0;
+    for (int i = 0; i < g_savedN && nc < 48; i++) cand[nc++] = g_saved[i].id;
+    unsigned known[24]; int kn = SWSE_FoliagePrograms(known, 24);
+    for (int i = 0; i < kn && nc < 48; i++) {
+        int dup = 0;
+        for (int j = 0; j < nc; j++) if (cand[j] == known[i]) { dup = 1; break; }
+        if (!dup) cand[nc++] = known[i];
+    }
+    char b[220];
+    wsprintfA(b, "clipcam: %d candidate program(s)", nc); LogW(b);
+    char* buf = (char*)malloc(SRC_MAX);
+    if (!buf) return;
+    for (int i = 0; i < nc && i < 8; i++) {
+        p_BindProgramARB(0x8620, cand[i]);
+        int len = 0;
+        p_GetProgramivARB(0x8620, 0x8627, &len);
+        if (len <= 0 || len >= SRC_MAX) {
+            wsprintfA(b, "clipcam: prog %u - bad source length %d", cand[i], len);
+            LogW(b); continue;
+        }
+        p_GetProgramStringARB(0x8620, 0x8628, buf);
+        buf[len] = 0;
+        int rows[4]; float sgn[4];
+        if (!ClipRowsFromSource(buf, rows, sgn)) {
+            wsprintfA(b, "clipcam: prog %u - clip rows not found (x=%d y=%d z=%d w=%d)",
+                      cand[i], rows[0], rows[1], rows[2], rows[3]);
+            LogW(b); continue;
+        }
+        float M[4][4];
+        for (int r = 0; r < 4; r++) {
+            p_GetProgramLocalParameterfvARB(0x8620, (unsigned)rows[r], M[r]);
+            for (int cco = 0; cco < 4; cco++) M[r][cco] *= sgn[r];
+        }
+        float l3 = (float)sqrt(M[3][0]*M[3][0]+M[3][1]*M[3][1]+M[3][2]*M[3][2]);
+        float sy = (float)sqrt(M[1][0]*M[1][0]+M[1][1]*M[1][1]+M[1][2]*M[1][2]);
+        wsprintfA(b, "clipcam: prog %u rows=%d/%d/%d/%d |row3|=%d.%03d sy=%d.%03d "
+                     "row3=[%d.%02d %d.%02d %d.%02d %d.%02d]",
+                  cand[i], rows[0], rows[1], rows[2], rows[3],
+                  (int)l3, (int)(l3*1000)%1000, (int)sy, (int)(sy*1000)%1000,
+                  (int)M[3][0], abs((int)(M[3][0]*100))%100,
+                  (int)M[3][1], abs((int)(M[3][1]*100))%100,
+                  (int)M[3][2], abs((int)(M[3][2]*100))%100,
+                  (int)M[3][3], abs((int)(M[3][3]*100))%100);
+        LogW(b);
+    }
+    free(buf);
+}
+
+int SWSE_WindClipCamera(float* nearOut, float* farOut, float* fovOut,
+                        float* aspectOut, unsigned* progOut, int* convOut,
+                        int* groupOut) {
+    if (!p_GetProgramLocalParameterfvARB || !p_BindProgramARB
+        || !p_GetProgramivARB || !p_GetProgramStringARB) return 0;
+    // Candidates: programs wind saved (they drew the world - that is how they
+    // were captured), then the foliage tracker's known list.
+    unsigned cand[48]; int nc = 0;
+    for (int i = 0; i < g_savedN && nc < 48; i++) cand[nc++] = g_saved[i].id;
+    unsigned known[24]; int kn = SWSE_FoliagePrograms(known, 24);
+    for (int i = 0; i < kn && nc < 48; i++) {
+        int dup = 0;
+        for (int j = 0; j < nc; j++) if (cand[j] == known[i]) { dup = 1; break; }
+        if (!dup) cand[nc++] = known[i];
+    }
+    // ...and EVERY program seen drawing world geometry. The two lists above are
+    // both foliage-derived, so in a sparse area they yielded two candidates and
+    // measured "tilt: 0 of 2 candidates agree with eye->player" - the real
+    // scene camera was not in the pool at all, and the consensus was returning
+    // the least-bad impostor every frame. The harvest sees every world draw,
+    // so its program set is where the true camera actually lives.
+    {
+        unsigned wp[64]; int wn = SWSE_GeoWorldPrograms(wp, 64);
+        for (int i = 0; i < wn && nc < 48; i++) {
+            int dup = 0;
+            for (int j = 0; j < nc; j++) if (cand[j] == wp[i]) { dup = 1; break; }
+            if (!dup) cand[nc++] = wp[i];
+        }
+    }
+    char* buf = (char*)malloc(SRC_MAX);
+    if (!buf) return 0;
+    // Collect EVERY valid decomposition, then pick by CONSENSUS. Different
+    // passes carry different cameras (measured: program 80 held a camera at
+    // w=271.81 while programs 3, 4 and 78 all agreed at -600.46), and
+    // first-that-validates happily returns an aux pass frustum. Programs
+    // drawing the main view share one camera; the largest agreeing group is it.
+    struct CamCand {
+        float n, f, fov, asp; int conv; unsigned prog; float dir[3]; float w;
+        float M[4][4];
+    };
+    CamCand ok[48]; int nok = 0;   // was 16: the pool is much larger now
+    for (int i = 0; i < nc && nok < 48; i++) {
+        p_BindProgramARB(0x8620 /*GL_VERTEX_PROGRAM_ARB*/, cand[i]);
+        int len = 0;
+        p_GetProgramivARB(0x8620, 0x8627 /*GL_PROGRAM_LENGTH_ARB*/, &len);
+        if (len <= 0 || len >= SRC_MAX) continue;
+        p_GetProgramStringARB(0x8620, 0x8628 /*GL_PROGRAM_STRING_ARB*/, buf);
+        buf[len] = 0;
+        int rows[4]; float sgn[4];
+        if (!ClipRowsFromSource(buf, rows, sgn)) continue;
+        float M[4][4];
+        for (int r = 0; r < 4; r++) {
+            p_GetProgramLocalParameterfvARB(0x8620, (unsigned)rows[r], M[r]);
+            for (int cco = 0; cco < 4; cco++) M[r][cco] *= sgn[r];
+        }
+        CamCand c2;
+        for (int rr2 = 0; rr2 < 4; rr2++)
+            for (int cc2 = 0; cc2 < 4; cc2++) c2.M[rr2][cc2] = M[rr2][cc2];
+        if (DecodeClip(M, &c2.n, &c2.f, &c2.fov, &c2.asp, &c2.conv)) {
+            float l3 = (float)sqrt(M[3][0]*M[3][0]+M[3][1]*M[3][1]+M[3][2]*M[3][2]);
+            c2.dir[0] = M[3][0]/l3; c2.dir[1] = M[3][1]/l3; c2.dir[2] = M[3][2]/l3;
+            c2.w = M[3][3];
+            c2.prog = cand[i];
+            ok[nok++] = c2;
+        }
+    }
+    free(buf);
+    if (nok == 0) return 0;
+
+    // ---- TILT TEST -------------------------------------------------------
+    // Position tests cannot catch the failure we measured. Program 3 put the
+    // eye ~7 units behind the player, aimed correctly in the horizontal plane,
+    // and passed both "player on screen" and "player at third-person distance"
+    // - yet its forward vector was (-0.998, -0.032, -0.033) where the true
+    // direction to the player was (-0.895, -0.029, -0.443). Vertical off by a
+    // factor of thirteen, and unchanged across a 300px pitch sweep. That is a
+    // camera that never looks up or down: the vertical artefact, upstream of
+    // everything.
+    //
+    // A third-person camera looks along the line from itself toward the
+    // player, so require the forward vector to AGREE with that direction. This
+    // is the only test that is sensitive to TILT rather than to position.
+    // Measured: the impostor scores 0.909, a correct camera ~0.99.
+    // 0.85, not 0.94. Measured: the CORRECT camera scores ~0.918 because a
+    // third-person view looks over the character rather than at them. The
+    // stricter value rejected every candidate, and the fallback then handed
+    // back the impostor anyway - a filter that rejects everything is the same
+    // as no filter, only harder to notice.
+    static const float kTiltMin = 0.85f;
+    {
+        float pp[3];
+        if (SWSE_PosGet(pp) == 1) {
+            int keep = 0;
+            for (int i = 0; i < nok; i++) {
+                float clip[16], inv[16];
+                for (int r = 0; r < 4; r++)
+                    for (int c = 0; c < 4; c++) clip[r*4+c] = ok[i].M[r][c];
+                for (int k = 4; k < 8; k++) clip[k] = -clip[k];   // engine y flip
+                if (!SWSE_GeoInvert4x4(clip, inv)) continue;
+
+                // Eye: intersect two unprojected screen rays, the same
+                // construction the tracer uses.
+                float A[3], B[3], C[3], D[3];
+                ClipUnproj(inv, -0.5f, -0.5f, -1.0f, A);
+                ClipUnproj(inv, -0.5f, -0.5f,  1.0f, B);
+                ClipUnproj(inv,  0.5f,  0.5f, -1.0f, C);
+                ClipUnproj(inv,  0.5f,  0.5f,  1.0f, D);
+                float d1[3], d2[3], r0[3];
+                for (int k = 0; k < 3; k++) { d1[k]=B[k]-A[k]; d2[k]=D[k]-C[k]; r0[k]=A[k]-C[k]; }
+                float aa=0, bb=0, cc=0, dd=0, ee=0;
+                for (int k = 0; k < 3; k++) {
+                    aa += d1[k]*d1[k]; bb += d1[k]*d2[k]; cc += d2[k]*d2[k];
+                    dd += d1[k]*r0[k]; ee += d2[k]*r0[k];
+                }
+                float den = aa*cc - bb*bb;
+                if (den > -1e-9f && den < 1e-9f) continue;
+                float tt = (bb*ee - cc*dd) / den, ss = (aa*ee - bb*dd) / den;
+                float eye[3];
+                for (int k = 0; k < 3; k++)
+                    eye[k] = 0.5f * ((A[k] + tt*d1[k]) + (C[k] + ss*d2[k]));
+
+                // Forward: centre of screen, near to far.
+                float na[3], nb[3], fwd[3];
+                ClipUnproj(inv, 0.0f, 0.0f, -1.0f, na);
+                ClipUnproj(inv, 0.0f, 0.0f,  1.0f, nb);
+                float fl = 0.0f;
+                for (int k = 0; k < 3; k++) { fwd[k] = nb[k]-na[k]; fl += fwd[k]*fwd[k]; }
+                fl = (float)sqrt(fl);
+                if (fl < 1e-6f) continue;
+                for (int k = 0; k < 3; k++) fwd[k] /= fl;
+
+                // Direction from the eye to the player.
+                float tp[3]; float tl = 0.0f;
+                for (int k = 0; k < 3; k++) { tp[k] = pp[k] - eye[k]; tl += tp[k]*tp[k]; }
+                tl = (float)sqrt(tl);
+
+                // THE GAME HAS BOTH CAMERAS (Tab toggles first/third person),
+                // so the validation has to be mode-aware or it rejects
+                // everything in one of them. In FIRST person the eye is
+                // essentially AT the player: there is no player on screen to
+                // centre, the projection puts them at or behind the near
+                // plane, and eye->player is a near-zero vector that cannot be
+                // normalised. Proximity IS the validation in that case, and it
+                // is a strong one - an impostor pass will not sit inside the
+                // player's head.
+                if (tl < 2.0f) { ok[keep++] = ok[i]; continue; }   // first person
+                if (tl > 40.0f) continue;                          // too far to be either
+                for (int k = 0; k < 3; k++) tp[k] /= tl;
+
+                // MEASURED CORRECTION. The original form of this test required
+                // the forward vector to point AT the player and rejected
+                // everything (0 of 13). That assumption was wrong: a
+                // third-person camera looks OVER the character, so the correct
+                // camera scores about 0.92 here, not 0.99 - the threshold was
+                // rejecting good cameras, and the "camera does not pitch" and
+                // "axis convention" conclusions both followed from it.
+                //
+                // Direct measurement settled it: our matrix puts the player at
+                // NDC (0.000, -0.683) - dead centre horizontally, 68% down the
+                // frame. That is exactly right for third person, so the camera
+                // was correct all along. Keep the test but state the real
+                // expectation: horizontal centring, which is what actually
+                // pins down yaw. Vertical offset is free, since how far the
+                // camera looks over the character is a design choice.
+                float dot = fwd[0]*tp[0] + fwd[1]*tp[1] + fwd[2]*tp[2];
+                if (dot < kTiltMin) continue;
+                ok[keep++] = ok[i];
+            }
+            // Only apply if something survived. If nothing does, the player
+            // position is probably stale (loading, cutscene) and a wrong
+            // camera still beats no camera for one frame.
+            //
+            // Log the survivor count: "0 of N" is a completely different fact
+            // from "the test did not run". If NO candidate ever passes, the
+            // true scene camera is not among the programs we scan at all, and
+            // we are picking the least-bad impostor every frame.
+            if (g_tiltLog > 0) {
+                g_tiltLog--;
+                char tb[120];
+                wsprintfA(tb, "tilt: %d of %d candidates agree with eye->player", keep, nok);
+                LogW(tb);
+            }
+            if (keep > 0) nok = keep;
+        }
+    }
+
+    // Position sanity, kept as a cheap pre-filter ahead of the tilt test.
+    // Neither of these catches a matrix that is right in position and wrong in
+    // tilt - that is what the tilt test above is for.
+    // VALIDATE AGAINST REALITY. Decomposing to a sane frustum only says a
+    // matrix looks like *a* camera, not that it is THE camera the game is
+    // rendering with. Measured failure: in a sparse-foliage area the consensus
+    // picked "prog 3, consensus 2" and the resulting eye did not track PITCH at
+    // all - 0.6 units of movement across a 220px pitch sweep, height changing
+    // by 0.003 - which is exactly the vertical artefact the owner kept seeing.
+    //
+    // The scene camera must project the PLAYER to somewhere on screen. That is
+    // a hard physical test costing one matrix multiply per candidate, and it
+    // rejects impostor passes that merely decompose plausibly.
+    {
+        float pp[3];
+        if (SWSE_PosGet(pp) == 1) {
+            int keep = 0;
+            for (int i = 0; i < nok; i++) {
+                const float (*M)[4] = ok[i].M;
+                float cx = M[0][0]*pp[0] + M[0][1]*pp[1] + M[0][2]*pp[2] + M[0][3];
+                float cy = M[1][0]*pp[0] + M[1][1]*pp[1] + M[1][2]*pp[2] + M[1][3];
+                float cw = M[3][0]*pp[0] + M[3][1]*pp[1] + M[3][2]*pp[2] + M[3][3];
+                // In FIRST person the player is at or behind the near plane, so
+                // a small/negative w is EXPECTED and must not be treated as a
+                // failed candidate. Defer to the tilt block, which decides the
+                // mode from eye-to-player distance.
+                if (cw < 0.05f) { ok[keep++] = ok[i]; continue; }
+                float sx = cx / cw, sy = cy / cw;         // NDC, -1..1
+                // HORIZONTAL CENTRING is the sharp test, and it is what pins
+                // down yaw: measured, the true camera puts the player at NDC
+                // x = 0.000. Vertical is left loose because how far a
+                // third-person camera looks over the character is a design
+                // choice, and measured here it is y = -0.683.
+                if (sx < -0.45f || sx > 0.45f) continue;
+                if (sy < -1.0f  || sy > 1.0f)  continue;
+                // DISTANCE is the strong test. Row 3 of a perspective matrix
+                // yields view depth once divided by its own length, and a
+                // third-person camera sits a few units from the player. A
+                // candidate that puts the player 200 units away is some other
+                // pass, not the scene camera. Measured: the old on-screen-only
+                // test passed program 3, whose forward vector was horizontal
+                // (0.023 vertical) while the player was looking down from
+                // above - the vertical artefact, straight from a wrong matrix.
+                float l3 = (float)sqrt(ok[i].M[3][0]*ok[i].M[3][0] +
+                                       ok[i].M[3][1]*ok[i].M[3][1] +
+                                       ok[i].M[3][2]*ok[i].M[3][2]);
+                if (l3 > 1e-6f) {
+                    float viewDist = cw / l3;
+                    if (viewDist < 0.5f || viewDist > 40.0f) continue;
+                }
+                ok[keep++] = ok[i];
+            }
+            // Only apply the filter if something survived. If nothing does, the
+            // player position is probably stale (loading, cutscene), and a
+            // wrong camera still beats no camera for one frame.
+            if (keep > 0) nok = keep;
+        }
+    }
+    // Largest group of candidates sharing a camera: same view direction
+    // (dot > 0.999) and the same camera-distance term within a few units
+    // (tolerant because a program that last drew a frame or two ago holds a
+    // slightly stale copy while the camera moves).
+    int bestIdx = 0, bestGroup = 0;
+    for (int i = 0; i < nok; i++) {
+        int g = 0;
+        for (int j = 0; j < nok; j++) {
+            float d = ok[i].dir[0]*ok[j].dir[0] + ok[i].dir[1]*ok[j].dir[1]
+                    + ok[i].dir[2]*ok[j].dir[2];
+            float dw = ok[i].w - ok[j].w; if (dw < 0) dw = -dw;
+            if (d > 0.999f && dw < 5.0f) g++;
+        }
+        if (g > bestGroup) { bestGroup = g; bestIdx = i; }
+    }
+    // stash the winner's raw VP rows for consumers that need the full
+    // matrix (temporal reprojection), not just the decomposed frustum
+    {
+        extern float g_lastClipVP[16]; extern int g_lastClipVPValid;
+        for (int r = 0; r < 4; r++)
+            for (int cc2 = 0; cc2 < 4; cc2++)
+                g_lastClipVP[r*4+cc2] = ok[bestIdx].M[r][cc2];
+        g_lastClipVPValid = 1;
+    }
+    if (nearOut)   *nearOut   = ok[bestIdx].n;
+    if (farOut)    *farOut    = ok[bestIdx].f;
+    if (fovOut)    *fovOut    = ok[bestIdx].fov;
+    if (aspectOut) *aspectOut = ok[bestIdx].asp;
+    if (progOut)   *progOut   = ok[bestIdx].prog;
+    if (convOut)   *convOut   = ok[bestIdx].conv;
+    if (groupOut)  *groupOut  = bestGroup;
+    return 1;
+}
+
+// Full view-projection rows of the last consensus camera, for temporal
+// reprojection. Row-major: clip = M * world, rows as the programs store them.
+float g_lastClipVP[16];
+int   g_lastClipVPValid = 0;
+
+// Dump local constants c[0..19] of the clip-camera candidate programs to the
+// log. The rows IDENTICAL across programs are per-frame globals (the VP in
+// c[1..4] is already known); among the rest of the globals, unit-length xyz
+// rows are light DIRECTIONS and [0,1] triples are light/ambient COLOURS.
+// Pure reconnaissance for the engine-lights work - reads, never writes.
+void SWSE_WindProgConstsOf(unsigned progId, int maxRow) {
+    if (!p_GetProgramLocalParameterfvARB || !p_BindProgramARB) {
+        LogW("consts: no readback entry points"); return;
+    }
+    if (maxRow < 1) maxRow = 20; if (maxRow > 256) maxRow = 256;
+    char b[240];
+    wsprintfA(b, "consts: prog %u rows 0..%d (nonzero only)", progId, maxRow - 1);
+    LogW(b);
+    p_BindProgramARB(0x8620, progId);
+    for (int r = 0; r < maxRow; r++) {
+        float v[4];
+        p_GetProgramLocalParameterfvARB(0x8620, (unsigned)r, v);
+        if (v[0] == 0.0f && v[1] == 0.0f && v[2] == 0.0f && v[3] == 0.0f) continue;
+        int ix[4], fx[4];
+        for (int k = 0; k < 4; k++) {
+            float a = v[k] < 0 ? -v[k] : v[k];
+            ix[k] = (int)v[k];
+            fx[k] = (int)(a * 1000.0f) % 1000;
+        }
+        wsprintfA(b, "consts: prog %u c[%d] = %s%d.%03d %s%d.%03d %s%d.%03d %s%d.%03d",
+                  progId, r,
+                  (v[0] < 0 && ix[0] == 0) ? "-" : "", ix[0], fx[0],
+                  (v[1] < 0 && ix[1] == 0) ? "-" : "", ix[1], fx[1],
+                  (v[2] < 0 && ix[2] == 0) ? "-" : "", ix[2], fx[2],
+                  (v[3] < 0 && ix[3] == 0) ? "-" : "", ix[3], fx[3]);
+        LogW(b);
+    }
+}
+
+void SWSE_WindProgConsts() {
+    if (!p_GetProgramLocalParameterfvARB || !p_BindProgramARB) {
+        LogW("consts: no readback entry points"); return;
+    }
+    unsigned cand[8]; int nc = 0;
+    for (int i = 0; i < g_savedN && nc < 4; i++) cand[nc++] = g_saved[i].id;
+    unsigned known[24]; int kn = SWSE_FoliagePrograms(known, 24);
+    for (int i = 0; i < kn && nc < 4; i++) {
+        int dup = 0;
+        for (int j = 0; j < nc; j++) if (cand[j] == known[i]) { dup = 1; break; }
+        if (!dup) cand[nc++] = known[i];
+    }
+    char b[240];
+    wsprintfA(b, "consts: dumping c[0..19] of %d program(s)", nc); LogW(b);
+    for (int i = 0; i < nc; i++) {
+        p_BindProgramARB(0x8620, cand[i]);
+        for (int r = 0; r < 20; r++) {
+            float v[4];
+            p_GetProgramLocalParameterfvARB(0x8620, (unsigned)r, v);
+            int ix[4], fx[4];
+            for (int k = 0; k < 4; k++) {
+                float a = v[k] < 0 ? -v[k] : v[k];
+                ix[k] = (int)v[k];
+                fx[k] = (int)(a * 1000.0f) % 1000;
+            }
+            wsprintfA(b, "consts: prog %u c[%d] = %s%d.%03d %s%d.%03d %s%d.%03d %s%d.%03d",
+                      cand[i], r,
+                      (v[0] < 0 && ix[0] == 0) ? "-" : "", ix[0], fx[0],
+                      (v[1] < 0 && ix[1] == 0) ? "-" : "", ix[1], fx[1],
+                      (v[2] < 0 && ix[2] == 0) ? "-" : "", ix[2], fx[2],
+                      (v[3] < 0 && ix[3] == 0) ? "-" : "", ix[3], fx[3]);
+            LogW(b);
+        }
+    }
+}
+
+int SWSE_WindClipVPLast(float out16[16]) {
+    if (!g_lastClipVPValid) return 0;
+    for (int i = 0; i < 16; i++) out16[i] = g_lastClipVP[i];
+    return 1;
 }

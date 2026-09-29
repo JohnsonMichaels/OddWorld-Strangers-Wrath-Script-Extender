@@ -1,0 +1,49 @@
+# SWSE - player tuning (playerprefs.txt)
+#
+# SWSE reads this file from SWSEMods\SWSE Console\ - the copy in examples\ is
+# only a template. Copy it up one folder to use it.
+#
+# The player's own numbers, applied automatically on every level. The
+# playertune switch ships as `auto`: it comes on at launch when this file sets
+# a value (or at once with `features playertune auto` in the console), and
+# stays off while every value is blank. `playertune = on` or `off` in
+# SWSEMods\features.txt overrides that.
+#
+# EVERY VALUE BELOW IS BLANK, AND BLANK MEANS "KEEP THE GAME'S OWN VALUE".
+# As shipped this file changes nothing, even with the switch on. Fill in only
+# what you want to change; blank, `-` and `default` all keep the game's value.
+# `key = value` and `key value` both work, and # starts a comment.
+#
+#   health      max AND current health. The game sets 600 / 300 / 150 for
+#               easy / normal / hard; a value here replaces whichever it
+#               chose, and applying it also fills the bar.
+#   stamina     max AND current stamina.
+#   speed       run speed - the player's own motion objects only.
+#   jump        jump height - the player's own motion objects only.
+#   gravity     fall gravity. GLOBAL: it lives in GlobalMotionPrefs, so it
+#               changes everyone, NPCs included, not only the player.
+#   aircontrol  midair steering. GLOBAL as well.
+#
+# In the console, `hp`, `stam`, `speed`, `jump`, `gravity` and `aircontrol`
+# with no number show the current value, so you can see what you would be
+# changing; `playertune` lists every key with its live value.
+#
+# WHEN. Once per level, about 3 seconds after the level's player appears -
+# after the game's own difficulty-based setup rather than racing it. If the
+# game later puts max health or stamina back to its own number (a checkpoint
+# reload re-initialising the player, say), the value is applied again. A value
+# changed any other way - `hp`, an artifact - is left alone.
+#
+# UNDO. The game's values are captured before the first write in each level,
+# so `playertune restore` - or switching the feature off - puts them back.
+# `playertune reload` re-reads this file and applies it straight away.
+#
+# Stranger: Armed to the Teeth writes this file for its Player Health and
+# Player Stamina fields, and rewrites the whole file when it does.
+
+health     =
+stamina    =
+speed      =
+jump       =
+gravity    =
+aircontrol =

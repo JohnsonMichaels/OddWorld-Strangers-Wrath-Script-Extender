@@ -1,23 +1,43 @@
 ================================================================
-                      SWSE  for
+                      SWSE 1.1  for
         Oddworld: Stranger's Wrath HD  (Steam)
 
-   SWSE Graphics  +  SWSE Console
+   SWSE Console  +  SWSE Graphics  +  more
    by Johnson Michaels
 ================================================================
+
+TO INSTALL: unzip, double-click  SWSE Setup.exe,  tick what you want
+switched on and press  Install / Update.  Details: EASY WAY, below.
 
 WHAT THIS IS
 ------------
 SWSE (the Stranger's Wrath Script Extender) is a small DLL that loads
 with the game and powers these mods:
 
+  * SWSE Console - an in-game command console. Press the ` / ~ key,
+    type commands, hit Enter. God mode, ammo, health, transform into
+    Steef, music, money, and access to 181 of the game's own functions.
+
   * SWSE Graphics - a graphics overhaul: sharpening, bloom, filmic
     tonemapping, colour grading, ambient occlusion, optional RTGI, and
     vignette. Only the 3D scene is touched; menus and HUD stay clean.
 
-  * SWSE Console - an in-game command console. Press the ` / ~ key,
-    type commands, hit Enter. God mode, ammo, health, transform into
-    Steef, music, money, and access to 181 of the game's own functions.
+  * HD textures, foliage wind, additive hit reactions, enemy AI tuning,
+    mod-defined triggers, character tuning, player tuning and live
+    edits to the game's own values.
+
+NEW IN 1.1 - ONLY THE CONSOLE IS SWITCHED ON AFTER INSTALLING.
+Everything else is still there, just off, so a fresh install leaves the
+game exactly as shipped apart from the console. You choose what to turn
+on - the EASY WAY below does it with tick boxes, or see STEP 5. (1.0.x
+switched everything on.)
+
+Also new in 1.1: play as any character in the level (`playnpc`), the
+developers' own free-flying camera (`freecam`), teleports that really
+move you (`savepos` / `tp`, `goto`, `tpxyz`), native plugins for
+modders, ray-traced ambient occlusion as an EXPERIMENT (the `raytrace`
+switch, off by default), menus that tools can drive without key
+presses, and a written contract for tools built on SWSE.
 
 
 NEED HELP, OR WANT TO SHOW OFF A MOD?
@@ -36,9 +56,56 @@ REQUIREMENTS
   * Windows.
   * That's it. No other tools needed.
 
+  The GOG version is not supported yet. SWSE recognises that it is a
+  different build of the game and runs in SAFE MODE there: everything
+  that would touch the game itself stays off, so SWSE cannot crash it.
+  In safe mode these work:
+    - the console (~) and its own commands: help, status, features,
+      mods, query, ver, key binds and aliases, selftest, snap
+    - graphics, HD textures, foliage and ray tracing. The plants sway,
+      but do not part around you: that needs your position, which is
+      read from the game.
+  Everything that reads or changes the game does not: cheats, teleports,
+  positions, NPCs, AI and player tuning, triggers, hit reactions,
+  playnpc, freecam, music. The console says so when you try one, and
+  `help` marks them with a *. `status` says which build SWSE found.
+  Safe mode has not been tested on a real GOG copy yet.
+
 
 ================================================================
-  INSTALLATION  -  step by step
+  EASY WAY  -  SWSE Setup.exe
+================================================================
+   1. Unzip this download anywhere (the Desktop is fine).
+   2. Double-click  SWSE Setup.exe  in the unzipped folder.
+   3. It finds your game (Steam or GOG). If it shows the wrong folder,
+      press Browse... and pick the folder that holds "bin" and "data".
+   4. Tick what you want switched on - point at a switch to read what
+      it does. Or one click for a whole set:
+        Recommended    the 1.1 default: the console only
+        Classic SWSE   the 1.0.x look: graphics, HD textures, hit
+                       reactions, foliage wind and AI tuning on
+        Everything     every system on
+   5. Press  Install / Update. It copies SWSE into the game folder and
+      writes your ticks into SWSEMods\features.txt. It never replaces
+      your own files: key binds, aliases, saved positions and sites,
+      prefs and playerprefs, features.txt and load_order.txt, and an
+      aiprefs.txt that is not ours (AT3 writes it). A file of ours that
+      you changed is replaced, and your copy is moved to a
+      SWSE-backup-<date> folder in the game folder first.
+   6. Start the game from Steam. The ~ key opens the console.
+
+   Changing your mind later: run SWSE Setup.exe again, tick and press
+   Apply switches. With the game running, that switches them at once
+   too; otherwise they apply the next time the game starts.
+   Ticking HD textures? It says whether the HD pack is in place and
+   offers the 4GB patch (see STEP 6). Uninstall in the same window takes
+   SWSE out again.
+
+   The rest of this file is the manual way, and what each part does.
+
+
+================================================================
+  INSTALLATION  -  step by step (the manual way)
 ================================================================
 
 STEP 1.  Find your game folder.
@@ -58,25 +125,74 @@ STEP 2.  Copy the mod files in.
    When Windows asks to merge/replace the "bin" folder, say YES -
    it only adds one new file (dinput8.dll), it does not delete anything.
 
+   Updating from SWSE 1.0.x? Read "UPDATING FROM 1.0.x" below first.
 
-STEP 3.  Run the installer helper (one click).
+
+STEP 3.  OPTIONAL - the installer helper.
+   Since 1.0.1 this step is no longer needed: SWSE finds the real
+   Windows dinput8.dll on its own. Running it does no harm.
    In your GAME FOLDER, double-click:
 
         SWSE-install.bat
 
-   It copies one Windows system file next to the mod so the loader
-   works (creates bin\dinput8_real.dll). You only do this once.
-   If Windows SmartScreen warns, click "More info" -> "Run anyway"
-   (the .bat is plain text - you can open it in Notepad to read it).
+   It copies one Windows system file next to the mod (creates
+   bin\dinput8_real.dll). If Windows SmartScreen warns, click
+   "More info" -> "Run anyway" (the .bat is plain text - you can open
+   it in Notepad to read it).
 
 
 STEP 4.  Launch the game (from Steam, normally).
    To confirm it loaded: after you reach the main menu, there will be
    a file  bin\swse_log.txt  in your game folder. If it exists, SWSE
-   is running.
+   is running. In game, press the ~ key: the console opens.
 
 
-STEP 5.  OPTIONAL - HD texture pack (needs the 4GB patch).
+STEP 5.  Choose what to switch on.
+   ONE WORD FOR THE CLASSIC SWSE: in the console (~ key), type
+
+        features preset full
+
+   That switches on the console, graphics, HD textures, hit reactions,
+   foliage wind and AI tuning - the 1.0.x look - and saves it.
+   `features preset default` goes back to the 1.1 default, and
+   `features preset list` says what each one sets.
+
+   Or one at a time: open  SWSEMods\features.txt  in Notepad. The
+   switches are at the top, one line each, with a short note; the long
+   explanations are further down in the same file:
+
+     console    = on     # in-game console (~ key) + remote mailbox
+     graphics   = off    # post-process look (F10 once on)
+     hdtextures = off    # HD texture pack (needs the 4GB patch)
+     hitreact   = off    # NPCs flinch where they are shot
+     foliage    = off    # grass and plants sway in the wind
+     aituning   = auto   # enemy AI profiles from aiprefs.txt
+     triggers   = off    # mod-defined events (ambushes)
+     npctuning  = off    # per-character health / gib rules
+     playertune = auto   # your health, stamina, speed, jump...
+     prefsedit  = off    # live edits to the game's own values
+     raytrace   = off    # ray-traced AO, EXPERIMENTAL (needs graphics)
+
+   `auto` means the system runs only while its own file asks for
+   something (an `active =` profile in aiprefs.txt, a value in
+   playerprefs.txt). A fresh install asks for nothing, so they stay
+   off until you, or a tool such as AT3, fill those files in.
+
+   Change `off` to `on`, save, and start the game. Or do it without
+   leaving the game: open the console and type, for example,
+
+        features foliage on
+
+   That switches it on now AND saves it in features.txt. Add `temp`
+   (features foliage on temp) to try something for one session only.
+   Type  features  on its own to see every system and what it does.
+
+   Switched on in the middle of a game, wind, HD textures and hit
+   reactions fully apply from the next level load (warp, or load a
+   save).
+
+
+STEP 6.  OPTIONAL - HD texture pack (needs the 4GB patch).
    The HD pack (960 textures at 2x) is a separate download because of
    its size. Get it from the project's GitHub Releases page or the
    Discord, then:
@@ -93,7 +209,10 @@ STEP 5.  OPTIONAL - HD texture pack (needs the 4GB patch).
       running it with  --restore  puts the original back.
       If your game is under Program Files, right-click it and
       pick "Run as administrator".
-   4. Launch the game. To check it worked, open the console
+   4. Switch HD textures on: in SWSEMods\features.txt set
+         hdtextures = on
+      (or type  features hdtextures on  in the console).
+   5. Launch the game. To check it worked, open the console
       (~ key) and type:   hd
       It reports how many textures are installed and how many are
       already swapped in. The count rises as levels load.
@@ -110,32 +229,66 @@ STEP 5.  OPTIONAL - HD texture pack (needs the 4GB patch).
   USING THE MODS
 ================================================================
 
-SWSE GRAPHICS
+SWSE GRAPHICS  (needs  graphics = on  in features.txt)
    * Press  F10  in-game to toggle the graphics effects on/off.
+     The look starts OFF each launch - F10 (or `gfx on`) shows it.
    * Press  F11  to reload settings live after editing them.
    * To tune the look, open in a text editor:
-        SWSEMods\SWSE Graphics\settings.txt
+        SWSEMods\SWSE Graphics\graphics.txt
      Change a value, save, press F11 in-game. Every effect has a
      comment explaining what it does.
 
-SWSE CONSOLE
+SWSE CONSOLE  (always on)
    * Press the  ` / ~  key (top-left of the keyboard) to open/close it.
    * Type a command and press Enter.  Esc closes.  Tab autocompletes.
-   * The console finds the player on its own. If a command ever says
-     it has no player context, pick up any ammo once and retry.
+   * While the console is open, the game ignores your keyboard and
+     mouse, so typing never walks Stranger around.
+   * The console finds what it needs on its own once a save is loaded.
+     If a command says there is no context, load a save (or let the
+     level finish loading) and retry; `autoprime` forces the search.
    * Type  help   to see the built-in commands.
    * Type  list <word>   to search all 181 game functions
        e.g.  list music     list npc     list boat
    * Type  call <function> [number]   to run any of them.
 
    Handy commands:
+       features            what is switched on, and switch it
+       status              where you are, health, what is on
        god                 toggle invulnerability
        ammo                give all ammo
        heal                full health + stamina
        steef / stranger    transform between forms
        money 50000         set your moolah
        combatmusic 1       force combat music (0 to stop)
+       savepos / tp        remember this spot and facing / go back
        help <command>      details for one command
+
+   New in 1.1: key binds (bind F5 savepos), aliases, `;` to run
+   several commands in one line, and more - see
+   SWSEMods\SWSE Console\README.txt.
+
+
+================================================================
+  UPDATING FROM 1.0.x
+================================================================
+   * Easiest: the EASY WAY above. Install / Update keeps your own
+     files, and backs up any file of ours you edited before replacing
+     it (SWSE-backup-<date> in the game folder). What follows is the
+     manual way.
+   * Copy the new "bin" and "SWSEMods" folders over the old ones.
+   * The new SWSEMods\features.txt switches everything off except the
+     console. If you want what you had before, either switch systems
+     back on (STEP 5), or keep your OLD features.txt: its six `on`
+     lines still work in 1.1. Systems it does not mention stay off -
+     including `triggers`, which 1.0.x switched on by default.
+   * Your own edits in the SWSEMods files are replaced by the copy.
+     Back up anything you changed first (aiprefs.txt, foliage.txt,
+     wind.txt, hitreact.txt, graphics.txt, positions.txt...).
+   * Using Stranger: Armed to the Teeth? It keeps its Global Rules in
+     SWSEMods\SWSE Console\aiprefs.txt (which the copy replaces - press
+     CONFIRM in AT3 again afterwards) and playerprefs.txt (not shipped,
+     so the copy leaves it alone). The aituning and playertune switches
+     ship as `auto`, so those rules work without switching anything on.
 
 
 ================================================================
@@ -145,21 +298,27 @@ SWSE CONSOLE
      - a line with just the mod name  = enabled
      - put "!" in front of the name   = disabled
      - lines starting with "#"        = comments
-   Everything is enabled by default.
+   Everything is enabled by default; a folder that is not listed is
+   enabled too. Later mods win when two provide the same file.
 
-   The SWSE DLL's own systems (HD textures, foliage wind, hit
-   reactions, graphics, console, AI tuning) are switched on and off
-   in  SWSEModseatures.txt  instead - each one can be disabled
-   individually, and a disabled system leaves the game completely
-   untouched.
+   The SWSE DLL's own systems (console, graphics, HD textures, hit
+   reactions, foliage wind, AI tuning, triggers, character tuning,
+   player tuning, prefs edits, ray tracing) are switched on and off in
+   SWSEMods\features.txt instead - each one individually, and a
+   system that is off leaves the game completely untouched.
 
 
 ================================================================
   UNINSTALL
 ================================================================
-   Delete these from your game folder:
+   Easiest: SWSE Setup.exe, Uninstall. It moves
+   bin\dinput8.dll and the SWSEMods folder into a SWSE-uninstalled-<date>
+   folder in the game folder - nothing is deleted - and the game runs as
+   shipped. Delete that folder yourself once you are sure.
+
+   By hand: delete these from your game folder:
      bin\dinput8.dll
-     bin\dinput8_real.dll
+     bin\dinput8_real.dll   (only there if you ran SWSE-install.bat)
      the SWSEMods folder
    The game returns to 100% vanilla. Your saves are never touched.
 
@@ -167,11 +326,21 @@ SWSE CONSOLE
 ================================================================
   TROUBLESHOOTING
 ================================================================
-   * No swse_log.txt after launching?  The dinput8.dll files aren't in
-     the "bin" folder, or Step 3 wasn't run. Redo Steps 2-3.
-   * Console cheats say "no context"?  Pick up ammo once to prime.
-   * Graphics look wrong?  Press F10 to toggle off, or edit settings.txt
+   * Installed 1.1 and nothing looks different?  That is the 1.1
+     default - only the console is on. See STEP 5.
+   * F10 does nothing?  Graphics is off by default: set
+     graphics = on  in features.txt (or type  features graphics on).
+   * No swse_log.txt after launching?  The dinput8.dll file isn't in
+     the "bin" folder. Redo Step 2.
+   * Console cheats say "no context"?  Load a save first: SWSE finds
+     what it needs once a level is up (`autoprime` searches again at
+     once).
+   * Graphics look wrong?  Press F10 to toggle off, or edit graphics.txt
      and press F11. Set any effect's *_enable to 0 to turn it off.
+   * Something misbehaving?  Type  selftest  in the console: it checks
+     every system that is switched on, and names the one that is not
+     working. Or switch everything but the console off with
+     features all off  and turn systems back on one at a time.
    * Want vanilla files back?  Steam -> right-click game -> Properties ->
      Installed Files -> Verify integrity of game files.
 

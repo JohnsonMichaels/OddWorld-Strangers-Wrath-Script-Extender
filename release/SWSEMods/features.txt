@@ -1,32 +1,135 @@
-# SWSE - feature switches
+# SWSE 1.1 - feature switches. Change `off` to `on` below, save, start the game.
+# One word instead: `features preset full` in the console (~ key) gives the classic
+# SWSE. SWSE Setup.exe (in the download) does it with tick boxes. Reference: below.
+
+console    = on     # in-game console (~ key) + remote mailbox
+graphics   = off    # post-process look (F10 once on)
+hdtextures = off    # HD texture pack (needs the 4GB patch)
+hitreact   = off    # NPCs flinch where they are shot
+foliage    = off    # grass and plants sway in the wind
+aituning   = auto   # enemy AI profiles from aiprefs.txt
+triggers   = off    # mod-defined events (ambushes)
+npctuning  = off    # per-character health / gib rules
+playertune = auto   # your health, stamina, speed, jump...
+prefsedit  = off    # live edits to the game's own values
+raytrace   = off    # ray-traced AO, EXPERIMENTAL (needs graphics)
+
+
+# ==========================================================================
+# REFERENCE - what the switches above do. SWSE reads only the switch lines;
+# everything starting with # is a note, and the `features` command keeps it.
+# ==========================================================================
 #
-# SWSE is several independent systems in one DLL. Turn off anything you do not
-# want. A disabled feature installs NO HOOKS AT ALL, so the game runs as if
-# SWSE never touched it - not a hook that runs and returns early.
+# SWSE is several independent systems in one DLL. IN 1.1 ONLY THE CONSOLE IS
+# ON BY DEFAULT: a fresh install leaves the game exactly as shipped apart from
+# the console (the ~ key). Nothing has been removed - every system above is
+# still built in and comes back with one word.
 #
-# Delete this file (or leave every line `on`) for the full set.
-# Changes take effect on the next launch.
-
-
-# In-game console overlay (~ key) and the remote command mailbox.
-# Turning this off also disables driving the game from outside.
-console    = on
-
-# Post-process graphics pipeline: RTGI and the other shader passes.
-graphics   = on
-
-# HD texture replacement - swaps .oft files in at upload time.
-# Archives are never modified, so this is always safe to turn off.
-hdtextures = on
-
-# Additive hit reactions: NPCs flinch from where they were actually shot.
-hitreact   = on
-
-# Foliage identification and wind - gentle sway, and plants pushed aside as
-# you walk through them.
-foliage    = on
-
-# NPC AI tuning from `SWSE Console\aiprefs.txt` (sight, fire rate, accuracy).
-# This only does anything if aiprefs.txt names an `active` profile; on its own
-# it changes nothing.
-aituning   = on
+# THREE WAYS TO SWITCH A SYSTEM ON
+#   here      change its `off` to `on` above, then start the game
+#   live      in the console:  features <name> on        switches it now AND
+#                                                         saves it in this file
+#                              features <name> on temp   this session only
+#   setup     SWSE Setup.exe, in the download: a tick box per switch
+#   `features` on its own lists every switch, on or off, and what it does.
+#
+# PRESETS, in the console (they save like `features`, and take `temp`):
+#   features preset full      the classic SWSE, the 1.0.x look: console,
+#                             graphics, hdtextures, hitreact, foliage and
+#                             aituning on; the other switches as they are
+#   features preset default   the 1.1 default: console on, aituning and
+#                             playertune auto, everything else off
+#   features preset list      what each one sets
+#
+# AUTO. aituning and playertune can also be `auto`, and ship that way: each
+# runs only while its own file asks for something, and stays off otherwise.
+# A stock install asks for nothing, so it stays console-only; a tool that
+# writes those files (Stranger: Armed to the Teeth does) works without
+# anyone editing this file. `on` or `off` always wins over auto.
+#   `features all off` turns everything off except the console.
+#
+# WHAT ON AND OFF MEAN
+# A system that is off at launch installs NO HOOKS AT ALL: the game runs as
+# if SWSE had never touched it - not a hook that runs and returns early.
+# Switching one on live installs its hooks at that moment. Switching one off
+# live stops it and puts the game's own values back where the system keeps
+# them, but a hook it already installed stays in place, inert, until the next
+# launch.
+#
+# Switched on in the middle of a game, foliage, HD textures and hit reactions
+# take full effect from the next level load (warp, or load a save): plants and
+# textures are recognised as a level uploads them, and hit reactions first
+# have to find the level's characters.
+#
+# PLUGINS (1.1). A mod can also ship native code: a DLL in its plugins\
+# folder, such as SWSEMods\My Mod\plugins\mymod.dll. Each plugin is a switch
+# named after its DLL - `mymod = on` here, or `features mymod on` - and it is
+# OFF until you name it: while it is off, SWSE does not even load the DLL.
+# `features all on` never switches a plugin on; `features all off` switches
+# them off too. A plugin runs with the game's full rights, so install plugins
+# only from people you trust. `plugins` in the console lists what is there.
+#
+# A missing line means the default: `console` on, `aituning` and `playertune`
+# auto, everything else off. `on`, `true`, `yes`, `1` and `enabled` all mean
+# on. Use the names exactly as above in this file; the console command also
+# accepts nicknames (wind, grass, hd, gfx...).
+# The `features` command rewrites the switch lines and keeps every comment.
+#
+# console - the in-game console (~ key) and the remote command mailbox
+# (SWSE Console\remote_in.txt) that tools use to drive the game from outside.
+# Off means no console AND no mailbox - and nothing left to switch it back on
+# with, so it can only be changed here. `features console off` just writes
+# `off` above for the next launch.
+#
+# graphics - the post-process pipeline: sharpening, bloom, filmic tonemapping,
+# colour grade, ambient occlusion, RTGI and vignette, on the 3D scene only
+# (menus and HUD stay clean). Switching it on LOADS the pipeline; the look
+# itself starts off and is toggled with F10 (or `gfx on` / `gfx off` in the
+# console). F11 reloads SWSE Graphics\graphics.txt after you edit it.
+#
+# hdtextures - HD texture replacement: .oft files from any mod's textures\
+# folder are swapped in as the game uploads each texture; the game's archives
+# are never modified. The HD pack is a separate download and needs the 4GB
+# patch - see "INSTALL - READ ME FIRST.txt". `hd` in the console reports what
+# is installed and whether anything failed to load.
+#
+# hitreact - additive hit reactions: NPCs flinch from the bone that was
+# actually shot, on top of whatever animation is playing, so they keep
+# walking, aiming or reloading. Tuned in SWSE Combat\hitreact.txt.
+#
+# foliage - grass and plant wind: plants sway, and part around you as you
+# walk through them. SWSE Wind\foliage.txt picks which plants move, and
+# wind.txt how they move.
+#
+# aituning - enemy AI tuning from SWSE Console\aiprefs.txt: sight, fire rate,
+# reload, accuracy and miss time. The profile named by `active =` in
+# aiprefs.txt is applied a few seconds into every level. `auto`: runs only
+# while that line names a profile - aiprefs.txt ships `active = off`.
+#
+# triggers - mod-defined game events from any mod's triggers.txt, such as
+# "when the player walks into this spot, a 40% chance of an ambush" (the SWSE
+# Ambushes example). Named positions (writepos, goto) work without it.
+#
+# npctuning - per-character health and gib rules from every mod's
+# characters.txt, plus the rules in SWSE Console\console.txt, applied as each
+# level spawns its characters. The shipped files hold only commented-out
+# examples (live, they made the game's unkillable townsfolk, natives and
+# storekeepers mortal). `tuning` in the console loads the rules until the
+# game is restarted.
+#
+# playertune - the player's own numbers from SWSE Console\playerprefs.txt:
+# health, stamina, run speed, jump height, gravity and air control, applied a
+# few seconds after each level's player appears. `auto`: runs only while
+# playerprefs.txt sets a value. SWSE ships none - see examples\playerprefs.txt.
+#
+# prefsedit - live edits to any loaded prefs record (ammo knockback and damage,
+# weapon timing, motion...) from every mod's prefs.txt, re-applied a few
+# seconds into every level. Nothing on disk is changed. SWSE ships no
+# prefs.txt - see SWSE Console\examples\prefs.txt; `prefs keep` and
+# `knockback ... keep` in the console create SWSE Console\prefs.txt and add
+# lines to it.
+#
+# raytrace - ray-traced ambient occlusion (EXPERIMENTAL). Runs inside the
+# graphics pipeline, so graphics must be on too. It traces nothing until
+# rtao_enable is 1: type `set rtao_enable 1` in the console, which also saves
+# it in SWSE Graphics\graphics.txt, where the other rtao_* values go too.

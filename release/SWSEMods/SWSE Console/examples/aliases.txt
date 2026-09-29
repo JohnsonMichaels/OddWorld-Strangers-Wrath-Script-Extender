@@ -1,0 +1,31 @@
+# SWSE aliases (aliases.txt)
+#
+# SWSE reads this file from SWSEMods\SWSE Console\ - the copy in examples\ is
+# only a template. Copy it up one folder to use it; `alias` creates it there
+# too.
+#
+# An alias is a new console command made of existing ones.
+# One per line:    <name>   <command line>
+#   `;` separates commands, `wait <ms>` pauses between them, and %1 .. %9 are
+#   the alias's own arguments (%* is all of them).
+#
+# A typed name is looked up as a built-in command first, then as a
+# scripts\*.txt command, then as an alias, then as one of the game's own
+# functions - so an alias can never replace a built-in.
+#
+# This file is read once, when the console starts. The `alias` and `unalias`
+# commands rewrite it from what is loaded - every # line is kept, ahead of the
+# aliases - so either edit it with the game closed or use the commands, not
+# both at once. `aliases` lists what is loaded.
+#
+# EXAMPLES - remove the leading # to use one.
+#
+# `mark cave1` saves where you stand, with your facing, and lists the spots:
+#mark         writepos %1; positions
+#
+# `lowgrav 7` - low gravity for everyone for 30 seconds (27 is the shipped
+# value):
+#lowgrav      gravity %1; after 30 gravity 27
+#
+# `topup` - full health and stamina, then show the state:
+#topup        heal; wait 250; status

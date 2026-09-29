@@ -22,6 +22,8 @@ int  SWSE_ScanForName(const char* name);
 // it created, and which read path it uses. This is the diagnostic that tells us
 // whether injection can work at all.
 void SWSE_InputStatus(char* out, int outLen);
+// The console and background-focus guards, as counts (see input.cpp).
+void SWSE_InputGuardStatus(char* out, int outLen);
 
 // True once the game has created a keyboard device through our proxy.
 bool SWSE_InputReady();
@@ -44,6 +46,14 @@ int  SWSE_AgentDebugModeOn();
 // TRUE focus, as opposed to what the engine is told. Everything that decides
 // whether the game may own the cursor or read the keyboard keys off this.
 int  SWSE_InputReallyFocused();
+
+// freecam's mouse. While capture is on, the relative mouse motion the game
+// receives through Raw Input - with the game really focused and the console
+// closed - is also added up here, in raw counts. The game's own records are
+// untouched. Take returns what has built up since the last take, and clears
+// it; switching capture on or off clears it too.
+void SWSE_InputMouseCapture(bool on);
+void SWSE_InputTakeMouseDelta(int* dx, int* dy);
 
 // Deliver a key straight to the game's window queue. This is a separate
 // channel from the DirectInput overlay and from the Win32 polling hooks -

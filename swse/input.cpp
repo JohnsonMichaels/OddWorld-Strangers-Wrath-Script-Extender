@@ -18,6 +18,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include "input.h"
+#include "hookreg.h"    // every patch reported to the one list (`hooks`)
 
 // Local C-string logger, same shape as the one in gfx.cpp: no C++ objects, so
 // it stays safe to call from inside a hook on the game's input thread.
@@ -88,9 +89,22 @@ static bool IsKeyboard(void* self) {
 // A press occupies a time window [downAt, upAt). Windows let a caller lay out
 // "Down now, Down in 400ms, Enter in 800ms" in one call, with no blocking and
 // no per-frame tick - the read hook just asks which windows are open right now.
+//
+// A window alone is not enough when frames are slow. Behind other windows (the
+// background mode agents use) the driver throttles the game to ~11 fps, so a
+// 90 ms press could open and close between two frames and never be posted -
+// which is why `continue` did nothing on a minimized game. So presses are
+// ADVANCED only by the per-frame tick, the channel the game actually reads
+// (its message queue): a press starts at the first tick at or after its time,
+// is held for its full duration from THAT tick, and is released at a later
+// tick. A second press of the same key waits until a tick has posted the first
+// one's release, so Down, Down never merges into one long Down. Every other
+// reader (DirectInput, GetAsyncKeyState) sees the same state, read-only.
 #define MAX_PRESSES 64
-struct Press { DWORD downAt, upAt; BYTE scan; BYTE live; };
+struct Press { DWORD downAt, upAt; BYTE scan; BYTE live; BYTE seen; };
 static Press g_press[MAX_PRESSES];
+static LONG  g_tickN = 0;                  // SWSE_InputTick advances
+static LONG  g_upTick[256];                // per key: the tick that released it last
 static CRITICAL_SECTION g_lock;
 static bool g_lockReady = false;
 
@@ -105,26 +119,42 @@ void SWSE_QueueKey(int scan, int delayMs, int holdMs) {
     EnterCriticalSection(&g_lock);
     DWORD now = GetTickCount();
     for (int i = 0; i < MAX_PRESSES; i++) {
-        if (g_press[i].live && g_press[i].upAt > now) continue;   // still in use
+        if (g_press[i].live) continue;                            // still in use
         g_press[i].scan   = (BYTE)scan;
         g_press[i].downAt = now + (DWORD)delayMs;
         g_press[i].upAt   = now + (DWORD)delayMs + (DWORD)holdMs;
         g_press[i].live   = 1;
+        g_press[i].seen   = 0;
         break;
     }
     LeaveCriticalSection(&g_lock);
 }
 
 // Fill a 256-byte DIK map with the keys we are currently holding down.
-static void SynthState(BYTE* out) {
+// advance = true only from SWSE_InputTick (once per frame): it starts and
+// releases presses. Everyone else reads the state it left, unchanged.
+static void SynthState(BYTE* out, bool advance = false) {
     memset(out, 0, 256);
     if (!g_lockReady) return;
     EnterCriticalSection(&g_lock);
     DWORD now = GetTickCount();
+    LONG tick = advance ? ++g_tickN : g_tickN;
     for (int i = 0; i < MAX_PRESSES; i++) {
-        if (!g_press[i].live) continue;
-        if (now >= g_press[i].upAt) { g_press[i].live = 0; continue; }
-        if (now >= g_press[i].downAt) out[g_press[i].scan] = 0x80;
+        Press& p = g_press[i];
+        if (!p.live) continue;
+        if (advance) {
+            if (!p.seen) {
+                if (now < p.downAt) continue;                 // not yet
+                if (g_upTick[p.scan] >= tick) continue;       // release not posted yet
+                p.seen = 1;
+                p.upAt = now + (p.upAt - p.downAt);           // hold from THIS tick
+            } else if (now >= p.upAt) {
+                p.live = 0;
+                g_upTick[p.scan] = tick;                      // released at this tick
+                continue;
+            }
+        }
+        if (p.seen) out[p.scan] = 0x80;
     }
     LeaveCriticalSection(&g_lock);
 }
@@ -200,7 +230,7 @@ static HRESULT WINAPI My_GetData(void* self, DWORD cb, SWSE_DIDATA* rgdod,
     return hr;
 }
 
-static void* PatchSlot(void* iface, int index, void* hook) {
+static void* PatchSlot(void* iface, int index, void* hook, const char* label) {
     void** vt = *(void***)iface;
     DWORD old;
     if (!VirtualProtect(&vt[index], sizeof(void*), PAGE_EXECUTE_READWRITE, &old)) return 0;
@@ -208,6 +238,7 @@ static void* PatchSlot(void* iface, int index, void* hook) {
     if (orig == hook) { VirtualProtect(&vt[index], sizeof(void*), old, &old); return 0; }
     vt[index] = hook;
     VirtualProtect(&vt[index], sizeof(void*), old, &old);
+    SWSE_HookNote(&vt[index], sizeof(void*), "input", SWSE_HOOK_VTABLE, label);
     return orig;
 }
 
@@ -224,9 +255,9 @@ static HRESULT WINAPI My_CreateDevice(void* self, REFGUID rguid, void** out, LPU
     else InterlockedIncrement(&g_nOther);
 
     // Patch once per vtable; a second device of the same class reuses it.
-    void* p = PatchSlot(*out, VT_DEV_GETSTATE, (void*)My_GetState);
+    void* p = PatchSlot(*out, VT_DEV_GETSTATE, (void*)My_GetState, "IDirectInputDevice8::GetDeviceState");
     if (p) o_GetState = (PFN_GetState)p;
-    p = PatchSlot(*out, VT_DEV_GETDATA, (void*)My_GetData);
+    p = PatchSlot(*out, VT_DEV_GETDATA, (void*)My_GetData, "IDirectInputDevice8::GetDeviceData");
     if (p) o_GetData = (PFN_GetData)p;
 
     char msg[160];
@@ -343,6 +374,99 @@ static BOOL WINAPI My_GetKeyboardState(PBYTE st) {
     return r;
 }
 
+// ---- the console owns the keyboard and mouse while it is open ---------------
+// The game reads the keyboard and mouse through Raw Input (RegisterRawInputDevices,
+// then GetRawInputData in its WM_INPUT handler) and also takes WM_KEYDOWN /
+// WM_CHAR from its queue - it creates no DirectInput devices. So typing in
+// SWSE's console drove the game too: WASD walked Stranger, the mouse turned the
+// camera, Escape paused. Now, for input typed while the console is open:
+//   * a raw key PRESS becomes "no key" (VKey 0xFF); raw mouse motion, button
+//     presses and the wheel become nothing. Releases pass, so a key held when
+//     the console opened is not left stuck down.
+//   * WM_KEYDOWN / WM_CHAR and mouse-button presses become WM_NULL. SWSE's own
+//     injected keys (the synthetic lParam bit) still pass.
+// "While open" includes input read just after it closed but typed before - the
+// Escape or Enter that closed it. SWSE's console reads the keyboard through its
+// own GetAsyncKeyState, which none of this touches.
+#define SWSE_SYNTH_BIT_EARLY (1 << 25)          // == SWSE_SYNTH_LPARAM_BIT, below
+bool SWSE_ConsoleOpen();
+void SWSE_ConsoleOpenWindow(DWORD* openedAt, DWORD* closedAt);
+static bool TypedIntoConsole(DWORD t) {
+    if (SWSE_ConsoleOpen()) return true;
+    DWORD o = 0, c = 0;
+    SWSE_ConsoleOpenWindow(&o, &c);
+    if (!c) return false;
+    return (LONG)(t - o) >= 0 && (LONG)(c - t) >= 0;
+}
+static volatile LONG g_consoleEaten = 0;
+
+// ---- freecam's mouse ---------------------------------------------------------
+// The developers' fly camera turns at a RATE set by the look stick, and on PC
+// the mouse reaches that stick only as one frame's motion (the game's WndProc
+// adds raw counts x 0.002 x sensitivity into 0x9D5510/14; the key-binding pass
+// hands at most 1.0 per poll to the virtual pad's right stick). The player's
+// cameras know that ("mouse mode", 0x7FE260) and turn by it directly; the fly
+// camera, older than the PC port, barely moves (research/FREECAM.md 5.1). So
+// while freecam asks, the relative motion the game receives is also added up
+// here and freecam turns the camera by it. The game's own records are left
+// exactly as they were. Written on the window's thread, taken on the render
+// thread: interlocked both ways.
+static volatile LONG g_mouseCapture = 0;
+static volatile LONG g_mouseDX = 0, g_mouseDY = 0;
+void SWSE_InputMouseCapture(bool on) {
+    InterlockedExchange(&g_mouseCapture, on ? 1 : 0);
+    InterlockedExchange(&g_mouseDX, 0);
+    InterlockedExchange(&g_mouseDY, 0);
+}
+void SWSE_InputTakeMouseDelta(int* dx, int* dy) {
+    LONG x = InterlockedExchange(&g_mouseDX, 0);
+    LONG y = InterlockedExchange(&g_mouseDY, 0);
+    if (dx) *dx = (int)x;
+    if (dy) *dy = (int)y;
+}
+
+typedef UINT (WINAPI *PFN_GetRawInputData)(HRAWINPUT, UINT, LPVOID, PUINT, UINT);
+static PFN_GetRawInputData o_GetRawInputData = nullptr;
+static UINT WINAPI My_GetRawInputData(HRAWINPUT h, UINT cmd, LPVOID data, PUINT size, UINT hdr) {
+    UINT r = o_GetRawInputData ? o_GetRawInputData(h, cmd, data, size, hdr) : (UINT)-1;
+    if (r == (UINT)-1 || cmd != RID_INPUT || !data || r < sizeof(RAWINPUTHEADER)) return r;
+    bool console = TypedIntoConsole((DWORD)GetMessageTime());
+    if (!console && g_mouseCapture && r >= sizeof(RAWINPUTHEADER) + sizeof(RAWMOUSE)) {
+        const RAWINPUT* rm = (const RAWINPUT*)data;
+        if (rm->header.dwType == RIM_TYPEMOUSE && !(rm->data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE) &&
+            SWSE_InputReallyFocused() && !SuppressRealInput()) {
+            InterlockedExchangeAdd(&g_mouseDX, rm->data.mouse.lLastX);
+            InterlockedExchangeAdd(&g_mouseDY, rm->data.mouse.lLastY);
+        }
+    }
+    if (!console) return r;
+    RAWINPUT* ri = (RAWINPUT*)data;
+    if (ri->header.dwType == RIM_TYPEKEYBOARD && r >= sizeof(RAWINPUTHEADER) + sizeof(RAWKEYBOARD)) {
+        if (!(ri->data.keyboard.Flags & RI_KEY_BREAK)) {
+            ri->data.keyboard.VKey = 0xFF;
+            ri->data.keyboard.MakeCode = 0;
+            InterlockedIncrement(&g_consoleEaten);
+        }
+    } else if (ri->header.dwType == RIM_TYPEMOUSE && r >= sizeof(RAWINPUTHEADER) + sizeof(RAWMOUSE)) {
+        RAWMOUSE& m = ri->data.mouse;
+        if (!(m.usFlags & MOUSE_MOVE_ABSOLUTE)) { m.lLastX = 0; m.lLastY = 0; }
+        const USHORT presses = RI_MOUSE_LEFT_BUTTON_DOWN | RI_MOUSE_RIGHT_BUTTON_DOWN |
+                               RI_MOUSE_MIDDLE_BUTTON_DOWN | RI_MOUSE_BUTTON_4_DOWN |
+                               RI_MOUSE_BUTTON_5_DOWN | RI_MOUSE_WHEEL;
+        m.usButtonFlags &= (USHORT)~presses;
+        if (!(m.usButtonFlags & ~presses)) m.usButtonData = 0;
+    }
+    return r;
+}
+
+// The key MESSAGES are filtered in SWSE's window procedure (BgWndProc), not by
+// hooking PeekMessageA. The game's loop (0x5F7E81) loads PeekMessageA,
+// TranslateMessage and DispatchMessageA into ESI/EBX/EDI ONCE, before SWSE is
+// running, and calls through the registers for the life of the game - so an
+// import hook on PeekMessageA is never called. That is why the first console
+// filter never ate a key (inputst: 0) while the owner's typing walked Stranger.
+// Every message still reaches the window procedure through DispatchMessageA.
+
 // Redirect one imported function in stranger.exe's IAT. Returns the original.
 static void* HookImport(const char* dll, const char* fn, void* hook) {
     BYTE* b = (BYTE*)GetModuleHandleA(NULL);
@@ -368,6 +492,7 @@ static void* HookImport(const char* dll, const char* fn, void* hook) {
             void* orig = (void*)ft->u1.Function;
             ft->u1.Function = (DWORD_PTR)hook;
             VirtualProtect(&ft->u1.Function, sizeof(void*), old, &old);
+            SWSE_HookNote(&ft->u1.Function, sizeof(void*), "input", SWSE_HOOK_IAT, fn);
             return orig;
         }
     }
@@ -423,14 +548,164 @@ static void NoteFocus(int focused) {
 // Marks a keyboard message as SWSE-injected. Bits 25-28 of a keyboard lParam
 // are reserved and are zero for genuine input, so this never collides.
 #define SWSE_SYNTH_LPARAM_BIT (1 << 25)
+static_assert(SWSE_SYNTH_LPARAM_BIT == SWSE_SYNTH_BIT_EARLY, "the console filter's copy of the synthetic-key bit");
 
 int SWSE_InputReallyFocused() { return g_reallyFocused ? 1 : 0; }
+
+// ---- keeping the keyboard where the owner is ------------------------------------
+// Agents launch the game from inside the app the owner types in, and Windows
+// lets a process started by the foreground app take the foreground itself - so
+// the game came to the front after loads while the owner was typing, and their
+// keys walked Stranger around (2026-09-28). The calls behind it were not the
+// game's own imports (the hooks below never fired), so the activation is
+// answered where it lands instead: in background mode, when the game becomes
+// the active app and the user did NOT click it (WM_ACTIVATE says WA_ACTIVE, not
+// WA_CLICKACTIVE) and is not on the taskbar, the foreground goes straight back
+// to the window the user was in. A click on the game, or on its taskbar
+// button, still hands it over.
+#define WM_SWSE_HANDBACK (WM_APP + 0x5E1)
+static HWND          g_lastOtherFg = nullptr;   // the user's window, polled each frame
+static volatile LONG g_appActivatedAt = 0;      // tick of the last WM_ACTIVATEAPP(TRUE)
+static volatile LONG g_handedBack = 0;
+
+static bool OtherProcessWindow(HWND h) {
+    if (!h || !IsWindow(h)) return false;
+    DWORD pid = 0;
+    GetWindowThreadProcessId(h, &pid);
+    return pid && pid != GetCurrentProcessId();
+}
+static bool CursorOnTaskbar() {
+    POINT pt;
+    if (!GetCursorPos(&pt)) return false;
+    HWND root = GetAncestor(WindowFromPoint(pt), GA_ROOT);
+    char cls[64] = "";
+    if (!root || !GetClassNameA(root, cls, sizeof(cls))) return false;
+    return !lstrcmpA(cls, "Shell_TrayWnd") || !lstrcmpA(cls, "Shell_SecondaryTrayWnd");
+}
+static void PidExe(DWORD pid, char* out, int outLen) {
+    lstrcpynA(out, "?", outLen);
+    HANDLE p = pid ? OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid) : nullptr;
+    if (!p) return;
+    char path[MAX_PATH]; DWORD n = MAX_PATH;
+    if (QueryFullProcessImageNameA(p, 0, path, &n)) {
+        const char* base = strrchr(path, '\\');
+        lstrcpynA(out, base ? base + 1 : path, outLen);
+    }
+    CloseHandle(p);
+}
+static void WindowExe(HWND h, char* out, int outLen) {
+    DWORD pid = 0;
+    GetWindowThreadProcessId(h, &pid);
+    PidExe(pid, out, outLen);
+}
+// Is h part of the Windows shell: the taskbar, the Alt+Tab switcher, Task
+// View, the Start menu, the desktop? Activation that comes FROM one of those is
+// the user switching to the game, so the game keeps it.
+static bool ShellWindow(HWND h) {
+    if (!h || !IsWindow(h)) return false;
+    char exe[MAX_PATH];
+    WindowExe(h, exe, sizeof(exe));
+    return !lstrcmpiA(exe, "explorer.exe") || !lstrcmpiA(exe, "ShellExperienceHost.exe") ||
+           !lstrcmpiA(exe, "StartMenuExperienceHost.exe") || !lstrcmpiA(exe, "SearchHost.exe");
+}
+
+// Every activation message in agent mode, as it arrives, so the next grab that
+// gets past the hand-back names the path it took: the time, the message and
+// what its wParam says, the exe on the other side (WM_ACTIVATE's lParam is a
+// window, WM_ACTIVATEAPP's a thread), the taskbar test, and the decision. The
+// first 200, then every power of two.
+static volatile LONG g_actLogged = 0;
+static void LogActivation(UINT m, WPARAM w, LPARAM l, bool onBar, const char* decided) {
+    LONG n = InterlockedIncrement(&g_actLogged);
+    if (n > 200 && (n & (n - 1))) return;
+    SYSTEMTIME t; GetLocalTime(&t);
+    char other[MAX_PATH] = "none";
+    char says[48];
+    if (m == WM_ACTIVATEAPP) {
+        lstrcpynA(says, w ? "TRUE" : "FALSE", sizeof(says));
+        HANDLE th = l ? OpenThread(THREAD_QUERY_LIMITED_INFORMATION, FALSE, (DWORD)l) : nullptr;
+        if (th) { PidExe(GetProcessIdOfThread(th), other, sizeof(other)); CloseHandle(th); }
+    } else {
+        const char* s = LOWORD(w) == WA_INACTIVE ? "WA_INACTIVE" : LOWORD(w) == WA_CLICKACTIVE ? "WA_CLICKACTIVE" : "WA_ACTIVE";
+        _snprintf_s(says, sizeof(says), _TRUNCATE, "%s%s", s, HIWORD(w) ? ", minimized" : "");
+        if (l) WindowExe((HWND)l, other, sizeof(other));
+    }
+    char b[MAX_PATH + 200];
+    _snprintf_s(b, sizeof(b), _TRUNCATE,
+                "background: %02d:%02d:%02d.%03d %s(%s), other side %s, cursor %son the taskbar - %s",
+                t.wHour, t.wMinute, t.wSecond, t.wMilliseconds,
+                m == WM_ACTIVATEAPP ? "WM_ACTIVATEAPP" : "WM_ACTIVATE", says, other,
+                onBar ? "" : "not ", decided);
+    SWSE_Log(b);
+}
+// Runs on the window's own thread, after the activation has finished. The game
+// is the foreground process at this point, so it may give the foreground away.
+// SetForegroundWindow here is SWSE's own import, not the game's hooked one.
+static void HandBack(HWND self, HWND to) {
+    if (!OtherProcessWindow(to) || GetForegroundWindow() != self) return;
+    BOOL ok = SetForegroundWindow(to);
+    LONG n = InterlockedIncrement(&g_handedBack);
+    if (n > 5 && (n & (n - 1))) return;
+    char exe[MAX_PATH], b[MAX_PATH + 160];
+    WindowExe(to, exe, sizeof(exe));
+    wsprintfA(b, "background: the game came to the front without a click - keyboard handed back to %s (%s, #%ld)",
+              exe, ok ? "done" : "Windows refused", n);
+    SWSE_Log(b);
+}
 
 static LRESULT CALLBACK BgWndProc(HWND h, UINT m, WPARAM w, LPARAM l) {
     // Never call through a pointer we are not sure of. Activation messages
     // arrive exactly when the user clicks the window, and a stale o_wndProc -
     // or one captured from a previous load - turns that click into a crash.
     if (!o_wndProc) return DefWindowProcA(h, m, w, l);
+    if (m == WM_SWSE_HANDBACK) { HandBack(h, (HWND)l); return 0; }
+    // What is typed into the console stays in the console: key presses,
+    // characters and mouse presses typed while it was open never reach the
+    // game (the raw feed is handled in My_GetRawInputData). Releases pass, so
+    // nothing sticks; SWSE's own injected keys carry the synthetic bit and pass.
+    switch (m) {
+    case WM_KEYDOWN: case WM_CHAR: case WM_DEADCHAR:
+    case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MBUTTONDOWN: case WM_XBUTTONDOWN:
+    case WM_MOUSEWHEEL:
+        if (!(l & SWSE_SYNTH_BIT_EARLY) && TypedIntoConsole((DWORD)GetMessageTime())) {
+            InterlockedIncrement(&g_consoleEaten);
+            return 0;
+        }
+        break;
+    }
+    if (g_agentDebug && (m == WM_ACTIVATEAPP || m == WM_ACTIVATE)) {
+        bool onBar = CursorOnTaskbar();
+        const char* decided;
+        // WM_ACTIVATEAPP(TRUE) is only sent when another app was active before,
+        // so it marks a transition from the background; WM_ACTIVATE follows.
+        if (m == WM_ACTIVATEAPP) {
+            if (w) InterlockedExchange(&g_appActivatedAt, (LONG)GetTickCount());
+            decided = w ? "noted: the game's app is active now" : "noted: another app is active now";
+        } else if (LOWORD(w) == WA_ACTIVE && GetTickCount() - (DWORD)g_appActivatedAt < 1000 && !onBar) {
+            HWND to = OtherProcessWindow((HWND)l) ? (HWND)l : g_lastOtherFg;
+            if (ShellWindow(to)) {
+                // Alt+Tab, Task View or a taskbar button: the switcher is the
+                // shell's window, so this is the user choosing the game. The
+                // first version handed the keyboard to explorer.exe instead,
+                // three times while the owner was trying to get in (2026-09-28).
+                decided = "switched to from the shell (Alt+Tab / taskbar) - the game keeps it";
+            } else if (OtherProcessWindow(to)) {
+                PostMessageA(h, WM_SWSE_HANDBACK, 0, (LPARAM)to);
+                decided = "no click: handing the keyboard back";
+            } else {
+                decided = "no click, but no window of the user's to hand back to - left";
+            }
+        } else if (LOWORD(w) == WA_INACTIVE) {
+            decided = "deactivated - nothing to do";
+        } else if (LOWORD(w) == WA_CLICKACTIVE) {
+            decided = "a click - the game keeps it";
+        } else if (onBar) {
+            decided = "cursor on the taskbar - the game keeps it";
+        } else {
+            decided = "no app switch in the last second - left";
+        }
+        LogActivation(m, w, l, onBar, decided);
+    }
     // Record the TRUE state before rewriting anything.
     switch (m) {
     case WM_ACTIVATE:
@@ -499,9 +774,39 @@ static BOOL WINAPI My_SetCursorPos(int x, int y) {
     if (g_agentDebug && !g_reallyFocused) return TRUE;
     return o_SetCursorPos ? o_SetCursorPos(x, y) : TRUE;
 }
+// The game hides its cursor with `while (ShowCursor(FALSE) >= 0);` (at
+// 0x5F7806 - it decrements Windows' display counter until it goes negative).
+// Background mode keeps the desktop cursor visible by not forwarding the
+// hide, and used to answer 0 - "still visible" - so that loop never ended:
+// the game's window thread spun at 100% forever, pumped no messages, and read
+// as hung (IsHungAppWindow) - which is why `continue` could not load a save in
+// the background. Instead the game gets a VIRTUAL counter that moves the way
+// the real one would; the real cursor stays shown, and the virtual state is
+// applied to the real counter when the window really gets focus back.
+static int  g_virtCursor = 0;          // display count the game believes in
+static bool g_virtActive = false;      // a background hide/show is pending
 static int WINAPI My_ShowCursor(BOOL show) {
-    if (g_agentDebug && !g_reallyFocused && !show) return 0;   // stay visible
-    return o_ShowCursor ? o_ShowCursor(show) : 0;
+    if (g_agentDebug && !g_reallyFocused) {
+        g_virtActive = true;
+        g_virtCursor += show ? 1 : -1;
+        return g_virtCursor;
+    }
+    int r = o_ShowCursor ? o_ShowCursor(show) : 0;
+    g_virtCursor = r;
+    return r;
+}
+
+// Focus is back: make the real counter match what the game asked for while
+// it was in the background (hidden if its virtual count is negative).
+static void SyncCursorAfterBackground() {
+    if (!g_virtActive || !o_ShowCursor) return;
+    g_virtActive = false;
+    bool wantHidden = g_virtCursor < 0;
+    int real = o_ShowCursor(TRUE);                     // read by nudging...
+    real = o_ShowCursor(FALSE);                        // ...and restoring
+    for (int i = 0; i < 64 && wantHidden && real >= 0; i++) real = o_ShowCursor(FALSE);
+    for (int i = 0; i < 64 && !wantHidden && real < 0; i++) real = o_ShowCursor(TRUE);
+    g_virtCursor = real;
 }
 
 // PFN_GetWnd / o_GetForegroundWindow are declared up by SuppressRealInput,
@@ -522,24 +827,92 @@ static HWND WINAPI My_GetFocus(void) {
     return o_GetFocus ? o_GetFocus() : (HWND)0;
 }
 
-int SWSE_AgentDebugMode(int on, char* msg, int msgLen) {
-    if (!g_wnd) EnumWindows(FindWnd, 0);
-    if (!g_wnd) { lstrcpynA(msg, "no game window found", msgLen); return 0; }
-    if (on && !o_wndProc) {
-        // Refuse to subclass a window that is ALREADY subclassed by us from a
-        // previous DLL load: the old BgWndProc address points into unmapped
-        // memory, and chaining to it crashes on the next activation - which is
-        // the moment the user clicks the window.
-        WNDPROC cur = (WNDPROC)GetWindowLongPtrA(g_wnd, GWLP_WNDPROC);
-        if (cur == BgWndProc) {
-            g_agentDebug = (on != 0);
-            lstrcpynA(msg, "already subclassed (reusing existing hook)", msgLen);
-            return 1;
-        }
-        o_wndProc = (WNDPROC)SetWindowLongPtrA(g_wnd, GWLP_WNDPROC,
-                                               (LONG_PTR)BgWndProc);
-        if (!o_wndProc) { lstrcpynA(msg, "could not subclass the window", msgLen); return 0; }
+// The game brings itself to the front on its own - after a level load, for
+// one - and once the user has been idle a little while Windows lets it. In
+// background mode that put the owner's keystrokes into the parked game while
+// they typed elsewhere (2026-09-28). So while background mode is on and the
+// window does not really have focus, the game's OWN activation calls are
+// neutralised. A click on its window still activates it, because Windows does
+// that, not the game; from then on these calls pass through untouched.
+typedef BOOL (WINAPI *PFN_SetForegroundWindow)(HWND);
+typedef HWND (WINAPI *PFN_SetFocus)(HWND);
+typedef BOOL (WINAPI *PFN_ShowWindow)(HWND, int);
+typedef BOOL (WINAPI *PFN_SetWindowPos)(HWND, HWND, int, int, int, int, UINT);
+static PFN_SetForegroundWindow o_SetForegroundWindow = nullptr;
+static PFN_SetFocus            o_SetFocus            = nullptr;
+static PFN_ShowWindow          o_ShowWindow          = nullptr;
+static PFN_SetWindowPos        o_SetWindowPos        = nullptr;
+static volatile LONG           g_keptBack[4];
+
+static bool KeepInBackground(HWND h) {
+    return g_agentDebug && !g_reallyFocused && g_wnd && (!h || h == g_wnd);
+}
+// The first three of each kind, then powers of two, so the log names the call
+// the game uses without filling up.
+static void NoteKeptBack(int i, const char* fn) {
+    LONG n = InterlockedIncrement(&g_keptBack[i]);
+    if (n > 3 && (n & (n - 1))) return;
+    char b[160];
+    wsprintfA(b, "background: kept the game from taking the foreground (%s, #%ld)", fn, n);
+    SWSE_Log(b);
+}
+static BOOL WINAPI My_SetForegroundWindow(HWND h) {
+    if (KeepInBackground(h)) { NoteKeptBack(0, "SetForegroundWindow"); return TRUE; }
+    return o_SetForegroundWindow ? o_SetForegroundWindow(h) : FALSE;
+}
+static HWND WINAPI My_SetFocus(HWND h) {
+    if (KeepInBackground(h)) { NoteKeptBack(1, "SetFocus"); return g_wnd; }
+    return o_SetFocus ? o_SetFocus(h) : (HWND)0;
+}
+static BOOL WINAPI My_ShowWindow(HWND h, int cmd) {
+    if (h && KeepInBackground(h)) {
+        int keep = cmd;
+        if (cmd == SW_SHOWNORMAL || cmd == SW_RESTORE || cmd == SW_SHOWDEFAULT) keep = SW_SHOWNOACTIVATE;
+        else if (cmd == SW_SHOW) keep = SW_SHOWNA;
+        if (keep != cmd) { NoteKeptBack(2, "ShowWindow"); cmd = keep; }
     }
+    return o_ShowWindow ? o_ShowWindow(h, cmd) : FALSE;
+}
+static BOOL WINAPI My_SetWindowPos(HWND h, HWND after, int x, int y, int cx, int cy, UINT flags) {
+    if (h && KeepInBackground(h)) {
+        UINT keep = flags | SWP_NOACTIVATE;
+        // Raising it to the top would still cover the windows the owner is in.
+        if (after == HWND_TOP || after == HWND_TOPMOST) keep |= SWP_NOZORDER;
+        if (keep != flags) { NoteKeptBack(3, "SetWindowPos"); flags = keep; }
+    }
+    return o_SetWindowPos ? o_SetWindowPos(h, after, x, y, cx, cy, flags) : FALSE;
+}
+
+// SWSE's window procedure in front of the game's. It used to go in only with
+// background mode. The console filter lives there too now (the game's loop
+// bypasses import hooks - see the note after My_GetRawInputData), so it goes
+// in at the first frame, always; everything background mode does in it stays
+// behind g_agentDebug.
+static bool EnsureSubclass(char* msg, int msgLen) {
+    if (!g_wnd) EnumWindows(FindWnd, 0);
+    if (!g_wnd) { if (msg) lstrcpynA(msg, "no game window found", msgLen); return false; }
+    if (o_wndProc) return true;
+    // Refuse to subclass a window that is ALREADY subclassed by us from a
+    // previous DLL load: the old BgWndProc address points into unmapped
+    // memory, and chaining to it crashes on the next activation - which is
+    // the moment the user clicks the window.
+    WNDPROC cur = (WNDPROC)GetWindowLongPtrA(g_wnd, GWLP_WNDPROC);
+    if (cur == BgWndProc) {
+        if (msg) lstrcpynA(msg, "already subclassed (reusing existing hook)", msgLen);
+        return true;
+    }
+    // The game's thread may dispatch the moment the pointer is swapped, so the
+    // original is known BEFORE BgWndProc can run (it passes messages to
+    // DefWindowProc while o_wndProc is null).
+    o_wndProc = cur;
+    WNDPROC prev = (WNDPROC)SetWindowLongPtrA(g_wnd, GWLP_WNDPROC, (LONG_PTR)BgWndProc);
+    if (!prev) { o_wndProc = nullptr; if (msg) lstrcpynA(msg, "could not subclass the window", msgLen); return false; }
+    if (prev != cur) o_wndProc = prev;
+    return true;
+}
+
+int SWSE_AgentDebugMode(int on, char* msg, int msgLen) {
+    if (!EnsureSubclass(msg, msgLen)) return 0;
     g_agentDebug = (on != 0);
     // Never leave the pointer trapped: releasing on both transitions means an
     // 'off' is always a way out, even if a hook failed to install.
@@ -571,6 +944,18 @@ void SWSE_InputInstallProbes() {
     if (p) o_GetActiveWindow = (PFN_GetWnd)p;
     p = HookImport("user32.dll", "GetFocus", (void*)My_GetFocus);
     if (p) o_GetFocus = (PFN_GetWnd)p;
+    // What the console types stays in the console (see My_GetRawInputData).
+    p = HookImport("user32.dll", "GetRawInputData", (void*)My_GetRawInputData);
+    if (p) o_GetRawInputData = (PFN_GetRawInputData)p;
+    // ...and the game's own attempts to take the foreground (see above).
+    p = HookImport("user32.dll", "SetForegroundWindow", (void*)My_SetForegroundWindow);
+    if (p) o_SetForegroundWindow = (PFN_SetForegroundWindow)p;
+    p = HookImport("user32.dll", "SetFocus", (void*)My_SetFocus);
+    if (p) o_SetFocus = (PFN_SetFocus)p;
+    p = HookImport("user32.dll", "ShowWindow", (void*)My_ShowWindow);
+    if (p) o_ShowWindow = (PFN_ShowWindow)p;
+    p = HookImport("user32.dll", "SetWindowPos", (void*)My_SetWindowPos);
+    if (p) o_SetWindowPos = (PFN_SetWindowPos)p;
 
     // Cursor ownership. Without these the game clips and recentres the pointer
     // every frame and the desktop becomes unusable while background mode is on.
@@ -582,6 +967,14 @@ void SWSE_InputInstallProbes() {
     if (p) o_ShowCursor = (PFN_ShowCursor)p;
 
     EnumWindows(FindWnd, 0);
+    {
+        char sm[160] = "";
+        bool ok = EnsureSubclass(sm, sizeof(sm));
+        char lb[220];
+        wsprintfA(lb, "input: window procedure %s%s%s", ok ? "installed (console input filter)" : "NOT installed",
+                  sm[0] ? " - " : "", sm);
+        SWSE_Log(lb);
+    }
 
     // AgentDebugMode on by default. This is a development build and the whole
     // point is that the game can be driven and observed while the user works in
@@ -630,6 +1023,20 @@ void SWSE_PostKeyMessage(int scan, bool down) {
 static BYTE g_prevPost[256];
 void SWSE_InputTick() {
     SWSE_InputInstallProbes();
+    // Which thread is which. MEASURED: SWSE's frame hook runs on the render
+    // thread, and the game window belongs to a DIFFERENT thread (the game's
+    // main thread) - so nothing here can pump the window's messages. That
+    // main thread stops pumping while the window is minimized (IsHungAppWindow
+    // true, WM_NULL unanswered), which is why background mode parks the
+    // window behind other windows instead of minimizing it.
+    static bool s_threadsLogged = false;
+    if (g_wnd && !s_threadsLogged) {
+        s_threadsLogged = true;
+        char b[160];
+        wsprintfA(b, "input: frame hook runs on thread %u; the game window belongs to thread %u",
+                  (unsigned)GetCurrentThreadId(), (unsigned)GetWindowThreadProcessId(g_wnd, nullptr));
+        SWSE_Log(b);
+    }
     // Authoritative focus, polled every frame.
     //
     // Deriving focus from window messages alone was wrong twice: a message
@@ -642,7 +1049,10 @@ void SWSE_InputTick() {
         HWND fg = o_GetForegroundWindow ? o_GetForegroundWindow()
                                         : GetForegroundWindow();
         LONG focused = (fg == g_wnd) ? 1 : 0;
-        InterlockedExchange(&g_reallyFocused, focused);
+        LONG was = InterlockedExchange(&g_reallyFocused, focused);
+        if (focused && !was) SyncCursorAfterBackground();
+        // The window the user is in, for a hand-back (see BgWndProc).
+        if (!focused && OtherProcessWindow(fg)) g_lastOtherFg = fg;
     }
 
     // Safety net. If the game calls ClipCursor/SetCursorPos through a pointer
@@ -652,7 +1062,7 @@ void SWSE_InputTick() {
     // between a usable desktop and a locked one.
     if (g_agentDebug && !g_reallyFocused) ClipCursor(nullptr);
     BYTE cur[256];
-    SynthState(cur);
+    SynthState(cur, true);                  // the one caller that advances presses
     for (int i = 1; i < 256; i++) {
         if (cur[i] == g_prevPost[i]) continue;
         SWSE_PostKeyMessage(i, cur[i] != 0);
@@ -670,13 +1080,23 @@ bool SWSE_InputReady() { return g_wnd != 0; }
 
 void SWSE_InputStatus(char* out, int outLen) {
     // Whichever counter is climbing is the path the game really reads.
-    wsprintfA(out,
+    _snprintf_s(out, outLen, _TRUNCATE,
         "dinput: %dkbd/%dmouse/%dother reads=%d/%d | win32: async=%d keystate=%d "
         "kbstate=%d | hwnd=%p",
         (int)g_nKeyboards, (int)g_nMice, (int)g_nOther,
         (int)g_stateCalls, (int)g_dataCalls,
         (int)g_asyncCalls, (int)g_keyStateCalls, (int)g_kbStateCalls, (void*)g_wnd);
-    (void)outLen;
+}
+
+// The two guards: what the console kept from the game, and the keyboard focus
+// handed back to the user's window in background mode.
+void SWSE_InputGuardStatus(char* out, int outLen) {
+    LONG kept = 0;
+    for (int i = 0; i < 4; i++) kept += g_keptBack[i];
+    _snprintf_s(out, outLen, _TRUNCATE,
+        "guards: %d input(s) kept from the game while the console was open; "
+        "focus handed back %d time(s); %d activation call(s) neutralised",
+        (int)g_consoleEaten, (int)g_handedBack, (int)kept);
 }
 
 extern "C" HMODULE SWSE_RealDInput8();   // dllmain.cpp
@@ -702,7 +1122,7 @@ extern "C" HRESULT WINAPI DirectInput8Create(HINSTANCE hinst, DWORD ver, REFIID 
 
     HRESULT hr = real(hinst, ver, riid, out, outer);
     if (SUCCEEDED(hr) && out && *out) {
-        void* p = PatchSlot(*out, VT_DI_CREATEDEVICE, (void*)My_CreateDevice);
+        void* p = PatchSlot(*out, VT_DI_CREATEDEVICE, (void*)My_CreateDevice, "IDirectInput8::CreateDevice");
         if (p) {
             o_CreateDevice = (PFN_CreateDevice)p;
             SWSE_Log("input: DirectInput8 proxied - CreateDevice hooked");

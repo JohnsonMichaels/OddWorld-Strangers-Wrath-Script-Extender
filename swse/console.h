@@ -17,3 +17,13 @@ void SWSE_ConsolePrint(const char* text);
 // small: a trigger's actions are console commands, so it inherits the whole
 // command set and every command added later, with no new plumbing.
 void SWSE_ConsoleExec(const char* line);
+
+// For the plugin API (plugins.cpp):
+// Is `name` one of the console's built-in commands? Those names can never be
+// taken by a plugin command.
+bool SWSE_ConsoleIsBuiltin(const char* name);
+// Run a line as a nested command - counted into the same depth as scripts,
+// aliases, `exec` and `repeat`, so a plugin command that runs itself stops at
+// 8 levels instead of running the stack out. 0 = ran; -11 (SWSE_E_NESTING)
+// = refused, nested too deep.
+int  SWSE_ConsoleExecNested(const char* line);

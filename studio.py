@@ -1,4 +1,16 @@
-"""Mod Loader - the modding UI for Oddworld: Stranger's Wrath HD.
+"""Mod Loader - the modders' studio for Oddworld: Stranger's Wrath HD.
+
+Players get "SWSE Setup.exe" (swse_setup.py) instead: the SWSE Setup screen
+alone. This studio keeps that screen as its first tab and adds the archive
+tools; it is built from the repository and not shipped in the player zip.
+
+v0.4:
+- SWSE Setup tab (the first): install, update or uninstall SWSE, and tick which
+  of its systems are on - oddforge/setupui.py, the same screen swse_setup.py
+  shows; the logic under it is oddforge/swsefeatures.py, swseinstall.py and
+  gamepaths.py, tested by tools/test_swsefeatures.py
+- `ModLoader.exe --selftest <file>`: builds the window unseen, checks it can
+  start, writes the answers to <file>
 
 v0.2:
 - Textures tab: browse, preview, replace DXT1 textures with your own images
@@ -21,26 +33,27 @@ from tkinter import filedialog, messagebox, ttk
 from PIL import Image, ImageTk
 
 from oddforge import __version__
+from oddforge import setupui
 from oddforge.container import SmbContainer
 from oddforge.dump import export_all, export_archive
+from oddforge.gamepaths import STEAM_DEFAULT_ROOT, GameInstall, find_game
 from oddforge.modloader import ModLoader
 from oddforge.resize import resize_entry
 from oddforge.textures import decode_entry, replace_entry
 from oddforge.toc import TextureEntry, find_textures
 
-DEFAULT_GAME = Path(r"C:\Program Files (x86)\Steam\steamapps\common\Stranger's Wrath\data")
-GOLD = "#d6a854"
-DARK = "#1c1a17"
-PANEL = "#26231f"
-TEXT = "#e8e2d4"
-DIM = "#8d876f"
+# The game: Steam libraries, GOG, or %SWSE_GAME_DIR% - tools\swse_paths.ps1's
+# rules (oddforge/gamepaths.py). The Steam default when none is found.
+GAME = find_game()
+DEFAULT_GAME = (GAME.root if GAME else STEAM_DEFAULT_ROOT) / "data"
+GOLD, DARK, PANEL, TEXT, DIM = setupui.GOLD, setupui.DARK, setupui.PANEL, setupui.TEXT, setupui.DIM
 
 
 class Studio(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
         self.title(f"Mod Loader v{__version__} - Stranger's Wrath modding")
-        self.geometry("1080x680")
+        self.geometry("1080x760")
         self.configure(bg=DARK)
 
         self.container: SmbContainer | None = None
@@ -57,17 +70,7 @@ class Studio(tk.Tk):
 
     # ------------------------------------------------------------------ UI
     def _build_ui(self) -> None:
-        style = ttk.Style(self)
-        style.theme_use("clam")
-        style.configure("Treeview", background=PANEL, fieldbackground=PANEL,
-                        foreground=TEXT, rowheight=22)
-        style.configure("Treeview.Heading", background=DARK, foreground=GOLD)
-        style.map("Treeview", background=[("selected", GOLD)],
-                  foreground=[("selected", DARK)])
-        style.configure("TNotebook", background=DARK, borderwidth=0)
-        style.configure("TNotebook.Tab", background=PANEL, foreground=TEXT, padding=(14, 6))
-        style.map("TNotebook.Tab", background=[("selected", GOLD)],
-                  foreground=[("selected", DARK)])
+        setupui.apply_theme(self)
 
         top = tk.Frame(self, bg=DARK)
         top.pack(fill="x", padx=10, pady=8)
@@ -112,9 +115,22 @@ class Studio(tk.Tk):
 
         self.nb = ttk.Notebook(self)
         self.nb.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        self._build_setup_tab()
         self._build_textures_tab()
         self._build_records_tab()
         self._build_mods_tab()
+
+    # ---------------- SWSE Setup tab: the players' app's screen (setupui)
+    def _build_setup_tab(self) -> None:
+        self.setup = setupui.SetupPanel(self.nb, GAME, on_game_changed=self._setup_game_changed)
+        self.nb.add(self.setup, text="  SWSE Setup  ")
+
+    def _setup_game_changed(self, g: GameInstall) -> None:
+        """Browse in the Setup tab picked another game: the Mod Loader tab follows."""
+        if hasattr(self, "loader"):
+            self.loader.game_data = g.root / "data"
+            self.loader.mods_root = g.mods
+            self._refresh_mods()
 
     # ---------------- records tab (labeled game data)
     def _build_records_tab(self) -> None:
@@ -693,5 +709,17 @@ class Studio(tk.Tk):
 
 
 
+def _selftest(report: str) -> int:
+    """`ModLoader.exe --selftest <file>` (setupui.run_selftest): builds the
+    window without showing it and writes what the Setup tab found."""
+    def build():
+        app = Studio()
+        return app, app.setup, (f"window built: {len(app.nb.tabs())} tabs, the first "
+                                f"'{app.nb.tab(0, 'text').strip()}'")
+    return setupui.run_selftest(report, build)
+
+
 if __name__ == "__main__":
+    if len(sys.argv) >= 3 and sys.argv[1] == "--selftest":
+        sys.exit(_selftest(sys.argv[2]))
     Studio().mainloop()

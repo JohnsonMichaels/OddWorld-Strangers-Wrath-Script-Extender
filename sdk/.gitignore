@@ -1,0 +1,10 @@
+# Build outputs of the examples and tools (they are rebuilt by their build.bat)
+*.dll
+*.exe
+*.obj
+*.exp
+*.lib
+*.res
+*.pdb
+*.ilk
+*.map

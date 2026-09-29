@@ -3,6 +3,10 @@
 The goal: a complete modding platform for Oddworld: Stranger's Wrath HD that lets the
 community create, share, and install mods - no reverse-engineering knowledge required.
 
+> **STATUS 2026-09-28: an older copy (2026-07).** The repo-root ROADMAP.md is the maintained
+> roadmap, and swse/research/SWSE2_ROADMAP.md is the plan from 1.1 to 2.0. Notes below mark what
+> changed.
+
 ## Architecture (bottom to top)
 
 ```
@@ -24,6 +28,13 @@ community create, share, and install mods - no reverse-engineering knowledge req
 |     parse AND write, byte-identical round-trip          |
 +---------------------------------------------------------+
 ```
+
+> **NOTE 2026-09-28:** layer 2 was never built as a `bounty` CLI. The round trip is
+> `oddforge/container.py` (checked by `tools/roundtrip_test.py`), texture export is
+> `python -m oddforge.dump`, and mods are applied and reverted by `oddforge/modloader.py`, through
+> the Mod Loader GUI (`studio.py`) or `python tools/mods_cli.py list|apply|revert`. The mod folder
+> is `SWSEMods\`, not `MODS\`, and a layer the diagram lacks sits beside all of this: the SWSE
+> DLL, which changes the running game in memory.
 
 ## Design principles
 
@@ -49,6 +60,12 @@ community create, share, and install mods - no reverse-engineering knowledge req
 | 6 | Mod system: MODS/ folder, manifest, merge, backup/restore | |
 | 7 | Mod Loader GUI (NPCs, weapons, quests, textures) | |
 | 8 | Community release: docs, GitHub, example mods | |
+
+> **STATUS 2026-09-28:** 6 and 7 shipped in 1.0 (2026-07-28): the mod system (`SWSEMods\`,
+> `mod.json`, `load_order.txt`, backups and "Revert to Vanilla") and the Mod Loader GUI with
+> textures, values and load order (NPCs, quests and locations were not built). 8 is done: SWSE 1.0
+> to 1.0.2 are public on GitHub with example mods, and 1.1 is the next release. 1 and 2 are partly
+> done (`oddforge/toc.py`, `records.py`, `dump.py`; DXT1 only); 5 is not started.
 
 Milestone 4 was hit the same day the project started: the game accepts rebuilt
 archives with no further validation (no checksums over section data). The loader

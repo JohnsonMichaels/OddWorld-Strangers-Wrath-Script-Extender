@@ -2,6 +2,10 @@
 # enabled  0/1   turn the effect on at launch
 # strength       bend per unit of plant height (0.06 = 6%)
 # speed          oscillation rate multiplier
+# weight         stiffness: the height above which bending stops growing
+# push           how far the player shoves foliage aside (0 = off)
+# pushradius     how close the player must be before foliage parts
+# pushmax        only plants shorter than this are pushed
 # axis     y/z   which local axis is up (measured: z)
 # seed     0/1   per-plant phase, so plants do not sway in step
 # gate     0/1   restrict wind to foliage draws (0 sways tyres too)

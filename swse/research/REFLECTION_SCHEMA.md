@@ -4,6 +4,15 @@ Auto-extracted from stranger.exe. **2014 reflected fields** across **106 class g
 
 > Fields = tunable/settable data (health, speeds, timers, damage, counts...). Combined with the 348 script functions (see script_handlers.tsv) this is the full SWSE surface.
 
+> **SUPERSEDED 2026-09-28 by `REFLECT_FIELDS.tsv`** (5,697 fields in 191 classes, with exact
+> classes, offsets, types and inheritance; PREFS_EDITOR.md). Use that table for any offset or class.
+> The class names in this file are heuristic and several are wrong (AT3_DISCOVERIES.md §0 item 1):
+> `CoverDuration` = AIPrefs, `OrbitCamera` = ActorPrefs, `MotionImplDummy` = MotionPrefs,
+> `QuadAnimationControl` = GameControl, `RenderTarget` = SkyParams, `XBowToHand` = LevelPrefs,
+> `BoltSurfaceSndPrefs` = BoltPrefs.
+> **Keep this file's format:** the Mod Loader reads it (`oddforge/records.py` `load_schema()`,
+> bundled by `ModLoader.spec`) and parses each class heading and its bullet lines of field names.
+
 
 ## BoltSurfaceSndPrefs  (246 fields)
 

@@ -8,6 +8,9 @@
 #include "glspy.h"
 #include "gfx.h"
 #include "foliage.h"
+#include "materials.h"
+#include "plugins.h"        // GL notifications to plugins (1.1)
+#include "hookreg.h"        // every patch reported to the one list (`hooks`)
 #include <gl/GL.h>
 #include <string>
 #include <fstream>
@@ -344,6 +347,10 @@ static void ClearSubbed() {
     g_subbedActive = false;
 }
 
+// Build the replacement index now rather than at the first upload, so `hd`
+// reports what is installed the moment HD is switched on.
+void SWSE_HdPrepare() { HdBuildFolderIndex(); }
+
 void SWSE_HdStats(int* available, int* loaded, int* failed) {
     if (available) *available = g_hdHaveN;
     int n = 0, bad = 0;
@@ -420,6 +427,11 @@ static void APIENTRY HookedCompTex2D(GLenum target, GLint level, GLenum ifmt,
         // EVERY level-0 upload, not just foliage, so a recycled id gets its
         // stale flag cleared rather than inherited.
         SWSE_FoliageNoteUpload(hash, (unsigned)bound);
+        SWSE_MaterialsNoteUpload(hash, (unsigned)bound);  // SSR mask id map
+        // Plugins' TEXTURE_UPLOAD event (1.1): the same condition, the same
+        // fingerprint, the vanilla data. One test while nobody listens.
+        if (g_swsePluginUploadListeners)
+            SWSE_PluginsNotifyUpload((unsigned)bound, hash, w, h, (unsigned)ifmt, size, data);
 
         // With HD replacement disabled the lookup is skipped entirely, so the
         // .oft folder is never even indexed - the game uploads its own texture
@@ -800,6 +812,139 @@ static void APIENTRY HookedBindFBO(GLenum target, GLuint fbo) {
     }
 }
 
+// ---- glBindTexture: one hook, fanned out (1.1) ----------------------------------
+// This trampoline lived in foliage.cpp until native plugins arrived; it belongs
+// to the core now, and foliage is its first client. glBindTexture runs
+// thousands of times a frame, so it is a trampoline (the prologue relocated
+// once, a jump back) rather than the unhook-call-rehook pattern above, which
+// would cost two VirtualProtect calls per bind. Before every real bind:
+//   * the built-in tap (foliage.cpp: bind tracking, the SSR mask, the wind's
+//     per-draw gate) - the exact code foliage ran here - once foliage or wind
+//     has asked for the hook;
+//   * plugins' bind listeners, while one that is on listens (plugins.cpp).
+//     A bind a listener makes itself is not reported back.
+// The hook goes in when the first client asks and is never removed: the render
+// thread may be inside it at any moment. A client that stops, stops being
+// called; with no client it costs two tests per bind.
+typedef void (APIENTRY* glBindTexture_t)(GLenum, GLuint);
+static glBindTexture_t   g_bindTramp = nullptr;
+static int               g_bindPrologue = 0;
+static volatile bool     g_bindBuiltin = false;
+static volatile unsigned g_bound2D = 0;
+static bool              g_inBindListeners = false;
+
+static void LogMain(const char* s) {                 // swse_log.txt, as foliage wrote
+    char path[MAX_PATH]; GetModuleFileNameA(GetModuleHandleA(NULL), path, MAX_PATH);
+    char* sl = strrchr(path, '\\'); if (sl) *sl = 0;
+    char full[MAX_PATH]; _snprintf_s(full, MAX_PATH, _TRUNCATE, "%s\\swse_log.txt", path);
+    FILE* f = fopen(full, "a");
+    if (!f) return;
+    fprintf(f, "%s\n", s);
+    fclose(f);
+}
+
+static void APIENTRY HookedBindTexture(GLenum target, GLuint tex) {
+    if (target == GL_TEXTURE_2D) {
+        g_bound2D = tex;
+        if (g_bindBuiltin) SWSE_FoliageOnBind2D(tex);
+    }
+    if (g_swsePluginBindListeners && !g_inBindListeners) {
+        g_inBindListeners = true;
+        SWSE_PluginsNotifyBind(target, tex);
+        g_inBindListeners = false;
+    }
+    g_bindTramp(target, tex);
+}
+
+// Verify before patching. A wrong prologue length splits an instruction and
+// corrupts the driver; refusing and logging the bytes is always better than
+// guessing, and the bytes tell us what to support next.
+static int BindPrologueLen(const BYTE* t) {
+    // mov edi,edi ; push ebp ; mov ebp,esp   -- the hot-patch prologue
+    if (t[0] == 0x8B && t[1] == 0xFF && t[2] == 0x55 && t[3] == 0x8B && t[4] == 0xEC)
+        return 5;
+    // push ebp ; mov ebp,esp ; sub esp,imm8
+    if (t[0] == 0x55 && t[1] == 0x8B && t[2] == 0xEC && t[3] == 0x83 && t[4] == 0xEC)
+        return 6;
+    // push ebp ; mov ebp,esp ; push esi/edi/ebx
+    if (t[0] == 0x55 && t[1] == 0x8B && t[2] == 0xEC &&
+        (t[3] == 0x56 || t[3] == 0x57 || t[3] == 0x53))
+        return 5;   // 1 + 2 + 1 = 4 whole; take 5 only if byte 4 also starts clean
+    return 0;
+}
+
+int SWSE_BindHookInstall(const char* who, char* msg, int msgLen) {
+    if (!who) who = "glspy";
+    char b[160];
+    if (g_bindTramp) {
+        _snprintf_s(b, sizeof(b), _TRUNCATE, "%s: glBindTexture hook already in place (prologue %d bytes)",
+                    who, g_bindPrologue);
+        if (msg) lstrcpynA(msg, b, msgLen);
+        return g_bindPrologue;
+    }
+    HMODULE gl = GetModuleHandleA("opengl32.dll");
+    if (!gl) { if (msg) lstrcpynA(msg, "opengl32.dll not loaded", msgLen); return 0; }
+    BYTE* t = (BYTE*)GetProcAddress(gl, "glBindTexture");
+    if (!t) { if (msg) lstrcpynA(msg, "glBindTexture not found", msgLen); return 0; }
+
+    int len = BindPrologueLen(t);
+    if (len == 0) {
+        _snprintf_s(b, sizeof(b), _TRUNCATE, "%s: UNRECOGNISED glBindTexture prologue %02X %02X %02X %02X %02X %02X",
+                    who, t[0], t[1], t[2], t[3], t[4], t[5]);
+        LogMain(b);
+        if (msg) lstrcpynA(msg, b, msgLen);
+        return 0;
+    }
+
+    BYTE* tramp = (BYTE*)VirtualAlloc(0, 32, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    if (!tramp) { if (msg) lstrcpynA(msg, "trampoline alloc failed", msgLen); return 0; }
+
+    memcpy(tramp, t, len);
+    tramp[len] = 0xE9;                                 // JMP back to target+len
+    *(DWORD*)(tramp + len + 1) = (DWORD)((t + len) - (tramp + len + 5));
+    g_bindTramp = (glBindTexture_t)tramp;
+
+    DWORD old;
+    VirtualProtect(t, len, PAGE_EXECUTE_READWRITE, &old);
+    t[0] = 0xE9;
+    *(DWORD*)(t + 1) = (DWORD)((BYTE*)HookedBindTexture - (t + 5));
+    for (int i = 5; i < len; i++) t[i] = 0x90;         // pad the remainder
+    VirtualProtect(t, len, old, &old);
+
+    g_bindPrologue = len;
+    SWSE_HookNote(t, len, "glspy", SWSE_HOOK_TRAMPOLINE, "glBindTexture");
+    _snprintf_s(b, sizeof(b), _TRUNCATE, "%s: glBindTexture hooked (prologue %d bytes)", who, len);
+    LogMain(b);
+    if (msg) lstrcpynA(msg, b, msgLen);
+    return len;
+}
+
+void     SWSE_BindHookEnableBuiltin() { g_bindBuiltin = true; }
+unsigned SWSE_BoundTexture2D()        { return g_bound2D; }
+
+// A bind that bypasses HookedBindFBO: with the hook installed, the original
+// bytes go back for the one call (exactly what the hook itself does) and
+// g_lastFbo learns the new binding, so the game's own next 0-after-scene bind
+// still triggers the early pass - but this restore never does.
+void SWSE_GlBindFramebufferQuiet(unsigned fbo) {
+    if (r_bindFBO) {                       // glspy installed: the function is hooked
+        RestoreFBO();
+        r_bindFBO(GL_FRAMEBUFFER_EXT, (GLuint)fbo);
+        g_lastFbo = (GLuint)fbo;
+        WriteJump((void*)r_bindFBO, (void*)&HookedBindFBO);
+        return;
+    }
+    static glBindFBO_t s_bind = nullptr;
+    static bool s_tried = false;
+    if (!s_tried) {
+        s_tried = true;
+        HMODULE gl = GetModuleHandleA("opengl32.dll");
+        wglGPA_t gpa = gl ? (wglGPA_t)GetProcAddress(gl, "wglGetProcAddress") : nullptr;
+        if (gpa) s_bind = (glBindFBO_t)gpa("glBindFramebufferEXT");
+    }
+    if (s_bind) s_bind(GL_FRAMEBUFFER_EXT, (GLuint)fbo);
+}
+
 void SWSE_InstallGLSpy() {
     static bool installed = false;
     if (installed) return;          // guard: two GL contexts => called twice
@@ -817,12 +962,14 @@ void SWSE_InstallGLSpy() {
 
     memcpy(g_orig, (void*)g_realGPA, 5);
     WriteJump((void*)g_realGPA, (void*)&HookedGPA);
+    SWSE_HookNote((void*)g_realGPA, 5, "glspy", SWSE_HOOK_REHOOK, "wglGetProcAddress");
 
     // INLINE-hook glBindFramebufferEXT directly (catches the game's cached
     // pointer regardless of when it resolved the function - beats the race).
     if (r_bindFBO) {
         memcpy(g_fboOrig, (void*)r_bindFBO, 5);
         WriteJump((void*)r_bindFBO, (void*)&HookedBindFBO);
+        SWSE_HookNote((void*)r_bindFBO, 5, "glspy", SWSE_HOOK_REHOOK, "glBindFramebufferEXT");
         LogS("==== SWSE GL spy installed - glBindFramebufferEXT inline-hooked ====");
     } else {
         LogS("==== SWSE GL spy: glBindFramebufferEXT not resolvable ====");
@@ -836,6 +983,7 @@ void SWSE_InstallGLSpy() {
     if (r_compTex) {
         memcpy(g_ctOrig, (void*)r_compTex, 5);
         WriteJump((void*)r_compTex, (void*)&HookedCompTex2D);
+        SWSE_HookNote((void*)r_compTex, 5, "glspy", SWSE_HOOK_REHOOK, "glCompressedTexImage2D");
         LogS("==== TEXSPY armed: logging compressed texture creation ====");
     } else {
         LogS("==== TEXSPY: glCompressedTexImage2D not resolvable ====");
