@@ -1,4 +1,4 @@
-# SWSE 1.1 - feature switches. Change `off` to `on` below, save, start the game.
+# SWSE 1.1.1 - feature switches. Change `off` to `on` below, save, start the game.
 # One word instead: `features preset full` in the console (~ key) gives the classic
 # SWSE. SWSE Setup.exe (in the download) does it with tick boxes. Reference: below.
 
@@ -20,7 +20,7 @@ raytrace   = off    # ray-traced AO, EXPERIMENTAL (needs graphics)
 # everything starting with # is a note, and the `features` command keeps it.
 # ==========================================================================
 #
-# SWSE is several independent systems in one DLL. IN 1.1 ONLY THE CONSOLE IS
+# SWSE is several independent systems in one DLL. SINCE 1.1 ONLY THE CONSOLE IS
 # ON BY DEFAULT: a fresh install leaves the game exactly as shipped apart from
 # the console (the ~ key). Nothing has been removed - every system above is
 # still built in and comes back with one word.
@@ -107,8 +107,8 @@ raytrace   = off    # ray-traced AO, EXPERIMENTAL (needs graphics)
 # while that line names a profile - aiprefs.txt ships `active = off`.
 #
 # triggers - mod-defined game events from any mod's triggers.txt, such as
-# "when the player walks into this spot, a 40% chance of an ambush" (the SWSE
-# Ambushes example). Named positions (writepos, goto) work without it.
+# "when the player walks into this spot, run this command". Named
+# positions (writepos, goto) work without it.
 #
 # npctuning - per-character health and gib rules from every mod's
 # characters.txt, plus the rules in SWSE Console\console.txt, applied as each

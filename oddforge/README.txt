@@ -62,8 +62,8 @@ CORRECTED 2026-09-28: all of this section has moved on.
   key opens it (SWSE_FEATURES.md, "Driving the console").
 - dinput8_real.dll is not needed since 1.0.1: SWSE finds the system
   dinput8.dll itself. Uninstall by deleting bin\dinput8.dll.
-- The dinput8.dll in oddforge\SWSE\ is an old 1.0.0 build (566,784 bytes). Take
-  SWSE from a release zip, or build swse\ with swse\build.bat.
+- The dinput8.dll in oddforge\SWSE\ is the SWSE 1.1.1 build, the same file as
+  release\bin\dinput8.dll. To build it yourself: swse\build.bat.
 
 
 SAFETY
@@ -74,7 +74,7 @@ SAFETY
   assets are distributed with SWSE.
 
 NOTE 2026-09-28: the backups are the Mod Loader's (archive edits). The SWSE
-DLL changes no game file: it edits the running game in memory. SWSE 1.1 can
-also find a GOG install (tools\swse_paths.ps1), but the GOG build is untested,
-and most of the DLL's in-game code patches refuse on any build other than
-Steam HD.
+DLL changes no game file: it edits the running game in memory. SWSE's setup
+and the Mod Loader can also find a GOG install (oddforge/gamepaths.py), but the
+GOG build is untested, and most of the DLL's in-game code patches refuse on any
+build other than Steam HD.

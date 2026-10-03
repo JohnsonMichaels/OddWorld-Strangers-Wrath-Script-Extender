@@ -132,12 +132,12 @@ int SWSE_Instances(unsigned addr, char* msg, int msgLen) {
 
 // Compare two live objects and report only the dwords that differ.
 //
-// Prefs told us what a character IS; they do not say who it FIGHTS -- every
-// character in a town reads m_affGenerally 1 (an ammo rule, not an affiliation:
-// research/AT3_DISCOVERIES.md C1), yet outlaws attack and townsfolk
-// flee. So hostility lives on the live NPC, not in prefs. Diffing an outlaw
-// against a townsfolk is the way to find it: whatever separates "attacks the
-// player" from "runs away" has to show up as a differing field.
+// Prefs say what a character IS. Who it fights is not a data field: it is a
+// hard-coded table over each actor's species (AIUtil::Attitude, 0x4E6E30;
+// the species int at actor+0xB8 is copied from prefs m_species at init), and
+// in it no NPC species is hostile to another. (m_affGenerally is an ammo
+// rule, research/AT3_DISCOVERIES.md C1.) Diffing two live objects is still
+// the general way to find a field that differs.
 int SWSE_DiffObjects(unsigned a, unsigned b, int len, char* msg, int msgLen) {
     char tmp[200], line[190];
     if (len <= 0 || len > 0x1000) len = 0x400;
@@ -1776,8 +1776,9 @@ int SWSE_MotionField(int field, const float* set, float* cur) {
 //  NPC SPAWNING via ActorSpawner
 //
 //  There is no script function that spawns an actor -- every Spawn* verb in
-//  the VM makes effects, not characters. But levels are full of ActorSpawner
-//  objects, and ActorSpawner::vfunc17 (RVA 0x230A0) is a timed tick:
+//  the VM makes effects, not characters. Some levels have ActorSpawner objects
+//  (lm_level_02, 03 and 05 only), and ActorSpawner::Tick (vfunc17, RVA 0x230A0)
+//  is a timed tick:
 //
 //      cmp byte [this+0x24], 0      ; enabled?
 //      mov eax, [this+0x64]         ; max count
@@ -1791,17 +1792,17 @@ int SWSE_MotionField(int field, const float* set, float* cur) {
 // ==========================================================================
 #define VT_ACTORSPAWNER 0x3669FC     // the 52-method ActorSpawner vtable
 #define AS_ENABLED      0x24         // byte
-#define AS_MAXCOUNT     0x64         // int, lifetime cap
+#define AS_MAXCOUNT     0x64         // int, m_countToSpawn (0 = no limit)
 // +0x68 is the CONCURRENT limit and it is the real gate: the tick counts how
 // many of its actors are currently busy and bails on
 //     cmp eax,[this+0x68] / jge bail
 // It ships as 1, so a spawner with even one live actor never fires again.
 // Raising +0x64 alone does nothing, which is why arming did not spawn.
-#define AS_CONCURRENT   0x68         // int
+#define AS_CONCURRENT   0x68         // int, m_maxAliveAtATime
 #define AS_INTERVAL     0x70         // float, seconds between spawns
-#define AS_ARRAY        0xB0         // array of live spawned actors
-#define AS_LIVECOUNT    0xB8         // int, how many are alive right now
-#define AS_CURCOUNT     0xBC         // int, only used by the tick's cap compare
+#define AS_ARRAY        0xB0         // m_pool: the pooled NPC* bodies
+#define AS_LIVECOUNT    0xB8         // int, pool size (bodies, alive or not)
+#define AS_CURCOUNT     0xBC         // int, m_countSpawned
 #define AS_LASTTIME     0xC0         // double, game time of last spawn
 
 // The spawner carries its own transform: +0x30..+0x4C is a rotation matrix and
@@ -1809,7 +1810,7 @@ int SWSE_MotionField(int field, const float* set, float* cur) {
 // player's coordinates there relocates the spawner to us, which is how we get
 // actors to appear nearby instead of wherever the level placed them.
 #define AS_POS          0x50
-#define AS_TYPEHASH     0x9C         // what it spawns (a path hash)
+#define AS_TYPEHASH     0x9C         // script token given to released NPCs (the type is +0x60)
 
 static float* PlayerPos();           // fwd: defined with the position work
 
@@ -1868,9 +1869,9 @@ int SWSE_SpawnHere(int count) {
 // ==========================================================================
 //  CRITTER SPAWNING via CritterPath
 //
-//  ActorSpawner was a dead end: an execution breakpoint on its tick
-//  (module+0x230A0) recorded ZERO hits, so those objects are never ticked and
-//  every field written to them was irrelevant.
+//  (ActorSpawner was once written off here: a breakpoint on its tick recorded
+//  zero hits, but only lm_level_02, 03 and 05 have spawners at all. Its tick
+//  is the engine's own runtime release of pooled NPCs - RE_SPAWNING.md section 8.)
 //
 //  CritterPath is different, and documented by the game itself.
 //  SetCritterPathSpawnEnabled boils down to one instruction:
@@ -3069,28 +3070,20 @@ int SWSE_Resolve(unsigned hash, char* msg, int msgLen) {
     return 1;
 }
 
-// Relocate live NPCs to the player.
+// Relocate live NPC bodies to the player.
 //
-// This engine never creates NPCs at runtime -- measured across a sleg ambush, a
-// boss fight and tunnel emergences, all with zero calls to the spawn routine
-// and a strictly falling NPC count. Every NPC exists from level load, and
-// encounters simply walk pre-placed ones out of hiding. So "summon enemies" here
-// means MOVING ones that already exist, which is also what makes a pre-loaded
-// pool of spare NPCs workable.
+// This MOVES bodies; it creates nothing. A moved NPC arrives as an inert
+// statue: its zone registration and AI do not move with it (NPC_SPAWNING.md,
+// FACTIONS.md). The engine does add NPCs at runtime - gib spawns and spawner
+// pools (RE_SPAWNING.md) - neither of which this uses.
 //
-// The actor's +0x24 position is a COPY; the motion object owns the real one
-// (back-pointer at +0x4C holds actor+8, position at +0x50). Writing only the
-// copy is why player teleports reverted -- the source overwrites it next frame.
-// One heap pass collects motion objects for every NPC we intend to move,
-// instead of a full scan per NPC.
-// Relocate NPCs to an ARBITRARY destination.
-//
-// The engine never creates NPCs at runtime - every one exists from level load
-// (measured across an ambush, a boss fight and tunnel emergences: zero calls to
-// the spawn routine and a strictly falling count). So "spawn an ambush" really
-// means MOVE ones that already exist, and if a level's cast is dead there is
-// nobody left to move. Callers should treat a 0 return as "no bodies
-// available", not as an error.
+// The actor's +0x24 position is a copy. The object found by its +0x4C
+// back-pointer (position at +0x50) is the body's GeometryHierarchyInst, not
+// the motion object (TELEPORT.md); writing it moves the drawn body. The
+// player is moved with the engine's own teleport instead (EngineTeleport).
+// One heap pass collects those objects for every NPC we intend to move.
+// Relocate NPC bodies to an ARBITRARY destination (same caveats). Callers
+// should treat a 0 return as "no bodies available", not as an error.
 int SWSE_BringNpcsTo(float px, float py, float pz,
                      int count, unsigned typeHash, char* msg, int msgLen) {
     char tmp[220], b[160];
@@ -3116,7 +3109,7 @@ int SWSE_BringNpcsTo(float px, float py, float pz,
     }
     if (!np) { lstrcpynA(msg, "no NPCs of that type to bring", msgLen); return 0; }
 
-    // One pass for the motion objects that own their positions.
+    // One pass for the body objects (+0x4C back-pointer) that carry the drawn position.
     static unsigned motion[64];
     for (int i = 0; i < np; i++) motion[i] = 0;
     SYSTEM_INFO si; GetSystemInfo(&si);
@@ -3160,7 +3153,7 @@ int SWSE_BringNpcsTo(float px, float py, float pz,
             // The copy, so anything reading the actor directly agrees...
             float* c = (float*)(pick[i] + NPC_POS);
             c[0] = tx; c[1] = ty; c[2] = pz;
-            // ...and the source, so it is not reverted next frame.
+            // ...and the body object's copy, so the drawn body moves too.
             if (motion[i]) {
                 float* m = (float*)(motion[i] + 0x50);
                 m[0] = tx; m[1] = ty; m[2] = pz;
@@ -3376,17 +3369,13 @@ int SWSE_CountNpcsOfType(unsigned typeHash) {
 
 // ---- reserve pool ---------------------------------------------------------
 //
-// The engine creates every NPC at level load and never again, so an ambush can
-// only MOVE bodies that already exist. Once a level's cast is dead there is
-// nobody to move, which is precisely why cleared areas stay barren.
+// Asks the level for MORE cast at load time (npcdupe re-invokes the game's
+// own spawn routine per tag, measured 318 -> 953 NPCs at n=2) and parks the
+// distant surplus straight down, in its own zone. spawnat can move parked
+// NPCs to a point, but relocated NPCs arrive inert (no AI). The engine's own
+// runtime spawning is its spawner pools (RE_SPAWNING.md section 8), not this.
 //
-// The way out is to ask the level for MORE cast at load time and park the
-// surplus somewhere the player will not meet it, then teleport from that pool
-// on demand. `npcdupe` re-invokes the game's own spawn routine per tag, which
-// is measured to work (318 -> 953 NPCs at n=2).
-//
-// Parking is straight down. Far below the map is out of sight and out of
-// pathfinding range, and BringNpcsTo skips anyone already near the
+// Parking is straight down. BringNpcsTo skips anyone already near the
 // destination, so parked NPCs are exactly who it picks.
 #define RESERVE_PARK_DZ  -4000.0f
 
@@ -3437,8 +3426,8 @@ int SWSE_ReservePark(char* msg, int msgLen) {
         } __except (EXCEPTION_EXECUTE_HANDLER) {}
     }
     g_reserveParked = parked;
-    wsprintfA(tmp, "reserve: parked %d distant NPC(s) below the map; "
-                   "spawnat will draw from them", parked);
+    wsprintfA(tmp, "reserve: parked %d distant NPC(s) below the map "
+                   "(spawnat can move them; they arrive inert)", parked);
     lstrcpynA(msg, tmp, msgLen);
     return parked;
 }
@@ -4037,10 +4026,7 @@ int SWSE_WhereIs(unsigned hash, char* msg, int msgLen) {
         lstrcpynA(msg, tmp, msgLen);
         return 0;
     }
-    int d = 0;
-    float g = 1.0f;
-    for (int k = 0; k < 400 && g * g < nearest; k++) g += 1.0f;
-    d = (int)g;
+    int d = (int)(sqrtf(nearest) + 0.5f);
     wsprintfA(tmp, "%d live %08X; nearest ~%d units away (positions in the log)",
               found, hash, d);
     lstrcpynA(msg, tmp, msgLen);
@@ -4164,14 +4150,15 @@ int SWSE_TownPanic(int forever, int radius, char* msg, int msgLen) {
     return touched;
 }
 
-// Make NPCs of one type attack NPCs of another, via the game's own AI.
+// Make NPCs of one type go for NPCs of another, via the game's own AI.
 //
-// This engine has no NPC-vs-NPC hostility: NPCs acquire only the player
-// (research/FACTIONS.md; m_affGenerally is an ammo rule, not an affiliation),
-// and armed outlaws ignore townsfolk entirely. So "outlaws attack chickens"
-// cannot be configured -- it has to be commanded. CombatGoto takes an Object,
-// and a verb acts on ITS CONTEXT'S actor, so the attacker's own VM instance
-// (NPC+0x18) is the context and the victim's handle is the argument.
+// NPCs acquire only the player (acquisition 0x51A440 reads the player
+// singleton), and hostility is a hard-coded species table (AIUtil::Attitude)
+// with no hostile NPC pair, so this cannot be configured in data. The
+// command writes the target and calls the verbs below once; the attacker
+// hunts but has not been seen to engage (FACTIONS.md). CombatGoto takes an
+// Object, and a verb acts on ITS CONTEXT'S actor, so the attacker's own VM
+// instance (NPC+0x18) is the context and the victim's handle the argument.
 #define RVA_CombatGoto 0x16C540
 #define RVA_GotoRun    0x16BC00
 #define NPC_MIND       0xB4      // -> MindBasic, null while the NPC is idle
@@ -4186,12 +4173,11 @@ int SWSE_TownPanic(int forever, int radius, char* msg, int msgLen) {
 
 // TakeDamage({void}|Object) -- "you were hurt BY this object".
 //
-// Writing Mind+0x60 changes who an NPC hunts, but it never engages: acquisition
-// runs through perception, and a townsfolk is filtered out as not-an-enemy.
-// Damage is the AI's own legitimate route to hostility -- shooting an outlaw
-// makes him drop everything and come for the shooter. So rather than fight the
-// perception filter, tell him the victim hurt him and let his threat logic do
-// the targeting properly.
+// Writing Mind+0x60 changes who an NPC hunts, but it does not hold: the
+// acquisition (0x51A440) has no candidate loop and re-derives the player
+// from the player singleton. (An older note here blamed a "perception
+// filter"; there is none.) TakeDamage was tried as a legitimate route to
+// hostility; the NPC searches but has not been seen to acquire an NPC.
 #define RVA_TakeDamage 0x155320
 
 // All defined further down, with the Object-argument machinery.
@@ -4275,8 +4261,8 @@ int SWSE_MakeAttack(unsigned attackerHash, unsigned victimHash, int count,
         } __except (EXCEPTION_EXECUTE_HANDLER) {}
         if (!wrote) { faulted++; continue; }
 
-        // Then tell the attacker the victim hurt it, which is how the AI
-        // legitimately becomes hostile -- and follow with a move order.
+        // Then tell the attacker the victim hurt it (TakeDamage) and give a move
+        // order. Neither has been seen to make it engage an NPC.
         unsigned inst = VmInstanceOf(a);
         if (inst) {
             g_ctx = (void*)inst;
@@ -4313,14 +4299,12 @@ int SWSE_MakeAttack(unsigned attackerHash, unsigned victimHash, int count,
 // thing we need to study: our forced retargets never engage, so a scripted
 // attacker that DOES is the counter-example that shows what we are missing.
 // Doing it by scan means not having to walk 700 units to watch it happen.
-// Start a feud: repeatedly tell NPCs that another NPC hurt them.
+// Start a feud: repeatedly tell two active NPCs that the other hurt them.
 //
-// A single accidental hit from one outlaw onto a chicken produced no
-// retaliation. But chickens are passive -- they flee rather than fight -- so
-// the honest test is two combat-capable NPCs. TakeDamage takes the source as an
-// Object, so each can be told the other hurt it, repeatedly, which is the one
-// route to hostility the AI accepts from the player ("he retargeted me after I
-// attacked him").
+// Experimental. TakeDamage takes the source as an Object, so each can be
+// told the other hurt it. Acquisition only ever picks the player, so this
+// has not produced a fight; it also needs a VM instance on both NPCs (about
+// 1 NPC in 10 has one).
 int SWSE_Feud(unsigned typeA, unsigned typeB, int rounds, char* msg, int msgLen) {
     char tmp[220], b[190];
     int n = SWSE_FindNpcs(g_snScan, 1024);
@@ -4417,13 +4401,12 @@ int SWSE_ScanTargets(char* msg, int msgLen) {
     return atNpc;
 }
 
-// ---- raid mode: keep raiders hostile, re-picking targets as they move ------
+// ---- raid mode (experimental): re-point raiders every N frames -------------
 //
-// A single write makes a raider tunnel-vision on one victim and give up when it
-// loses them ("lost him"). A raid needs standing hostility: every so often,
-// point each raider at the nearest thing it should hate -- and the player
-// counts, so a raider that cannot reach a townsfolk will come for you instead
-// of wandering off.
+// A single write makes a raider hunt one victim and give up ("lost him").
+// This re-points each raider at the nearest townsfolk or the player every N
+// frames (default 60). At that rate acquisition puts the player back in
+// between, and no fight has been seen.
 static bool     g_raidOn       = false;
 static unsigned g_raidAttacker = 0;
 static unsigned g_raidVictim   = 0;
@@ -4460,16 +4443,13 @@ static int TickNpcList() {
     return g_tickCount;
 }
 
-// ---- decoy mode: shoot the victim without targeting it --------------------
+// ---- decoy mode (experimental, no effect measured) -------------------------
 //
-// The AI refuses to ENGAGE another NPC -- blanket, tested outlaw->townsfolk and
-// slog->townsfolk. But two things it will do: fire at a POSITION, and damage
-// whatever its projectiles actually hit (NPCs kill each other with stray
-// explosives all the time). So do not fight the veto: leave the target handle
-// pointing at the player, so the AI stays engaged and willing to shoot, and
-// write the VICTIM's coordinates into the last-known-position cache. The NPC
-// believes the player is over there and opens fire on that spot -- and the
-// thing standing in it is a chicken.
+// Leaves the target handle on the player and writes the VICTIM's position
+// into the last-known-position cache (+0x3E8). That cache only steers
+// searching; aiming uses the live target, so shots still go at the player.
+// Whether a bolt hits an NPC is decided by species (AIUtil::DoesBoltCollide,
+// 0x4E6FC0): outlaw/wolvark/sleg bolts pass through each other.
 static bool     g_decoyOn     = false;
 static unsigned g_decoyShooter = 0;
 static unsigned g_decoyVictim  = 0;
@@ -4720,16 +4700,14 @@ int SWSE_NpcNear(char* msg, int msgLen) {
     // visible on screen.
     int dist = 0;
     __try {
-        float d = bestD, g = 1.0f;
-        for (int k = 0; k < 24 && g * g < d; k++) g += 1.0f;   // integer-ish sqrt
-        dist = (int)g;
+        float d = bestD;
+        dist = (int)(sqrtf(d) + 0.5f);
         float* q = (float*)(best + NPC_POS);
         wsprintfA(b, "npcnear: at %d %d %d, player %d %d %d",
                   (int)q[0], (int)q[1], (int)q[2], (int)pp[0], (int)pp[1], (int)pp[2]);
         LogS(b);
     } __except (EXCEPTION_EXECUTE_HANDLER) {}
-    wsprintfA(tmp, "nearest is type %08X, ~%d units away - more with: npcnow 3 %08X",
-              hash, dist, hash);
+    wsprintfA(tmp, "nearest is type %08X, ~%d units away", hash, dist);
     lstrcpynA(msg, tmp, msgLen);
     return 1;
 }
@@ -5537,13 +5515,13 @@ int SWSE_SpawnCloned(char* msg, int msgLen) {
 //     InstancedObjectTag (the routine reads its zone at +0x14 and position
 //     at +0x3C);
 //   - it wrote the position into NPCTag+0x30, the factory's script token.
-// `npcnow` builds the right pair of objects. A spawn that shows needs a valid
-// zone for its position: RE_SPAWNING.md section 5 (NPC::Create,
-// Zones::ExtrapolateZone, NPC::Respawn), not built yet.
+// `npcnow` builds the right pair of objects, but what it makes is not drawn:
+// it files the NPC under the captured tag's zone, not one for its position
+// (RE_SPAWNING.md section 3).
 int SWSE_SpawnNpc(int typeIndex, char* msg, int msgLen) {
     (void)typeIndex;
     lstrcpynA(msg, "spawnnpc is retired: it moved a live piece of the level and wrote the wrong "
-                   "fields (RE_SPAWNING.md) - npcnow builds the right objects", msgLen);
+                   "fields", msgLen);
     return 0;
 }
 
@@ -7210,6 +7188,11 @@ const char* SWSE_ScriptArgs(const char* name) {
 // respawn fallback reads the same box). A zone code below the count is a zone
 // index; above it, a portal being crossed (s_portals at 0xA410AC, 0x40 each,
 // its two zones at +0x34/+0x38).
+// KNOWN LIMIT (2026-09-29): zone boxes overlap both ways, so the box rule can
+// pick the wrong zone, and with a wrong zone the engine draws almost nothing
+// (the sky and the player) until the player crosses a portal. A `savepos`
+// position is exact. Separately, a teleport into or out of a scripted fight
+// twice crashed in vm:ForceCombat (stranger.exe+0x152F07, a Mind-less NPC).
 #define VT_PLAYERIMPL        0x36ACE4
 #define VTS_FOOTPOS          0x05C
 #define RVA_GETFOOTPOS       0x05F970

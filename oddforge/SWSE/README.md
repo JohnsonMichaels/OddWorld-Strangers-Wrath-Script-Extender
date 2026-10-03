@@ -3,10 +3,10 @@
 A native DLL injected into `stranger.exe` (32-bit x86, OpenGL) that adds engine
 capabilities mods can use. This is the deep, native-code half of SWSE.
 
-> **STATUS 2026-09-28: an old copy from before SWSE 1.0.** The maintained version of this README
-> is `swse/README.md`, and the source and `build.bat` are in `swse/`. The `dinput8.dll` in this
-> folder is the 1.0.0 build (566,784 bytes, linked 2026-07-28), and `install.bat` still installs a
-> `dinput8_real.dll`, which SWSE has not needed since 1.0.1.
+> **STATUS: an old README from before SWSE 1.0.** The maintained version is `swse/README.md`, and
+> the source and `build.bat` are in `swse/`. The `dinput8.dll` in this folder is the SWSE 1.1.1
+> build (the same file as `release\bin\dinput8.dll`). `install.bat` still installs a
+> `dinput8_real.dll`, which SWSE has not needed since 1.0.1 and which is harmless.
 
 ## Injection method: OpenGL proxy DLL
 
@@ -18,10 +18,10 @@ system copies (DLL search order). SWSE ships as a proxy that:
    own a point in every rendered frame.
 3. Loads SWSE graphics/script plugins and runs their per-frame hooks.
 
-> **CORRECTED 2026-09-28:** step 3 is not what SWSE does. On the first frame it starts the systems
-> `SWSEMods\features.txt` switches on (since 1.1 only the console by default) and runs their
-> per-frame work. Native plugins are designed (swse/research/PLUGIN_SYSTEM.md) and built on branch
-> `feat/plugins`; they are not in 1.1 at 329df87.
+> **CORRECTED:** step 3 is not what SWSE does. On the first frame it starts the
+> systems `SWSEMods\features.txt` switches on (since 1.1 only the console by
+> default) and runs their per-frame work. Native plugins shipped in 1.1: see
+> `sdk/README.md`.
 
 We proxy `dinput8.dll` (tiny export surface - the game only needs
 `DirectInput8Create`) to *get into the process*, then hook OpenGL from inside.
@@ -48,8 +48,8 @@ which still transform the look.
 
 > **STATUS 2026-09-28:** M1-M5 all shipped in 1.0 (2026-07-28). The depth question was answered
 > yes: the scene renders into FBOs, and its depth is a sampleable texture at 2x the window size
-> (swse/research/GRAPHICS_RTGI.md). The graphics work went on to GTAO, HBIL, temporal denoising
-> and ray-traced AO (swse/research/GRAPHICS_ROADMAP.md, RT_1_3_PLAN.md).
+> (see "RTGI / screen-space global illumination" in SWSE_FEATURES.md). The graphics work went on
+> to GTAO, HBIL, temporal denoising and an experimental ray-traced AO.
 
 ## Build
 

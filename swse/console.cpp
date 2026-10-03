@@ -58,14 +58,56 @@
 #endif
 typedef void (APIENTRY* glUseProgram_t)(GLuint);
 static glUseProgram_t p_useProgram = nullptr;
+// The overlay draws on texture unit 0 with the fixed-function pipeline, so it
+// pins the state that would otherwise leak in from the frame: the active unit,
+// the blend equation and a bound unpack buffer (an atlas upload would read
+// from it). All three are optional; without them the overlay draws as before.
+typedef void (APIENTRY* glActiveTexture_t)(GLenum);
+typedef void (APIENTRY* glBindBuffer_t)(GLenum, GLuint);
+typedef void (APIENTRY* glBlendEquation_t)(GLenum);
+typedef void (APIENTRY* glBindSampler_t)(GLuint, GLuint);
+static glActiveTexture_t p_activeTexture = nullptr;
+static glActiveTexture_t p_clientActiveTexture = nullptr;   // same signature
+static glBindBuffer_t    p_bindBuffer    = nullptr;
+static glBlendEquation_t p_blendEquation = nullptr;
+static glBindSampler_t   p_bindSampler   = nullptr;          // GL 3.3; absent before
+#define CON_GL_TEXTURE0              0x84C0
+#define CON_GL_TEXTURE_CUBE_MAP      0x8513
+#define CON_GL_FUNC_ADD              0x8006
+#define CON_GL_PIXEL_UNPACK_BUFFER   0x88EC
+#define CON_GL_PIXEL_UNPACK_BINDING  0x88EF
+#define CON_GL_TEXTURE_3D            0x806F
+#define CON_GL_TEXTURE_RECTANGLE     0x84F5
+#define CON_GL_TEXTURE_BASE_LEVEL    0x813C
+#define CON_GL_TEXTURE_MAX_LEVEL     0x813D
+#define CON_GL_CURRENT_PROGRAM       0x8B8D
+#define CON_GL_SAMPLER_BINDING       0x8919
+#define CON_GL_CLIENT_ACTIVE_TEXTURE 0x84E1
+#define CON_GL_MAX_TEXTURE_UNITS     0x84E2
+#define GL_ACTIVE_TEXTURE_ARB_CON    0x84E0
 
-// ---- font atlas ----
-static const int CELL_W = 8, CELL_H = 16;   // glyph cell in the atlas
-static const int ATLAS_COLS = 16, ATLAS_ROWS = 6;   // 96 chars, 0x20..0x7F
-static const int ATLAS_W = CELL_W * ATLAS_COLS;     // 128
-static const int ATLAS_H = CELL_H * ATLAS_ROWS;     // 96
-static GLuint g_font = 0;
-static bool   g_inited = false;
+// ---- fonts ----------------------------------------------------------------
+// Each face is rasterized by GDI into an ASCII atlas (0x20..0x7E) at the exact
+// pixel size it is drawn at, and rebuilt when the window height (or the GL
+// context) changes: crisp at 1080p, 1440p and 4K, where 1.1 drew a 16 px
+// Consolas and doubled it with nearest filtering above 1200 lines. Glyphs are
+// white with coverage in alpha, so glColor tints each line.
+struct GlyphFont {
+    GLuint tex;
+    int    texW, texH;     // atlas texture
+    int    cellW, cellH;   // atlas cell
+    int    pad;            // room left of the pen for overhang
+    int    height;         // tmHeight: the line box a string is centred on
+    int    px;             // requested em size
+    int    adv[95];        // advance per glyph, 0x20..0x7E
+    char   face[32];       // the face GDI actually used (a fallback shows here)
+};
+enum { F_MONO = 0, F_MONO_SM, F_UI, F_UI_SM, F_TITLE, F_COUNT };
+static GlyphFont g_fonts[F_COUNT];
+static int   g_fontH   = 0;         // window height the atlases were built for
+static HGLRC g_fontCtx = nullptr;   // ...and the context they live in
+static float g_s       = 1.0f;      // layout scale: window height / 1080
+static bool  g_inited  = false;
 
 // ---- console state ----
 static bool  g_open = false;
@@ -78,6 +120,30 @@ static const int LOG_MAX = 256;
 static char  g_log[LOG_MAX][240];
 static int   g_logCount = 0;
 static int   g_scroll = 0;   // lines scrolled up from bottom
+static DWORD g_logTime[LOG_MAX];   // local time of day (s) each line was printed
+static int   g_forceCol = -1;      // PrintCol: a line type chosen by the caller
+static DWORD g_keyTick = 0;        // last key typed: the cursor stays lit while typing
+
+// ---- fps for the header (measured every frame, open or not) -------------------
+static LARGE_INTEGER g_fpsT0 = {0}, g_qpf = {0};
+static long g_fpsF0 = 0;
+static int  g_fps10 = 0, g_ms10 = 0;   // x10; 0 = not measured yet
+
+// ---- command history (Up/Down when no suggestion list is showing) -------------
+static const int HIST_MAX = 32;
+static char g_hist[HIST_MAX][256];
+static int  g_histN = 0;            // oldest first
+static int  g_histPos = -1;         // -1: editing the draft, else the entry shown
+static char g_histDraft[256] = {0};
+
+// ---- suggestions: the card under the console while a command name is typed ----
+static const int SUGG_MAX = 300, SUGG_ROWS = 8;
+struct Sugg { char name[48]; char help[100]; unsigned char rank; };
+static Sugg g_sug[SUGG_MAX];
+static int  g_sugN = 0, g_sugSel = 0, g_sugTop = 0;
+static bool g_sugChosen = false;    // Up/Down picked a row: Enter runs that one
+static bool g_sugHidden = false;    // Esc or a history recall; cleared by an edit
+static char g_sugFor[256] = {0};    // the input the list was built for
 
 bool SWSE_ConsoleOpen() { return g_open; }
 
@@ -127,15 +193,27 @@ static bool HasCI(const char* hay, const char* needle) {
     return false;
 }
 
+// " ON" as SWSE prints a switch going on ("post-process ON", "normals ON -"):
+// upper case and a whole word. Matched case-insensitively it caught every
+// " on", " one" and " only" in ordinary text.
+static bool HasOnWord(const char* s) {
+    for (const char* p = strstr(s, " ON"); p; p = strstr(p + 1, " ON")) {
+        char c = p[3];
+        if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))) return true;
+    }
+    return false;
+}
+
 static unsigned char ClassifyLine(const char* s) {
     if (s[0] == '-' && s[1] == '-' && s[2] == '-')        return LC_HEADING;
     if (s[0] == '>' && s[1] == ' ')                        return LC_ECHO;
-    if (HasCI(s, "FAULT") || HasCI(s, "no such") ||
+    // "FAULT" case-sensitive, as SWSE prints it: any case caught "default".
+    if (strstr(s, "FAULT") || HasCI(s, "no such") ||
         HasCI(s, "could not") || HasCI(s, "failed") ||
         HasCI(s, "not working") || HasCI(s, "no script context") ||
         HasCI(s, "out of range") || HasCI(s, "unknown"))   return LC_BAD;
     if (HasCI(s, "granted") || HasCI(s, ": done") ||
-        HasCI(s, " ON") || HasCI(s, "installed") ||
+        HasOnWord(s) || HasCI(s, "installed") ||
         HasCI(s, "primed") || HasCI(s, "saved") ||
         HasCI(s, "called") || HasCI(s, "->"))              return LC_GOOD;
     if (HasCI(s, "usage:") || HasCI(s, "(none)"))          return LC_DIM;
@@ -144,12 +222,27 @@ static unsigned char ClassifyLine(const char* s) {
 
 void SWSE_ConsolePrint(const char* text) {
     if (g_capOn) CapAppend(text);
+    int slot;
     if (g_logCount < LOG_MAX) {
-        lstrcpynA(g_log[g_logCount++], text, 240);
+        slot = g_logCount++;
     } else {
         for (int i = 1; i < LOG_MAX; i++) memcpy(g_log[i - 1], g_log[i], 240);
-        lstrcpynA(g_log[LOG_MAX - 1], text, 240);
+        memmove(g_logCol, g_logCol + 1, LOG_MAX - 1);
+        memmove(g_logTime, g_logTime + 1, (LOG_MAX - 1) * sizeof(DWORD));
+        slot = LOG_MAX - 1;
     }
+    lstrcpynA(g_log[slot], text, 240);
+    g_logCol[slot] = (g_forceCol >= 0) ? (unsigned char)g_forceCol : ClassifyLine(g_log[slot]);
+    SYSTEMTIME st; GetLocalTime(&st);
+    g_logTime[slot] = st.wHour * 3600u + st.wMinute * 60u + st.wSecond;
+    // Scrolled back to read something: keep it where it is as lines arrive.
+    if (g_scroll > 0) g_scroll++;
+}
+// A line whose type the caller knows (the banner is dim, whatever it says).
+static void PrintCol(const char* text, int col) {
+    g_forceCol = col;
+    SWSE_ConsolePrint(text);
+    g_forceCol = -1;
 }
 static void Printf(const char* fmt, ...) {
     // wvsprintfA writes up to 1024 characters whatever the buffer is; a 240
@@ -1670,8 +1763,9 @@ static void Cmd_whatis(int argc, char** argv) {
     SWSE_WhatIs(a, msg, sizeof(msg));
     SWSE_ConsolePrint(msg);
 }
-// Clakkerz are townsfolkprefs.txt (5CEE67FD) with m_health = 100000, which is
-// the whole of their "immortality". Default to 45, an outlaw cutter's value.
+// Clakkerz are townsfolkprefs.txt (5CEE67FD) with m_health = 100000; the engine
+// skips damage at 10000 health or more, which is their "immortality". Default
+// to 45, an outlaw cutter's value.
 static void PrefsGet(const char* target, const char* field);   // fwd (1.1 block)
 
 // m_affGenerally is "player ammo affects this character" (a bool, with
@@ -1706,14 +1800,13 @@ static void Cmd_npchurt(int argc, char** argv) {
 // findtarget [npcAddr] - with no address, uses the NPC nearest you (the one
 // most likely to be actively shooting at you).
 // raidmode <attackerHash> <victimHash> [everyFrames]  /  raidmode off
-// Standing hostility, re-evaluated every few frames: raiders go for the nearest
-// townsfolk OR the player, whichever is closer.
+// Experimental: re-points raiders every N frames at the nearest townsfolk or
+// the player. No fight seen at that rate (scriptvm.cpp, raid mode).
 // decoy <shooterType> <victimType> [everyFrames]  /  decoy off
-// Keeps the shooter hostile to the player but feeds it the victim's position,
-// so its shots land where the victim is standing.
-// feud <typeA> <typeB> [rounds] - inject mutual damage between two live NPCs.
-// Untested as of writing; the retaliation route is the last idea standing for
-// NPC-vs-NPC combat.
+// Experimental, no effect measured: feeds the victim's position as the
+// last-known player position, which only steers searching.
+// feud <typeA> <typeB> [rounds] - inject mutual TakeDamage between two active
+// NPCs. Experimental: never seen to start a fight.
 static void Cmd_feud(int argc, char** argv) {
     if (argc < 3) { SWSE_ConsolePrint("usage: feud <typeA> <typeB> [rounds]   both must be ACTIVE"); return; }
     unsigned a = (unsigned)strtoul(argv[1], nullptr, 16);
@@ -2522,7 +2615,7 @@ static void Cmd_yaw(int argc, char** argv) {
 static void Cmd_spawnat(int argc, char** argv) {
     if (argc < 2) {
         SWSE_ConsolePrint("usage: spawnat <label> [count] [typehash]");
-        SWSE_ConsolePrint("  moves NPCs to a saved position - this is how an ambush works");
+        SWSE_ConsolePrint("  moves NPC bodies to a saved position; they arrive inert (their AI stays behind)");
         return;
     }
     float p[3];
@@ -2538,7 +2631,7 @@ static void Cmd_spawnat(int argc, char** argv) {
     int moved = SWSE_BringNpcsTo(p[0], p[1], p[2], count, h, msg, sizeof(msg));
     SWSE_ConsolePrint(msg);
     if (moved == 0)
-        SWSE_ConsolePrint("(the engine cannot create NPCs - none were spare. try `reserve`)");
+        SWSE_ConsolePrint("(no NPC of that type was left to move - `reserve` adds extra cast at the next load)");
 }
 
 // reserve [n] - build a pool of spare NPCs and park them out of the way.
@@ -3105,7 +3198,7 @@ static unsigned g_scanBuf[SCAN_MAX];
 static void Cmd_geominst(int, char**) {
     int n = SWSE_FindGeomInst(g_scanBuf, SCAN_MAX);
     if (!n) { SWSE_ConsolePrint("no GeometryInst found"); return; }
-    Printf("%d GeometryInst(s) - positions logged (these are spawn anchors)%s", n,
+    Printf("%d GeometryInst(s) - positions logged%s", n,
            (n == SCAN_MAX) ? " - AT THE CAP" : "");
 }
 static void Cmd_npctypes(int, char**) {
@@ -4675,8 +4768,8 @@ static Cmd g_cmds[] = {
     { "artifact",     "items", "give artifact (raw VM call)",           VMcmd },
 
     // ---- world ------------------------------------------------------------
-    { "spawn",      "world", "spawn [n] - fire the level's spawners",    Cmd_spawn },
-    { "spawnhere",  "world", "spawnhere [n] - move a spawner to you",    Cmd_spawnhere },
+    { "spawn",      "world", "spawn [n] - arm ActorSpawners (only levels 02, 03, 05 have them; experimental)", Cmd_spawn },
+    { "spawnhere",  "world", "spawnhere [n] - move an ActorSpawner to you and arm it (experimental)", Cmd_spawnhere },
     { "critters",   "world", "critters [n] - enable critter spawning",   Cmd_critters },
     { "npcspy",     "debug", "npcspy [off] - capture a real NPC creation", Cmd_npcspy },
     { "npchits",    "debug", "npchits - how many times the spawn routine ran", Cmd_npchits },
@@ -4684,11 +4777,11 @@ static Cmd g_cmds[] = {
     { "buildtest",  "debug", "buildtest [n] - constructed spawns during a load", Cmd_buildtest },
     { "dupetype",   "world", "dupetype <hash> - make a level spawn that character", Cmd_dupetype },
     { "npccount",   "world", "npccount [n] - raise a spawn tag's count to n", Cmd_npccount },
-    { "npcreplay",  "world", "npcreplay - re-run the captured spawn right now", Cmd_npcreplay },
-    { "npcnow",     "world", "npcnow [n] [type] - spawn n NPCs at you now",   Cmd_npcnow },
+    { "npcreplay",  "world", "npcreplay - experimental: re-run the captured spawn (result usually not drawn)", Cmd_npcreplay },
+    { "npcnow",     "world", "npcnow [n] [type] - experimental: constructed NPCs, usually not drawn and inert", Cmd_npcnow },
     { "spawntypes", "world", "spawntypes - NPC types harvested from this level", Cmd_spawntypes },
     { "npcnear",    "world", "npcnear - identify the NPC next to you, to clone it", Cmd_npcnear },
-    { "bring",      "world", "bring [n] [type] - teleport live NPCs to you",  Cmd_bring },
+    { "bring",      "world", "bring [n] [type] - move NPC bodies to you (they arrive inert: no AI)", Cmd_bring },
     { "sendnpc",    "world", "sendnpc [n] [type] - send NPCs at you (their AI)", Cmd_sendnpc },
     { "resolve",    "debug", "resolve <hash> - resolve a type hash to its prefs", Cmd_resolve },
     { "ai",         "world", "ai <hash> [field value] - AI perception + weapon timing", Cmd_ai },
@@ -4705,7 +4798,7 @@ static Cmd g_cmds[] = {
     { "writepos",   "world", "writepos <label> - save where you stand + facing, by name", Cmd_writepos },
     { "positions",  "world", "positions - list saved positions", Cmd_positions },
     { "goto",       "world", "goto <label> - teleport to a saved position (and facing)", Cmd_goto },
-    { "spawnat",    "world", "spawnat <label> [n] [type] - move NPCs to a position", Cmd_spawnat },
+    { "spawnat",    "world", "spawnat <label> [n] [type] - move NPC bodies to a position (they arrive inert)", Cmd_spawnat },
     { "playnpc",    "world", "playnpc [name|off|status] - play as a character from this level (loads it first if needed)", SWSE_PlayNpcCmd },
     { "freecam",    "world", "freecam [on|off|toggle] | pos <x> <y> <z> | look <yaw> [pitch] | speed [n] | sens [n] - fly the view with the game's own dev camera", SWSE_FreecamCmd },
     { "reserve",    "world", "reserve [n] | reserve park - spare NPCs for ambushes", Cmd_reserve },
@@ -4723,29 +4816,29 @@ static Cmd g_cmds[] = {
     { "npchealth",  "world", "npchealth <type> [hp] - set a character's health", Cmd_npchealth },
     { "npcelite",   "world", "npcelite <type|*> <pct> [hp] - promote a fraction to elites", Cmd_npcelite },
     { "npcgib",     "world", "npcgib <type> [0|1] - gib that character on death", Cmd_npcgib },
-    { "whereis",    "world", "whereis <type> - locate every NPC of that type",   Cmd_whereis },
+    { "whereis",    "world", "whereis <type> - every NPC of that type, and the distance to the nearest", Cmd_whereis },
     { "townpanic",  "world", "townpanic [on|off] [radius] - the town alarm system", Cmd_townpanic },
     { "raid",       "world", "raid [zone] [bell] - post the town alarm",        Cmd_raid },
-    { "attack",     "world", "attack <atkType> <victimType> [n] - NPC vs NPC", Cmd_attack },
+    { "attack",     "world", "attack <atkType> <victimType> [n] - experimental: retarget once; NPCs hunt, rarely engage", Cmd_attack },
     { "findtarget", "debug", "findtarget [npc] - where an NPC stores its target", Cmd_findtarget },
-    { "raidmode",   "world", "raidmode <atk> <victim> - standing NPC hostility", Cmd_raidmode },
+    { "raidmode",   "world", "raidmode <atk> <victim> - experimental: re-point targets every N frames; no fight seen", Cmd_raidmode },
     { "scantargets","debug", "scantargets - who every active NPC is fighting", Cmd_scantargets },
-    { "decoy",      "world", "decoy <shooter> <victim> - make shots land on the victim", Cmd_decoy },
-    { "feud",       "world", "feud <typeA> <typeB> - inject mutual damage (untested)", Cmd_feud },
+    { "decoy",      "world", "decoy <shooter> <victim> - experimental: false last-known position (no effect seen)", Cmd_decoy },
+    { "feud",       "world", "feud <typeA> <typeB> - experimental: mutual TakeDamage verbs; no fight seen", Cmd_feud },
     { "npchurt",    "world", "npchurt <type> [0|2] - 2 = cannot be staggered",  Cmd_npchurt },
     { "npcaff",     "world", "npcaff <type> [0|1] - player ammo affects it (0 = immune; NOT affiliation)", Cmd_npcaff },
     { "allnpcs",    "world", "allnpcs <hp|-> [gib] - apply to every character here", Cmd_allnpcs },
     { "tuning",     "world", "tuning - reload characters.txt (hp/gib per character)", Cmd_tuning },
     { "types",      "world", "types [dump] - characters here + hp/gib, or to a file", Cmd_types },
-    { "npclast",    "world", "npclast - replay the captured NPC creation", Cmd_npclast },
-    { "npchere",    "world", "npchere - spawn the captured NPC at you",  Cmd_npchere },
-    { "spawnnpc",   "world", "spawnnpc - retired: it moved a live piece of the level (npcnow instead)", Cmd_spawnnpc },
+    { "npclast",    "world", "npclast - experimental: replay the captured NPC creation (unregistered, not drawn)", Cmd_npclast },
+    { "npchere",    "world", "npchere - experimental: the captured NPC creation at you (unregistered, not drawn)", Cmd_npchere },
+    { "spawnnpc",   "world", "spawnnpc - retired in 1.1: it moved a live piece of the level", Cmd_spawnnpc },
     { "spawnclone", "world", "spawnclone - clone a captured NPC at you", Cmd_spawnclone },
     { "npcspawn",   "world", "npcspawn - replay a captured spawn",       Cmd_npcspawn },
     { "npctags",    "debug", "npctags - find live NPC spawn tags",       Cmd_npctags },
     { "npcs",       "debug", "npcs - find live NPCs in the level",       Cmd_npcs },
     { "npctypes",   "debug", "npctypes - list spawnable NPC types",      Cmd_npctypes },
-    { "geominst",   "debug", "geominst - find spawn anchors",            Cmd_geominst },
+    { "geominst",   "debug", "geominst - find GeometryInst objects (pieces of level geometry)", Cmd_geominst },
     { "anim",       "world", "anim <torso|endtorso|stop> [n] [tag] - animation probe", Cmd_anim },
     { "granny",     "debug", "granny [minBones] | granny dump <addr> - find bone poses", Cmd_granny },
     { "peek",       "debug", "peek <hexaddr> [dwords] - hex/float/ascii memory view", Cmd_peek },
@@ -4781,8 +4874,8 @@ static Cmd g_cmds[] = {
     { "fps",        "world", "force first-person view",                 VMcmd },
     { "nofps",      "world", "force third-person view",                 VMcmd },
     { "sniper",     "world", "force sniper view",                       VMcmd },
-    { "tphome",     "world", "teleport home",                           VMcmd },
-    { "tpreset",    "world", "teleport reset",                          VMcmd },
+    { "tphome",     "world", "TeleportHome verb - acts on a script's object; nothing from the console", VMcmd },
+    { "tpreset",    "world", "TeleportReset verb - acts on a script's object; nothing from the console", VMcmd },
     { "save",       "world", "quick save",                              VMcmd },
     { "checkpoint", "world", "set checkpoint",                          VMcmd },
     { "loadsave",   "world", "load last save",                          VMcmd },
@@ -5078,6 +5171,9 @@ static void Cmd_help(int argc, char** argv) {
         HelpCategory(pc, false);
     }
     SWSE_ConsolePrint("also: 'list' = 181 game functions, 'scripts' = your own .txt commands");
+    SWSE_ConsolePrint("keys: Tab completes, Up/Down history, PgUp/PgDn scroll, Esc closes");
+    SWSE_ConsolePrint("      Ctrl+V or Shift+Insert pastes - each pasted line runs, in order (64 at most)");
+    SWSE_ConsolePrint("      Ctrl+C copies the line typed, or the last command and its output; Ctrl+Shift+C the lines on screen");
     if (SWSE_GameBuildSafeMode())
         SWSE_ConsolePrint("* = unavailable on this game build: SWSE runs in safe mode here ('status')");
     if (SWSE_PluginsFound()) SWSE_ConsolePrint("plugins: 'plugins' lists them, 'help <plugin>' shows one's commands");
@@ -5132,6 +5228,135 @@ static void Complete() {
         if (++col == 4) { SWSE_ConsolePrint(row); row[0] = 0; col = 0; }
     }
     if (col) SWSE_ConsolePrint(row);
+}
+
+// ---- suggestions (1.1.1) ----------------------------------------------------------
+// While the first word is being typed, the card under the console lists every
+// command it could become, with its help; the first (or chosen) one shows as
+// ghost text after the cursor. Tab takes it, Up/Down choose, Esc hides the
+// card. Same sources as Tab completion: built-ins, script commands, plugins'
+// commands (those that would run now), then the game's functions.
+static void ShortHelp(const char* help, char* out, int n) {
+    const char* d = strstr(help, " - ");      // "name [args] - what it does"
+    lstrcpynA(out, d ? d + 3 : help, n);
+}
+static void SuggAdd(const char* name, const char* help, unsigned char rank) {
+    if (g_sugN >= SUGG_MAX) return;
+    Sugg& s = g_sug[g_sugN++];
+    lstrcpynA(s.name, name, sizeof(s.name));
+    lstrcpynA(s.help, help ? help : "", sizeof(s.help));
+    s.rank = rank;
+}
+static void SuggRefresh() {
+    if (!lstrcmpA(g_sugFor, g_input)) return;
+    lstrcpynA(g_sugFor, g_input, sizeof(g_sugFor));
+    g_sugN = 0; g_sugSel = 0; g_sugTop = 0; g_sugChosen = false;
+    if (!g_inputLen || strchr(g_input, ' ')) return;
+    char h[100];
+    for (int i = 0; i < N_CMDS; i++)
+        if (StartsWithCI(g_cmds[i].name, g_input)) {
+            ShortHelp(g_cmds[i].help, h, sizeof(h));
+            SuggAdd(g_cmds[i].name, h, 0);
+        }
+    for (int i = 0; i < g_dynCmdCount; i++)
+        if (StartsWithCI(g_dynCmds[i].name, g_input)) {
+            wsprintfA(h, "your script: scripts\\%s.txt", g_dynCmds[i].name);
+            SuggAdd(g_dynCmds[i].name, h, 0);
+        }
+    const char *pn, *pc, *ph, *pp; int on;
+    for (int i = 0; SWSE_PluginCmdAt(i, &pn, &pc, &ph, &pp, &on); i++)
+        if (on && pn && StartsWithCI(pn, g_input)) {
+            ShortHelp(ph ? ph : "", h, sizeof(h));
+            SuggAdd(pn, h, 0);
+        }
+    const char* m[SUGG_MAX];
+    int k = SWSE_ScriptComplete(g_input, m, SUGG_MAX - g_sugN);
+    for (int i = 0; i < k; i++) {
+        const char* fmt = SWSE_ScriptArgs(m[i]);
+        char hint[64] = {0};
+        if (fmt && *fmt) ArgHint(fmt, hint);
+        wsprintfA(h, "game function %s", hint);
+        SuggAdd(m[i], h, 1);
+    }
+    // Commands before game functions, each alphabetically (insertion sort: a
+    // few hundred at most, once per keystroke).
+    for (int i = 1; i < g_sugN; i++) {
+        Sugg t = g_sug[i];
+        int j = i - 1;
+        while (j >= 0 && (g_sug[j].rank > t.rank ||
+               (g_sug[j].rank == t.rank && lstrcmpiA(g_sug[j].name, t.name) > 0))) {
+            g_sug[j + 1] = g_sug[j];
+            j--;
+        }
+        g_sug[j + 1] = t;
+    }
+}
+static bool SuggShowing() {
+    SuggRefresh();
+    return g_open && g_inputLen > 0 && g_sugN > 0 && !g_sugHidden && !strchr(g_input, ' ');
+}
+static const char* SuggGhost() {
+    if (!SuggShowing() || g_sugSel >= g_sugN) return "";
+    const char* n = g_sug[g_sugSel].name;
+    return (lstrlenA(n) > g_inputLen) ? n + g_inputLen : "";
+}
+static void SuggMove(int d) {
+    if (g_sugN <= 0) return;
+    g_sugSel = (g_sugSel + d + g_sugN) % g_sugN;
+    g_sugChosen = true;
+    if (g_sugSel < g_sugTop) g_sugTop = g_sugSel;
+    if (g_sugSel >= g_sugTop + SUGG_ROWS) g_sugTop = g_sugSel - SUGG_ROWS + 1;
+}
+// Any edit of the line: a new list, and the line is the draft again.
+static void InputEdited() {
+    g_sugHidden = false;
+    g_histPos = -1;
+}
+static void SuggAccept(bool space) {
+    if (g_sugSel >= g_sugN) return;
+    wsprintfA(g_input, space ? "%s " : "%s", g_sug[g_sugSel].name);
+    g_inputLen = lstrlenA(g_input);
+    InputEdited();
+}
+
+// ---- history (1.1.1) ----------------------------------------------------------------
+// Lines typed at the console (not exec'd, mailed or bound), this session.
+static void HistAdd(const char* s) {
+    if (!*s) return;
+    if (g_histN && !lstrcmpA(g_hist[g_histN - 1], s)) return;   // no repeats in a row
+    if (g_histN == HIST_MAX) {
+        memmove(g_hist[0], g_hist[1], sizeof(g_hist[0]) * (HIST_MAX - 1));
+        g_histN--;
+    }
+    lstrcpynA(g_hist[g_histN++], s, sizeof(g_hist[0]));
+}
+static void HistShow(const char* s) {
+    lstrcpynA(g_input, s, 251);
+    g_inputLen = lstrlenA(g_input);
+    g_sugHidden = true;   // a recalled "status" must not open the list and take Up/Down
+}
+static void HistUp() {
+    if (!g_histN) return;
+    if (g_histPos == -1) {
+        lstrcpynA(g_histDraft, g_input, sizeof(g_histDraft));
+        g_histPos = g_histN - 1;
+    } else if (g_histPos > 0) {
+        g_histPos--;
+    } else {
+        return;
+    }
+    HistShow(g_hist[g_histPos]);
+}
+static void HistDown() {
+    if (g_histPos == -1) return;
+    if (g_histPos < g_histN - 1) {
+        g_histPos++;
+        HistShow(g_hist[g_histPos]);
+    } else {
+        g_histPos = -1;
+        HistShow(g_histDraft);
+        g_sugHidden = false;
+    }
 }
 
 // ---- user-defined script commands -----------------------------------------
@@ -5510,85 +5735,608 @@ int SWSE_ConsoleExecNested(const char* line) {
 }
 
 
-// ---- font atlas build (GDI -> GL texture) --------------------------------
-static void BuildFont() {
+// ---- font atlases (GDI -> GL texture) ----------------------------------------
+static int Pow2(int v) { int p = 1; while (p < v) p <<= 1; return p; }
+
+// The face asked for, or the fallback when GDI would substitute another one
+// (Bahnschrift is Windows 10+; Segoe UI stands in before that).
+static HFONT MakeFont(HDC dc, int px, int weight, const char* face, const char* fallback,
+                      bool mono, char* used, int usedLen) {
+    DWORD pitch = mono ? (FIXED_PITCH | FF_MODERN) : (VARIABLE_PITCH | FF_SWISS);
+    const char* faces[2] = { face, fallback };
+    HFONT f = nullptr;
+    for (int k = 0; k < 2; k++) {
+        if (!faces[k]) break;
+        f = CreateFontA(-px, 0, 0, 0, weight, 0, 0, 0, DEFAULT_CHARSET, OUT_TT_PRECIS,
+                        CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, pitch, faces[k]);
+        if (!f) continue;
+        HGDIOBJ old = SelectObject(dc, f);
+        char got[LF_FACESIZE] = {0};
+        GetTextFaceA(dc, LF_FACESIZE, got);
+        SelectObject(dc, old);
+        lstrcpynA(used, got, usedLen);
+        if (!_strnicmp(got, faces[k], lstrlenA(faces[k])) || k == 1 || !faces[1]) return f;
+        DeleteObject(f);
+        f = nullptr;
+    }
+    return f;
+}
+
+// Texture uploads with the unpack state at its defaults, whatever the frame
+// left bound or set (a row length or an unpack buffer would garble the atlas).
+static void UploadRGBA(int w, int h, const void* data) {
+    GLint pbo = 0;
+    if (p_bindBuffer) {
+        glGetIntegerv(CON_GL_PIXEL_UNPACK_BINDING, &pbo);
+        if (pbo) p_bindBuffer(CON_GL_PIXEL_UNPACK_BUFFER, 0);
+    }
+    glPushClientAttrib(GL_CLIENT_PIXEL_STORE_BIT);
+    glPixelStorei(GL_UNPACK_SWAP_BYTES, 0);
+    glPixelStorei(GL_UNPACK_LSB_FIRST, 0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+    glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    // The pixel-TRANSFER state too: level 01 leaves GL_ALPHA_BIAS at 1, which
+    // turned every atlas texel opaque - each glyph a solid block.
+    glPushAttrib(GL_PIXEL_MODE_BIT);
+    glPixelTransferf(GL_RED_SCALE, 1.0f);   glPixelTransferf(GL_RED_BIAS, 0.0f);
+    glPixelTransferf(GL_GREEN_SCALE, 1.0f); glPixelTransferf(GL_GREEN_BIAS, 0.0f);
+    glPixelTransferf(GL_BLUE_SCALE, 1.0f);  glPixelTransferf(GL_BLUE_BIAS, 0.0f);
+    glPixelTransferf(GL_ALPHA_SCALE, 1.0f); glPixelTransferf(GL_ALPHA_BIAS, 0.0f);
+    glPixelTransferi(GL_MAP_COLOR, GL_FALSE);
+    glPixelTransferi(GL_INDEX_SHIFT, 0);    glPixelTransferi(GL_INDEX_OFFSET, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glPopAttrib();
+    glPopClientAttrib();
+    if (pbo && p_bindBuffer) p_bindBuffer(CON_GL_PIXEL_UNPACK_BUFFER, (GLuint)pbo);
+}
+
+// The atlas's sampling state, on the texture bound on unit 0: nearest, clamped,
+// and one level only, so it is complete whatever min filter it is given (a
+// mipmapped filter on a texture without mips makes it incomplete, and an
+// incomplete texture draws as if texturing were off: every glyph a solid cell).
+static void AtlasParams() {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, CON_GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, CON_GL_TEXTURE_MAX_LEVEL, 0);
+}
+
+static void BuildGlyphFont(GlyphFont* gf, int px, int weight, const char* face,
+                           const char* fallback, bool mono) {
+    memset(gf, 0, sizeof(*gf));
+    gf->px = px;
     HDC dc = CreateCompatibleDC(NULL);
+    if (!dc) return;
+    HFONT font = MakeFont(dc, px, weight, face, fallback, mono, gf->face, sizeof(gf->face));
+    if (!font) { DeleteDC(dc); return; }
+    HGDIOBJ oldfont = SelectObject(dc, font);
+    TEXTMETRICA tm;
+    GetTextMetricsA(dc, &tm);
+    int maxAdv = 1;
+    for (int i = 0; i < 95; i++) {
+        char ch = (char)(0x20 + i);
+        SIZE sz = {0, 0};
+        GetTextExtentPoint32A(dc, &ch, 1, &sz);
+        gf->adv[i] = sz.cx;
+        if (sz.cx > maxAdv) maxAdv = sz.cx;
+    }
+    gf->pad    = px / 5 + 1;
+    gf->cellW  = maxAdv + 2 * gf->pad;
+    gf->cellH  = tm.tmHeight;
+    gf->height = tm.tmHeight;
+    gf->texW   = Pow2(16 * gf->cellW);
+    gf->texH   = Pow2(6 * gf->cellH);
+
     BITMAPINFO bi = {0};
     bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bi.bmiHeader.biWidth = ATLAS_W;
-    bi.bmiHeader.biHeight = -ATLAS_H;        // top-down
+    bi.bmiHeader.biWidth = gf->texW;
+    bi.bmiHeader.biHeight = -gf->texH;        // top-down
     bi.bmiHeader.biPlanes = 1;
     bi.bmiHeader.biBitCount = 32;
     bi.bmiHeader.biCompression = BI_RGB;
     void* bits = nullptr;
     HBITMAP dib = CreateDIBSection(dc, &bi, DIB_RGB_COLORS, &bits, NULL, 0);
-    HGDIOBJ oldbmp = SelectObject(dc, dib);
-
-    HFONT font = CreateFontA(CELL_H, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
-                             OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-                             ANTIALIASED_QUALITY, FIXED_PITCH | FF_MODERN, "Consolas");
-    HGDIOBJ oldfont = SelectObject(dc, font);
-    SetBkColor(dc, RGB(0, 0, 0));
-    SetTextColor(dc, RGB(255, 255, 255));
-    SetBkMode(dc, OPAQUE);
-    RECT full = {0, 0, ATLAS_W, ATLAS_H};
-    FillRect(dc, &full, (HBRUSH)GetStockObject(BLACK_BRUSH));
-
-    for (int i = 0; i < ATLAS_COLS * ATLAS_ROWS; i++) {
-        char ch = (char)(0x20 + i);
-        int cx = (i % ATLAS_COLS) * CELL_W;
-        int cy = (i / ATLAS_COLS) * CELL_H;
-        RECT r = { cx, cy, cx + CELL_W, cy + CELL_H };
-        DrawTextA(dc, &ch, 1, &r, DT_LEFT | DT_TOP | DT_NOPREFIX);
+    if (dib && bits) {
+        HGDIOBJ oldbmp = SelectObject(dc, dib);
+        int n = gf->texW * gf->texH;
+        memset(bits, 0, (size_t)n * 4);
+        SetTextColor(dc, RGB(255, 255, 255));
+        SetBkMode(dc, TRANSPARENT);
+        SetTextAlign(dc, TA_LEFT | TA_TOP | TA_NOUPDATECP);
+        for (int i = 0; i < 95; i++) {
+            char ch = (char)(0x20 + i);
+            TextOutA(dc, (i % 16) * gf->cellW + gf->pad, (i / 16) * gf->cellH, &ch, 1);
+        }
+        GdiFlush();
+        // white glyphs, coverage in alpha: glColor tints them per line
+        unsigned char* src = (unsigned char*)bits;
+        unsigned char* rgba = (unsigned char*)malloc((size_t)n * 4);
+        if (rgba) {
+            for (int i = 0; i < n; i++) {
+                unsigned char b = src[i * 4], g = src[i * 4 + 1], r = src[i * 4 + 2];
+                unsigned char a = r > g ? (r > b ? r : b) : (g > b ? g : b);
+                rgba[i * 4] = rgba[i * 4 + 1] = rgba[i * 4 + 2] = 255;
+                rgba[i * 4 + 3] = a;
+            }
+            glGenTextures(1, &gf->tex);
+            SWSE_GlBindTextureQuiet(GL_TEXTURE_2D, gf->tex);
+            AtlasParams();
+            UploadRGBA(gf->texW, gf->texH, rgba);
+            free(rgba);
+        }
+        SelectObject(dc, oldbmp);
     }
-    GdiFlush();
-
-    // convert BGRA DIB -> RGBA where alpha = luminance (so text blends cleanly)
-    unsigned char* px = (unsigned char*)bits;
-    int npx = ATLAS_W * ATLAS_H;
-    unsigned char* rgba = (unsigned char*)malloc(npx * 4);
-    for (int i = 0; i < npx; i++) {
-        unsigned char b = px[i*4+0], g = px[i*4+1], r = px[i*4+2];
-        unsigned char lum = (unsigned char)((r*30 + g*59 + b*11) / 100);
-        rgba[i*4+0] = 210; rgba[i*4+1] = 255; rgba[i*4+2] = 190; rgba[i*4+3] = lum;
-    }
-    glGenTextures(1, &g_font);
-    glBindTexture(GL_TEXTURE_2D, g_font);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ATLAS_W, ATLAS_H, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    free(rgba);
-
-    SelectObject(dc, oldfont); DeleteObject(font);
-    SelectObject(dc, oldbmp);  DeleteObject(dib);
+    if (dib) DeleteObject(dib);
+    SelectObject(dc, oldfont);
+    DeleteObject(font);
     DeleteDC(dc);
 }
 
-// ---- text drawing --------------------------------------------------------
-static void DrawText(float x, float y, float scale, const char* s) {
-    float gw = CELL_W * scale, gh = CELL_H * scale;
-    glBindTexture(GL_TEXTURE_2D, g_font);
-    glBegin(GL_QUADS);
-    for (const char* p = s; *p; p++) {
-        unsigned char c = (unsigned char)*p;
-        if (c < 0x20 || c > 0x7F) c = '?';
-        int idx = c - 0x20;
-        float u0 = (float)((idx % ATLAS_COLS) * CELL_W) / ATLAS_W;
-        float v0 = (float)((idx / ATLAS_COLS) * CELL_H) / ATLAS_H;
-        float u1 = u0 + (float)CELL_W / ATLAS_W;
-        float v1 = v0 + (float)CELL_H / ATLAS_H;
-        glTexCoord2f(u0, v0); glVertex2f(x, y);
-        glTexCoord2f(u1, v0); glVertex2f(x + gw, y);
-        glTexCoord2f(u1, v1); glVertex2f(x + gw, y + gh);
-        glTexCoord2f(u0, v1); glVertex2f(x, y + gh);
-        x += gw;
+// Sizes from the mock-up at 1080 lines, scaled with the window height. Called
+// inside RenderConsole's attribute push, so the binds it makes are undone.
+static void EnsureFonts(int h) {
+    HGLRC ctx = wglGetCurrentContext();
+    if (h == g_fontH && ctx == g_fontCtx) return;
+    // Same context: free the old atlases. A new context (the game recreated
+    // its own) never had them, and its texture names may be the game's now.
+    if (ctx == g_fontCtx)
+        for (int i = 0; i < F_COUNT; i++)
+            if (g_fonts[i].tex) glDeleteTextures(1, &g_fonts[i].tex);
+    g_fontH = h;
+    g_fontCtx = ctx;
+    float s = h / 1080.0f;
+    if (s < 0.75f) s = 0.75f;
+    if (s > 4.0f)  s = 4.0f;
+    g_s = s;
+    BuildGlyphFont(&g_fonts[F_MONO],    (int)(20 * s + 0.5f), FW_NORMAL,   "Consolas",    "Courier New", true);
+    BuildGlyphFont(&g_fonts[F_MONO_SM], (int)(16 * s + 0.5f), FW_NORMAL,   "Consolas",    "Courier New", true);
+    BuildGlyphFont(&g_fonts[F_UI],      (int)(17 * s + 0.5f), FW_NORMAL,   "Bahnschrift", "Segoe UI",    false);
+    BuildGlyphFont(&g_fonts[F_UI_SM],   (int)(15 * s + 0.5f), FW_NORMAL,   "Bahnschrift", "Segoe UI",    false);
+    BuildGlyphFont(&g_fonts[F_TITLE],   (int)(25 * s + 0.5f), FW_SEMIBOLD, "Bahnschrift", "Segoe UI",    false);
+}
+
+// Each frame, before any text: is every atlas still ours? A name another part of
+// the process deleted (and maybe reused), or a texture of another size under it,
+// means our text would sample something else - so the atlases are built again,
+// under new names; the old ones are not deleted, as they may be someone else's
+// now. Then the sampling state is set again on each, in case it was changed.
+// Seen live in development: after a graphics script, every glyph drew as a
+// solid cell - the atlas not sampled at all.
+// swse_log.txt, for the rebuild note below.
+static void LogLine(const char* s) {
+    char path[MAX_PATH];
+    GetModuleFileNameA(GetModuleHandleA(NULL), path, MAX_PATH);
+    char* sl = strrchr(path, '\\'); if (sl) *sl = 0;
+    char full[MAX_PATH];
+    _snprintf_s(full, sizeof(full), _TRUNCATE, "%s\\swse_log.txt", path);
+    HANDLE h = CreateFileA(full, FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                           OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (h == INVALID_HANDLE_VALUE) return;
+    DWORD w = 0;
+    WriteFile(h, s, (DWORD)lstrlenA(s), &w, NULL);
+    WriteFile(h, "\r\n", 2, &w, NULL);
+    CloseHandle(h);
+}
+static int  g_atlasRebuilds = 0;
+static char g_atlasWhy[160] = "";
+static void ValidateFonts(int h) {
+    char why[160] = "";
+    for (int i = 0; i < F_COUNT && !why[0]; i++) {
+        GlyphFont& f = g_fonts[i];
+        if (!f.tex) continue;
+        if (!glIsTexture(f.tex)) {
+            _snprintf_s(why, sizeof(why), _TRUNCATE, "atlas %d (texture %u) is no longer a texture", i, f.tex);
+            break;
+        }
+        SWSE_GlBindTextureQuiet(GL_TEXTURE_2D, f.tex);
+        GLint tw = 0, th = 0;
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &tw);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &th);
+        if (tw != f.texW || th != f.texH) {
+            _snprintf_s(why, sizeof(why), _TRUNCATE, "atlas %d (texture %u) is %dx%d, not the %dx%d built",
+                        i, f.tex, (int)tw, (int)th, f.texW, f.texH);
+            break;
+        }
+        AtlasParams();
     }
+    if (!why[0]) return;
+    // At most one GDI build every half second, should something clobber the
+    // atlases every frame; the frames between draw as they are.
+    static DWORD last = 0, lastLog = 0;
+    static int skipped = 0;
+    DWORD now = GetTickCount();
+    if (last && now - last < 500) { skipped++; return; }
+    last = now;
+    g_atlasRebuilds++;
+    lstrcpynA(g_atlasWhy, why, sizeof(g_atlasWhy));
+    if (g_atlasRebuilds <= 5 || now - lastLog > 10000) {
+        lastLog = now;
+        char b[260];
+        _snprintf_s(b, sizeof(b), _TRUNCATE, "console: %s - fonts rebuilt (%d so far, %d frame(s) waited)",
+                    why, g_atlasRebuilds, skipped);
+        LogLine(b);
+    }
+    for (int i = 0; i < F_COUNT; i++) g_fonts[i].tex = 0;   // forgotten, not deleted
+    g_fontH = 0;
+    EnsureFonts(h);
+}
+
+// ---- drawing primitives (fixed-function, immediate mode) ----------------------
+static float Rd(float v) { return floorf(v + 0.5f); }
+static void SetCol(unsigned rgb, float a) {
+    glColor4f(((rgb >> 16) & 255) / 255.0f, ((rgb >> 8) & 255) / 255.0f, (rgb & 255) / 255.0f, a);
+}
+static void Rect(float x0, float y0, float x1, float y1, unsigned rgb, float a) {
+    SetCol(rgb, a);
+    glBegin(GL_QUADS);
+    glVertex2f(x0, y0); glVertex2f(x1, y0); glVertex2f(x1, y1); glVertex2f(x0, y1);
+    glEnd();
+}
+static void VGrad(float x0, float y0, float x1, float y1, unsigned rgb, float aTop, float aBot) {
+    glBegin(GL_QUADS);
+    SetCol(rgb, aTop); glVertex2f(x0, y0); glVertex2f(x1, y0);
+    SetCol(rgb, aBot); glVertex2f(x1, y1); glVertex2f(x0, y1);
     glEnd();
 }
 
+// A rounded rectangle's outline, moved out by d (in by -d), clockwise.
+static const int RR_SEG = 6;
+static const int RR_PTS = 4 * (RR_SEG + 1);
+static void RRContour(float x0, float y0, float x1, float y1, float r, float d, float* px, float* py) {
+    float rr = r + d;
+    if (rr < 0) rr = 0;
+    const float cx[4] = { x1 - r, x1 - r, x0 + r, x0 + r };
+    const float cy[4] = { y0 + r, y1 - r, y1 - r, y0 + r };
+    int n = 0;
+    for (int c = 0; c < 4; c++)
+        for (int k = 0; k <= RR_SEG; k++) {
+            float a = (c * 90.0f - 90.0f + 90.0f * k / RR_SEG) * 0.01745329f;
+            px[n] = cx[c] + rr * cosf(a);
+            py[n] = cy[c] + rr * sinf(a);
+            n++;
+        }
+}
+// The band between two offsets of the outline, each with its own alpha.
+static void RRBand(float x0, float y0, float x1, float y1, float r,
+                   float dA, float aA, float dB, float aB, unsigned rgb) {
+    float ax[RR_PTS], ay[RR_PTS], bx[RR_PTS], by[RR_PTS];
+    RRContour(x0, y0, x1, y1, r, dA, ax, ay);
+    RRContour(x0, y0, x1, y1, r, dB, bx, by);
+    glBegin(GL_TRIANGLE_STRIP);
+    for (int i = 0; i <= RR_PTS; i++) {
+        int j = i % RR_PTS;
+        SetCol(rgb, aA); glVertex2f(ax[j], ay[j]);
+        SetCol(rgb, aB); glVertex2f(bx[j], by[j]);
+    }
+    glEnd();
+}
+// Filled, with a soft edge `feather` px wide centred on the boundary (1 px:
+// anti-aliased corners; wider: a shadow).
+static void RoundRect(float x0, float y0, float x1, float y1, float r, unsigned rgb, float a,
+                      float feather = 1.0f) {
+    if (r < feather * 0.5f) r = feather * 0.5f;
+    float px[RR_PTS], py[RR_PTS];
+    RRContour(x0, y0, x1, y1, r, -feather * 0.5f, px, py);
+    SetCol(rgb, a);
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f((x0 + x1) * 0.5f, (y0 + y1) * 0.5f);
+    for (int i = 0; i <= RR_PTS; i++) glVertex2f(px[i % RR_PTS], py[i % RR_PTS]);
+    glEnd();
+    RRBand(x0, y0, x1, y1, r, -feather * 0.5f, a, feather * 0.5f, 0.0f, rgb);
+}
+// A 1 px border just inside the edge, anti-aliased.
+static void RoundRectLine(float x0, float y0, float x1, float y1, float r, unsigned rgb, float a) {
+    if (r < 1.5f) r = 1.5f;
+    RRBand(x0, y0, x1, y1, r, -1.5f, 0.0f, -0.5f, a, rgb);
+    RRBand(x0, y0, x1, y1, r, -0.5f, a, 0.5f, 0.0f, rgb);
+}
+
+static float TextW(int fi, const char* s) {
+    const GlyphFont& f = g_fonts[fi];
+    float w = 0;
+    for (; s && *s; s++) {
+        unsigned c = (unsigned char)*s;
+        if (c < 0x20 || c > 0x7E) c = '?';
+        w += f.adv[c - 0x20];
+    }
+    return w;
+}
+static float GlyphRun(const GlyphFont& f, float x, float y, const char* s) {
+    const float iw = 1.0f / f.texW, ih = 1.0f / f.texH;
+    for (; *s; s++) {
+        unsigned c = (unsigned char)*s;
+        if (c < 0x20 || c > 0x7E) c = '?';
+        int i = c - 0x20;
+        if (c != ' ') {
+            float u0 = (i % 16) * f.cellW * iw, v0 = (i / 16) * f.cellH * ih;
+            float u1 = u0 + f.cellW * iw,       v1 = v0 + f.cellH * ih;
+            float qx = x - f.pad;
+            glTexCoord2f(u0, v0); glVertex2f(qx, y);
+            glTexCoord2f(u1, v0); glVertex2f(qx + f.cellW, y);
+            glTexCoord2f(u1, v1); glVertex2f(qx + f.cellW, y + f.cellH);
+            glTexCoord2f(u0, v1); glVertex2f(qx, y + f.cellH);
+        }
+        x += f.adv[i];
+    }
+    return x;
+}
+// One string at (x, top of its line box), on whole pixels so the atlas maps
+// 1:1. `shadow`: a dark copy 1 px down-right first, for text over the game.
+static float DrawStr(int fi, float x, float y, const char* s, unsigned rgb, float a = 1.0f,
+                     bool shadow = true) {
+    const GlyphFont& f = g_fonts[fi];
+    x = Rd(x); y = Rd(y);
+    if (!f.tex || !s || !*s) return x + TextW(fi, s);
+    // Bind, then enable. Enabled first, Windows' software GL (the offline
+    // harness) drew each string with the previous string's atlas. Bound past
+    // SWSE's bind hook: the wind gate, the SSR mask and plugins read every bind
+    // as the engine's current texture, and this one is not.
+    SWSE_GlBindTextureQuiet(GL_TEXTURE_2D, f.tex);
+    glEnable(GL_TEXTURE_2D);
+    glBegin(GL_QUADS);
+    if (shadow) {
+        float o = Rd(g_s) < 1 ? 1 : Rd(g_s);
+        glColor4f(0, 0, 0, 0.75f * a);
+        GlyphRun(f, x + o, y + o, s);
+    }
+    SetCol(rgb, a);
+    float end = GlyphRun(f, x, y, s);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    return end;
+}
+// Top of a font's line box centred on y.
+static float Mid(int fi, float y) { return y - g_fonts[fi].height * 0.5f; }
+// glScissor in top-down overlay coordinates.
+static void Clip(float x0, float y0, float x1, float y1, int h) {
+    glEnable(GL_SCISSOR_TEST);
+    glScissor((GLint)x0, (GLint)(h - y1), (GLsizei)(x1 - x0 > 0 ? x1 - x0 : 0),
+              (GLsizei)(y1 - y0 > 0 ? y1 - y0 : 0));
+}
+
 // ---- input ---------------------------------------------------------------
+// A printable character into the line, as typing it does.
+static void TypeChar(char c) {
+    if (c == '`' || c == '~') return;                   // never type the toggle key
+    if (c >= 0x20 && c < 0x7F && g_inputLen < 250) {
+        g_input[g_inputLen++] = c; g_input[g_inputLen] = 0;
+        InputEdited();
+    }
+}
+
+// ---- the clipboard (1.1.1) -----------------------------------------------------------
+// Ctrl+V or Shift+Insert pastes; Ctrl+C copies the line typed, or with nothing
+// typed the last command and its output; Ctrl+Shift+C copies the lines on screen.
+// A paste works as in a terminal: the text goes in at the cursor (the end of the
+// line), every line break runs the line before it, in order (`wait` delays the
+// rest, as in exec; at most 64 lines; '#' lines skipped), and what follows the
+// last break stays in the input. Text is ASCII here: the usual typographic
+// stand-ins (curly quotes, dashes, non-breaking spaces) become their plain
+// forms, anything else '?'. What happened shows in the input field for 2.5 s,
+// not in the scrollback, so a copy never copies its own note.
+static HWND  g_conHwnd = nullptr;           // the game window: the clipboard's owner when we write
+static char  g_toast[96] = "";
+static DWORD g_toastTick = 0;
+static int   g_visFirst = 0, g_visLast = -1;  // the scrollback lines on screen (DrawConsoleUI)
+static const int PASTE_MAX = 64;
+
+static void Toast(const char* m) { lstrcpynA(g_toast, m, sizeof(g_toast)); g_toastTick = GetTickCount(); }
+
+static bool OpenClip() {
+    for (int i = 0; i < 4; i++) {            // another app may hold it for a moment
+        if (OpenClipboard(g_conHwnd)) return true;
+        Sleep(5);
+    }
+    return false;
+}
+
+static char AsciiOf(unsigned c) {
+    if (c == '\t') return ' ';
+    if (c >= 0x20 && c < 0x7F) return (char)c;
+    switch (c) {
+    case 0xA0: case 0x2002: case 0x2003: case 0x2009: case 0x202F: return ' ';
+    case 0x91: case 0x92: case 0x2018: case 0x2019: case 0x201A: case 0x2032: return '\'';
+    case 0x93: case 0x94: case 0x201C: case 0x201D: case 0x201E: case 0x2033: return '"';
+    case 0x96: case 0x97: case 0x2010: case 0x2011: case 0x2012: case 0x2013: case 0x2014: case 0x2212: return '-';
+    }
+    return '?';
+}
+
+// The clipboard's text as ASCII, lines split by '\n'. -1: the clipboard is busy.
+static int ReadClipboard(char* out, int cap) {
+    out[0] = 0;
+    if (!OpenClip()) return -1;
+    int n = 0;
+    HANDLE h = GetClipboardData(CF_UNICODETEXT);
+    if (h) {
+        const wchar_t* w = (const wchar_t*)GlobalLock(h);
+        if (w) {
+            for (; *w && n < cap - 1; w++) {
+                unsigned c = (unsigned)*w;
+                if (c == '\r') continue;
+                if (c == '\n') { out[n++] = '\n'; continue; }
+                if (c >= 0xD800 && c <= 0xDFFF) { if (c <= 0xDBFF) out[n++] = '?'; continue; }   // a pair: one '?'
+                out[n++] = AsciiOf(c);
+            }
+            GlobalUnlock(h);
+        }
+    } else if ((h = GetClipboardData(CF_TEXT)) != nullptr) {
+        const char* a = (const char*)GlobalLock(h);
+        if (a) {
+            for (; *a && n < cap - 1; a++) {
+                unsigned char c = (unsigned char)*a;
+                if (c == '\r') continue;
+                out[n++] = (c == '\n') ? '\n' : AsciiOf(c);
+            }
+            GlobalUnlock(h);
+        }
+    }
+    CloseClipboard();
+    out[n] = 0;
+    return n;
+}
+
+static bool WriteClipboard(const char* text) {
+    size_t n = strlen(text);
+    HGLOBAL g = GlobalAlloc(GMEM_MOVEABLE, n + 1);
+    if (!g) return false;
+    char* p = (char*)GlobalLock(g);
+    if (!p) { GlobalFree(g); return false; }
+    memcpy(p, text, n + 1);
+    GlobalUnlock(g);
+    if (!OpenClip()) { GlobalFree(g); return false; }
+    EmptyClipboard();
+    bool ok = SetClipboardData(CF_TEXT, g) != nullptr;   // Windows offers it as Unicode too
+    CloseClipboard();
+    if (!ok) GlobalFree(g);
+    return ok;
+}
+
+static void CopyLines(int a, int b, const char* what) {
+    if (a < 0) a = 0;
+    if (b >= g_logCount) b = g_logCount - 1;
+    if (b < a) { Toast("nothing to copy"); return; }
+    size_t cap = (size_t)(b - a + 1) * 242 + 1;
+    char* t = (char*)malloc(cap);
+    if (!t) return;
+    size_t n = 0;
+    for (int i = a; i <= b; i++) {
+        size_t L = strlen(g_log[i]);
+        memcpy(t + n, g_log[i], L); n += L;
+        t[n++] = '\r'; t[n++] = '\n';
+    }
+    t[n] = 0;
+    bool ok = WriteClipboard(t);
+    free(t);
+    char m[96];
+    if (ok) wsprintfA(m, "copied %s (%d line%s)", what, b - a + 1, b > a ? "s" : "");
+    else lstrcpyA(m, "the clipboard is busy - not copied");
+    Toast(m);
+}
+
+static void CopyKey(bool shift) {
+    if (shift) { CopyLines(g_visFirst, g_visLast, "the lines on screen"); return; }
+    if (g_inputLen) {
+        Toast(WriteClipboard(g_input) ? "copied the line typed" : "the clipboard is busy - not copied");
+        return;
+    }
+    int i = g_logCount - 1;
+    while (i >= 0 && g_logCol[i] != LC_ECHO) i--;        // "> command", where its output starts
+    if (i < 0) i = g_logCount > 20 ? g_logCount - 20 : 0;
+    CopyLines(i, g_logCount - 1, "the last command and its output");
+}
+
+static void PasteKey() {
+    static char clip[16384];
+    int n = ReadClipboard(clip, sizeof(clip));
+    if (n < 0) { Toast("the clipboard is busy - nothing pasted"); return; }
+    if (n == 0) { Toast("the clipboard has no text"); return; }
+    if (!strchr(clip, '\n')) {                          // one line: into the input
+        for (const char* p = clip; *p; p++) TypeChar(*p);
+        return;
+    }
+    char (*lines)[240] = (char (*)[240])malloc(PASTE_MAX * 240);
+    if (!lines) return;
+    int nl = 0, total = 0, cl = 0;
+    char cur[256];
+    lstrcpynA(cur, g_input, sizeof(cur));
+    cl = lstrlenA(cur);
+    for (const char* p = clip; *p; p++) {
+        if (*p != '\n') { if (cl < 250) cur[cl++] = *p; continue; }
+        cur[cl] = 0;
+        char* a = cur;
+        while (*a == ' ') a++;
+        char* e = a + lstrlenA(a);
+        while (e > a && e[-1] == ' ') *--e = 0;
+        if (*a && *a != '#') {
+            total++;
+            if (nl < PASTE_MAX) lstrcpynA(lines[nl++], a, 240);
+        }
+        cl = 0;
+    }
+    cur[cl] = 0;
+    g_inputLen = 0; g_input[0] = 0;                     // what follows the last break stays
+    for (const char* p = cur; *p; p++) TypeChar(*p);
+    InputEdited();
+    g_scroll = 0;
+    for (int i = 0; i < nl; i++) HistAdd(lines[i]);
+    if (total > PASTE_MAX) Printf("paste: the first %d of %d lines run", PASTE_MAX, total);
+    RunLines(lines, nl);
+    free(lines);
+}
+
+// One key press. HandleInput calls it for every key that went down this frame.
+static void HandleKey(int vk, const BYTE* ks) {
+    if (vk == VK_OEM_3) {                 // ` / ~  toggles the console
+        SetOpen(!g_open);
+        g_inputLen = 0; g_input[0] = 0;
+        g_histPos = -1; g_sugHidden = false;
+        return;
+    }
+    if (!g_open) { RunBind(vk); return; }    // key binds (1.1)
+    g_keyTick = GetTickCount();              // the cursor stays lit while typing
+
+    // The clipboard. Ctrl with Alt is AltGr - a character on many layouts - not
+    // a shortcut. No other Ctrl+key types anything.
+    const bool ctrl = (ks[VK_CONTROL] & 0x80) && !(ks[VK_MENU] & 0x80);
+    const bool shift = (ks[VK_SHIFT] & 0x80) != 0;
+    if (ctrl) {
+        if (vk == 'V') PasteKey();
+        else if (vk == 'C') CopyKey(shift);
+        return;
+    }
+    if (vk == VK_INSERT && shift) { PasteKey(); return; }
+
+    // Escape hides the suggestion card first, then closes the console.
+    if (vk == VK_ESCAPE) {
+        if (SuggShowing()) g_sugHidden = true;
+        else SetOpen(false);
+        return;
+    }
+    if (vk == VK_RETURN) {
+        // A row picked with Up/Down runs; otherwise the line as typed. The
+        // line is taken off the input before it runs, so a command that reads
+        // the input never finds itself there.
+        if (SuggShowing() && g_sugChosen) SuggAccept(false);
+        if (g_inputLen) {
+            char line[256];
+            lstrcpynA(line, g_input, sizeof(line));
+            g_inputLen = 0; g_input[0] = 0; g_scroll = 0;
+            InputEdited();
+            HistAdd(line);
+            Execute(line);
+        }
+        InputEdited();
+        return;
+    }
+    if (vk == VK_BACK) {
+        if (g_inputLen) { g_input[--g_inputLen] = 0; InputEdited(); }
+        return;
+    }
+    if (vk == VK_TAB) {                   // take the suggestion; else 1.1's completion
+        if (SuggShowing()) SuggAccept(true);
+        else Complete();
+        return;
+    }
+    if (vk == VK_UP)   { if (SuggShowing()) SuggMove(-1); else HistUp();   return; }
+    if (vk == VK_DOWN) { if (SuggShowing()) SuggMove(+1); else HistDown(); return; }
+    if (vk == VK_PRIOR) { g_scroll += 3; return; }   // PageUp
+    if (vk == VK_NEXT)  { g_scroll = (g_scroll > 3) ? g_scroll - 3 : 0; return; }
+
+    // translate to a printable char (honours shift/caps, and AltGr: Ctrl and Alt
+    // reach ToAscii only together)
+    BYTE k2[256];
+    memcpy(k2, ks, sizeof(k2));
+    if (!((ks[VK_CONTROL] & 0x80) && (ks[VK_MENU] & 0x80))) { k2[VK_CONTROL] = 0; k2[VK_MENU] = 0; }
+    UINT scan = MapVirtualKeyA(vk, 0);
+    WORD out = 0;
+    if (ToAscii(vk, scan, k2, &out, 0) == 1) TypeChar((char)(out & 0xFF));
+}
+
 static void HandleInput() {
     // Only the game's own keyboard. GetAsyncKeyState is the GLOBAL key state,
     // so without this, while the console was open, whatever the user typed in
@@ -5603,6 +6351,8 @@ static void HandleInput() {
     BYTE ks[256] = {0};
     if (GetAsyncKeyState(VK_SHIFT)   & 0x8000) ks[VK_SHIFT]   = 0x80;
     if (GetKeyState(VK_CAPITAL)      & 0x0001) ks[VK_CAPITAL] = 0x01;
+    if (GetAsyncKeyState(VK_CONTROL) & 0x8000) ks[VK_CONTROL] = 0x80;   // Ctrl+V / Ctrl+C
+    if (GetAsyncKeyState(VK_MENU)    & 0x8000) ks[VK_MENU]    = 0x80;   // with Ctrl: AltGr
 
     // From 4 (middle mouse, then X1/X2) so those can be bound; they translate
     // to no character, so typing is unaffected. 1 and 2 (left/right click)
@@ -5612,46 +6362,252 @@ static void HandleInput() {
         bool down = (GetAsyncKeyState(vk) & 0x8000) != 0;
         bool edge = down && !g_prevKey[vk];
         g_prevKey[vk] = down;
-        if (!edge) continue;
-
-        if (vk == VK_OEM_3) {                 // ` / ~  toggles the console
-            SetOpen(!g_open);
-            g_inputLen = 0; g_input[0] = 0;
-            continue;
-        }
-        if (!g_open) { RunBind(vk); continue; }   // key binds (1.1)
-
-        if (vk == VK_ESCAPE) { SetOpen(false); continue; }
-        if (vk == VK_RETURN) {
-            if (g_inputLen) { Execute(g_input); g_inputLen = 0; g_input[0] = 0; g_scroll = 0; }
-            continue;
-        }
-        if (vk == VK_BACK) {
-            if (g_inputLen) g_input[--g_inputLen] = 0;
-            continue;
-        }
-        if (vk == VK_TAB) { Complete(); continue; }         // autocomplete
-        if (vk == VK_PRIOR) { g_scroll += 3; continue; }   // PageUp
-        if (vk == VK_NEXT)  { g_scroll = (g_scroll > 3) ? g_scroll - 3 : 0; continue; }
-
-        // translate to a printable char (honours shift/caps)
-        UINT scan = MapVirtualKeyA(vk, 0);
-        WORD out = 0;
-        if (ToAscii(vk, scan, ks, &out, 0) == 1) {
-            char c = (char)(out & 0xFF);
-            if (c == '`' || c == '~') continue;             // never type the toggle key
-            if (c >= 0x20 && c < 0x7F && g_inputLen < 250) {
-                g_input[g_inputLen++] = c; g_input[g_inputLen] = 0;
-            }
-        }
+        if (edge) HandleKey(vk, ks);
     }
 }
 
+// ---- fps -----------------------------------------------------------------------
+// Frames counted by the frame hook over half-second windows, every frame, so
+// the header has a number the moment the console opens.
+static void FpsTick() {
+    LARGE_INTEGER now;
+    QueryPerformanceCounter(&now);
+    if (!g_qpf.QuadPart) {
+        QueryPerformanceFrequency(&g_qpf);
+        g_fpsT0 = now; g_fpsF0 = g_frameCount;
+        return;
+    }
+    LONGLONG dt = now.QuadPart - g_fpsT0.QuadPart;
+    if (dt < g_qpf.QuadPart / 2) return;
+    long df = g_frameCount - g_fpsF0;
+    if (df > 0 && dt > 0) {
+        g_fps10 = (int)((df * 10LL * g_qpf.QuadPart) / dt);
+        g_ms10  = (int)((dt * 10000LL) / (g_qpf.QuadPart * (LONGLONG)df));
+    }
+    g_fpsT0 = now; g_fpsF0 = g_frameCount;
+}
+static void FpsText(char* out) {
+    out[0] = 0;
+    if (g_fps10 > 0) wsprintfA(out, "%d fps  %d.%d ms", (g_fps10 + 5) / 10, g_ms10 / 10, g_ms10 % 10);
+}
+
+// ---- the overlay (1.1.1: the owner's "Console C") ----------------------------------
+// A flat near-black panel over the top 45% with a gold rule and a soft shadow;
+// a header with SWSE, the version and, right-aligned, the look and the frame
+// rate; the scrollback coloured by line type with the time on command lines;
+// a scrollbar; the input field with ghost-text completion; and under the
+// panel, while a command name is typed, the suggestion card.
+#define C_PANEL   0x0C0C0E
+#define C_GOLD    0xD6AC5C
+#define C_TITLE   0xF0ECE4
+#define C_VER     0x82807C
+#define C_MUTED   0x9A978F   // the header's status text
+#define C_TEXT    0xE2E0DC
+#define C_GOOD    0x8EC488
+#define C_BAD     0xF06E60
+#define C_DIM     0x807E7A
+#define C_HEAD    0xE8C478
+#define C_TS      0x606064
+#define C_INPUT   0xF0EEEA
+#define C_GHOST   0x6E6C68
+#define C_HELP    0x82807C
+#define C_HELPSEL 0xBEBCB6
+#define C_KEYS    0x787672
+
+static unsigned LineRGB(unsigned char c) {
+    switch (c) {
+    case LC_HEADING: return C_HEAD;
+    case LC_ECHO:    return C_GOLD;
+    case LC_GOOD:    return C_GOOD;
+    case LC_BAD:     return C_BAD;
+    case LC_DIM:     return C_DIM;
+    default:         return C_TEXT;
+    }
+}
+
+// The header's logo slot. It draws nothing (the owner's call, 2026-10-02:
+// text only for now). To add a logo later: load an image from
+// SWSEMods\SWSE Console once into a texture, draw it as a quad h px tall
+// ending at x + its width, and return that width plus a gap - the title moves
+// right by the return value.
+static float DrawHeaderLogo(float x, float centerY, float h) {
+    (void)x; (void)centerY; (void)h;
+    return 0.0f;
+}
+
+static void DrawSuggestions(float W, int h, float panelH) {
+    const float s = g_s;
+    const int rows = g_sugN < SUGG_ROWS ? g_sugN : SUGG_ROWS;
+    const float rowh = Rd(30 * s);
+    const float sx0 = Rd(120 * s), sy0 = panelH + Rd(12 * s);
+    float nameW = 0, helpW = 0;
+    for (int r = 0; r < rows; r++) {
+        const Sugg& g = g_sug[g_sugTop + r];
+        float a = TextW(F_MONO, g.name), b = TextW(F_UI, g.help);
+        if (a > nameW) nameW = a;
+        if (b > helpW) helpW = b;
+    }
+    float nameCol = Rd(18 * s) + nameW + Rd(24 * s);
+    if (nameCol < Rd(150 * s)) nameCol = Rd(150 * s);
+    const char* keys = "Tab  complete      Up/Down  choose      PgUp/PgDn  scroll      Esc  close";
+    char more[32] = {0};
+    if (g_sugN > rows) wsprintfA(more, "%d matches", g_sugN);
+    float sw = Rd(680 * s);
+    float need = nameCol + helpW + Rd(24 * s);
+    if (need > sw) sw = need;
+    need = Rd(36 * s) + TextW(F_UI_SM, keys) + (more[0] ? Rd(40 * s) + TextW(F_UI_SM, more) : 0);
+    if (need > sw) sw = need;
+    if (sx0 + sw > W - Rd(20 * s)) sw = W - Rd(20 * s) - sx0;
+    const float sh = rowh * rows + Rd(46 * s);
+
+    RoundRect(sx0 + Rd(2 * s), sy0 + Rd(8 * s), sx0 + sw + Rd(2 * s), sy0 + sh + Rd(8 * s),
+              Rd(10 * s), 0x000000, 0.30f, Rd(12 * s));                       // soft shadow
+    RoundRect(sx0, sy0, sx0 + sw, sy0 + sh, Rd(8 * s), 0x141417, 244 / 255.0f);
+    RoundRectLine(sx0, sy0, sx0 + sw, sy0 + sh, Rd(8 * s), 0xFFFFFF, 30 / 255.0f);
+    Clip(sx0, sy0, sx0 + sw - Rd(6 * s), sy0 + sh, h);
+    for (int r = 0; r < rows; r++) {
+        int i = g_sugTop + r;
+        float ry = sy0 + Rd(6 * s) + r * rowh, rm = ry + rowh * 0.5f;
+        bool sel = (i == g_sugSel);
+        if (sel) RoundRect(sx0 + Rd(6 * s), ry, sx0 + sw - Rd(6 * s), ry + rowh, Rd(5 * s), C_GOLD, 34 / 255.0f);
+        DrawStr(F_MONO, sx0 + Rd(18 * s), Mid(F_MONO, rm), g_sug[i].name, sel ? C_GOLD : C_TEXT, 1, false);
+        DrawStr(F_UI, sx0 + nameCol, Mid(F_UI, rm), g_sug[i].help, sel ? C_HELPSEL : C_HELP, 1, false);
+    }
+    glDisable(GL_SCISSOR_TEST);
+    float fy = sy0 + sh - Rd(20 * s);
+    Rect(sx0 + 1, fy - Rd(14 * s), sx0 + sw - 1, fy - Rd(14 * s) + 1, 0xFFFFFF, 20 / 255.0f);
+    DrawStr(F_UI_SM, sx0 + Rd(18 * s), Mid(F_UI_SM, fy), keys, C_KEYS, 1, false);
+    if (more[0])
+        DrawStr(F_UI_SM, sx0 + sw - Rd(18 * s) - TextW(F_UI_SM, more), Mid(F_UI_SM, fy), more, C_KEYS, 1, false);
+}
+
+static void DrawConsoleUI(int w, int h) {
+    const float s = g_s;
+    const float W = (float)w;
+    const float panelH = floorf(h * 0.45f);
+    const GlyphFont& M = g_fonts[F_MONO];
+    const float advM = (float)M.adv['M' - 0x20];
+    float lineH = Rd(23 * s);
+    if (lineH < (float)M.height) lineH = (float)M.height;
+
+    // panel, gold rule, soft shadow under it
+    Rect(0, 0, W, panelH, C_PANEL, 226 / 255.0f);
+    Rect(0, panelH - 1, W, panelH, C_GOLD, 1.0f);
+    VGrad(0, panelH, W, panelH + Rd(26 * s), 0x000000, 0.47f, 0.0f);
+
+    // header: [logo slot] SWSE <version> ...................... 62 fps  16.1 ms
+    const float hdr = Rd(60 * s), hy = Rd(30 * s);
+    float x = Rd(20 * s);
+    x += DrawHeaderLogo(x, hy, Rd(44 * s));
+    x = DrawStr(F_TITLE, x, Mid(F_TITLE, hy), "SWSE", C_TITLE);
+    DrawStr(F_UI, x + Rd(10 * s), Mid(F_UI, hy + 1), SWSE_VERSION, C_VER);
+    float rx = W - Rd(20 * s);
+    char fps[48];
+    FpsText(fps);
+    if (fps[0]) {
+        rx -= TextW(F_UI, fps);
+        DrawStr(F_UI, rx, Mid(F_UI, hy), fps, C_MUTED);
+    }
+    Rect(Rd(16 * s), hdr, W - Rd(16 * s), hdr + 1, 0xFFFFFF, 22 / 255.0f);
+
+    // scrollback, newest at the bottom
+    const float inputY = Rd(panelH - 56 * s);
+    const float top = hdr + Rd(10 * s), bottom = inputY - Rd(8 * s);
+    int visible = (int)((bottom - top) / lineH);
+    if (visible < 1) visible = 1;
+    int maxScroll = g_logCount - visible;
+    if (maxScroll < 0) maxScroll = 0;
+    if (g_scroll > maxScroll) g_scroll = maxScroll;
+    int last = g_logCount - 1 - g_scroll;
+    int first = last - visible + 1;
+    if (first < 0) first = 0;
+    g_visFirst = first; g_visLast = last;     // Ctrl+Shift+C copies these
+    float y = bottom - (last - first + 1) * lineH;
+    const float textX = Rd(120 * s), tsX = Rd(28 * s);
+    const GlyphFont& T = g_fonts[F_MONO_SM];
+    Clip(0, top - 2, W - Rd(18 * s), bottom + 2, h);
+    for (int i = first; i <= last; i++) {
+        unsigned char c = g_logCol[i];
+        if (c == LC_BAD) {
+            Rect(Rd(16 * s), y, W - Rd(30 * s), y + lineH - Rd(2 * s), C_BAD, 26 / 255.0f);
+            Rect(Rd(16 * s), y, Rd(16 * s) + Rd(2 * s), y + lineH - Rd(2 * s), C_BAD, 1.0f);
+        }
+        if (c == LC_ECHO) {
+            DWORD t = g_logTime[i];
+            char ts[16];
+            wsprintfA(ts, "%02u:%02u:%02u", t / 3600, (t / 60) % 60, t % 60);
+            DrawStr(F_MONO_SM, tsX, y + (lineH - T.height) * 0.5f, ts, C_TS, 1, false);
+        }
+        DrawStr(F_MONO, textX, y + (lineH - M.height) * 0.5f, g_log[i], LineRGB(c));
+        y += lineH;
+    }
+    glDisable(GL_SCISSOR_TEST);
+
+    // scrollbar: only when there is more than fits
+    if (g_logCount > visible) {
+        float tr0 = top, tr1 = bottom - Rd(2 * s), span = tr1 - tr0;
+        float th = span * visible / (float)g_logCount;
+        if (th < Rd(24 * s)) th = Rd(24 * s);
+        float t = maxScroll ? (float)g_scroll / maxScroll : 0.0f;
+        float tb = tr1 - t * (span - th);
+        float bw = Rd(4 * s) < 3 ? 3 : Rd(4 * s);
+        RoundRect(W - Rd(10 * s), tb - th, W - Rd(10 * s) + bw, tb, bw * 0.5f, 0xFFFFFF, 70 / 255.0f);
+    }
+
+    // input field: prompt, the line, the ghost of the chosen suggestion, cursor
+    const float fx0 = Rd(16 * s), fx1 = W - Rd(16 * s), fy0 = inputY, fy1 = inputY + Rd(40 * s);
+    const float mid = (fy0 + fy1) * 0.5f;
+    RoundRect(fx0, fy0, fx1, fy1, Rd(6 * s), 0xFFFFFF, 12 / 255.0f);
+    RoundRectLine(fx0, fy0, fx1, fy1, Rd(6 * s), C_GOLD, 150 / 255.0f);
+    const float ty = Mid(F_MONO, mid);
+    DrawStr(F_MONO, Rd(32 * s), ty, ">", C_GOLD, 1, false);
+    const float tx = Rd(32 * s) + 2 * advM;
+    float typedW = TextW(F_MONO, g_input);
+    float avail = fx1 - Rd(24 * s) - tx;
+    float off = typedW > avail ? typedW - avail : 0.0f;    // a long line scrolls left
+    Clip(tx, fy0, fx1 - Rd(8 * s), fy1, h);
+    float cx = DrawStr(F_MONO, tx - off, ty, g_input, C_INPUT, 1, false);
+    const char* ghost = SuggGhost();
+    if (*ghost) DrawStr(F_MONO, cx + Rd(3 * s), ty, ghost, C_GHOST, 1, false);
+    glDisable(GL_SCISSOR_TEST);
+    if (((GetTickCount() - g_keyTick) / 530) % 2 == 0) {
+        float cw = Rd(2 * s) < 2 ? 2 : Rd(2 * s);
+        Rect(cx, mid - Rd(11 * s), cx + cw, mid + Rd(11 * s), C_GOLD, 1.0f);
+    }
+    if (g_toast[0] && GetTickCount() - g_toastTick < 2500)        // "copied ...", "pasted ..."
+        DrawStr(F_UI_SM, fx1 - Rd(14 * s) - TextW(F_UI_SM, g_toast), Mid(F_UI_SM, mid), g_toast, C_GOLD, 1, false);
+
+    if (SuggShowing()) DrawSuggestions(W, h, panelH);
+}
+
 // ---- per-frame entry -----------------------------------------------------
+// Every texture target off on the active unit (2D comes on per string).
+static void TexTargetsOff() {
+    glDisable(GL_TEXTURE_1D);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(CON_GL_TEXTURE_3D);
+    glDisable(CON_GL_TEXTURE_CUBE_MAP);
+    glDisable(CON_GL_TEXTURE_RECTANGLE);
+}
+
 static void RenderConsole(int w, int h) {
-    int panelH = (int)(h * 0.45f);
-    float scale = (h > 1200) ? 2.0f : 1.0f;
-    float lineH = CELL_H * scale + 2.0f;
+    // Not in the attribute stack: the program, unit 0's sampler and the client
+    // unit. Read now, put back after the pop.
+    GLint prevProg = 0, prevSampler = 0, prevClient = CON_GL_TEXTURE0, prevActive = CON_GL_TEXTURE0;
+    if (p_useProgram) glGetIntegerv(CON_GL_CURRENT_PROGRAM, &prevProg);
+    if (p_activeTexture) glGetIntegerv(GL_ACTIVE_TEXTURE_ARB_CON, &prevActive);
+    if (p_bindSampler && p_activeTexture) {
+        p_activeTexture(CON_GL_TEXTURE0);
+        glGetIntegerv(CON_GL_SAMPLER_BINDING, &prevSampler);
+        p_activeTexture((GLenum)prevActive);
+    }
+    if (p_clientActiveTexture) glGetIntegerv(CON_GL_CLIENT_ACTIVE_TEXTURE, &prevClient);
+    static GLint units = 0;                 // the fixed-function units, once
+    if (!units) {
+        glGetIntegerv(CON_GL_MAX_TEXTURE_UNITS, &units);
+        if (units < 1) units = 1;
+        if (units > 32) units = 32;
+    }
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     glMatrixMode(GL_PROJECTION); glPushMatrix(); glLoadIdentity();
@@ -5664,43 +6620,53 @@ static void RenderConsole(int w, int h) {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glDisable(GL_ALPHA_TEST);
+    // 1.1.1 draws gradients, fans and tinted text, so it pins what those need
+    // and the frame might have left otherwise. All of it is in the attribute
+    // push above and comes back with the pop.
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_FOG);
+    glDisable(GL_STENCIL_TEST);
+    glDisable(GL_SCISSOR_TEST);
+    glDisable(GL_TEXTURE_GEN_S);
+    glDisable(GL_TEXTURE_GEN_T);
+    glShadeModel(GL_SMOOTH);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glViewport(0, 0, w, h);
+    // Texturing: unit 0 only, 2D only (on per string), modulated by glColor;
+    // every other fixed-function unit off; no sampler object over the atlas's
+    // own state; texture coordinates from glTexCoord, not generated.
+    if (p_activeTexture) {
+        for (int u = 1; u < units; u++) { p_activeTexture(CON_GL_TEXTURE0 + u); TexTargetsOff(); }
+        p_activeTexture(CON_GL_TEXTURE0);
+    }
+    if (p_clientActiveTexture) p_clientActiveTexture(CON_GL_TEXTURE0);
+    if (p_bindSampler) p_bindSampler(0, 0);
+    TexTargetsOff();
+    glDisable(GL_TEXTURE_GEN_R);
+    glDisable(GL_TEXTURE_GEN_Q);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glMatrixMode(GL_TEXTURE); glPushMatrix(); glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
     glEnable(GL_BLEND);
+    if (p_blendEquation) p_blendEquation(CON_GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // background panel
-    glDisable(GL_TEXTURE_2D);
-    glColor4f(0.04f, 0.05f, 0.04f, 0.86f);
-    glBegin(GL_QUADS);
-        glVertex2f(0, 0); glVertex2f((float)w, 0);
-        glVertex2f((float)w, (float)panelH); glVertex2f(0, (float)panelH);
-    glEnd();
-    // accent line
-    glColor4f(0.84f, 0.66f, 0.33f, 1.0f);
-    glBegin(GL_QUADS);
-        glVertex2f(0, (float)panelH - 2); glVertex2f((float)w, (float)panelH - 2);
-        glVertex2f((float)w, (float)panelH); glVertex2f(0, (float)panelH);
-    glEnd();
+    EnsureFonts(h);
+    ValidateFonts(h);
+    DrawConsoleUI(w, h);
 
-    // text
-    glEnable(GL_TEXTURE_2D);
-    glColor4f(1, 1, 1, 1);
-    // input line at the bottom of the panel
-    char prompt[300];
-    wsprintfA(prompt, "> %s_", g_input);
-    DrawText(6, panelH - lineH - 4, scale, prompt);
-
-    // scrollback above the input, newest at bottom
-    int visible = (int)((panelH - lineH - 10) / lineH);
-    int last = g_logCount - 1 - g_scroll;
-    float y = panelH - lineH * 2 - 6;
-    for (int i = 0; i < visible && last - i >= 0; i++) {
-        DrawText(6, y, scale, g_log[last - i]);
-        y -= lineH;
-    }
-
+    // Nothing of ours bound at the pop: a pop that restores the pushed texture
+    // parameters into whatever is bound at that moment would write the game's
+    // texture's (a mipmapped min filter) into the atlas.
+    SWSE_GlBindTextureQuiet(GL_TEXTURE_2D, 0);
+    glMatrixMode(GL_TEXTURE); glPopMatrix();
     glMatrixMode(GL_PROJECTION); glPopMatrix();
     glMatrixMode(GL_MODELVIEW); glPopMatrix();
     glPopAttrib();
+    if (p_bindSampler) p_bindSampler(0, (GLuint)prevSampler);
+    if (p_clientActiveTexture) p_clientActiveTexture((GLenum)prevClient);
+    if (p_useProgram) p_useProgram((GLuint)prevProg);
 }
 
 static void FrameProtectedBody(HDC hdc) {
@@ -5712,8 +6678,18 @@ static void FrameProtectedBody(HDC hdc) {
         if (gpa) {
             p_useProgram = (glUseProgram_t)gpa("glUseProgram");
             if (!p_useProgram) p_useProgram = (glUseProgram_t)gpa("glUseProgramObjectARB");
+            p_activeTexture = (glActiveTexture_t)gpa("glActiveTexture");
+            if (!p_activeTexture) p_activeTexture = (glActiveTexture_t)gpa("glActiveTextureARB");
+            p_bindBuffer = (glBindBuffer_t)gpa("glBindBuffer");
+            if (!p_bindBuffer) p_bindBuffer = (glBindBuffer_t)gpa("glBindBufferARB");
+            p_blendEquation = (glBlendEquation_t)gpa("glBlendEquation");
+            if (!p_blendEquation) p_blendEquation = (glBlendEquation_t)gpa("glBlendEquationEXT");
+            p_clientActiveTexture = (glActiveTexture_t)gpa("glClientActiveTexture");
+            if (!p_clientActiveTexture) p_clientActiveTexture = (glActiveTexture_t)gpa("glClientActiveTextureARB");
+            p_bindSampler = (glBindSampler_t)gpa("glBindSampler");
         }
-        BuildFont();
+        // The fonts are built the first time the console opens, at the
+        // window's size (EnsureFonts), and again whenever that changes.
         SWSE_ScriptVMInit();
         LoadDynCmds();
         LoadBinds();
@@ -5722,13 +6698,15 @@ static void FrameProtectedBody(HDC hdc) {
         // Deliberately plain. The font atlas is ASCII only, so decorative
         // separators drew as '?', and four dense lines buried the one thing a
         // new user needs to know.
-        SWSE_ConsolePrint("SWSE Console " SWSE_VERSION);
-        SWSE_ConsolePrint("type 'help' for commands, 'features' for what is switched on");
+        PrintCol("SWSE Console " SWSE_VERSION, LC_DIM);
+        PrintCol("type 'help' for commands, 'features' for what is switched on", LC_DIM);
         if (SWSE_GameBuildSafeMode())
             SWSE_ConsolePrint("safe mode: this game build is not the one SWSE was measured on - 'status'");
     }
     SWSE_ScriptTick();        // apply god mode each frame (no-op unless enabled)
     SchedTick();              // `after` / `wait` commands that have come due
+    FpsTick();                // the header's frame rate, measured open or closed
+    g_conHwnd = WindowFromDC(hdc);   // the clipboard's owner when the console writes to it
     HandleInput();
     if (!g_open) return;
     HWND hwnd = WindowFromDC(hdc);

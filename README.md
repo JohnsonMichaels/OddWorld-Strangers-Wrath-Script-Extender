@@ -15,6 +15,22 @@ If you release a mod, post it in `#your-mods`.
 
 ---
 
+## What's new in 1.1.1
+
+* **The console's new look**: sharp text at any resolution, the frame rate
+  (fps and ms) at the top right, and colour-coded commands, results and
+  errors.
+* **Typing help**: suggestions as you type a command name (Tab takes one,
+  Up/Down choose), and Up/Down history of what you typed.
+* **Copy and paste**: Ctrl+V or Shift+Insert pastes (each pasted line runs),
+  Ctrl+C copies the line you are typing - or, with nothing typed, the last
+  command and its output - and Ctrl+Shift+C copies the lines on screen.
+* Nothing else changed: the same 220 commands, switches and defaults as 1.1.
+  The keys in full:
+  [The console's look and keys](SWSE_FEATURES.md#the-consoles-look-and-keys-111).
+
+---
+
 ## What's new in 1.1
 
 * **Only the console is switched on after installing.** Every other system is
@@ -38,7 +54,7 @@ If you release a mod, post it in `#your-mods`.
   animations.
 * **Ray-traced ambient occlusion, as an experiment** - the `raytrace` switch,
   off by default and only with graphics on. Its occlusion is known to be
-  wrong; fixing that is the next milestone.
+  wrong: it only sees what the camera already drew.
 * **A game-build check, and a safe mode**: on a build SWSE's addresses were
   not measured on (GOG, a future patch), nothing that patches, calls or reads
   the game runs, so it cannot crash it; the console, graphics, HD textures,
@@ -59,13 +75,13 @@ If you release a mod, post it in `#your-mods`.
 | **SWSE Setup** | The players' installer (`SWSE Setup.exe` in the zip): installs, updates or removes SWSE and switches its systems with tick boxes. | - |
 | **Mod Loader** | The modders' desktop studio (`studio.py`, built from this repository, not in the player zip): import & export textures, edit stat values (bounties, damage, ...), manage installed mods - and the same SWSE Setup screen as its first tab. | - |
 | **SWSE** - Stranger's Wrath Script Extender | A DLL that loads with the game (`dinput8` proxy) and powers everything below. Each system is switched on or off individually in `SWSEMods\features.txt`, or live with `features <name> on\|off`. | - |
-| **SWSE Console** | In-game dev console. Press **` / ~**: god, ammo, heal, transform into Steef, money, level warp, NPC control, playing as any character in the level (`playnpc`), plus `list`/`call` access to **181 of the game's own native script functions**. Scriptable from outside the game via `tools/swse.ps1`. | `console` - **on** |
+| **SWSE Console** | In-game dev console. Press **` / ~**: god, ammo, heal, transform into Steef, money, level warp, NPC control, playing as any character in the level (`playnpc`), plus `list`/`call` access to **181 of the game's own native script functions**. Scriptable from outside the game through the remote mailbox (`SWSE Console\remote_in.txt` - see [AT3_INTEGRATION.md](AT3_INTEGRATION.md#the-remote-mailbox)). | `console` - **on** |
 | **SWSE Graphics** | Post-process overhaul: sharpening, bloom, filmic tonemapping, colour grading, ambient occlusion, RTGI, vignette. Once switched on, press **F10** in-game for the look, **F11** to reload settings live. Only the 3D scene is touched - HUD/menus stay clean. | `graphics` - off |
-| **SWSE HD** | HD texture pack: 960 textures upscaled to 2x, swapped in at GPU upload. The game's archives are never modified. The pack itself is a separate download (about 200 MB) from the Releases page; it needs the included 4GB patcher, and the INSTALL file walks through both. | `hdtextures` - off |
+| **SWSE HD** | HD texture pack: 960 textures upscaled to 2x, swapped in at GPU upload. The game's archives are never modified. The pack itself is a separate download (about 200 MB, `SWSE-HD-Textures-2x.zip` on the [1.0 release](https://github.com/JohnsonMichaels/OddWorld-Strangers-Wrath-Script-Extender/releases/tag/v1.0), unchanged since); it needs the included 4GB patcher, and the INSTALL file walks through both. | `hdtextures` - off |
 | **SWSE Wind** | Foliage wind: grass and plants sway, and part around you as you walk through them. Per-plant tuning in `foliage.txt`. | `foliage` - off |
 | **SWSE Combat** | Additive hit reactions: NPCs flinch from the bone that was actually shot. Tuning in `hitreact.txt`. | `hitreact` - off |
 | **AI tuning** | Build your own difficulty: per-character sight, fire rate, accuracy, miss time and more via `aiprefs.txt` profiles. | `aituning` - auto |
-| **SWSE Ambushes** | Example trigger mod: mod-defined game events from `triggers.txt`, such as a chance of an ambush where you already cleared an area. | `triggers` - off |
+| **Triggers** | Mod-defined game events from a mod's own `triggers.txt`. | `triggers` - off |
 | **Character tuning** | Per-character health and gib rules from `characters.txt` and `console.txt`, every level. | `npctuning` - off |
 | **Player tuning** (1.1) | Your own health, stamina, speed, jump, gravity and air control from `playerprefs.txt`, every level. | `playertune` - auto |
 | **Prefs editor** (1.1) | Live edits to any of the game's loaded prefs records from `prefs.txt` or the console (`prefs`, `knockback`). | `prefsedit` - off |
@@ -83,8 +99,11 @@ The full command and file reference for modders is
 
 ## Install the mods (players)
 
-Grab **`release/`** (or the packaged zip) and follow
-**`release/INSTALL - READ ME FIRST.txt`**.
+Download **`SWSE-1.1.1.zip`** from the
+[Releases page](https://github.com/JohnsonMichaels/OddWorld-Strangers-Wrath-Script-Extender/releases)
+and follow **`INSTALL - READ ME FIRST.txt`** inside it. (The repository's
+`release/` folder holds the same files except `SWSE Setup.exe`, which is
+built from `swse_setup.py` - see below.)
 
 **The easy way:** unzip, run **`SWSE Setup.exe`**, tick what you want on (or
 press **Recommended**, **Classic SWSE** or **Everything**) and press
@@ -103,7 +122,7 @@ The manual way:
    in one word. Or change `off` to `on` at the top of `SWSEMods\features.txt`,
    or type `features <name> on` - for example `features graphics on`, then
    **F10** for the look. `features` on its own lists everything.
-4. Optional: for the HD texture pack, download it from the Releases page,
+4. Optional: for the HD texture pack, download `SWSE-HD-Textures-2x.zip` from the 1.0 release on the Releases page,
    unzip into `SWSEMods\SWSE HD\textures\`, run `SWSE_4GB_Patcher.exe` once,
    and switch on `hdtextures`. The INSTALL file explains why the patch is
    needed and how to undo it.
@@ -128,12 +147,13 @@ pip install pyinstaller
 python -m PyInstaller SWSESetup.spec --distpath release     # -> release\SWSE Setup.exe
 ```
 
-`tools/package_swse.ps1` ships `release\SWSE Setup.exe` (git-ignored; about
-12 MB, as it needs no Pillow). It refuses an exe older than the Python it is
-built from, and runs its `--selftest` before zipping. What SWSE Setup does:
-- It finds the game the way `tools/swse_paths.ps1` does - `SWSE_GAME_DIR`,
-  every Steam library, the GOG registry and folders - with **Browse** to pick
-  another, and shows which SWSE is installed there (`bin\dinput8.dll`'s version).
+The release zip ships `SWSE Setup.exe` (git-ignored here; about 12 MB, as it
+needs no Pillow). The packaging script refuses an exe older than the Python
+it is built from, and runs its `--selftest` before zipping. What SWSE Setup
+does:
+- It finds the game from `SWSE_GAME_DIR`, every Steam library, and the GOG
+  registry and folders - with **Browse** to pick another - and shows which
+  SWSE is installed there (`bin\dinput8.dll`'s version).
 - A tick box per switch with its one-line description (aituning and playertune
   get auto/on/off), plugins found in the enabled mods listed after them, and
   the presets **Recommended** (the 1.1 default), **Classic SWSE**
@@ -155,8 +175,7 @@ built from, and runs its `--selftest` before zipping. What SWSE Setup does:
 
 The logic is in `oddforge/swsefeatures.py` (features.txt, read and written by
 `swse/features.cpp`'s rules), `oddforge/swseinstall.py` and
-`oddforge/gamepaths.py`, tested without the window by
-`python tools/test_swsefeatures.py`. `"SWSE Setup.exe" --selftest <file>` (and
+`oddforge/gamepaths.py`. `"SWSE Setup.exe" --selftest <file>` (and
 `ModLoader.exe --selftest <file>`) builds the window without showing it and
 reports whether the exe finds its modules and the release beside it.
 
@@ -223,17 +242,19 @@ top of `install.bat` if your install isn't the default Steam location.
   native script functions), and in 1.1 the level watcher, player tuning, the
   live prefs editor, `playnpc`, the game-build check and the experimental ray
   tracer. See [swse/README.md](swse/README.md).
-- **`swse/research/`** - the reverse-engineering notes that make it all possible:
-  the game's script VM (**348 script functions mapped to native addresses**),
-  the exact **reflection table (5,697 fields in 191 classes,
-  `REFLECT_FIELDS.tsv`)**, and which functions are console-callable. This is
-  the map for building new features.
+- **`swse/research/`** - in this repository, `REFLECTION_SCHEMA.md`, which the
+  Mod Loader's Game Data tab uses to name fields. The full reverse-engineering
+  notes (the game's script VM with 348 script functions mapped, the exact
+  reflection table of 5,697 fields in 191 classes, which functions are
+  console-callable) are kept in the development repository, not published
+  here.
 - **[AT3_INTEGRATION.md](AT3_INTEGRATION.md)** - building a tool on SWSE: the
   files, the remote mailbox and `query`, as used by Stranger: Armed to the
   Teeth. **[TOOL_CONTRACT.md](TOOL_CONTRACT.md)** is what a tool can rely on
   in every 1.x release.
 - **`FORMAT.md`** - the `.smb` container spec.
-- **`tools/`** - exploration/validation scripts.
+- **`sdk/`** - the native plugin SDK: the C header, a complete example and a
+  stand-in host. See [sdk/README.md](sdk/README.md).
 
 ---
 
@@ -263,9 +284,9 @@ checks the game build, the level watcher, and each tuning system and the ray
 tracer that is switched on; `difficulty`, `playertune`, `prefs status` and
 `triggers` give the details. Systems you have not switched on are listed on
 one `[OFF ]` line, never as a failure. One feature was
-attempted and removed: blood decals. The
-engine has no decal system, and the findings are preserved in
-`swse/research/BLOOD_DECALS.md` so nobody has to rediscover why.
+attempted and removed: blood decals. The engine has no decal system; the
+findings are kept in the project's research notes so nobody has to
+rediscover why.
 
 Requires a legal copy of Oddworld: Stranger's Wrath HD (Steam). The GOG
 release is not supported yet: SWSE recognises it as a different build and

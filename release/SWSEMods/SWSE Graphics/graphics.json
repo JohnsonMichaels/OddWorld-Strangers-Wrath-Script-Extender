@@ -1,5 +1,5 @@
 {
-  "_comment": "SWSE reads this. 'passes' run in order over the captured 3D-scene frame, before HUD/menus are drawn (scene_only=true guarantees UI is untouched). Each effect has an in-overlay control (Home menu). Values here are defaults/saved state.",
+  "_comment": "SWSE only checks that this file exists: it marks the folder as a graphics mod in swse_log.txt. The passes, shaders and overlay key below are not read, and there is no Home menu. The look is set in graphics.txt: F10 toggles it in-game, F11 reloads it.",
   "scene_only": true,
   "overlay_key": "HOME",
   "passes": [

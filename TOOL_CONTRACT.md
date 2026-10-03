@@ -17,8 +17,8 @@ starting with 1.1:
 
 | Question | How |
 |---|---|
-| Is SWSE installed? | `bin\dinput8.dll` exists and its version resource says InternalName `SWSE` (ProductName `SWSE (Stranger's Wrath Script Extender)`). PowerShell: `(Get-Item bin\dinput8.dll).VersionInfo.ProductVersion` gives, for example, `1.1`. Works with the game closed. |
-| Which game folder? | Steam: `<library>\steamapps\common\Stranger's Wrath`. GOG: the path in `HKLM\SOFTWARE\WOW6432Node\GOG.com\Games\<id>` whose `gameName` mentions Stranger. `tools\swse_paths.ps1` does both, plus the override `SWSE_GAME_DIR`. |
+| Is SWSE installed? | `bin\dinput8.dll` exists and its version resource says InternalName `SWSE` (ProductName `SWSE (Stranger's Wrath Script Extender)`). PowerShell: `(Get-Item bin\dinput8.dll).VersionInfo.ProductVersion` gives, for example, `1.1.1`. Works with the game closed. |
+| Which game folder? | Steam: `<library>\steamapps\common\Stranger's Wrath`. GOG: the path in `HKLM\SOFTWARE\WOW6432Node\GOG.com\Games\<id>` whose `gameName` mentions Stranger. `oddforge/gamepaths.py` does both, plus the override `SWSE_GAME_DIR`. |
 | Where is the exe? | `bin\stranger.exe` on Steam. A GOG build may differ, so look in both `bin\` and the root. |
 | Is it running with SWSE? | `bin\swse_log.txt` has a line starting `==== SWSE injected ====` for this session, and the mailbox (below) answers. |
 | Which version is running? | `query version` answers `swse=<ver> build=<name>`. `build` is `Steam_HD`, or `unknown` for a game build SWSE does not recognise. There SWSE runs in safe mode: nothing that patches, calls or reads the game runs. The mailbox works, and so do SWSE's own commands (`query`, `status`, `features`, `help`, `mods`, `ver`, `plugins`, `hooks`, `selftest`, binds, aliases, `exec`, `after`, `repeat`, `wait`, key presses) and the switches `graphics`, `hdtextures`, `foliage` and `raytrace`. The level watcher does not start: `query player` answers `levelup=0 epoch=0 level=- safemode=1` and nothing more, for good. A command that reaches the game is refused with one line and no effect; the switches `hitreact`, `npctuning`, `aituning`, `triggers`, `playertune` and `prefsedit` refuse to come on. `SWSE_UNKNOWN_BUILD_OK=1` in the game's environment turns safe mode off (then `build=unknown` runs everything). |
@@ -73,8 +73,8 @@ second while the game draws frames. Background mode (below) keeps it drawing.
 launch: start `bin\stranger.exe` from a process that has it, and the game
 inherits it.
 - Starting `bin\stranger.exe` directly works in background mode. It was
-  verified on every agent run of 1.1. The "frozen window" that
-  `tools\relaunch.ps1` warns about was most likely the cursor loop that 1.1
+  verified on every agent run of 1.1. The "frozen window" SWSE's own relaunch
+  script warned about was most likely the cursor loop that 1.1
   fixed. A direct start WITHOUT background mode has not been re-measured.
 - Start it OUTSIDE the app the user is typing in. Windows lets a process
   started by the foreground app take the foreground itself. WMI's

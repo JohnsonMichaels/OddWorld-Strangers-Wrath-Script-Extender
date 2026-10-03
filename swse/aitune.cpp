@@ -119,11 +119,11 @@ static char     g_wantProfile[24];
 #define NW_RELOADMX 0x188
 #define NW_ACCURACY 0x1A8
 #define NW_MISSTIME 0x1AC      // m_missTime, seconds (shipped 0.010 = 10 ms)
-// Characters with this much health are the engine's "protected" cast -
-// townsfolk, Clakkerz, natives, storekeepers. They are not flagged
-// invulnerable, they simply have an enormous health value (see
-// research/NPC_TUNING.md). It doubles as a reliable "this is not an enemy"
-// test, which is how the tuning avoids buffing the wrong people.
+// Characters shipped with this much m_health are the game's "protected" cast -
+// townsfolk, Clakkerz, natives, storekeepers. They take no damage because the
+// engine skips damage at or above 10000.0 health (health core 0x46A670,
+// constant 0x806F20). The 100000 value doubles as a reliable "this is not an
+// enemy" test, which is how the tuning avoids buffing the wrong people.
 #define PROTECTED_HP 100000.0f
 struct WBase {
     unsigned addr;

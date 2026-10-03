@@ -17,8 +17,12 @@ if not defined VSPATH (
 )
 call "%VSPATH%\VC\Auxiliary\Build\vcvars32.bat" >nul
 
-echo Compiling SWSE proxy (x86)...
-REM The version resource (swse.rc, FileVersion 1.1.0.0) lets tools read the
+REM The version comes from swse_version.h, the one place it is set.
+set "SWSE_VER=?"
+for /f "tokens=3" %%v in ('findstr /b /c:"#define SWSE_VERSION " swse_version.h') do set "SWSE_VER=%%~v"
+
+echo Compiling SWSE %SWSE_VER% proxy (x86)...
+REM The version resource (swse.rc, from swse_version.h) lets tools read the
 REM installed version from bin\dinput8.dll without running the game.
 rc /nologo /fo swse.res swse.rc
 if errorlevel 1 (
@@ -44,7 +48,7 @@ del /q "%TEMP%\swse_hello_abi.obj" 2>nul
 
 del /q *.obj swse.res dinput8.exp dinput8.lib dllmain.exp dllmain.lib 2>nul
 echo.
-echo Built dinput8.dll (SWSE 1.1)
+echo Built dinput8.dll (SWSE %SWSE_VER%)
 echo Install: copy dinput8.dll into the game's bin\ folder - install.bat does it
 echo for the default Steam path. dinput8_real.dll is optional since 1.0.1: SWSE
 echo loads the system dinput8.dll itself when it is not there.

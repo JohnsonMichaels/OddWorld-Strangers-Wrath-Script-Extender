@@ -1,16 +1,16 @@
 # SWSE - Stranger's Wrath Script Extender
 
-Everything SWSE 1.1 can do. The SWSE DLL is the runtime half of the project:
+Everything SWSE 1.1.1 can do. The SWSE DLL is the runtime half of the project:
 a `dinput8.dll` proxy loaded by the game, giving an in-game console, graphics
 features, gameplay tuning from text files, and the reverse-engineering
 instruments the rest of the project is built with. The offline half (archive
 parsing, texture pipeline, the Mod Loader GUI) is the `oddforge` Python library
-and `tools/`.
+and `studio.py`.
 
 **Install:** `swse/build.bat`, then copy `dinput8.dll` into the game's `bin\`.
 A `dinput8_real.dll` beside it is optional: since 1.0.1 SWSE loads the real
 system `dinput8.dll` by absolute path when that file is absent. The DLL carries
-a version resource (1.1.0.0 - Properties > Details); in game, `ver` and
+a version resource (1.1.1.0 - Properties > Details); in game, `ver` and
 `query version` say the same.
 
 What changed release by release is in [CHANGELOG.md](CHANGELOG.md). The guide
@@ -18,7 +18,21 @@ for tools built on SWSE - Stranger: Armed to the Teeth in particular - is
 [AT3_INTEGRATION.md](AT3_INTEGRATION.md), and what a tool can rely on from
 release to release is [TOOL_CONTRACT.md](TOOL_CONTRACT.md).
 
+**Paths on this page.** `swse/research/...` and `tools/...` name files in the
+project's development repository. Of the research notes, the public
+repository carries only `swse/research/REFLECTION_SCHEMA.md`, and none of the
+`tools/` scripts; where this page names one, it says where the work is
+recorded, not a file you will find here.
+
 ---
+
+## What is new in 1.1.1
+
+* **The console's new look and keys** - the frame rate (fps and ms) at the top
+  right, sharper coloured text, suggestions as you type, history on Up/Down,
+  and copy and paste (Ctrl+V / Shift+Insert, Ctrl+C, Ctrl+Shift+C). See
+  [The console's look and keys](#the-consoles-look-and-keys-111). No new
+  commands; nothing else changed from 1.1.
 
 ## What is new in 1.1
 
@@ -68,7 +82,7 @@ release to release is [TOOL_CONTRACT.md](TOOL_CONTRACT.md).
   eleventh switch, `raytrace`, off by
   default and only with `graphics` on - see
   [Ray tracing (experimental)](#ray-tracing-experimental). Its occlusion is
-  known to be wrong; fixing that is the next milestone.
+  known to be wrong.
 * **Menus without keys.** `menu continue` loads the last save, `menu skip`
   skips a paused movie, and `menu fs` sends any Flash screen's own command,
   the way its button does - so they work with the game behind other windows.
@@ -381,19 +395,54 @@ would silently erase a second patch laid over them.
 Two ways in:
 
 * **In game** - the `` ` `` / `~` key opens the console. Tab completes,
-  PageUp/PageDown scroll, Enter runs, Esc closes. While it is open the game
+  PageUp/PageDown scroll, Enter runs, Esc closes. Up/Down recall the lines
+  typed this session, and the clipboard works (1.1.1, below). While it is open the game
   gets no key presses, mouse movement, clicks or wheel (1.1), so typing never
   walks Stranger and the mouse does not turn the camera. That holds for keys
   the game reads just after the console closes, such as the key that closed
   it. Releases still pass, so nothing is left held down. The console reads the
   keyboard only while the game is the window you are in, so typing in another
   app never lands in its line, even with it open (after a mailbox `show`).
-* **From outside** - `powershell -File tools/swse.ps1 "<command>"`. This writes
-  a sequence-numbered request into
-  `SWSEMods\SWSE Console\remote_in.txt` and reads the reply back from
-  `remote_out.txt`. It needs **no window focus**, which matters: the console
-  reads the keyboard with `GetAsyncKeyState`, so synthesising keystrokes would
-  type into whatever window is actually focused.
+* **From outside** - write a request into
+  `SWSEMods\SWSE Console\remote_in.txt` and read the reply back from
+  `remote_out.txt` (the mailbox, below). It needs **no window focus**, which
+  matters: the console reads the keyboard with `GetAsyncKeyState`, so
+  synthesising keystrokes would type into whatever window is actually focused.
+
+### The console's look and keys (1.1.1)
+
+* **The header.** `SWSE` and the version at the left; at the right, the frame
+  rate as plain text, `62 fps  16.1 ms`, averaged over half a second from
+  SWSE's own frame counter. It is measured whether the console is open or
+  not, so a number is there the moment it opens.
+* **Text.** Rasterized at the window's size (Consolas 20 px at 1080 lines, 27
+  at 1440; Bahnschrift, else Segoe UI, for the header and the card) and
+  rebuilt when the window changes. Lines are coloured by type: your commands
+  in gold with the time, errors on a red row, results in green, usage and
+  `(none)` dimmed. A scrollbar shows when there is more than fits.
+* **Suggestions.** While a command name is typed, a card under the console
+  lists every command it could become, with its help: the first one shows as
+  ghost text after the cursor. Tab takes it, Up/Down choose (Enter then runs
+  the chosen one), Esc hides the card and a second Esc closes the console.
+* **History.** Up/Down, with no card showing, step through the lines typed
+  this session (32, no repeats in a row). Lines run by `exec`, the mailbox or
+  a bind are not added.
+* **Paste - Ctrl+V or Shift+Insert.** As in a terminal: the text goes in at
+  the end of the line, and each line break runs the line before it, in order
+  (through the same runner as `exec`, so `wait` delays the rest; 64 lines at
+  most; `#` lines and blank ones skipped; each run line joins the history).
+  What follows the last line break stays in the input. Text without a line
+  break just goes into the input. Unicode becomes ASCII: curly quotes, dashes
+  and non-breaking spaces become their plain forms, anything else `?`.
+* **Copy - Ctrl+C / Ctrl+Shift+C.** Ctrl+C copies the line typed; with
+  nothing typed, the last command and its output (from its `> ` line to the
+  end). Ctrl+Shift+C copies the lines on screen. What happened shows in the
+  input field for 2.5 s, not in the scrollback.
+* The clipboard keys work only while the console is open and the game is the
+  window you are in, as for typing. No other Ctrl+key types anything; Ctrl
+  with Alt is AltGr, so AltGr characters type on European layouts.
+* `help` ends with these keys. No command was added or changed: 1.1.1 has
+  1.1's 220 commands, word for word.
 
 `help` lists everything by category (player, movement, items, world, tuning,
 graphics, raytrace, input, scripting, debug, music, console); `help <category>`
@@ -418,8 +467,7 @@ lines starting `#` are skipped. A request runs when its sequence number **or
 the file's write time** changes, and the first poll after launch only records
 the file already on disk, so a leftover request never replays itself. Checking
 the write time too means a tool that restarts its numbering every session is
-not ignored; a new number per request is still the clean way - `tools/swse.ps1`
-uses the number on disk plus one.
+not ignored; a new number per request is still the clean way - for example the number on disk plus one.
 
 **End the file with a newline.** A request runs only once it is completely
 written: when the file ends with a newline, or has sat unchanged for one poll
@@ -454,8 +502,8 @@ session (`remote` shows its state and the last sequence number).
 | `query [player]` | one line of key=value: `levelup epoch level x y z yaw health healthmax stamina staminamax moolah`; in safe mode `levelup=0 epoch=0 level=- safemode=1` |
 | `query position` | the same without health, stamina and moolah |
 | `query features` | `console=on graphics=off ...` for every switch (eleven) |
-| `query version` | `swse=1.1 build=Steam_HD`; `build=unknown` on a game build SWSE does not recognise, which runs in safe mode |
-| `query contract` | `contract=1 swse=1.1`: the version of the tool contract below |
+| `query version` | `swse=1.1.1 build=Steam_HD`; `build=unknown` on a game build SWSE does not recognise, which runs in safe mode |
+| `query contract` | `contract=1 swse=1.1.1`: the version of the tool contract below |
 | `mods` | enabled mod folders in load order, and which SWSE files each provides |
 | `mods reload` | rescan `SWSEMods` and `load_order.txt`, reload positions and scripts, and re-read the files of the tuning systems that are on (`aiprefs.txt`, `triggers.txt`, `playerprefs.txt`, `prefs.txt`, `console.txt` / `characters.txt`) |
 | `hide` / `show` | close / open the overlay (a tool on the mailbox cannot press `~`) |
@@ -551,15 +599,20 @@ release ships commented examples in `SWSE Console\examples\`.
 | `writepos <label>` | save where you stand and your facing, by name, to file |
 | `goto <label>` | teleport to a saved position and facing |
 | `positions` | list them, with yaw and level |
-| `spawnat <label\|here> [n] [type]` | move NPCs to a position |
+| `spawnat <label\|here> [n] [type]` | move existing NPCs to a position (they arrive without their AI running) |
 
 Since 1.1 every teleport is the game's own - the call its checkpoint respawn
 makes - so the destination streams in first (a short hitch on a long jump).
 The destination needs a zone: `tp` uses the one `savepos` recorded, anything
 else the zone whose box contains the point, and a point outside every zone is
 refused. Refused too while a level loads, in a boat, and on an unknown game
-build. Before 1.1 no teleport moved the player at all
-([swse/research/TELEPORT.md](swse/research/TELEPORT.md)).
+build. Before 1.1 no teleport moved the player at all.
+
+**Known risk: teleporting into a scripted fight can crash the game.** Seen
+twice in testing after 1.1's release: a teleport into an area where the
+level's script starts a fight, and the game closed a few seconds later (a
+fault inside the game's own combat script). Save first, and walk into story
+fights rather than teleporting into them.
 
 **Yaw** is the rotation angle of the player's world matrix about Z (up), in
 degrees 0..360 - `atan2(m3, m0)`, **the same angle the game's level records
@@ -594,8 +647,7 @@ when the facing could be read**, to `SWSE Console\sites.txt` - a made-up 0
 there would be read as a facing. Appending keeps the author's comments, and
 re-using a label simply moves the point. Every mod's `positions.txt` is still
 read, so a mod author moves the lines into their own mod. (1.0.x appended to
-whichever mod last had a `positions.txt` - in a stock install the shipped
-`SWSE Ambushes` example, which an update replaces.)
+whichever mod last had a `positions.txt`.)
 
 **The level column is partial.** SWSE learns the level name only from its own
 `warp` command, so after loading a save, or a normal in-game transition, the
@@ -900,8 +952,7 @@ pipeline was absent, including when graphics had been switched off on purpose.)
 **New in 1.1, experimental. Needs the `graphics` and `raytrace` features.** SWSE builds a bounding
 volume hierarchy (BVH) from the world geometry the game draws, and traces
 ambient-occlusion rays through it on the GPU, feeding the post-process
-composite. It is the foundation of the RTX-Remix-style renderer the project is
-working towards, and it is **not finished**: see the known problems below.
+composite. It is **not finished**: see the known problems below.
 
 To see it:
 - `features graphics on`, then `features raytrace on`. `raytrace` refuses to
@@ -951,10 +1002,7 @@ on but not `raytrace`; without it they say so instead of doing nothing.
   measurements. The card controls above have not been measured against them
   yet.
 
-Fixing these (the engine's own scene instead of the draw stream, culling
-held off for the tracer, card opacity) is the next milestone, "True light",
-planned in `swse/research/RT_1_3_PLAN.md`. The measurements are in
-`swse/research/RT_DIAG_*.md`.
+These are not fixed in 1.1.1.
 
 ### HD texture replacement
 
@@ -1542,10 +1590,12 @@ behind it.
 **Spawning / placement:** `spawn`, `spawnhere`, `npcnow`,
 `npcdupe`, `npccount`, `dupetype`, `npcreplay`, `npchere`, `npclast`,
 `spawnclone`, `npcspawn`, `bring`, `sendnpc`, `spawnradius`, `critters`,
-`spawnat`, `reserve`. `spawnnpc` is retired and refuses: it moved a live
-piece of the level to you and wrote the wrong fields. NPCs SWSE constructs
-itself (`npcnow`) are still not drawn: they need a valid zone for their
-position (`swse/research/RE_SPAWNING.md`).
+`spawnat`, `reserve`. These are research tools: adding a new, working NPC is
+not supported in this version. `spawnnpc` is retired and refuses: it moved a
+live piece of the level to you and wrote the wrong fields. NPCs SWSE builds
+itself (`npcnow` and the replay commands) are not drawn and do not act, and
+NPCs moved across the level (`bring`, `sendnpc`, `spawnat`) arrive without
+their AI running.
 
 **Tuning:** `npchealth`, `npcelite` (promote a fraction to elites), `npcgib`,
 `npchurt`, `npcaff`, `allnpcs`, `ai`, `types`, `tuning`
@@ -1554,11 +1604,12 @@ position (`swse/research/RE_SPAWNING.md`).
 `whereis`, `geominst`, `resolve`, `strhash`
 
 **Hostility and alarms:** `townpanic`, `raid`, `raidmode`, `attack`, `decoy`,
-`feud`, `findtarget`, `scantargets`
+`feud`, `findtarget`, `scantargets` - research tools; none of them makes NPCs
+fight each other (see the known limit below).
 
 **Events:** `triggers [list|reload|test <name>|on|off]` - mod-defined events
-from every enabled mod's `triggers.txt` (the `SWSE Ambushes` folder is the
-worked example). Needs the `triggers` feature to fire on its own.
+from every enabled mod's `triggers.txt`. Needs the `triggers` feature to
+fire on its own.
 
 ### Play as a character - `playnpc` (1.1)
 
@@ -1654,13 +1705,13 @@ weapon object the character really uses, found through the resource registry;
 1.0.x wrote into the AIPrefs vtable and through the weapon's hash as if it were
 an address, with AI offsets four bytes short.
 
-**Known limit:** there is no NPC-vs-NPC hostility in this engine - every
-character reads affiliation `1`, and "enemy" is a relationship to the player
-only. Faction raids are blocked on this; see `swse/research/FACTIONS.md`.
-`swse/research/AT3_DISCOVERIES.md` (static analysis, not yet run in the game)
-reads that field as an ammo-immunity rule rather than an affiliation - so use
-`npcaff` with care until that is checked - and points at `m_species` as the
-place hostility may really live.
+**Known limit:** NPCs fighting each other is not supported in this version.
+The game's own attack rules make characters hostile to the player only: its
+attitude check, its melee hit filter and its bolt-collision check allow an
+attack only when the target is the Stranger (or Steef). The commands above
+can retarget NPCs or (`feud`, untested) inject damage, but they do not make
+characters fight. `m_affGenerally`, the field `npcaff` writes, is an
+ammo-immunity rule, not an affiliation: use `npcaff` with care.
 
 ---
 
@@ -1771,7 +1822,7 @@ the game or by disassembly. Thank you, Racewizard.
 
 ### Mapped but not yet run: the AT3 discoveries catalogue
 
-[`swse/research/AT3_DISCOVERIES.md`](swse/research/AT3_DISCOVERIES.md) maps
+`AT3_DISCOVERIES.md` (in the development repository's research notes) maps
 everything else AT3 found onto live offsets and proposes commands for it. It is
 static analysis of the exe and of retail records - **nothing in it has been
 run in the game yet** - so read it as a map, not a feature list. Its headline
@@ -1791,14 +1842,17 @@ results:
   (NPCTag `0616073E`, InstancedObjectTag `2B9F6678`...).
 * The engine **does** create NPCs at runtime - when a character gibs
   (`m_onGibSpawnNPC`: the Shock Tank becomes a wolvark shooter) and to refill
-  spawn pools - which `NPC_SPAWNING.md` said never happens. AT3's visibility
-  rules (the zone index must match the position; a spawn at floor level falls
-  through) fit SWSE's "constructed NPCs never render" result closely enough to
-  re-test `npcnow`.
+  spawn pools - which `NPC_SPAWNING.md` said never happens. Later research
+  found why SWSE's constructed NPCs never render (the game files them under
+  no zone) and that the game itself spawns by releasing characters it placed
+  in a level's spawner pools at load. Spawning through SWSE is not supported
+  in 1.1.1.
 * `m_affGenerally` / `m_affList` read as an **ammo-immunity rule**, not an
   affiliation: `npcaff <type> 0` may make a type immune to all player ammo.
-  `m_species` (outlaw, wolvark and slog hostile; native and townsfolk not) is
-  the new lead for NPC-vs-NPC hostility.
+  `m_species` (outlaw, wolvark and slog hostile; native and townsfolk not)
+  sets how a character treats the player; later research found the game's
+  attack checks allow attacks on the Stranger only, so it does not on its own
+  make NPCs fight each other.
 * Characters drop loot through spawner slots (any character could drop ammo or
   moolah), each zone carries its own fog and ambience block, and the weapon
   damage, clip, area and homing fields are named.
@@ -1807,7 +1861,10 @@ Its top ten proposed commands, by value for effort: `npcgibspawn` leading to
 `npcspawn`, a zone and height fix for `npcnow`, per-type `npcai` sight and
 tactics, `npcspecies`, `npcammo` (replacing `npcaff`), `npcloot` with `spray`,
 `wpn`, `fog` / `env` / `hunters`, `npcgibfx`, and a key=value `characters.txt`
-applied in the spawn hook. None of them exist in 1.1.
+applied in the spawn hook. Of these only `wpn` exists (1.1, see
+[Characters and weapons by name](#characters-and-weapons-by-name---npc-wpn-11));
+the console's existing `npcspawn` replays a captured spawn and is not the
+proposed command.
 
 How AT3 and SWSE 1.1 fit together - files, commands, and the one behaviour
 change it needs to know about - is in [AT3_INTEGRATION.md](AT3_INTEGRATION.md).
@@ -2032,7 +2089,11 @@ list, which triggers count from when hit reactions are off - 1.1)
 
 ---
 
-## Offline tooling (`tools/`, `oddforge/`)
+## Offline tooling (`oddforge/` here; `tools/` in the development repository)
+
+`oddforge/`, `studio.py` and `swse_setup.py` are in this repository. The
+`tools/` scripts below are not: they live in the development repository and
+are listed so the pipeline is documented.
 
 | Tool | What it does |
 |---|---|
@@ -2119,7 +2180,10 @@ SWSEMods\SWSE Console\remote_out.txt  replies
 
 ## Research notes
 
-Deeper write-ups live in `swse/research/`. For native plugins (1.1):
+The deeper write-ups are kept in the development repository's
+`swse/research/`; this repository carries only `REFLECTION_SCHEMA.md` (which
+the Mod Loader's Game Data tab reads). Ask in `#mod-dev` on Discord about
+one. For native plugins (1.1):
 `PLUGIN_SYSTEM.md` (the design, every rule's reason, the hook list) and
 `PLUGIN_QA.md` (what the fault guard can and cannot catch, measured, and the
 loader's test results). Earlier:

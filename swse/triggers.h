@@ -24,19 +24,18 @@
 //   once     = level     at most once per level load  (or `once = ever`)
 //   level    = lm_level_03   only in that level
 //
-// EXAMPLE - the barren-after-combat problem
-//   [canyon_ambush]
+// EXAMPLE
+//   [canyon_music]
 //   when     = enter enemyambush1 radius 18
 //   level    = lm_level_03
 //   chance   = 40
 //   cooldown = 300
-//   do       = spawnat enemyambush1 3 F4DC66D8
 //   do       = combatmusic 1
 //
-// HONEST LIMIT: the engine never creates NPCs at runtime, so a "spawn" moves
-// NPCs that already exist in the level. If its cast is dead there is nobody
-// left to move and the trigger fires but places nothing - by design, rather
-// than pretending.
+// LIMIT: SWSE's spawnat/bring only MOVE NPC bodies, and moved NPCs arrive
+// inert (their AI and zone registration stay behind). The engine's own
+// runtime spawning is its spawner pools (RE_SPAWNING.md), which these
+// commands do not drive.
 #pragma once
 
 // Load triggers.txt from every enabled mod. Returns the number parsed.

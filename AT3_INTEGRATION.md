@@ -9,7 +9,7 @@ patching, and a machine-readable way to ask the game questions. This page says
 what AT3 can rely on in SWSE 1.1, and the one behaviour change it has to plan
 for.
 
-Everything below is checked against the SWSE 1.1 source. Remarks about AT3
+Everything below is checked against the SWSE 1.1 source and holds for 1.1.1, which changed only the console's look. Remarks about AT3
 itself refer to AT3 v0.3.0's code as we read it - correct us if we misread
 anything. The complete command and file reference is
 [SWSE_FEATURES.md](SWSE_FEATURES.md); what changed is in
@@ -62,7 +62,7 @@ for nothing, so it is still console-only.
 | Live prefs edits | `prefs`, `knockback`, `prefs.txt` | the live equivalent of the ammo bundle patches |
 | Rescan after writing files | `mods reload` | see below for what it re-reads |
 | Install check | `bin\dinput8.dll` + `SWSEMods\features.txt` / `load_order.txt` | AT3's `Test-AT3Install` still passes: both files ship |
-| Version check, game closed | `bin\dinput8.dll` version resource | ProductVersion `1.1` (1.0.x has none) |
+| Version check, game closed | `bin\dinput8.dll` version resource | ProductVersion `1.1` or later (`1.1.1` for this release; 1.0.x has none) - compare as a version, not as text |
 
 ---
 
@@ -176,9 +176,14 @@ stores for the player. In compass terms 0 = facing -Y, 90 = +X, 180 = +Y,
 | `pos` | X Y Z and yaw |
 | `yaw [deg]` | read or set the facing |
 | `writepos <label>` / `savepos <label>` | save the spot and facing by name, to file |
-| `goto <label>` / `tp <label>` | go there, facing restored |
+| `goto <label>` / `tp <label>` | go there, facing restored (`tp` reuses the zone `savepos` recorded) |
 | `tpxyz <x> <y> <z> [yaw]` | teleport to coordinates |
 | `positions` | list every label with yaw and level |
+
+Teleports use the game's own teleport. A destination that was not saved with `savepos` gets
+the zone whose box contains it; zone boxes overlap, so the zone can be wrong, and then the world
+draws almost empty until you walk through a doorway. Do not teleport into, or out of, a scripted
+fight: twice that crashed the game.
 
 **The files.** Both are read from every enabled mod folder; a later
 definition of a label wins.
@@ -248,8 +253,8 @@ features aituning on temp        levelup=1 epoch=2 level=- x=... yaw=137.90 ...
 | `query` or `query player` | `levelup=1 epoch=2 level=- x=... y=... z=... yaw=... health=... healthmax=... stamina=... staminamax=... moolah=...` |
 | `query position` | `levelup=... epoch=... level=... x=... y=... z=... yaw=...` |
 | `query features` | `console=on graphics=off hdtextures=off hitreact=off foliage=off aituning=off triggers=off npctuning=off playertune=off prefsedit=off raytrace=off` (the live state: an `auto` switch reads `on` or `off`) |
-| `query version` | `swse=1.1 build=Steam_HD` (`build=unknown` on a game build SWSE does not recognise) |
-| `query contract` | `contract=1 swse=1.1` - see [TOOL_CONTRACT.md](TOOL_CONTRACT.md) |
+| `query version` | `swse=1.1.1 build=Steam_HD` (`swse=1.1` on 1.1; `build=unknown` on a game build SWSE does not recognise) |
+| `query contract` | `contract=1 swse=1.1.1` - see [TOOL_CONTRACT.md](TOOL_CONTRACT.md) |
 
 `levelup=0` means no level is loaded (menu, loading screen). `epoch` counts
 levels since launch, so a change in it means a new level. Coordinates carry
@@ -257,7 +262,7 @@ three decimals, yaw two, health and stamina one. On 1.0.x `query` does not
 exist - the reply is an "unknown" line - which is a simple way to tell the
 versions apart while the game runs. With the game closed, the DLL's version
 resource answers: `(Get-Item "bin\dinput8.dll").VersionInfo.ProductVersion`
-is `1.1` for a 1.1 build (file version 1.1.0.0), and empty for 1.0.x, whose
+is `1.1` for a 1.1 build (file version 1.1.0.0) and `1.1.1` for 1.1.1 (1.1.1.0), and empty for 1.0.x, whose
 DLLs carry no version resource. `status` is the same information as `query`,
 laid out for people.
 
@@ -351,9 +356,9 @@ way. They are credited to you in
 and [CHANGELOG.md](CHANGELOG.md). Thank you.
 
 The rest of what AT3 found is mapped onto live offsets, with proposed SWSE
-commands, in `swse/research/AT3_DISCOVERIES.md`. That document is static
-analysis of the exe and of retail records - nothing in it has been run in the
-game yet - and it ends with a few points that may be useful to you:
+commands, in the research note `AT3_DISCOVERIES.md` (development repository;
+ask on the Discord for a copy). It is mostly static analysis of the exe and of
+retail records, and it ends with a few points that may be useful to you:
 
 * `ser+89` / `ser+93` are `m_damage` / `m_damageDestructable` in the engine's
   own parameter order - the two look swapped in AT3's weapon fields, though

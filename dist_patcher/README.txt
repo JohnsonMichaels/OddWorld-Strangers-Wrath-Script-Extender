@@ -56,11 +56,11 @@ KNOWN RISK
     started.
 
 NOTE FOR SWSE USERS
-    SWSE finds game objects by scanning the game's heap. For this patch the
-    scanned range was raised (HEAP_HI, from 0x20000000 to 0x40000000), so NPC
-    scanning, tuning, spawning and the camera scan keep finding objects when
-    the patched game's heap grows past its old ceiling. Every SWSE release,
-    1.0 and later, has this.
+    SWSE finds game objects by scanning the game's heap between 256 MB and 1 GB
+    (HEAP_LO 0x10000000 to HEAP_HI 0x40000000; the top was raised from 512 MB
+    for this patch). That covers a heap that grows past the old ceiling. An
+    object the patched game places above 1 GB would not be found by those
+    scans; this has not been seen, but it has not been measured either.
 
-    Verify after patching by opening the console and running:  npcs
-    If it still reports a sensible NPC count, the tooling survived.
+    After patching, open the console and run:  npcs
+    A sensible count (and no "AT THE CAP") means the scans still see the level.

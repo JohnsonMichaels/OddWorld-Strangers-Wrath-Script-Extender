@@ -84,3 +84,6 @@ void     SWSE_BindHookEnableBuiltin();
 // The last texture bound to GL_TEXTURE_2D as the hook saw it; 0 before the
 // hook exists.
 unsigned SWSE_BoundTexture2D();
+// A bind past the hook (1.1.1): SWSE's own binds - the console's font atlas -
+// must not reach the built-in tap or plugins' listeners. Render thread.
+void     SWSE_GlBindTextureQuiet(unsigned target, unsigned tex);

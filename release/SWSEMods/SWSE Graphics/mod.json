@@ -1,6 +1,6 @@
 {
   "name": "SWSE Graphics",
   "author": "Johnson Michaels",
-  "version": "1.1",
-  "description": "The SWSE graphics overhaul. Adds screen-space post-processing rendered by SWSE (the Stranger's Wrath Script Extender): sharpening, soft bloom, filmic ACES tonemapping, colour grading, contact-shadow ambient occlusion, an optional screen-space RTGI pass, and a subtle vignette. Only the 3D scene is affected - menus and HUD are untouched. OFF by default in SWSE 1.1: set graphics = on in SWSEMods/features.txt (or type `features graphics on` in the console), then press F10 in-game to toggle the effect and F11 to reload graphics.txt live. Edit SWSEMods/SWSE Graphics/graphics.txt to tune every effect."
+  "version": "1.1.1",
+  "description": "The SWSE graphics overhaul. Adds screen-space post-processing rendered by SWSE (the Stranger's Wrath Script Extender): sharpening, soft bloom, filmic ACES tonemapping, colour grading, contact-shadow ambient occlusion, an optional screen-space RTGI pass, and a subtle vignette. Only the 3D scene is affected - menus and HUD are untouched. OFF by default since SWSE 1.1: set graphics = on in SWSEMods/features.txt (or type `features graphics on` in the console), then press F10 in-game to toggle the effect and F11 to reload graphics.txt live. The shipped look starts with ambient occlusion, SSGI and the colour grade on; bloom, sharpening, the filmic tonemap and the vignette are in graphics.txt to switch on. Edit SWSEMods/SWSE Graphics/graphics.txt to tune every effect."
 }

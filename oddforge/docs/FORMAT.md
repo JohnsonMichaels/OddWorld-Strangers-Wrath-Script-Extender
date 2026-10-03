@@ -5,7 +5,7 @@ all 1,222 `.smb` archives in the Steam HD release (2026-07).
 
 > **STATUS 2026-09-28: written 2026-07-23; corrections are marked where they apply.** The container
 > layout below is implemented in `oddforge/container.py` (parse and byte-identical rebuild,
-> 1,222/1,222; `tools/roundtrip_test.py`). `oddforge/toc.py` decodes the TOC node header and the
+> 1,222/1,222, checked by a round-trip script kept in the development repository). `oddforge/toc.py` decodes the TOC node header and the
 > texture records, and `oddforge/records.py` finds and edits generic records. Later format work:
 > ODDVIEW.md (character bundles, `.geo` records) and swse/research/AT3_DISCOVERIES.md (record
 > framing, prefs records, `.smh`, `.lvl`).
@@ -90,9 +90,9 @@ payloads) rather than a name/record table.
 | `bin\cg.dll` | NVIDIA Cg shader pipeline (renderer is shader-based → ReShade yes, RTX Remix no). |
 
 > **NOTE 2026-09-28:** two rows above moved on.
-> - `.lvl` is now readable and writable: `tools/lvl_schema.json`, read from the exe's reflection,
->   parses all 9 shipped level roots, and AT3 decoded the object-record chain (token `0x7A60600D`,
->   class-hash marker `0x000B4265`, zone, rotation, translation, scale; CHANGELOG.md 1.1).
+> - `.lvl` is now readable and writable with a schema read from the exe's reflection (`tools/lvl_schema.json`,
+>   development repository only), which parses all 9 shipped level roots; AT3 decoded the object-record chain
+>   (token `0x7A60600D`, class-hash marker `0x000B4265`, zone, rotation, translation, scale; CHANGELOG.md 1.1).
 > - `.smh`: AT3 found that the blockmap holds the section-1 copy the game actually loads, indexed
 >   by cumulative cursors and ended by `0xCAFED00D` (AT3_DISCOVERIES.md H2). Script extraction
 >   through it is still not built in oddforge.
@@ -121,8 +121,8 @@ payloads) rather than a name/record table.
 4. `.smh` blockmap format (magic 0xBEEF2B16) → script extraction/injection.
 
 > **STATUS 2026-09-28:** 3 is done: `oddforge.container.SmbContainer.parse(...).build()` rebuilds
-> all 1,222 archives byte for byte (`python tools/roundtrip_test.py`), and modified rebuilds load
+> all 1,222 archives byte for byte (a round-trip script in the development repository checks it), and modified rebuilds load
 > in game. The `bounty catch` / `bounty cashin` commands were never built under those names: texture
 > export is `python -m oddforge.dump <game>\data <out>`, and mods are applied and reverted by
-> `oddforge/modloader.py` (the Mod Loader GUI, or `python tools/mods_cli.py list|apply|revert`).
+> `oddforge/modloader.py`, through the Mod Loader GUI (`studio.py`). A command-line front end, `tools/mods_cli.py`, is in the development repository only.
 > 1 is done in part (see the notes above); 4 is not started in oddforge.

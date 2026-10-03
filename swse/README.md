@@ -20,6 +20,14 @@ This keeps the proxy simple and the frame hook robust. The real `dinput8.dll`
 is resolved at runtime: a `dinput8_real.dll` beside the proxy if there is one,
 otherwise the system copy by absolute path.
 
+## What's new in 1.1.1
+
+- **The console's new look** (`console.cpp`, `glspy.cpp` for the font atlas upload): the
+  suggestion card while a command name is typed (Tab takes one, Up/Down choose), history,
+  copy and paste, colour-coded lines and the frame-rate readout. No command was added or
+  changed: still 220.
+- The version is 1.1.1 (`swse_version.h`); `build.bat` reads it from there.
+
 ## What's new in 1.1
 
 - **Console-only by default.** `features.cpp` defaults every system but the
@@ -90,6 +98,9 @@ default:
 | Named positions | `positions.cpp` | - | `positions.txt` / `sites.txt`, with facing (1.1) |
 | Play as a character | `playnpc.cpp` | - | `playnpc`; off until used (1.1) |
 | Menus without keys | `menu.cpp` | - | `menu list/continue/skip/resume/fs`: sends a Flash screen its own command (1.1) |
+| Native plugins | `plugins.cpp` (host side of `..\sdk\swse_plugin_api.h`) | one switch per plugin, off until named | loads `SWSEMods\<Mod>\plugins\<name>.dll`, fault guard, `plugins`, `query plugins` (1.1) |
+| Hook registry | `hookreg.cpp` | - | every code/table patch SWSE has live, by owner; `hooks`; a plugin's `Memory.Write` refuses those ranges (1.1) |
+| Free camera | `freecam.cpp` | - | `freecam`: flies the game's own developer FlyCamera (1.1) |
 | Menu callback spy | `uispy.cpp` | - | `uispy on` logs each command a menu screen receives (the real handlers, 19 screens) |
 | Game-build check | `gamebuild.cpp` | - | identifies the exe from its PE header; an unknown build runs in safe mode: no game patch, call or read (the gates: `SWSE_GameBuildSafeMode`, console.cpp's `SafeModeBlocks`) (1.1) |
 | Input | `input.cpp` | - | `DirectInput8Create` and the device hooks, key injection, and the user32 imports background mode answers |
@@ -99,25 +110,27 @@ default:
 | Feature switches | `features.cpp` | - | per-system on/off from `features.txt`, saved by the `features` command |
 | Self-test | `selftest.cpp` | - | proves each system is doing work, once per level |
 
-`reflect_gen.h` is generated - regenerate it with
-`python tools/gen_reflect_header.py` (from `research/REFLECT_FIELDS.tsv`, which
-`tools/reflect/` extracts from `stranger.exe`) rather than editing it.
+`reflect_gen.h` is generated - its generator (`tools/gen_reflect_header.py`, from
+`research/REFLECT_FIELDS.tsv`, which `tools/reflect/` extracts from `stranger.exe`) is in the
+development repository, not this one - so do not edit it by hand.
 `scriptvm_gen.h`, the 181 script verbs `list` and `call` offer, is generated too,
 from the decoded signatures (`research/script_signatures.tsv`,
 `CONSOLE_CALLABLE.md`); its generator (`gen_cmd_table.py`, named in the file's
 header) is not in the repository.
 
-The reverse-engineering notes behind all of this are in `research/`. Start with
-its index, `research/README.md`, which gives every document's status and lists
-what to read first (`SWSE2_ROADMAP.md`, `GRAPHICS_ROADMAP.md`, `RT_1_3_PLAN.md`
-and the `RE_*` engine map). New in 1.1 are, among others, `PLAYER_FACING.md`
-(where the player's facing lives and how it is set), `PREFS_EDITOR.md` (the
-prefs object model, finding and editing loaded records), `REFLECT_FIELDS.tsv`
-(every reflected field), `PLAYNPC.md` and `AT3_DISCOVERIES.md` (everything
-Stranger: Armed to the Teeth found, mapped onto live offsets, with proposed
-commands). The full command and file reference is the top-level
-`SWSE_FEATURES.md`, release history is `CHANGELOG.md`, `TOOL_CONTRACT.md` is what
-tools can rely on, and `AT3_INTEGRATION.md` is the guide for tools built on SWSE.
+The reverse-engineering notes behind all of this (the research index, the
+engine map, PLAYER_FACING.md, PREFS_EDITOR.md, REFLECT_FIELDS.tsv, PLAYNPC.md,
+AT3_DISCOVERIES.md and the rest) are kept in the development repository; only
+`research/REFLECTION_SCHEMA.md` ships here, because the Mod Loader reads it.
+The full command and file reference is the top-level `SWSE_FEATURES.md`,
+release history is `CHANGELOG.md`, `TOOL_CONTRACT.md` is what tools can rely
+on, and `AT3_INTEGRATION.md` is the guide for tools built on SWSE.
+
+> **Not in this repository.** The same goes for every research note named in
+> these docs and in code comments (`swse/research/*.md`, `*.tsv`) and for the
+> `tools\` scripts: they are kept in the development repository. This public
+> snapshot ships the source, the plugin SDK, the Mod Loader and the release
+> files.
 
 ## Build
 
@@ -126,16 +139,16 @@ Requires the Visual Studio 2022+ C++ toolchain (MSVC). Run:
     build.bat
 
 Run it from PowerShell or a Command Prompt; `cmd /c build.bat` from a Bash
-shell can hang. It compiles `swse.rc`, then every `.cpp` in this folder (29
+shell can hang. It compiles `swse.rc`, then every `.cpp` in this folder (32
 files, x86, `/O2 /EHsc`) into one DLL; a new source file must be added to its
 `cl` line.
 
 Produces `dinput8.dll` (the proxy), with the version resource from `swse.rc`
-(file version 1.1.0.0) so tools can read the installed version without running
-the game. Install by copying it into the game's `bin\` folder next to
+(numbers from `swse_version.h`: file version 1.1.1.0 for SWSE 1.1.1) so tools
+can read the installed version without running the game. Install by copying it into the game's `bin\` folder next to
 `stranger.exe`. Remove it to uninstall - the game reverts to stock instantly.
 No `dinput8_real.dll` is needed: the proxy loads the system `dinput8.dll` by
 absolute path. Its exports are declared in `dllmain.cpp` and `input.cpp`, not
 in a `.def` file. `install.bat` copies the DLL into a default Steam install
-and still stashes a `dinput8_real.dll`, which is harmless. To build the
-release zip, see `tools/package_swse.ps1`.
+and still stashes a `dinput8_real.dll`, which is harmless. The release zip is built by
+`tools/package_swse.ps1` in the development repository.

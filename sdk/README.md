@@ -3,21 +3,18 @@
 Write native plugins for SWSE, the Stranger's Wrath Script Extender, without
 touching SWSE's source.
 
-> **Plugin API version 1, served by SWSE 1.1** (in development). Everything in
-> the header is served except the three tables behind
-> `SWSE_PLUGIN_API_PROPOSED` (prefs, script VM, hooks), which `GetInterface`
-> answers with NULL. The design, the reasoning behind every rule below and
-> what is still planned are in
-> [`swse/research/PLUGIN_SYSTEM.md`](../swse/research/PLUGIN_SYSTEM.md); what
-> the fault guard can and cannot catch, measured, and the loader's in-game test
-> results are in [`swse/research/PLUGIN_QA.md`](../swse/research/PLUGIN_QA.md).
+> **Plugin API version 1, served by SWSE 1.1 and later (1.1.1 included).** Everything in
+> the header is served except the three tables behind `SWSE_PLUGIN_API_PROPOSED` (prefs,
+> script VM, hooks), which `GetInterface` answers with NULL. The design notes and the
+> measured fault-guard limits (`PLUGIN_SYSTEM.md`, `PLUGIN_QA.md`) are in the development
+> repository; this README states every rule a plugin needs.
 
 | File | What it is |
 |---|---|
 | `swse_plugin_api.h` | the whole API: one C header, no library to link |
 | `examples/hello_plugin/` | a complete plugin: a command, a frame counter, a level-up message |
 | `tools/mockhost/` | a stand-in host for trying a plugin outside the game, a deliberately faulty test plugin, and a self-check of the loader rules |
-| `tools/qaplugins/` | the test plugins behind `tools\swse_plugin_tests.ps1`, SWSE's in-game test pass of the loader; several misbehave on purpose - never ship them |
+| `tools/qaplugins/` | the test plugins behind SWSE's in-game test pass of the loader (its script is in the development repository); several misbehave on purpose - never ship them |
 
 ---
 
@@ -112,7 +109,7 @@ next time.
 
 **What the guard cannot catch.** The guard covers only code running inside a
 call from SWSE, on the render thread. These still take the whole game down
-(measured, see `swse/research/PLUGIN_QA.md`):
+(measured in SWSE's plugin QA):
 - **A fault on a thread you started.** Wrap your thread procedure in your own
   `__try`/`__except` (or `try`/`catch`), and report failures through
   `SWSELogAPI.Write`.
@@ -198,10 +195,10 @@ than the version you asked for exists.
 | prefs, script VM, hooks | | proposed; in the header behind `SWSE_PLUGIN_API_PROPOSED` | later |
 
 **Every console command is already an API.** `Execute(self, line)` runs a
-line exactly as if it were typed, so all of SWSE's 200-odd commands and the
+line exactly as if it were typed, so all of SWSE's 220 commands and the
 game's own script functions are yours from day one:
 `"grant surgerybid 1"`, `"warp 3"`, `"prefs set @NPCPrefs m_health 500"`,
-`"spawnat enemyambush1 3"`. The typed tables exist for what a command cannot
+`"knockback all - 0"`. The typed tables exist for what a command cannot
 do: return values, per-frame reads, callbacks.
 
 ---
@@ -268,9 +265,9 @@ float hp;
 if (g_mem->Read(npc + 0x78, &hp, sizeof(hp)) == SWSE_OK) { ... }
 ```
 
-The fault guard is on SWSE's side, so this works from any compiler. Offsets
-come from `swse/research/`; they are for the Steam HD build - check
-`GameInfo().timeDateStamp` before writing anywhere.
+The fault guard is on SWSE's side, so this works from any compiler. Offsets are for
+the Steam HD build (SWSE's research notes, kept in the development repository, use
+the same build) - check `GameInfo().timeDateStamp` before writing anywhere.
 
 **Safe mode.** On a game build SWSE does not recognise (GOG, a future patch),
 SWSE runs in safe mode, and your plugin still loads. The calls that would
@@ -310,7 +307,7 @@ SWSE's post-process and before the console, so the console stays on top.
   plugin work once it is loaded.
 - Keep a `.map` file (`/link /MAP`) for each build you hand out, so a fault
   offset from a user's log can be turned into a function name.
-- The game has to be started through `Launcher.exe`; SWSE's `exit` command
+- Start the game the usual way (Steam, or `Launcher.exe`); SWSE's `exit` command
   quits it cleanly when you need to replace your DLL.
 
 ---
@@ -359,8 +356,8 @@ My Mod\
 **Can my plugin hook a game function?** Not through SWSE yet. A verified,
 registered hook helper is designed (`SWSEHooksAPI` in the header, behind
 `SWSE_PLUGIN_API_PROPOSED`). Until then do not patch code: SWSE patches
-several game and GL functions - `hooks` in the console lists the ones live
-right now, and `PLUGIN_SYSTEM.md` appendix A all of them - and two patches on
+several game and GL functions - `hooks` in the console lists every one live
+right now - and two patches on
 one function break each other. `Memory.Write` refuses the bytes on that list.
 
 **C++, the STL, my own libraries?** Yes, inside your DLL. Only the boundary

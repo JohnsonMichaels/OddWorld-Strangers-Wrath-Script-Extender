@@ -1,12 +1,26 @@
 ================================================================
-  SWSE Console  (SWSE 1.1)
+  SWSE Console  (SWSE 1.1.1)
 ================================================================
 
 Press the  `  /  ~  key in-game to open the console.
 Type a command and press Enter. Esc closes it. PageUp/PageDown scroll.
 Tab completes a command name.
 
-In SWSE 1.1 the console is the ONLY system switched on by default
+NEW IN 1.1.1 - the console's new look and keys:
+  * The frame rate, in fps and ms, at the top right of the console.
+  * Text drawn sharp at the window's size; errors in red, results in green.
+  * While you type a command name, a card under the console lists the
+    commands it could be: Up/Down choose, Tab takes one, Esc hides the card
+    (a second Esc closes the console).
+  * Up/Down with no card showing bring back what you typed before.
+  * Ctrl+V or Shift+Insert pastes. Each pasted line runs, in order (64 at
+    most; lines starting with # are skipped); text after the last line
+    break stays in the input line.
+  * Ctrl+C copies the line you are typing - or, with nothing typed, the
+    last command and its output. Ctrl+Shift+C copies the lines on screen.
+  * No new commands: the same commands as 1.1.
+
+Since SWSE 1.1 the console is the ONLY system switched on by default
 (SWSE Setup.exe, in the download, switches the others with ticks). The
 other SWSE systems (graphics, HD textures, wind, hit reactions, triggers,
 character tuning, prefs edits, and the experimental ray tracing) are off
@@ -30,7 +44,7 @@ On a game build SWSE does not recognise (the GOG version), the console runs
 in SAFE MODE: the commands that would read or change the game are refused
 with a one-line message, and `help` marks them with a *. `status` says so.
 
-WORKING NOW (drives the SWSE Graphics / SWSE layer):
+CONSOLE AND GRAPHICS COMMANDS:
   help                 list all commands  ('help <category>' for details)
   clear                clear the console
   echo <text>          print text
@@ -55,7 +69,7 @@ GAME-STATE COMMANDS (LIVE via the script-VM bridge):
   maxhealth            max health
   maxstamina           max stamina
   sethealth <n>        set health value
-  kill                 kill current target/self
+  kill                 the game's own kill verb (no effect on Stranger)
   steef                transform into Steef
   stranger             transform back to Stranger
   naked                Steef naked toggle
@@ -64,7 +78,9 @@ GAME-STATE COMMANDS (LIVE via the script-VM bridge):
   artifact             give artifact
   artifacts            list all 53 artifacts
   money [amount]       set moolah (default 10000)
-  tphome / tpreset     teleport home / reset
+  tphome / tpreset     the game's teleport-home / reset verbs: they need a
+                       script target and do nothing from the console (use
+                       tp, goto or tpxyz)
   save / checkpoint    quick save / set checkpoint
   loadsave             load last save
   healthbars           show enemy health bars
@@ -92,6 +108,8 @@ WHERE YOU ARE AND WHICH WAY YOU FACE (new in 1.1: facing is saved too):
   tpxyz <x> <y> <z> [yaw]   teleport to coordinates
   up [dist]            lift yourself dist units (default 10) and fall back down
                        (no ceiling check - use it in the open)
+  Teleporting into an area where a story fight is about to start can crash
+  the game (seen twice in testing): save first, and walk into those fights.
   positions            list named spots
 
 DISCOVERY COMMANDS:

@@ -1,9 +1,0 @@
-# Named positions for this mod.
-#
-# Every enabled mod's positions.txt is read, so a mod ships its own points
-# here. To make one: stand where you want it and run   writepos <label>
-# SWSE 1.1 appends it (with the facing and the level) to
-# SWSEMods\SWSE Console\positions.txt - copy the line here to make it part
-# of this mod.
-#
-#   label                     x          y          z     level     yaw

@@ -97,8 +97,8 @@ install hooks, load SWSE mods' native plugins, extend the script VM.
 > and hooks `wglSwapBuffers` to own a point in every frame (swse/README.md). It starts only the
 > systems `SWSEMods\features.txt` switches on; since 1.1 that is the console alone by default. It
 > calls the game's own script functions (`list`, `call`) but adds no new `.foo` verbs. Native
-> plugins are designed (swse/research/PLUGIN_SYSTEM.md) and built on branch `feat/plugins`; they
-> are not in 1.1 at 329df87.
+> plugins shipped in 1.1: a plugin is a DLL in a mod folder, off until the user names it
+> (sdk/README.md).
 
 **The hard, honest part - this is real reverse engineering:**
 1. Load `stranger.exe` in Ghidra/IDA, locate the `.foo` script-function
@@ -118,6 +118,6 @@ This is a multi-stage effort with uncertainty, not a weekend feature.
 real users now, creates the community), then pursue **SWSE** to unlock Tier-2.
 The loader is also what will *distribute* SWSE plugins when they exist.
 
-> **NOTE 2026-09-28:** in the plugin design a plugin is a DLL in a mod folder
+> **Since 1.1:** plugins exist. A plugin is a DLL in a mod folder
 > (`SWSEMods\<Mod>\plugins\<name>.dll`), found by the DLL's own mod registry and ordered by
-> `load_order.txt`, and each plugin is a feature switch (swse/research/PLUGIN_SYSTEM.md §0).
+> `load_order.txt`, and each plugin is a feature switch, off until named (sdk/README.md).

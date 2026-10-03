@@ -269,13 +269,15 @@ int   SWSE_SpawnGate(char* msg, int msgLen);
 // Type hashes harvested from a level load -- the menu npcnow's type arg indexes.
 // Identify the NPC nearest the player and which spawn type produces it --
 // "give me more of what I'm looking at", without needing a name for it.
-// Move live NPCs to the player. This engine creates no NPCs at runtime, so
-// relocating existing ones is what "summon" can actually mean here.
+// Move live NPC bodies to the player. Only the body moves: the NPC's zone
+// registration and its AI stay behind, so a moved NPC arrives as an inert
+// statue. (The engine does add NPCs at runtime - gib spawns, and spawners
+// releasing their pooled bodies, RE_SPAWNING.md - but not through this.)
 int   SWSE_BringNpcs(int count, unsigned typeHash, char* msg, int msgLen);
 
-// Relocate NPCs to an arbitrary point (triggers use this for ambushes).
-// The engine never creates NPCs at runtime, so this MOVES existing ones; a 0
-// return means the level had nobody left to move.
+// Relocate NPC bodies to an arbitrary point (triggers use this). Moved NPCs
+// arrive inert: their zone registration and AI do not move with the body.
+// A 0 return means no NPC of that type was left to move.
 int   SWSE_BringNpcsTo(float x, float y, float z,
                        int count, unsigned typeHash, char* msg, int msgLen);
 
@@ -288,11 +290,11 @@ void  SWSE_NpcCacheReset();
 // State of SWSE's own NPC list (count -1 = not built), for `npccache`.
 void  SWSE_NpcCacheInfo(int* count, int* scanning, int* passes, int* lastMs, int* watcher);
 
-// ---- reserve pool: spare NPCs for ambushes --------------------------------
-// The engine only creates NPCs at level load, so a cleared area has nobody
-// left to ambush with. Build asks the level for extra cast (takes effect on
-// the next load); Park banks the distant ones below the map so spawnat can
-// draw on them.
+// ---- reserve pool: spare NPCs ---------------------------------------------
+// Build asks the level for extra cast (takes effect on the next load); Park
+// moves the distant ones straight down in their own zone. spawnat can move
+// parked NPCs elsewhere, but relocated NPCs arrive inert (no AI). The engine
+// adds NPCs at runtime only through gib spawns and its spawner pools.
 int   SWSE_ReserveBuild(int extraPerTag, char* msg, int msgLen);
 int   SWSE_ReservePark(char* msg, int msgLen);
 // Feet at x y z via the engine's teleport, dropped onto the floor there.
@@ -302,27 +304,31 @@ int   SWSE_PlayerTeleport(float x, float y, float z);
 // Object arguments, which are handles -- {u16 index, u16 generation} into the
 // table at 0x9D55F0 -- not pointers.
 int   SWSE_SendNpcs(int count, unsigned typeHash, char* msg, int msgLen);
-// Order NPCs of one type to attack one of another, through the game's own AI.
-// The engine has no NPC-vs-NPC hostility, so this is commanded rather than set.
+// Order NPCs of one type to attack one of another. Hostility is a hard-coded
+// species table (AIUtil::Attitude, 0x4E6E30) in which no NPC species is
+// hostile to another, and acquisition (0x51A440) only picks the player, so
+// this writes the target once and calls TakeDamage + CombatGoto. The NPC
+// hunts the victim; it has not been seen to engage (FACTIONS.md).
 int   SWSE_MakeAttack(unsigned attackerHash, unsigned victimHash, int count,
                       int useRun, char* msg, int msgLen);
 // Locate the field holding "who I am fighting", by searching an aggro'd NPC
 // for the player's own handle and pointer.
 int   SWSE_FindTarget(unsigned npc, char* msg, int msgLen);
 
-// Raid mode: standing hostility. Re-points every active raider at the nearest
-// valid enemy every few frames -- townsfolk OR the player, whichever is closer,
-// so raiders that lose a victim come for you instead of giving up.
+// Raid mode (experimental): every N frames (default 60), re-points each
+// active raider at the nearest townsfolk or the player. Writes at that rate
+// have not produced a fight: acquisition puts the player back in between.
 // Who is fighting whom right now, read from every active NPC's Mind.
 int   SWSE_ScanTargets(char* msg, int msgLen);
-// Repeatedly tell two NPCs that the other hurt them -- the retaliation route,
-// which is the one path to hostility the AI accepts when the player uses it.
+// Repeatedly tell two active NPCs that the other hurt them (the TakeDamage
+// verb). Experimental: the NPC searches but has not been seen to fight back,
+// because acquisition only ever picks the player. Needs a VM instance on both.
 int   SWSE_Feud(unsigned typeA, unsigned typeB, int rounds, char* msg, int msgLen);
 int   SWSE_RaidMode(unsigned attacker, unsigned victim, int on, int everyFrames);
-// Decoy mode: leave the target as the player but feed the AI the victim's
-// position, so it fires at the spot the victim is standing in. Works around the
-// blanket refusal to target another NPC, using the fact that projectiles damage
-// whatever they hit.
+// Decoy mode (experimental, no effect measured): leave the target as the
+// player and write the victim's position into the last-known-position cache
+// (+0x3E8). That cache only steers searching; aiming uses the live target.
+// Bolt hits are decided by species (AIUtil::DoesBoltCollide, 0x4E6FC0).
 int   SWSE_DecoyMode(unsigned shooter, unsigned victim, int on, int everyFrames);
 void  SWSE_DecoyTick();
 int   SWSE_DecoyCount();
@@ -388,14 +394,18 @@ int   SWSE_Nearby(int radius, char* msg, int msgLen);
 int   SWSE_DiffObjects(unsigned a, unsigned b, int len, char* msg, int msgLen);
 unsigned SWSE_FirstNpcOfType(unsigned hash);
 // Set a character type's health (prefs + every live NPC of that type).
-// Townsfolk immortality is just m_health = 100000; this is the cure.
+// Townsfolk "immortality" is the engine's rule that health at or above
+// 10000.0 takes no damage (health core 0x46A670, constant 0x806F20); they
+// ship with m_health 100000. Any value below 10000 makes them mortal.
 int   SWSE_SetTypeHealth(unsigned hash, float health, char* msg, int msgLen);
 // Make a character type gib on death rather than play a death animation.
 int   SWSE_SetTypeGib(unsigned hash, int on, char* msg, int msgLen);
 // m_hurtReaction: 0 = staggers/knocked about, 2 = unflinchable.
 int   SWSE_SetTypeHurt(unsigned hash, int value, char* msg, int msgLen);
-// m_affGenerally: affiliation. Outlaws and townsfolk both ship as 1, so they
-// never fight each other -- the lever for town raids.
+// m_affGenerally: the player-ammo rule, NOT affiliation. 1 = every player
+// ammo affects this character except those in m_affList; 0 = only those
+// listed (0 makes it immune to most player ammo). It has nothing to do with
+// who fights whom.
 int   SWSE_SetTypeAff(unsigned hash, int value, char* msg, int msgLen);
 // Sweep every character type the current level uses. -1 leaves a setting alone.
 int   SWSE_SetAllTypes(float health, int gib, char* msg, int msgLen);
@@ -418,7 +428,7 @@ int   SWSE_NpcTuningStats(int* rules);
 int   SWSE_LoadSettings(const char* path, char* msg, int msgLen);
 // A character type's current health / gib flag, for auditing a level's cast.
 int   SWSE_TypeInfo(unsigned hash, int* hpOut, int* gibOut);
-// Also reports m_hurtReaction and m_affGenerally, for mapping a level's factions.
+// Also reports m_hurtReaction and m_affGenerally (the player-ammo rule).
 int   SWSE_TypeInfo2(unsigned hash, int* hpOut, int* gibOut, int* hurtOut, int* affOut);
 // Locate every live NPC of a type, with the distance to the nearest.
 int   SWSE_WhereIs(unsigned hash, char* msg, int msgLen);

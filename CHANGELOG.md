@@ -3,6 +3,11 @@
 What changed in SWSE, release by release, newest first. The full command and
 file reference is [SWSE_FEATURES.md](SWSE_FEATURES.md).
 
+## 1.1.1
+
+SWSE 1.1.1: new console
+- New look: dark panel with a gold line and sharp text at any resolution, displays frame rate and ms at the top right. Colour-coded lines for commands, results and errors, typing suggestions (Tab to take one, Up/Down to choose), history (Up/Down to view history), copy and paste (Ctrl+V or Shift+Insert to paste, Ctrl+C to copy the current line, Ctrl+Shift+C to copy the whole screen).
+
 ## 1.1
 
 SWSE 1.1 switches on only the console by default, can switch every other

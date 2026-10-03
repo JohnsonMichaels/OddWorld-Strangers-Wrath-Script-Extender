@@ -62,7 +62,7 @@ sharpen_enable 0
 sharpen_strength   0.05
 
 # ---- Tonemap + Colour Grade (filmic ACES + colour shaping) ----------------
-# Left off while GI is being evaluated, so the GI is judged on its own.
+# tonemap 1 = filmic ACES curve; the shipped look leaves it off (0).
 grade_enable 1
 exposure 1.2
 tonemap 0

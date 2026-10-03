@@ -922,6 +922,14 @@ int SWSE_BindHookInstall(const char* who, char* msg, int msgLen) {
 void     SWSE_BindHookEnableBuiltin() { g_bindBuiltin = true; }
 unsigned SWSE_BoundTexture2D()        { return g_bound2D; }
 
+// A texture bind no client hears: SWSE's own binds (the console's font atlas)
+// must not reach the wind gate, the SSR mask or plugins, which read every bind
+// as the engine's current texture.
+void SWSE_GlBindTextureQuiet(unsigned target, unsigned tex) {
+    if (g_bindTramp) g_bindTramp((GLenum)target, (GLuint)tex);
+    else glBindTexture((GLenum)target, (GLuint)tex);
+}
+
 // A bind that bypasses HookedBindFBO: with the hook installed, the original
 // bytes go back for the one call (exactly what the hook itself does) and
 // g_lastFbo learns the new binding, so the game's own next 0-after-scene bind

@@ -1,5 +1,5 @@
 ================================================================
-                      SWSE 1.1  for
+                     SWSE 1.1.1  for
         Oddworld: Stranger's Wrath HD  (Steam)
 
    SWSE Console  +  SWSE Graphics  +  more
@@ -25,6 +25,11 @@ with the game and powers these mods:
   * HD textures, foliage wind, additive hit reactions, enemy AI tuning,
     mod-defined triggers, character tuning, player tuning and live
     edits to the game's own values.
+
+NEW IN 1.1.1 - THE CONSOLE'S NEW LOOK. Sharper text at any resolution,
+the frame rate (fps and ms) at the top right, coloured output, command
+suggestions as you type, history on Up/Down, and copy and paste:
+Ctrl+V or Shift+Insert pastes, Ctrl+C copies. Nothing else changed.
 
 NEW IN 1.1 - ONLY THE CONSOLE IS SWITCHED ON AFTER INSTALLING.
 Everything else is still there, just off, so a fresh install leaves the
@@ -126,6 +131,10 @@ STEP 2.  Copy the mod files in.
    it only adds one new file (dinput8.dll), it does not delete anything.
 
    Updating from SWSE 1.0.x? Read "UPDATING FROM 1.0.x" below first.
+   Updating from SWSE 1.1? Copy only the "bin" folder: the DLL is the one
+   file that changed. Copying "SWSEMods" too would reset features.txt (your
+   switches) to console-only. SWSE Setup.exe's Install / Update keeps your
+   files either way.
 
 
 STEP 3.  OPTIONAL - the installer helper.
@@ -194,8 +203,9 @@ STEP 5.  Choose what to switch on.
 
 STEP 6.  OPTIONAL - HD texture pack (needs the 4GB patch).
    The HD pack (960 textures at 2x) is a separate download because of
-   its size. Get it from the project's GitHub Releases page or the
-   Discord, then:
+   its size: SWSE-HD-Textures-2x.zip, attached to the 1.0 release on the
+   project's GitHub Releases page (it has not changed since), or the
+   Discord. Then:
 
    1. Unzip it. You get files ending in .oft
    2. Put them all in:   SWSEMods\SWSE HD\textures
@@ -241,6 +251,11 @@ SWSE GRAPHICS  (needs  graphics = on  in features.txt)
 SWSE CONSOLE  (always on)
    * Press the  ` / ~  key (top-left of the keyboard) to open/close it.
    * Type a command and press Enter.  Esc closes.  Tab autocompletes.
+     PageUp/PageDown scroll.
+   * Up/Down recall what you typed.  Ctrl+V or Shift+Insert pastes
+     (each pasted line runs); Ctrl+C copies the line, or the last
+     command and its output; Ctrl+Shift+C copies the lines on screen.
+     The frame rate is at the top right.
    * While the console is open, the game ignores your keyboard and
      mouse, so typing never walks Stranger around.
    * The console finds what it needs on its own once a save is loaded.
@@ -326,8 +341,8 @@ SWSE CONSOLE  (always on)
 ================================================================
   TROUBLESHOOTING
 ================================================================
-   * Installed 1.1 and nothing looks different?  That is the 1.1
-     default - only the console is on. See STEP 5.
+   * Installed SWSE and nothing looks different?  Since 1.1 only the
+     console is on by default. See STEP 5.
    * F10 does nothing?  Graphics is off by default: set
      graphics = on  in features.txt (or type  features graphics on).
    * No swse_log.txt after launching?  The dinput8.dll file isn't in

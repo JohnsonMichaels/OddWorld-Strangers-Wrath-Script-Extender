@@ -1,9 +1,9 @@
 @echo off
 REM ================================================================
 REM  SWSE installer helper  -  by Johnson Michaels
-REM  Run this AFTER copying the "bin" and "SWSEMods" folders into
-REM  your Stranger's Wrath game folder. It creates the forward DLL the
-REM  loader needs (bin\dinput8_real.dll) from your Windows system file.
+REM  OPTIONAL since SWSE 1.0.1: SWSE finds the Windows dinput8.dll by
+REM  itself. Run this AFTER copying the "bin" and "SWSEMods" folders into
+REM  your game folder if you want bin\dinput8_real.dll created anyway.
 REM ================================================================
 setlocal
 cd /d "%~dp0"
@@ -39,7 +39,7 @@ if exist "bin\dinput8_real.dll" (
 
 echo.
 echo  Done. Launch the game from Steam.
-echo  In-game: ` (tilde) = console. SWSE 1.1 starts with ONLY the console on.
+echo  In-game: ` (tilde) = console. SWSE 1.1.1 starts with ONLY the console on.
 echo  Type  features  in the console to see every system, and e.g.
 echo  features graphics on   (then F10 toggles the look)  or  features foliage on
 echo  to switch one on, or  features preset full  for the classic SWSE in one
